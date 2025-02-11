@@ -23,5 +23,7 @@ namespace PR {
         void makeContext();
 
         unsigned int prepMesh(float vertices[], unsigned int indices[]);
+
+        unsigned int genDefaultSHaderProgram();
     };
 }

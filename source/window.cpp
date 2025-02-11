@@ -1,5 +1,7 @@
 #include <PR/window.hpp>
 
+#include <iostream>
+
 void PR::window::makeTestTri() {
     float vertices[] = {
         -0.5f, -0.5f, 0.0f,
@@ -90,8 +92,56 @@ unsigned int PR::window::prepMesh(float vertices[], unsigned int indices[]) {
 
     // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
     // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
-    openglContext.BindVertexArray(0); 
+    openglContext.BindVertexArray(0);
 
-    stuff.push_back({EBO, VAO});
-    return stuff.size() - 1;
+    return 0;
+}
+
+unsigned int PR::window::genDefaultSHaderProgram() {
+    const char *vertexShaderSource = "#version 330 core\n"
+        "layout (location = 0) in vec3 aPos;\n"
+        "void main() {\n"
+        "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+        "}\0";
+
+    const char *fragmentShaderSource = "#version 330 core\n"
+        "out vec4 FragColor;\n"
+        "void main() {\n"
+        "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+        "}\n\0";
+
+    unsigned int vertexShader = openglContext.CreateShader(GL_VERTEX_SHADER);
+    openglContext.ShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
+    openglContext.CompileShader(vertexShader);
+    // check for shader compile errors
+    int success;
+    char infoLog[512];
+    openglContext.GetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
+    if(!success) {
+        openglContext.GetShaderInfoLog(vertexShader, 512, NULL, infoLog);
+        std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
+    }
+    // fragment shader
+    unsigned int fragmentShader = openglContext.CreateShader(GL_FRAGMENT_SHADER);
+    openglContext.ShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
+    openglContext.CompileShader(fragmentShader);
+    // check for shader compile errors
+    openglContext.GetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
+    if(!success) {
+        openglContext.GetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
+        std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
+    }
+    // link shaders
+    unsigned int shaderProgram = openglContext.CreateProgram();
+    openglContext.AttachShader(shaderProgram, vertexShader);
+    openglContext.AttachShader(shaderProgram, fragmentShader);
+    openglContext.LinkProgram(shaderProgram);
+    // check for linking errors
+    openglContext.GetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
+    if(!success) {
+        openglContext.GetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
+        std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
+    }
+
+    return shaderProgram;
 }
