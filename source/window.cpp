@@ -72,7 +72,6 @@ unsigned int PR::window::prepMesh(float vertices[], unsigned int indices[]) {
     openglContext.GenVertexArrays(1, &VAO);
     openglContext.GenBuffers(1, &VBO);
     openglContext.GenBuffers(1, &EBO);
-    // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
     openglContext.BindVertexArray(VAO);
 
     openglContext.BindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -84,17 +83,11 @@ unsigned int PR::window::prepMesh(float vertices[], unsigned int indices[]) {
     openglContext.VertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     openglContext.EnableVertexAttribArray(0);
 
-    // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
     openglContext.BindBuffer(GL_ARRAY_BUFFER, 0); 
 
-    // remember: do NOT unbind the EBO while a VAO is active as the bound element buffer object IS stored in the VAO; keep the EBO bound.
-    //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-    // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
-    // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
     openglContext.BindVertexArray(0);
 
-    return 0;
+    return VAO;
 }
 
 unsigned int PR::window::genDefaultSHaderProgram() {

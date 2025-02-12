@@ -14,8 +14,6 @@ namespace PR {
         GLFWwindow* windowInternal;
         GladGLContext openglContext;
 
-        std::vector<std::pair<unsigned int, unsigned int>> stuff;
-
         void makeTestTri();
 
         void makeWindow(std::string title, int width, int height);

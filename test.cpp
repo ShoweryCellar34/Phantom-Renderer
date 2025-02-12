@@ -31,7 +31,7 @@ int main(int argc, char** argv) {
 
         // Render
         test.openglContext.UseProgram(shaderProgram);
-        test.openglContext.BindVertexArray(1); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
+        test.openglContext.BindVertexArray(data); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
         //glDrawArrays(GL_TRIANGLES, 0, 6);
         test.openglContext.DrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
