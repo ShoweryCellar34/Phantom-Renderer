@@ -8,20 +8,15 @@
 namespace PR {
     struct window {
     public:
-        unsigned int testTriShaderProgram = 0;
-        unsigned int testTriVAO = 0;
-
-        GLFWwindow* windowInternal;
-        GladGLContext openglContext;
-
-        void makeTestTri();
+        GLFWwindow* i_window;
+        GladGLContext i_openglContext;
 
         void makeWindow(std::string title, int width, int height);
 
         void makeContext();
 
-        unsigned int prepMesh(float vertices[], unsigned int indices[]);
+        unsigned int prepMesh(float vertices[], unsigned int verticesCount, unsigned int indices[], unsigned int indicesCount);
 
-        unsigned int genDefaultSHaderProgram();
+        unsigned int genDefaultShaderProgram();
     };
 }
