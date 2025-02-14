@@ -22,8 +22,12 @@ int main(int argc, char** argv) {
     PR::window test;
     test.makeWindow("Test", 600, 600);
     test.makeContext();
+
+    PR::meshData testMesh;
+    testMesh.updateMesh(vertices, sizeof(vertices), indices, sizeof(indices));
+
     unsigned int shaderProgram = test.genDefaultShaderProgram();
-    unsigned int data = test.prepMesh(vertices, sizeof(vertices), indices, sizeof(indices));
+    test.prepMesh(testMesh, "testMesh");
 
     int width, height;
     glfwGetWindowSize(test.i_window, &width, &height);
@@ -35,9 +39,7 @@ int main(int argc, char** argv) {
 
         // Render
         test.i_openglContext.UseProgram(shaderProgram);
-        test.i_openglContext.BindVertexArray(data); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
-        //glDrawArrays(GL_TRIANGLES, 0, 6);
-        test.i_openglContext.DrawElements(GL_TRIANGLES, sizeof(indices), GL_UNSIGNED_INT, 0);
+        test.drawMesh("testMesh");
 
         glfwSwapBuffers(test.i_window);
 

@@ -4,18 +4,19 @@
 #include <glad/gl.h>
 
 namespace PR {
-    struct mesh {
+    struct meshData {
     public:
-        GladGLContext* i_openglContext = nullptr;
-        unsigned int VBO = 0, VAO = 0, EBO = 0;
-        std::vector<float> i_vertices;
-        std::vector<unsigned int> i_indices;
+        float* i_vertices = nullptr;
+        unsigned int* i_indices = nullptr;
         unsigned int i_verticesCount = 0, i_indicesCount = 0;
+
+        meshData() = default;
+        ~meshData();
+        meshData(const meshData& original);
+        meshData& operator=(const meshData& original);
 
         void updateMesh(float vertices[], unsigned int verticesCount, unsigned int indices[], unsigned int indicesCount);
 
         void updateMesh(std::vector<float> vertices, std::vector<unsigned int> indices);
-
-        void buildMesh();
     };
 }
