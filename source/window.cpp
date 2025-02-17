@@ -3,7 +3,7 @@
 #include <iostream>
 #include <PR/mesh.hpp>
 
-void PR::window::makeWindow(std::string title, int width, int height) {
+void PR::window::makeWindow(const std::string& title, int width, int height) {
     i_window = glfwCreateWindow(width, height, title.c_str(), NULL, NULL);
 }
 
@@ -12,7 +12,7 @@ void PR::window::makeContext() {
     gladLoadGLContext(&i_openglContext, (GLADloadfunc)glfwGetProcAddress);
 }
 
-void PR::window::prepMesh(meshData mesh, std::string alias) {
+void PR::window::prepMesh(const meshData& mesh, unsigned int texture, const std::string& alias) {
     unsigned int VBO, VAO, EBO;
     i_openglContext.GenVertexArrays(1, &VAO);
     i_openglContext.GenBuffers(1, &VBO);
@@ -35,7 +35,7 @@ void PR::window::prepMesh(meshData mesh, std::string alias) {
     i_VAOList.insert({alias, {VAO, mesh.i_indicesCount}});
 }
 
-void PR::window::drawMesh(std::string alias) {
+void PR::window::drawMesh(const std::string& alias) {
     i_openglContext.BindVertexArray(i_VAOList.at(alias).first);
     i_openglContext.DrawElements(GL_TRIANGLES, i_VAOList.at(alias).second, GL_UNSIGNED_INT, 0);
 }
@@ -44,14 +44,17 @@ unsigned int PR::window::genDefaultShaderProgram()
 {
     const char *vertexShaderSource = "#version 330 core\n"
         "layout (location = 0) in vec3 aPos;\n"
+        "out vec4 Color;\n"
         "void main() {\n"
+        "   Color = vec4(aPos.x, aPos.y, aPos.z, 1.0f);\n"
         "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
         "}\0";
 
     const char *fragmentShaderSource = "#version 330 core\n"
         "out vec4 FragColor;\n"
+        "in vec4 Color;\n"
         "void main() {\n"
-        "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+        "   FragColor = Color + 1.0f;\n"
         "}\n\0";
 
     unsigned int vertexShader = i_openglContext.CreateShader(GL_VERTEX_SHADER);

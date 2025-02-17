@@ -24,10 +24,10 @@ int main(int argc, char** argv) {
     test.makeContext();
 
     PR::meshData testMesh;
-    testMesh.updateMesh(vertices, sizeof(vertices), indices, sizeof(indices));
+    testMesh.updateMesh(vertices, sizeof(vertices), indices, sizeof(indices), nullptr, 0);
 
     unsigned int shaderProgram = test.genDefaultShaderProgram();
-    test.prepMesh(testMesh, "testMesh");
+    test.prepMesh(testMesh, 0, "testMesh");
 
     int width, height;
     glfwGetWindowSize(test.i_window, &width, &height);

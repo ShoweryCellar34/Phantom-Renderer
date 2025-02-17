@@ -2,5 +2,6 @@ This project uses the following project(s):
 
 - GLFW: The license for GLFW can be found at `vendors/glfw/LICENCE.md`.
 - GLAD: The license for GLAD can be found at `vendors/glad/glad/LICENSE`.
+- stb: The license for stb can be found at `vendors/stb/LICENSE`.
 
 Please ensure to comply with the terms and conditions of each license when using these projects.

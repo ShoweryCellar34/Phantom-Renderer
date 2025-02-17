@@ -8,15 +8,16 @@ namespace PR {
     public:
         float* i_vertices = nullptr;
         unsigned int* i_indices = nullptr;
-        unsigned int i_verticesCount = 0, i_indicesCount = 0;
+        float* i_textureCoordinates = nullptr;
+        unsigned int i_verticesCount = 0, i_indicesCount = 0, i_textureCoordinatesCount = 0;
 
         meshData() = default;
         ~meshData();
         meshData(const meshData& original);
         meshData& operator=(const meshData& original);
 
-        void updateMesh(float vertices[], unsigned int verticesCount, unsigned int indices[], unsigned int indicesCount);
+        void updateMesh(float vertices[], unsigned int verticesCount, unsigned int indices[], unsigned int indicesCount, float textureCoordinates[], unsigned int textureCoordinatesCount);
 
-        void updateMesh(std::vector<float> vertices, std::vector<unsigned int> indices);
+        void updateMesh(const std::vector<float>& vertices, const std::vector<unsigned int>& indices, const std::vector<float>& textureCoordinates);
     };
 }

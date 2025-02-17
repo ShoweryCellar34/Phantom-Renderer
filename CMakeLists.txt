@@ -14,7 +14,10 @@ set(GLFW_USE_HYBRID_HPG true CACHE BOOL "Force use of high-performance GPU on hy
 set(GLFW_LIBRARY_TYPE "STATIC" CACHE STRING "Library type override for GLFW (SHARED, STATIC, OBJECT, or empty to follow BUILD_SHARED_LIBS)")
 add_subdirectory(vendors/glfw)
 
-target_link_libraries(Phantom-Renderer glad glfw)
+set(STB_LIBRARY_TYPE "STATIC")
+add_subdirectory(vendors/stb)
+
+target_link_libraries(Phantom-Renderer glad glfw stb)
 
 if(MSVC)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_CRT_SECURE_NO_WARNINGS /MP")

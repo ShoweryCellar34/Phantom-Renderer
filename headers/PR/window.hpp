@@ -14,13 +14,13 @@ namespace PR {
         GladGLContext i_openglContext;
         std::unordered_map<std::string, std::pair<unsigned int, unsigned int>> i_VAOList;
 
-        void makeWindow(std::string title, int width, int height);
+        void makeWindow(const std::string& title, int width, int height);
 
         void makeContext();
 
-        void prepMesh(meshData, std::string alias);
+        void prepMesh(const meshData& mesh, unsigned int texture, const std::string& alias);
 
-        void drawMesh(std::string alias);
+        void drawMesh(const std::string& alias);
 
         unsigned int genDefaultShaderProgram();
     };
