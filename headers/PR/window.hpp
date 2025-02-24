@@ -7,6 +7,7 @@
 
 namespace PR {
     struct meshData;
+    struct textureData;
 
     struct window {
     public:
@@ -18,7 +19,9 @@ namespace PR {
 
         void makeContext();
 
-        void prepMesh(const meshData& mesh, unsigned int texture, const std::string& alias);
+        void prepMesh(const meshData& mesh, const std::string& alias);
+
+        void prepTexture(const textureData& texture, const std::string& alias);
 
         void drawMesh(const std::string& alias);
 

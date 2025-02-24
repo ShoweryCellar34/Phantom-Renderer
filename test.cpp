@@ -1,7 +1,7 @@
 #include <PR/PR.hpp>
 
 float vertices[] = {
-    0.5f,  0.5f, 0.0f,  // top right
+    1.0f,  1.0f, 0.0f,  // top right
     0.5f, -0.5f, 0.0f,  // bottom right
    -0.5f, -0.5f, 0.0f,  // bottom left
    -0.5f,  0.5f, 0.0f,  // top left
@@ -27,7 +27,7 @@ int main(int argc, char** argv) {
     testMesh.updateMesh(vertices, sizeof(vertices), indices, sizeof(indices), nullptr, 0);
 
     unsigned int shaderProgram = test.genDefaultShaderProgram();
-    test.prepMesh(testMesh, 0, "testMesh");
+    test.prepMesh(testMesh, "testMesh");
 
     int width, height;
     glfwGetWindowSize(test.i_window, &width, &height);
