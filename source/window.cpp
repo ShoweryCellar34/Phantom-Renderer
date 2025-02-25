@@ -26,7 +26,10 @@ void PR::window::prepMesh(const meshData& mesh, const std::string& alias) {
     i_openglContext.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     i_openglContext.BufferData(GL_ELEMENT_ARRAY_BUFFER, mesh.i_indicesCount, mesh.i_indices, GL_STATIC_DRAW);
 
-    i_openglContext.VertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    i_openglContext.VertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(0 * sizeof(float)));
+    i_openglContext.EnableVertexAttribArray(0);
+
+    i_openglContext.VertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
     i_openglContext.EnableVertexAttribArray(0);
 
     i_openglContext.BindBuffer(GL_ARRAY_BUFFER, 0); 
@@ -41,30 +44,53 @@ void PR::window::prepTexture(const textureData& texture, const std::string& alia
     i_openglContext.GenTextures(1, &TBO);
     i_openglContext.BindTexture(GL_TEXTURE_2D, TBO);
 
-    i_openglContext.TexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texture.i_width, texture.i_height, 0, GL_RGB, GL_UNSIGNED_BYTE, texture.i_data);
+    i_openglContext.TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);	
+    i_openglContext.TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    i_openglContext.TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    i_openglContext.TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    i_openglContext.TexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texture.i_width, texture.i_height, 0, GL_RGB, GL_UNSIGNED_BYTE, texture.i_textureData);
     i_openglContext.GenerateMipmap(GL_TEXTURE_2D);
+
+    i_TBOList.insert({alias, TBO});
 }
 
-void PR::window::drawMesh(const std::string& alias) {
-    i_openglContext.BindVertexArray(i_VAOList.at(alias).first);
-    i_openglContext.DrawElements(GL_TRIANGLES, i_VAOList.at(alias).second, GL_UNSIGNED_INT, 0);
+void PR::window::drawMesh(unsigned int shaderProgram, const std::string& meshAlias, const std::string& textureAlias) {
+    i_openglContext.UseProgram(shaderProgram);
+
+    unsigned int textureUnifromLocation = i_openglContext.GetUniformLocation(shaderProgram, "ourTexture");
+    i_openglContext.Uniform1i(textureUnifromLocation, i_TBOList.at(textureAlias));
+
+    i_openglContext.BindVertexArray(i_VAOList.at(meshAlias).first);
+    i_openglContext.DrawElements(GL_TRIANGLES, i_VAOList.at(meshAlias).second, GL_UNSIGNED_INT, 0);
 }
 
 unsigned int PR::window::genDefaultShaderProgram() {
-    const char *vertexShaderSource = "#version 330 core\n"
-        "layout (location = 0) in vec3 aPos;\n"
-        "out vec4 Color;\n"
-        "void main() {\n"
-        "   Color = vec4(smoothstep(-1.0, 1.0, aPos), 1.0f);\n"
-        "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-        "}\0";
+    const char *vertexShaderSource = R"(
+            #version 330 core
+            layout (location = 0) in vec3 aPos;
+            layout (location = 2) in vec2 aTexCoord;
 
-    const char *fragmentShaderSource = "#version 330 core\n"
-        "out vec4 FragColor;\n"
-        "in vec4 Color;\n"
-        "void main() {\n"
-        "   FragColor = Color;\n"
-        "}\n\0";
+            out vec2 TexCoord;
+
+            void main() {
+                gl_Position = vec4(aPos, 1.0);
+                TexCoord = aTexCoord;
+            }
+        )";
+
+    const char *fragmentShaderSource = R"(
+            #version 330 core
+            out vec4 FragColor;
+
+            in vec2 TexCoord;
+
+            uniform sampler2D ourTexture;
+
+            void main() {
+                FragColor = texture(ourTexture, TexCoord);
+            }
+        )";
 
     unsigned int vertexShader = i_openglContext.CreateShader(GL_VERTEX_SHADER);
     i_openglContext.ShaderSource(vertexShader, 1, &vertexShaderSource, NULL);

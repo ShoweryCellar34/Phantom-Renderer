@@ -14,6 +14,7 @@ namespace PR {
         GLFWwindow* i_window;
         GladGLContext i_openglContext;
         std::unordered_map<std::string, std::pair<unsigned int, unsigned int>> i_VAOList;
+        std::unordered_map<std::string, unsigned int> i_TBOList;
 
         void makeWindow(const std::string& title, int width, int height);
 
@@ -23,7 +24,7 @@ namespace PR {
 
         void prepTexture(const textureData& texture, const std::string& alias);
 
-        void drawMesh(const std::string& alias);
+        void drawMesh(unsigned int shaderProgram, const std::string& meshAlias, const std::string& textureAlias);
 
         unsigned int genDefaultShaderProgram();
     };
