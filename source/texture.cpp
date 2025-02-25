@@ -37,6 +37,10 @@ void PR::textureData::updateTexture(unsigned char rawTextureData[], unsigned int
 
     // unsigned char* textureData = stbi_load_from_memory(rawTextureData, rawTextureDataCount, &i_width, &i_height, &i_channels, 3);
     unsigned char* textureData = stbi_load("awesomeface.png", &i_width, &i_height, &i_channels, 3);
+    if(textureData[0] == '\0') {
+        printf("WE'RE FUCKED!!!!!!!!!!!!!");
+        exit(69420);
+    }
     unsigned int textureDataCount = strlen((const char*)textureData);
 
     i_textureData = new unsigned char[textureDataCount];

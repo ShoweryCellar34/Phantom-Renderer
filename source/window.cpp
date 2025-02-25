@@ -49,7 +49,7 @@ void PR::window::prepTexture(const textureData& texture, const std::string& alia
     i_openglContext.TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     i_openglContext.TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    i_openglContext.TexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texture.i_width, texture.i_height, 0, GL_RGB, GL_UNSIGNED_BYTE, texture.i_textureData);
+    i_openglContext.TexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texture.i_width, texture.i_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, texture.i_textureData);
     i_openglContext.GenerateMipmap(GL_TEXTURE_2D);
 
     i_TBOList.insert({alias, TBO});
