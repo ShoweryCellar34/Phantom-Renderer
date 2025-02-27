@@ -6,6 +6,12 @@ float vertices[] = {
    -0.8f, -0.8f, 0.0f,  // bottom left
    -0.8f,  0.8f, 0.0f // top left
 };
+float textureCoordinates[] {
+    1.0f,  1.0f,
+    1.0f, -1.0f,
+   -1.0f, -1.0f,
+   -1.0f,  1.0f
+};
 unsigned int indices[] = {
    0, 1, 3,  // first Triangle
    1, 2, 3,  // second Triangle
@@ -29,7 +35,7 @@ int main(int argc, char** argv) {
     test.i_openglContext.DebugMessageCallback(MessageCallback, 0);
 
     PR::meshData testMesh;
-    testMesh.updateMesh(vertices, sizeof(vertices), indices, sizeof(indices), nullptr, 0);
+    testMesh.updateMesh(vertices, sizeof(vertices), indices, sizeof(indices), textureCoordinates, sizeof(textureCoordinates));
 
     PR::textureData testTexture;
     testTexture.updateTexture(nullptr, 0);

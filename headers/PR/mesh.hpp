@@ -10,6 +10,7 @@ namespace PR {
         window* i_windowLink;
         float* i_vertices;
         float* i_textureCoordinates;
+        float* i_GPUReadyArray;
         unsigned int* i_indices;
         unsigned int i_verticesCount, i_textureCoordinatesCount, i_indicesCount;
         unsigned int i_VBO, i_VAO, i_EBO;
