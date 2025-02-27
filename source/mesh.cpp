@@ -1,5 +1,10 @@
 #include <PR/mesh.hpp>
 
+#include <PR/window.hpp>
+
+PR::meshData::meshData() : i_windowLink(nullptr), i_vertices(nullptr), i_textureCoordinates(nullptr), i_indices(nullptr), i_verticesCount(0), i_textureCoordinatesCount(0), i_indicesCount(0), i_VBO(0), i_VAO(0), i_EBO(0) {
+}
+
 PR::meshData::~meshData() {
     if(!i_vertices) {
         delete[] i_vertices;
@@ -55,6 +60,33 @@ PR::meshData& PR::meshData::operator=(const meshData& original) {
     i_textureCoordinatesCount = original.i_textureCoordinatesCount;
 
     return *this;
+}
+
+void PR::meshData::i_createGPUMesh() {
+    i_windowLink->i_openglContext.GenVertexArrays(1, &i_VAO);
+    i_windowLink->i_openglContext.GenBuffers(1, &i_VBO);
+    i_windowLink->i_openglContext.GenBuffers(1, &i_EBO);
+    i_windowLink->i_openglContext.BindVertexArray(i_VAO);
+
+    i_windowLink->i_openglContext.BindBuffer(GL_ARRAY_BUFFER, i_VBO);
+    i_windowLink->i_openglContext.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, i_EBO);
+
+    if(i_vertices) {
+        
+    }
+
+    i_windowLink->i_openglContext.VertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(0 * sizeof(float)));
+    i_windowLink->i_openglContext.EnableVertexAttribArray(0);
+
+    i_windowLink->i_openglContext.VertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(3 * sizeof(float)));
+    i_windowLink->i_openglContext.EnableVertexAttribArray(1);
+
+    i_windowLink->i_openglContext.VertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(7 * sizeof(float)));
+    i_windowLink->i_openglContext.EnableVertexAttribArray(2);
+
+    i_windowLink->i_openglContext.BindBuffer(GL_ARRAY_BUFFER, 0); 
+
+    i_windowLink->i_openglContext.BindVertexArray(0);
 }
 
 void PR::meshData::updateMesh(float vertices[], unsigned int verticesCount, unsigned int indices[], unsigned int indicesCount, float textureCoordinates[], unsigned int textureCoordinatesCount) {
@@ -115,4 +147,8 @@ void PR::meshData::updateMesh(const std::vector<float>& vertices, const std::vec
         }
     }
     i_verticesCount = textureCoordinates.size();
+}
+
+void PR::meshData::link(window* window) {
+    i_windowLink = window;
 }
