@@ -1,20 +1,18 @@
 #pragma once
 
-#include <vector>
+#include <glad/gl.h>
 
-namespace PR {
-    struct textureData {
-    public:
-        unsigned char* i_textureData = nullptr;
-        int i_width = 0, i_height = 0, i_channels = 0;
+typedef struct prWindow prWindow;
 
-        textureData() = default;
-        ~textureData();
-        textureData(const textureData& original);
-        textureData& operator=(const textureData& original);
+typedef struct prTextureData {
+    prWindow* window;
+    GLubyte* textureData;
+    GLint width, height, channels;
+    GLuint TBO;
+} prTextureData;
 
-        void updateTexture(unsigned char rawTextureData[], unsigned int rawTextureDataCount);
+void prTextureInit(prTextureData* texture);
 
-        void updateTexture(const std::vector<unsigned char>& rawTextureData);
-    };
-}
+void prTextureLink(prTextureData* texture, prWindow* window);
+
+void prTextureUpdate(prTextureData* texture, unsigned char rawTextureData[], unsigned int rawTextureDataCount);

@@ -1,52 +1,42 @@
-#include <PR/texture.hpp>
+#include <PR/texture.h>
+
+#include <PR/textureInternal.h>
 
 #include <stb_image.h>
-#include <cstring>
 
-PR::textureData::~textureData() {
-    if(!i_textureData) {
-        delete[] i_textureData;
+void prTextureInit(prTextureData* texture) {
+    texture->textureData = NULL;
+    texture->width = 0;
+    texture->height = 0;
+    texture->channels = 0;
+}
+
+void prTextureLink(prTextureData* texture, prWindow* window) {
+    if(texture->window) {
+        i_prTextureDestroyOnGPUSide(texture);
+    }
+    texture->window = window;
+    if(texture->window && texture->textureData) {
+        i_prTextureCreateOnGPUSide(texture);
     }
 }
 
-PR::textureData::textureData(const textureData& original) : i_width(original.i_width), i_height(original.i_height), i_channels(original.i_channels) {
-    if(!original.i_textureData) {
-        unsigned int textureDataCount = original.i_width * original.i_height * original.i_channels;
-        i_textureData = new unsigned char[textureDataCount];
-        for(unsigned int i = 0; i < textureDataCount; i++) {
-            i_textureData[i] = original.i_textureData[i];
-        }
-    }
-}
-
-PR::textureData& PR::textureData::operator=(const textureData& original) {
-    i_width = original.i_width;
-    i_height = original.i_height;
-    i_channels = original.i_channels;
-    if(!original.i_textureData) {
-        unsigned int textureDataCount = original.i_width * original.i_height * original.i_channels;
-        i_textureData = new unsigned char[textureDataCount];
-        for(unsigned int i = 0; i < textureDataCount; i++) {
-            i_textureData[i] = original.i_textureData[i];
-        }
-    }
-
-    return *this;
-}
-
-void PR::textureData::updateTexture(unsigned char rawTextureData[], unsigned int rawTextureDataCount) {
-    if(i_textureData) {
-        delete[] i_textureData;
+void prTextureUpdate(prTextureData* texture, unsigned char rawTextureData[], unsigned int rawTextureDataCount) {
+    if(texture->textureData) {
+        free(texture->textureData);
+        texture->textureData = NULL;
     }
 
     // unsigned char* textureData = stbi_load_from_memory(rawTextureData, rawTextureDataCount, &i_width, &i_height, &i_channels, 0);
-    i_textureData = stbi_load("awesomeface.png", &i_width, &i_height, &i_channels, 0);
-}
+    texture->textureData = stbi_load("awesomeface.png", &texture->width, &texture->height, &texture->channels, 0);
 
-void PR::textureData::updateTexture(const std::vector<unsigned char>& rawTextureData) {
-    if(!i_textureData) {
-        delete[] i_textureData;
+    if(texture->window) {
+        i_prTextureUpdateOnGPUSide(texture);
     }
 
-    unsigned char* textureData = stbi_load_from_memory(rawTextureData.data(), rawTextureData.size(), &i_width, &i_height, &i_channels, 0);
+    if(texture->window && !texture->TBO) {
+        i_prTextureCreateOnGPUSide(texture);
+    } else if(texture->window) {
+        i_prTextureUpdateOnGPUSide(texture);
+    }
 }

@@ -1,6 +1,13 @@
 #pragma once
 
-#include <PR/error.hpp>
-#include <PR/mesh.hpp>
-#include <PR/texture.hpp>
-#include <PR/window.hpp>
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#include <PR/mesh.h>
+#include <PR/texture.h>
+#include <PR/window.h>
+
+#ifdef __cplusplus
+}
+#endif

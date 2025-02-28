@@ -1,35 +1,13 @@
 #include <PR/mesh.h>
 
+#include <PR/meshInternal.h>
+
+#include <stdlib.h>
 #include <memory.h>
+#include <stdio.h>
 
-// void PR::meshData::i_createGPUMesh() {
-//     i_windowLink->i_openglContext.GenVertexArrays(1, &i_VAO);
-//     i_windowLink->i_openglContext.GenBuffers(1, &i_VBO);
-//     i_windowLink->i_openglContext.GenBuffers(1, &i_EBO);
-//     i_windowLink->i_openglContext.BindVertexArray(i_VAO);
-
-//     i_windowLink->i_openglContext.BindBuffer(GL_ARRAY_BUFFER, i_VBO);
-//     i_windowLink->i_openglContext.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, i_EBO);
-
-//     if(i_vertices) {
-        
-//     }
-
-//     i_windowLink->i_openglContext.VertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(0 * sizeof(float)));
-//     i_windowLink->i_openglContext.EnableVertexAttribArray(0);
-
-//     i_windowLink->i_openglContext.VertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(3 * sizeof(float)));
-//     i_windowLink->i_openglContext.EnableVertexAttribArray(1);
-
-//     i_windowLink->i_openglContext.VertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(7 * sizeof(float)));
-//     i_windowLink->i_openglContext.EnableVertexAttribArray(2);
-
-//     i_windowLink->i_openglContext.BindBuffer(GL_ARRAY_BUFFER, 0); 
-
-//     i_windowLink->i_openglContext.BindVertexArray(0);
-// }
-
-void prInitMesh(prMeshData* mesh) {
+void prMeshInit(prMeshData* mesh) {
+    mesh->window = NULL;
     mesh->vertices = NULL;
     mesh->textureCoordinates = NULL;
     mesh->indices = NULL;
@@ -39,17 +17,30 @@ void prInitMesh(prMeshData* mesh) {
     mesh->VBO = 0;
     mesh->VAO = 0;
     mesh->EBO = 0;
-    mesh->GPUArray = NULL;
-    mesh->GPUArrayCount = 0;
+    mesh->GPUReadyBuffer = NULL;
+    mesh->GPUReadyBufferCount = 0;
 }
 
-void prUpdateMesh(prMeshData* mesh, GLfloat vertices[], size_t verticesCount, GLuint indices[], size_t indicesCount, GLfloat textureCoordinates[], size_t textureCoordinatesCount) {
+void prMeshLink(prMeshData* mesh, prWindow* window) {
+    if(mesh->window) {
+        i_prMeshDestroyOnGPUSide(mesh);
+    }
+    mesh->window = window;
+    if(mesh->window && mesh->GPUReadyBuffer) {
+        i_prMeshCreateOnGPUSide(mesh);
+    }
+}
+
+void prMeshUpdate(prMeshData* mesh, GLfloat vertices[], size_t verticesCount, GLuint indices[], size_t indicesCount, GLfloat textureCoordinates[], size_t textureCoordinatesCount) {
     if(mesh->vertices) {
         free(mesh->vertices);
         free(mesh->indices);
+        mesh->vertices = NULL;
+        mesh->indices = NULL;
     }
     if(mesh->textureCoordinates) {
         free(mesh->textureCoordinates);
+        mesh->textureCoordinates = NULL;
     }
 
     mesh->vertices = malloc(sizeof(GLfloat) * verticesCount);
@@ -68,18 +59,22 @@ void prUpdateMesh(prMeshData* mesh, GLfloat vertices[], size_t verticesCount, GL
     }
     mesh->textureCoordinatesCount = textureCoordinatesCount;
 
-    if(mesh->GPUArray) {
-        free(mesh->GPUArray);
+    if(mesh->GPUReadyBuffer) {
+        free(mesh->GPUReadyBuffer);
+        mesh->GPUReadyBuffer = NULL;
     }
 
-    mesh->GPUArray = malloc(sizeof(GLfloat) * 5 * verticesCount);
-    if(textureCoordinates) {
-        for(size_t i = 0; i < (verticesCount / 3); i++) {
-            mesh->GPUArray[i] = vertices[i++];
-            mesh->GPUArray[i] = vertices[i++];
-            mesh->GPUArray[i] = vertices[i++];
-            mesh->GPUArray[i] = textureCoordinates[i++];
-            mesh->GPUArray[i] = textureCoordinates[i];
-        }
+    mesh->GPUReadyBuffer = malloc(verticesCount * sizeof(GLfloat));
+    for(size_t i = 0; i < verticesCount; i++) {
+        mesh->GPUReadyBuffer[i] = vertices[i++];
+        mesh->GPUReadyBuffer[i] = vertices[i++];
+        mesh->GPUReadyBuffer[i] = vertices[i];
+    }
+    mesh->GPUReadyBufferCount = verticesCount;
+
+    if(mesh->window && !mesh->VAO) {
+        i_prMeshCreateOnGPUSide(mesh);
+    } else if(mesh->window) {
+        i_prMeshUpdateOnGPUSide(mesh);
     }
 }

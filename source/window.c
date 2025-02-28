@@ -1,135 +1,86 @@
-#include <PR/window.hpp>
+#include <PR/window.h>
 
-#include <iostream>
-#include <PR/mesh.hpp>
-#include <PR/texture.hpp>
+#include <PR/mesh.h>
+#include <PR/texture.h>
+#include <stdio.h>
 
-void PR::window::makeWindow(const std::string& title, int width, int height) {
-    i_window = glfwCreateWindow(width, height, title.c_str(), NULL, NULL);
+void prWindowInit(prWindow* window, const char* title, int width, int height) {
+    window->window = glfwCreateWindow(width, height, title, NULL, NULL);
 }
 
-void PR::window::makeContext() {
-    glfwMakeContextCurrent(i_window);
-    gladLoadGLContext(&i_openglContext, (GLADloadfunc)glfwGetProcAddress);
+void prWindowInitContext(prWindow* window) {
+    glfwMakeContextCurrent(window->window);
+    gladLoadGLContext(&window->openglContext, (GLADloadfunc)glfwGetProcAddress);
 }
 
-void PR::window::prepMesh(const meshData& mesh, const std::string& alias) {
-    unsigned int VBO, VAO, EBO;
-    i_openglContext.GenVertexArrays(1, &VAO);
-    i_openglContext.GenBuffers(1, &VBO);
-    i_openglContext.GenBuffers(1, &EBO);
-    i_openglContext.BindVertexArray(VAO);
+void prWindowDrawMesh(prWindow* window, unsigned int shaderProgram, prMeshData* mesh, prTextureData* texture) {
+    window->openglContext.UseProgram(shaderProgram);
 
-    i_openglContext.BindBuffer(GL_ARRAY_BUFFER, VBO);
-    i_openglContext.BufferData(GL_ARRAY_BUFFER, mesh.i_verticesCount, mesh.i_vertices, GL_STATIC_DRAW);
+    window->openglContext.ActiveTexture(GL_TEXTURE0);
+    window->openglContext.BindTexture(GL_TEXTURE_2D, texture->TBO);
 
-    i_openglContext.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    i_openglContext.BufferData(GL_ELEMENT_ARRAY_BUFFER, mesh.i_indicesCount, mesh.i_indices, GL_STATIC_DRAW);
-
-    i_openglContext.VertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(0 * sizeof(float)));
-    i_openglContext.EnableVertexAttribArray(0);
-
-    i_openglContext.VertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(3 * sizeof(float)));
-    i_openglContext.EnableVertexAttribArray(1);
-
-    i_openglContext.VertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(7 * sizeof(float)));
-    i_openglContext.EnableVertexAttribArray(2);
-
-    i_openglContext.BindBuffer(GL_ARRAY_BUFFER, 0); 
-
-    i_openglContext.BindVertexArray(0);
-
-    i_VAOList.insert({alias, {VAO, mesh.i_indicesCount}});
+    window->openglContext.BindVertexArray(mesh->VAO);
+    window->openglContext.DrawElements(GL_TRIANGLES, mesh->EBO, GL_UNSIGNED_INT, 0);
 }
 
-void PR::window::prepTexture(const textureData& texture, const std::string& alias) {
-    unsigned int TBO;
-    i_openglContext.GenTextures(1, &TBO);
-    i_openglContext.BindTexture(GL_TEXTURE_2D, TBO);
+unsigned int prWindowGenDefaultShaderProgram(prWindow* window) {
+    const char *vertexShaderSource = "\n\
+            #version 330 core\n\
+            layout (location = 0) in vec3 inputPosition;\n\
+            layout (location = 1) in vec2 inputTextureCoordinates;\n\
+            \n\
+            out vec2 textureCoordinates;\n\
+            \n\
+            void main() {\n\
+                gl_Position = vec4(inputPosition, 1.0);\n\
+                textureCoordinates = inputTextureCoordinates;\n\
+            }\n\
+        ";
 
-    i_openglContext.TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);	
-    i_openglContext.TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    i_openglContext.TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    i_openglContext.TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    const char *fragmentShaderSource = "\n\
+            #version 330 core\n\
+            out vec4 FragColor;\n\
+            \n\
+            in vec2 textureCoordinates;\n\
+            \n\
+            uniform sampler2D textureSampler;\n\
+            \n\
+            void main() {\n\
+                FragColor = vec4(1.0f, 1.0f, 1.0f, 1.0f);\n\
+            }\n\
+        ";
 
-    i_openglContext.TexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texture.i_width, texture.i_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, texture.i_textureData);
-    i_openglContext.GenerateMipmap(GL_TEXTURE_2D);
-
-    i_TBOList.insert({alias, TBO});
-}
-
-void PR::window::drawMesh(unsigned int shaderProgram, const std::string& meshAlias, const std::string& textureAlias) {
-    i_openglContext.UseProgram(shaderProgram);
-
-    i_openglContext.ActiveTexture(GL_TEXTURE0);
-    i_openglContext.BindTexture(GL_TEXTURE_2D, i_TBOList.at(textureAlias));
-
-    i_openglContext.BindVertexArray(i_VAOList.at(meshAlias).first);
-    i_openglContext.DrawElements(GL_TRIANGLES, i_VAOList.at(meshAlias).second, GL_UNSIGNED_INT, 0);
-}
-
-unsigned int PR::window::genDefaultShaderProgram() {
-    const char *vertexShaderSource = R"(
-            #version 330 core
-            layout (location = 0) in vec3 inputPosition;
-            layout (location = 1) in vec4 inputColor;
-            layout (location = 2) in vec2 inputTextureCoordinates;
-
-            out vec4 color;
-            out vec2 textureCoordinates;
-
-            void main() {
-                gl_Position = vec4(inputPosition, 1.0);
-                color = inputColor;
-                textureCoordinates = inputTextureCoordinates;
-            }
-        )";
-
-    const char *fragmentShaderSource = R"(
-            #version 330 core
-            out vec4 FragColor;
-            
-            in vec4 color;
-            in vec2 textureCoordinates;
-            
-            uniform sampler2D textureSampler;
-            
-            void main() {
-                FragColor = texture(textureSampler, textureCoordinates) + color;
-            }
-        )";
-
-    unsigned int vertexShader = i_openglContext.CreateShader(GL_VERTEX_SHADER);
-    i_openglContext.ShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-    i_openglContext.CompileShader(vertexShader);
+    unsigned int vertexShader = window->openglContext.CreateShader(GL_VERTEX_SHADER);
+    window->openglContext.ShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
+    window->openglContext.CompileShader(vertexShader);
     // check for shader compile errors
     int success;
     char infoLog[512];
-    i_openglContext.GetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
+    window->openglContext.GetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
     if(!success) {
-        i_openglContext.GetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
+        window->openglContext.GetShaderInfoLog(vertexShader, 512, NULL, infoLog);
+        printf("%s\n%s\n", "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n", infoLog);
     }
     // fragment shader
-    unsigned int fragmentShader = i_openglContext.CreateShader(GL_FRAGMENT_SHADER);
-    i_openglContext.ShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-    i_openglContext.CompileShader(fragmentShader);
+    unsigned int fragmentShader = window->openglContext.CreateShader(GL_FRAGMENT_SHADER);
+    window->openglContext.ShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
+    window->openglContext.CompileShader(fragmentShader);
     // check for shader compile errors
-    i_openglContext.GetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
+    window->openglContext.GetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
     if(!success) {
-        i_openglContext.GetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
+        window->openglContext.GetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
+        printf("%s\n%s\n", "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n", infoLog);
     }
     // link shaders
-    unsigned int shaderProgram = i_openglContext.CreateProgram();
-    i_openglContext.AttachShader(shaderProgram, vertexShader);
-    i_openglContext.AttachShader(shaderProgram, fragmentShader);
-    i_openglContext.LinkProgram(shaderProgram);
+    unsigned int shaderProgram = window->openglContext.CreateProgram();
+    window->openglContext.AttachShader(shaderProgram, vertexShader);
+    window->openglContext.AttachShader(shaderProgram, fragmentShader);
+    window->openglContext.LinkProgram(shaderProgram);
     // check for linking errors
-    i_openglContext.GetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
+    window->openglContext.GetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
     if(!success) {
-        i_openglContext.GetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
+        window->openglContext.GetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
+        printf("%s\n%s\n", "ERROR::SHADER::PROGRAM::LINKING_FAILED\n", infoLog);
     }
 
     return shaderProgram;

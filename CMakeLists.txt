@@ -1,9 +1,8 @@
-set(CMAKE_CXX_STANDARD 20)
 set(POSITION_INDEPENDENT_CODE true)
 
 cmake_minimum_required(VERSION 3.20)
 project(Phantom-Renderer DESCRIPTION "A Basic File Resource Manager" LANGUAGES C HOMEPAGE_URL "https://github.com/ShoweryCellar34/Phantom-Renderer")
-file(GLOB source source/*.cpp)
+file(GLOB source source/*.c)
 add_library(Phantom-Renderer ${source})
 target_include_directories(Phantom-Renderer PUBLIC headers)
 
@@ -26,5 +25,5 @@ if(GCC)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Wall -Wextra -pedantic -fsanitize=address,undefined")
 endif()
 
-add_executable(Test test.cpp)
+add_executable(Test test.c)
 target_link_libraries(Test Phantom-Renderer)

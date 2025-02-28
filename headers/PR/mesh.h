@@ -3,18 +3,21 @@
 #include <stddef.h>
 #include <glad/gl.h>
 
-struct i_prMeshData {
+typedef struct prWindow prWindow;
+
+typedef struct prMeshData {
+    prWindow* window;
     GLfloat* vertices;
     GLfloat* textureCoordinates;
     GLuint* indices;
     GLuint verticesCount, textureCoordinatesCount, indicesCount;
     GLuint VBO, VAO, EBO;
-    GLfloat* GPUArray;
-    GLuint GPUArrayCount;
-};
+    GLfloat* GPUReadyBuffer;
+    GLuint GPUReadyBufferCount;
+} prMeshData;
 
-typedef struct i_prMeshData prMeshData;
+void prMeshInit(prMeshData* mesh);
 
-void prInitMesh(prMeshData* mesh);
+void prMeshLink(prMeshData* mesh, prWindow* window);
 
-void prUpdateMesh(prMeshData* mesh, GLfloat vertices[], size_t verticesCount, GLuint indices[], size_t indicesCount, GLfloat textureCoordinates[], size_t textureCoordinatesCount);
+void prMeshUpdate(prMeshData* mesh, GLfloat vertices[], size_t verticesCount, GLuint indices[], size_t indicesCount, GLfloat textureCoordinates[], size_t textureCoordinatesCount);

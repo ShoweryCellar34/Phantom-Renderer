@@ -2,7 +2,7 @@
 
 # What is Phantom Renderer?
 
-Phantom Renderer basic file OpenGL based renderer using GLFW. This is mostly just for use in my other projects. It is designed in a way that everywhere a class/stuct has no private methods/properties for easy access to internal data \(all properties/methods that would be private are prefixed with `i_`\)
+Phantom Renderer basic file OpenGL based renderer using GLFW written in C. This is mostly just for use in my other projects.
 
 ## Platform support
 

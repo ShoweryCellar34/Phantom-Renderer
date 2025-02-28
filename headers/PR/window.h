@@ -1,31 +1,20 @@
 #pragma once
 
-#include <unordered_map>
-#include <string>
 #include <glad/gl.h>
 #include <GLFW/glfw3.h>
 
-namespace PR {
-    struct meshData;
-    struct textureData;
+typedef struct prMeshData prMeshData;
+typedef struct prTextureData prTextureData;
 
-    struct window {
-    public:
-        GLFWwindow* i_window;
-        GladGLContext i_openglContext;
-        std::unordered_map<std::string, std::pair<unsigned int, unsigned int>> i_VAOList;
-        std::unordered_map<std::string, unsigned int> i_TBOList;
+typedef struct prWindow {
+    GLFWwindow* window;
+    GladGLContext openglContext;
+} prWindow;
 
-        void makeWindow(const std::string& title, int width, int height);
+void prWindowInit(prWindow* window, const char* title, int width, int height);
 
-        void makeContext();
+void prWindowInitContext(prWindow* window);
 
-        void prepMesh(const meshData& mesh, const std::string& alias);
+void prWindowDrawMesh(prWindow* window, unsigned int shaderProgram, prMeshData* mesh, prTextureData* texture);
 
-        void prepTexture(const textureData& texture, const std::string& alias);
-
-        void drawMesh(unsigned int shaderProgram, const std::string& meshAlias, const std::string& textureAlias);
-
-        unsigned int genDefaultShaderProgram();
-    };
-}
+unsigned int prWindowGenDefaultShaderProgram(prWindow* window);
