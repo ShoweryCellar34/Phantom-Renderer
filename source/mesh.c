@@ -55,7 +55,6 @@ void prMeshUpdate(prMeshData* mesh, GLfloat vertices[], size_t verticesCount, GL
         mesh->textureCoordinates = malloc(sizeof(GLfloat) * textureCoordinatesCount);
         memcpy(mesh->textureCoordinates, textureCoordinates, sizeof(GLfloat) * textureCoordinatesCount);
         mesh->textureCoordinatesCount = textureCoordinatesCount;
-    
     }
     mesh->textureCoordinatesCount = textureCoordinatesCount;
 
@@ -64,13 +63,17 @@ void prMeshUpdate(prMeshData* mesh, GLfloat vertices[], size_t verticesCount, GL
         mesh->GPUReadyBuffer = NULL;
     }
 
-    mesh->GPUReadyBuffer = malloc(verticesCount * sizeof(GLfloat));
-    for(size_t i = 0; i < verticesCount; i++) {
-        mesh->GPUReadyBuffer[i] = vertices[i++];
-        mesh->GPUReadyBuffer[i] = vertices[i++];
-        mesh->GPUReadyBuffer[i] = vertices[i];
+    mesh->GPUReadyBuffer = malloc((textureCoordinatesCount + verticesCount) * sizeof(GLfloat));
+    for(size_t i = 0; i < (verticesCount + textureCoordinatesCount) / 5; i++) {
+        size_t vertexIndex = i * 3;
+        size_t textureCoordinatesIndex = i * 2;
+        mesh->GPUReadyBuffer[i * 5] = vertices[vertexIndex];
+        mesh->GPUReadyBuffer[i * 5 + 1] = vertices[vertexIndex + 1];
+        mesh->GPUReadyBuffer[i * 5 + 2] = vertices[vertexIndex + 2];
+        mesh->GPUReadyBuffer[i * 5 + 3] = textureCoordinates[textureCoordinatesIndex];
+        mesh->GPUReadyBuffer[i * 5 + 4] = textureCoordinates[textureCoordinatesIndex + 1];
     }
-    mesh->GPUReadyBufferCount = verticesCount;
+    mesh->GPUReadyBufferCount = verticesCount + textureCoordinatesCount;
 
     if(mesh->window && !mesh->VAO) {
         i_prMeshCreateOnGPUSide(mesh);
