@@ -57,39 +57,13 @@ int main(int argc, char** argv) {
     prMeshLink(testMesh2, test);
     prMeshUpdate(testMesh2, vertices2, 12, indices, 6, textureCoordinates, 8);
 
-	FILE *file;
-	char *buffer;
-	unsigned long fileLen;
-
-	//Open file
-	file = fopen("awesomeface.png", "rb");
-	if (!file)
-	{
-		fprintf(stderr, "Unable to open file %s", "awesomeface.png");
-	}
-	
-	//Get file length
-	fseek(file, 0, SEEK_END);
-	fileLen=ftell(file);
-	fseek(file, 0, SEEK_SET);
-
-	//Allocate memory
-	buffer=(char *)malloc(fileLen+1);
-	if (!buffer)
-	{
-		fprintf(stderr, "Memory error!");
-                                fclose(file);
-	}
-
-	//Read file contents into buffer
-	fread(buffer, fileLen, 1, file);
-	fclose(file);
-
     FILE* textureFile = fopen("awesomeface.png", "rb");
     fseek(textureFile, 0L, SEEK_END);
     size_t textureFileSize = ftell(textureFile);
+    fseek(textureFile, 0L, SEEK_SET);
     unsigned char* textureData = malloc(textureFileSize + 1);
     fread(textureData, textureFileSize, 1, textureFile);
+    fclose(textureFile);
 
     prTextureData* testTexture = prTextureCreate();
     prTextureLink(testTexture, test);
