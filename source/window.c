@@ -1,11 +1,16 @@
 #include <PR/window.h>
 
+#include <stdlib.h>
+#include <stdio.h>
 #include <PR/mesh.h>
 #include <PR/texture.h>
-#include <stdio.h>
 
-void prWindowInit(prWindow* window, const char* title, int width, int height) {
+prWindow* prWindowCreate(const char* title, int width, int height) {
+    prWindow* window = malloc(sizeof(prWindow));
+
     window->window = glfwCreateWindow(width, height, title, NULL, NULL);
+
+    return window;
 }
 
 void prWindowInitContext(prWindow* window) {
@@ -13,14 +18,21 @@ void prWindowInitContext(prWindow* window) {
     gladLoadGLContext(&window->openglContext, (GLADloadfunc)glfwGetProcAddress);
 }
 
+void prWindowDestroy(prWindow* window) {
+    glfwDestroyWindow(window->window);
+}
+
 void prWindowDrawMesh(prWindow* window, unsigned int shaderProgram, prMeshData* mesh, prTextureData* texture) {
     window->openglContext.UseProgram(shaderProgram);
+
+    window->openglContext.BindVertexArray(mesh->VAO);
 
     window->openglContext.ActiveTexture(GL_TEXTURE0);
     window->openglContext.BindTexture(GL_TEXTURE_2D, texture->TBO);
 
-    window->openglContext.BindVertexArray(mesh->VAO);
-    window->openglContext.DrawElements(GL_TRIANGLES, mesh->EBO, GL_UNSIGNED_INT, 0);
+    window->openglContext.DrawElements(GL_TRIANGLES, mesh->indicesCount, GL_UNSIGNED_INT, 0);
+
+    window->openglContext.BindVertexArray(0);
 }
 
 unsigned int prWindowGenDefaultShaderProgram(prWindow* window) {
@@ -46,7 +58,7 @@ unsigned int prWindowGenDefaultShaderProgram(prWindow* window) {
             uniform sampler2D textureSampler;\n\
             \n\
             void main() {\n\
-                FragColor = vec4(1.0f, 1.0f, 1.0f, 1.0f);\n\
+                FragColor = texture(textureSampler, textureCoordinates);\n\
             }\n\
         ";
 

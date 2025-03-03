@@ -12,19 +12,18 @@ void i_prMeshCreateOnGPUSide(prMeshData* mesh) {
         context->BindVertexArray(mesh->VAO);
 
         context->BindBuffer(GL_ARRAY_BUFFER, mesh->VBO);
-        context->BufferData(GL_ARRAY_BUFFER, mesh->GPUReadyBufferCount, mesh->GPUReadyBuffer, GL_STATIC_DRAW);
+        context->BufferData(GL_ARRAY_BUFFER, mesh->GPUReadyBufferCount * sizeof(GLfloat), mesh->GPUReadyBuffer, GL_STATIC_DRAW);
 
         context->BindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->EBO);
-        context->BufferData(GL_ELEMENT_ARRAY_BUFFER, mesh->indicesCount, mesh->indices, GL_STATIC_DRAW);
+        context->BufferData(GL_ELEMENT_ARRAY_BUFFER, mesh->indicesCount * sizeof(GLuint), mesh->indices, GL_STATIC_DRAW);
 
-        context->VertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(GLfloat), (void*)(0 * sizeof(GLfloat)));
+        context->VertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (void*)(0 * sizeof(GLfloat)));
         context->EnableVertexAttribArray(0);
 
-        context->VertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 9 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
+        context->VertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
         context->EnableVertexAttribArray(1);
 
-        context->VertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 9 * sizeof(GLfloat), (void*)(7 * sizeof(GLfloat)));
-        context->EnableVertexAttribArray(2);
+        context->BindBuffer(GL_ARRAY_BUFFER, 0);
 
         context->BindVertexArray(0);
 }

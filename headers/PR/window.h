@@ -11,7 +11,9 @@ typedef struct prWindow {
     GladGLContext openglContext;
 } prWindow;
 
-void prWindowInit(prWindow* window, const char* title, int width, int height);
+prWindow* prWindowCreate(const char* title, int width, int height);
+
+void prWindowDestroy(prWindow* window);
 
 void prWindowInitContext(prWindow* window);
 

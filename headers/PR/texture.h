@@ -11,7 +11,9 @@ typedef struct prTextureData {
     GLuint TBO;
 } prTextureData;
 
-void prTextureInit(prTextureData* texture);
+prTextureData* prTextureCreate();
+
+void prTextureDestroy(prTextureData* texture);
 
 void prTextureLink(prTextureData* texture, prWindow* window);
 

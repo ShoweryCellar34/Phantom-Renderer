@@ -6,7 +6,9 @@
 #include <memory.h>
 #include <stdio.h>
 
-void prMeshInit(prMeshData* mesh) {
+prMeshData* prMeshCreate() {
+    prMeshData* mesh = malloc(sizeof(prMeshData));
+
     mesh->window = NULL;
     mesh->vertices = NULL;
     mesh->textureCoordinates = NULL;
@@ -19,10 +21,17 @@ void prMeshInit(prMeshData* mesh) {
     mesh->EBO = 0;
     mesh->GPUReadyBuffer = NULL;
     mesh->GPUReadyBufferCount = 0;
+
+    return mesh;
+}
+
+void prMeshDestroy(prMeshData* mesh) {
+    i_prMeshDestroyOnGPUSide(mesh);
+    free(mesh);
 }
 
 void prMeshLink(prMeshData* mesh, prWindow* window) {
-    if(mesh->window) {
+    if(mesh->window && mesh->GPUReadyBuffer) {
         i_prMeshDestroyOnGPUSide(mesh);
     }
     mesh->window = window;

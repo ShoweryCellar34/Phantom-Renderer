@@ -16,7 +16,9 @@ typedef struct prMeshData {
     GLuint GPUReadyBufferCount;
 } prMeshData;
 
-void prMeshInit(prMeshData* mesh);
+prMeshData* prMeshCreate();
+
+void prMeshDestroy(prMeshData* mesh);
 
 void prMeshLink(prMeshData* mesh, prWindow* window);
 
