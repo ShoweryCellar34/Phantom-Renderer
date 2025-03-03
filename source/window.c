@@ -15,24 +15,26 @@ prWindow* prWindowCreate(const char* title, int width, int height) {
 
 void prWindowInitContext(prWindow* window) {
     glfwMakeContextCurrent(window->window);
-    gladLoadGLContext(&window->openglContext, (GLADloadfunc)glfwGetProcAddress);
+    window->openglContext = malloc(sizeof(GladGLContext));
+    gladLoadGLContext(window->openglContext, (GLADloadfunc)glfwGetProcAddress);
 }
 
 void prWindowDestroy(prWindow* window) {
     glfwDestroyWindow(window->window);
+    free(window->openglContext);
 }
 
 void prWindowDrawMesh(prWindow* window, unsigned int shaderProgram, prMeshData* mesh, prTextureData* texture) {
-    window->openglContext.UseProgram(shaderProgram);
+    window->openglContext->UseProgram(shaderProgram);
 
-    window->openglContext.BindVertexArray(mesh->VAO);
+    window->openglContext->BindVertexArray(mesh->VAO);
 
-    window->openglContext.ActiveTexture(GL_TEXTURE0);
-    window->openglContext.BindTexture(GL_TEXTURE_2D, texture->TBO);
+    window->openglContext->ActiveTexture(GL_TEXTURE0);
+    window->openglContext->BindTexture(GL_TEXTURE_2D, texture->TBO);
 
-    window->openglContext.DrawElements(GL_TRIANGLES, mesh->indicesCount, GL_UNSIGNED_INT, 0);
+    window->openglContext->DrawElements(GL_TRIANGLES, mesh->indicesCount, GL_UNSIGNED_INT, 0);
 
-    window->openglContext.BindVertexArray(0);
+    window->openglContext->BindVertexArray(0);
 }
 
 unsigned int prWindowGenDefaultShaderProgram(prWindow* window) {
@@ -62,36 +64,36 @@ unsigned int prWindowGenDefaultShaderProgram(prWindow* window) {
             }\n\
         ";
 
-    unsigned int vertexShader = window->openglContext.CreateShader(GL_VERTEX_SHADER);
-    window->openglContext.ShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-    window->openglContext.CompileShader(vertexShader);
+    unsigned int vertexShader = window->openglContext->CreateShader(GL_VERTEX_SHADER);
+    window->openglContext->ShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
+    window->openglContext->CompileShader(vertexShader);
     // check for shader compile errors
     int success;
     char infoLog[512];
-    window->openglContext.GetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
+    window->openglContext->GetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
     if(!success) {
-        window->openglContext.GetShaderInfoLog(vertexShader, 512, NULL, infoLog);
+        window->openglContext->GetShaderInfoLog(vertexShader, 512, NULL, infoLog);
         printf("%s\n%s\n", "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n", infoLog);
     }
     // fragment shader
-    unsigned int fragmentShader = window->openglContext.CreateShader(GL_FRAGMENT_SHADER);
-    window->openglContext.ShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-    window->openglContext.CompileShader(fragmentShader);
+    unsigned int fragmentShader = window->openglContext->CreateShader(GL_FRAGMENT_SHADER);
+    window->openglContext->ShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
+    window->openglContext->CompileShader(fragmentShader);
     // check for shader compile errors
-    window->openglContext.GetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
+    window->openglContext->GetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
     if(!success) {
-        window->openglContext.GetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
+        window->openglContext->GetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
         printf("%s\n%s\n", "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n", infoLog);
     }
     // link shaders
-    unsigned int shaderProgram = window->openglContext.CreateProgram();
-    window->openglContext.AttachShader(shaderProgram, vertexShader);
-    window->openglContext.AttachShader(shaderProgram, fragmentShader);
-    window->openglContext.LinkProgram(shaderProgram);
+    unsigned int shaderProgram = window->openglContext->CreateProgram();
+    window->openglContext->AttachShader(shaderProgram, vertexShader);
+    window->openglContext->AttachShader(shaderProgram, fragmentShader);
+    window->openglContext->LinkProgram(shaderProgram);
     // check for linking errors
-    window->openglContext.GetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
+    window->openglContext->GetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
     if(!success) {
-        window->openglContext.GetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
+        window->openglContext->GetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
         printf("%s\n%s\n", "ERROR::SHADER::PROGRAM::LINKING_FAILED\n", infoLog);
     }
 

@@ -5,11 +5,14 @@
 #include <stdlib.h>
 #include <memory.h>
 #include <stdio.h>
+#include <PR/error.h>
 
 prMeshData* prMeshCreate() {
     prMeshData* mesh = malloc(sizeof(prMeshData));
 
-    mesh->window = NULL;
+    
+
+    mesh->context = NULL;
     mesh->vertices = NULL;
     mesh->textureCoordinates = NULL;
     mesh->indices = NULL;
@@ -30,12 +33,12 @@ void prMeshDestroy(prMeshData* mesh) {
     free(mesh);
 }
 
-void prMeshLink(prMeshData* mesh, prWindow* window) {
-    if(mesh->window && mesh->GPUReadyBuffer) {
+void prMeshLink(prMeshData* mesh, GladGLContext* context) {
+    if(mesh->context && mesh->GPUReadyBuffer) {
         i_prMeshDestroyOnGPUSide(mesh);
     }
-    mesh->window = window;
-    if(mesh->window && mesh->GPUReadyBuffer) {
+    mesh->context = context;
+    if(mesh->context && mesh->GPUReadyBuffer) {
         i_prMeshCreateOnGPUSide(mesh);
     }
 }
@@ -84,9 +87,9 @@ void prMeshUpdate(prMeshData* mesh, GLfloat vertices[], size_t verticesCount, GL
     }
     mesh->GPUReadyBufferCount = verticesCount + textureCoordinatesCount;
 
-    if(mesh->window && !mesh->VAO) {
+    if(mesh->context && !mesh->VAO) {
         i_prMeshCreateOnGPUSide(mesh);
-    } else if(mesh->window) {
+    } else if(mesh->context) {
         i_prMeshUpdateOnGPUSide(mesh);
     }
 }

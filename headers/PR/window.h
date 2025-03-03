@@ -8,7 +8,7 @@ typedef struct prTextureData prTextureData;
 
 typedef struct prWindow {
     GLFWwindow* window;
-    GladGLContext openglContext;
+    GladGLContext* openglContext;
 } prWindow;
 
 prWindow* prWindowCreate(const char* title, int width, int height);

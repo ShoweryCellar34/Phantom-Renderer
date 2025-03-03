@@ -4,6 +4,15 @@
 
 #include <stb_image.h>
 
+void prEnableBlending(GladGLContext* context) {
+    context->Enable(GL_BLEND);
+    context->BlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+}
+
+void prDisableBlending(GladGLContext* context) {
+    context->Disable(GL_BLEND);
+}
+
 prTextureData* prTextureCreate() {
     prTextureData* texture = malloc(sizeof(prTextureData));
 
@@ -20,12 +29,12 @@ void prTextureDestroy(prTextureData* texture) {
     free(texture);
 }
 
-void prTextureLink(prTextureData* texture, prWindow* window) {
-    if(texture->window && texture->textureData) {
+void prTextureLink(prTextureData* texture, GladGLContext* context) {
+    if(texture->context && texture->textureData) {
         i_prTextureDestroyOnGPUSide(texture);
     }
-    texture->window = window;
-    if(texture->window && texture->textureData) {
+    texture->context = context;
+    if(texture->context && texture->textureData) {
         i_prTextureCreateOnGPUSide(texture);
     }
 }
@@ -38,9 +47,9 @@ void prTextureUpdate(prTextureData* texture, unsigned char rawTextureData[], uns
 
     texture->textureData = stbi_load_from_memory(rawTextureData, rawTextureDataCount, &texture->width, &texture->height, &texture->channels, 0);
 
-    if(texture->window && !texture->TBO) {
+    if(texture->context && !texture->TBO) {
         i_prTextureCreateOnGPUSide(texture);
-    } else if(texture->window) {
+    } else if(texture->context) {
         i_prTextureUpdateOnGPUSide(texture);
     }
 }

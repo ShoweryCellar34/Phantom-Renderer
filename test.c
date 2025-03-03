@@ -28,11 +28,11 @@ unsigned int indices[] = {
    1, 2, 3,  // second Triangle
 };
 
-void GLAPIENTRY MessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam) {
-    fprintf(stderr, "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n",
-           ( type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : "" ),
-            type, severity, message);
-}
+// void GLAPIENTRY MessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam) {
+//     fprintf(stderr, "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n",
+//            ( type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : "" ),
+//             type, severity, message);
+// }
 
 int main(int argc, char** argv) {
     glfwInit();
@@ -43,6 +43,7 @@ int main(int argc, char** argv) {
     glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, GLFW_TRUE);
     prWindow* test = prWindowCreate("Test", 600, 600);
     prWindowInitContext(test);
+    prEnableBlending(test->openglContext);
 
     // test.openglContext.Enable(GL_DEBUG_OUTPUT);
     // test.openglContext.DebugMessageCallback(MessageCallback, 0);
@@ -50,11 +51,11 @@ int main(int argc, char** argv) {
     unsigned int shaderProgram = prWindowGenDefaultShaderProgram(test);
 
     prMeshData* testMesh = prMeshCreate();
-    prMeshLink(testMesh, test);
+    prMeshLink(testMesh, test->openglContext);
     prMeshUpdate(testMesh, vertices, 12, indices, 6, textureCoordinates, 8);
 
     prMeshData* testMesh2 = prMeshCreate();
-    prMeshLink(testMesh2, test);
+    prMeshLink(testMesh2, test->openglContext);
     prMeshUpdate(testMesh2, vertices2, 12, indices, 6, textureCoordinates, 8);
 
     FILE* textureFile = fopen("awesomeface.png", "rb");
@@ -66,16 +67,16 @@ int main(int argc, char** argv) {
     fclose(textureFile);
 
     prTextureData* testTexture = prTextureCreate();
-    prTextureLink(testTexture, test);
+    prTextureLink(testTexture, test->openglContext);
     prTextureUpdate(testTexture, textureData, textureFileSize);
 
     int width, height;
     glfwGetWindowSize(test->window, &width, &height);
-    test->openglContext.Viewport(0, 0, width, height);
+    test->openglContext->Viewport(0, 0, width, height);
 
     while(!glfwWindowShouldClose(test->window)) {
-        test->openglContext.ClearColor(0.3f, 0.5f, 0.7f, 1.0f);
-        test->openglContext.Clear(GL_COLOR_BUFFER_BIT);
+        test->openglContext->ClearColor(0.3f, 0.5f, 0.7f, 1.0f);
+        test->openglContext->Clear(GL_COLOR_BUFFER_BIT);
 
         prWindowDrawMesh(test, shaderProgram, testMesh, testTexture);
         prWindowDrawMesh(test, shaderProgram, testMesh2, testTexture);
