@@ -4,6 +4,10 @@
 
 void prEnableBlending(GladGLContext* context);
 
+void prEnableImageFlip();
+
+void prDisableImageFlip();
+
 void prDisableBlending(GladGLContext* context);
 
 typedef struct prTextureData {

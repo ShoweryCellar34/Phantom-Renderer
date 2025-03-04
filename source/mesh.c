@@ -2,15 +2,10 @@
 
 #include <PR/meshInternal.h>
 
-#include <stdlib.h>
-#include <memory.h>
-#include <stdio.h>
-#include <PR/error.h>
+#include <PR/memory.h>
 
 prMeshData* prMeshCreate() {
-    prMeshData* mesh = malloc(sizeof(prMeshData));
-
-    
+    prMeshData* mesh = prMalloc(sizeof(prMeshData));
 
     mesh->context = NULL;
     mesh->vertices = NULL;
@@ -30,7 +25,7 @@ prMeshData* prMeshCreate() {
 
 void prMeshDestroy(prMeshData* mesh) {
     i_prMeshDestroyOnGPUSide(mesh);
-    free(mesh);
+    prFree(mesh);
 }
 
 void prMeshLink(prMeshData* mesh, GladGLContext* context) {
@@ -45,37 +40,37 @@ void prMeshLink(prMeshData* mesh, GladGLContext* context) {
 
 void prMeshUpdate(prMeshData* mesh, GLfloat vertices[], size_t verticesCount, GLuint indices[], size_t indicesCount, GLfloat textureCoordinates[], size_t textureCoordinatesCount) {
     if(mesh->vertices) {
-        free(mesh->vertices);
-        free(mesh->indices);
+        prFree(mesh->vertices);
+        prFree(mesh->indices);
         mesh->vertices = NULL;
         mesh->indices = NULL;
     }
     if(mesh->textureCoordinates) {
-        free(mesh->textureCoordinates);
+        prFree(mesh->textureCoordinates);
         mesh->textureCoordinates = NULL;
     }
 
-    mesh->vertices = malloc(sizeof(GLfloat) * verticesCount);
-    memcpy(mesh->vertices, vertices, sizeof(GLfloat) * verticesCount);
+    mesh->vertices = prMalloc(sizeof(GLfloat) * verticesCount);
+    prMemcpy(mesh->vertices, vertices, sizeof(GLfloat) * verticesCount);
     mesh->verticesCount = verticesCount;
 
-    mesh->indices = malloc(sizeof(GLuint) * indicesCount);
-    memcpy(mesh->indices, indices, sizeof(GLuint) * indicesCount);
+    mesh->indices = prMalloc(sizeof(GLuint) * indicesCount);
+    prMemcpy(mesh->indices, indices, sizeof(GLuint) * indicesCount);
     mesh->indicesCount = indicesCount;
 
     if(textureCoordinatesCount && textureCoordinates) {
-        mesh->textureCoordinates = malloc(sizeof(GLfloat) * textureCoordinatesCount);
-        memcpy(mesh->textureCoordinates, textureCoordinates, sizeof(GLfloat) * textureCoordinatesCount);
+        mesh->textureCoordinates = prMalloc(sizeof(GLfloat) * textureCoordinatesCount);
+        prMemcpy(mesh->textureCoordinates, textureCoordinates, sizeof(GLfloat) * textureCoordinatesCount);
         mesh->textureCoordinatesCount = textureCoordinatesCount;
     }
     mesh->textureCoordinatesCount = textureCoordinatesCount;
 
     if(mesh->GPUReadyBuffer) {
-        free(mesh->GPUReadyBuffer);
+        prFree(mesh->GPUReadyBuffer);
         mesh->GPUReadyBuffer = NULL;
     }
 
-    mesh->GPUReadyBuffer = malloc((textureCoordinatesCount + verticesCount) * sizeof(GLfloat));
+    mesh->GPUReadyBuffer = prMalloc((textureCoordinatesCount + verticesCount) * sizeof(GLfloat));
     for(size_t i = 0; i < (verticesCount + textureCoordinatesCount) / 5; i++) {
         size_t vertexIndex = i * 3;
         size_t textureCoordinatesIndex = i * 2;

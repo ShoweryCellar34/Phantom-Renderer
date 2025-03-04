@@ -1,6 +1,5 @@
 #pragma once
 
-#define PR_MEMORY_CHECK(x, y) 
 
 typedef enum prErrorType {
     PR_MEMORY_ERROR,
@@ -20,3 +19,5 @@ void prLogError(const char* tag, const char* message);
 void prLogFatal(const char* tag, const char* message);
 
 void prError(prErrorType errorType, const char* message);
+
+#define PR_MEMORY_CHECK(x, y, z) if (x == NULL) {prLogError("[MEMORY]", y);} else {prLogTrace("[MEMORY]", z);};

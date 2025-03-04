@@ -3,10 +3,19 @@
 #include <PR/textureInternal.h>
 
 #include <stb_image.h>
+#include <PR/memory.h>
 
 void prEnableBlending(GladGLContext* context) {
     context->Enable(GL_BLEND);
     context->BlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+}
+
+void prEnableImageFlip() {
+    stbi_set_flip_vertically_on_load(1);
+}
+
+void prDisableImageFlip() {
+    stbi_set_flip_vertically_on_load(0);
 }
 
 void prDisableBlending(GladGLContext* context) {
@@ -14,7 +23,7 @@ void prDisableBlending(GladGLContext* context) {
 }
 
 prTextureData* prTextureCreate() {
-    prTextureData* texture = malloc(sizeof(prTextureData));
+    prTextureData* texture = prMalloc(sizeof(prTextureData));
 
     texture->textureData = NULL;
     texture->width = 0;
@@ -26,7 +35,7 @@ prTextureData* prTextureCreate() {
 
 void prTextureDestroy(prTextureData* texture) {
     i_prTextureDestroyOnGPUSide(texture);
-    free(texture);
+    prFree(texture);
 }
 
 void prTextureLink(prTextureData* texture, GladGLContext* context) {

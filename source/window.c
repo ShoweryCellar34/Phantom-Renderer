@@ -1,12 +1,12 @@
 #include <PR/window.h>
 
-#include <stdlib.h>
 #include <stdio.h>
+#include <PR/memory.h>
 #include <PR/mesh.h>
 #include <PR/texture.h>
 
 prWindow* prWindowCreate(const char* title, int width, int height) {
-    prWindow* window = malloc(sizeof(prWindow));
+    prWindow* window = prMalloc(sizeof(prWindow));
 
     window->window = glfwCreateWindow(width, height, title, NULL, NULL);
 
@@ -15,13 +15,14 @@ prWindow* prWindowCreate(const char* title, int width, int height) {
 
 void prWindowInitContext(prWindow* window) {
     glfwMakeContextCurrent(window->window);
-    window->openglContext = malloc(sizeof(GladGLContext));
+    window->openglContext = prMalloc(sizeof(GladGLContext));
     gladLoadGLContext(window->openglContext, (GLADloadfunc)glfwGetProcAddress);
 }
 
 void prWindowDestroy(prWindow* window) {
     glfwDestroyWindow(window->window);
-    free(window->openglContext);
+    prFree(window->window);
+    prFree(window->openglContext);
 }
 
 void prWindowDrawMesh(prWindow* window, unsigned int shaderProgram, prMeshData* mesh, prTextureData* texture) {

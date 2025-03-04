@@ -1,7 +1,7 @@
 #include <PR/PR.h>
 
-#include <stdlib.h>
 #include <stdio.h>
+#include <PR/memory.h>
 
 float vertices[] = {
     0.8f,  0.8f, 0.0f,  // top right
@@ -43,7 +43,9 @@ int main(int argc, char** argv) {
     glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, GLFW_TRUE);
     prWindow* test = prWindowCreate("Test", 600, 600);
     prWindowInitContext(test);
+
     prEnableBlending(test->openglContext);
+    prEnableImageFlip();
 
     // test.openglContext.Enable(GL_DEBUG_OUTPUT);
     // test.openglContext.DebugMessageCallback(MessageCallback, 0);
@@ -62,13 +64,14 @@ int main(int argc, char** argv) {
     fseek(textureFile, 0L, SEEK_END);
     size_t textureFileSize = ftell(textureFile);
     fseek(textureFile, 0L, SEEK_SET);
-    unsigned char* textureData = malloc(textureFileSize + 1);
+    unsigned char* textureData = prMalloc(textureFileSize + 1);
     fread(textureData, textureFileSize, 1, textureFile);
     fclose(textureFile);
 
     prTextureData* testTexture = prTextureCreate();
     prTextureLink(testTexture, test->openglContext);
     prTextureUpdate(testTexture, textureData, textureFileSize);
+    prFree(textureData);
 
     int width, height;
     glfwGetWindowSize(test->window, &width, &height);
