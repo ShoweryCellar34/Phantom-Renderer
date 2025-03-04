@@ -18,5 +18,3 @@ void prWindowDestroy(prWindow* window);
 void prWindowInitContext(prWindow* window);
 
 void prWindowDrawMesh(prWindow* window, unsigned int shaderProgram, prMeshData* mesh, prTextureData* texture);
-
-unsigned int prWindowGenDefaultShaderProgram(prWindow* window);

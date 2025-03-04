@@ -7,24 +7,40 @@
 
 void* prMalloc(size_t size) {
     void* memory = malloc(size);
-    char failMessage[50];
+
+    char failMessage[48];
     snprintf(failMessage, 50, "Failed to allocate %llu bytes of memory", size);
-    char successMessage[100];
+    char successMessage[96];
     snprintf(successMessage, 50, "Succesfully allocated %llu bytes of memory", size);
-    PR_MEMORY_CHECK(memory, failMessage, successMessage)
+    if(!memory) {
+        prError(PR_MEMORY_ERROR, failMessage);
+        return NULL;
+    } else {
+        prLogInfo("[MEMORY]", successMessage);
+    }
+
     return memory;
 }
 
 void* prMemcpy(void* destinatonMemory, void* sourceMemory, size_t size) {
     void* memory = memcpy(destinatonMemory, sourceMemory, size);
-    char failMessage[50];
+
+    char failMessage[48];
     snprintf(failMessage, 50, "Failed to copy %llu bytes of memory", size);
-    char successMessage[100];
+    char successMessage[96];
     snprintf(successMessage, 50, "Succesfully copied %llu bytes of memory", size);
-    PR_MEMORY_CHECK(memory, failMessage, successMessage)
+    if(!memory) {
+        prError(PR_MEMORY_ERROR, failMessage);
+        return NULL;
+    } else {
+        prLogInfo("[MEMORY]", successMessage);
+    }
+
     return memory;
 }
 
 void prFree(void* memory) {
     free(memory);
+
+    prLogTrace("[MEMORY]", "Successfully deallocated memory");
 }

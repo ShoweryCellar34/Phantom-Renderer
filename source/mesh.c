@@ -3,6 +3,7 @@
 #include <PR/meshInternal.h>
 
 #include <PR/memory.h>
+#include <PR/error.h>
 
 prMeshData* prMeshCreate() {
     prMeshData* mesh = prMalloc(sizeof(prMeshData));
@@ -50,6 +51,27 @@ void prMeshUpdate(prMeshData* mesh, GLfloat vertices[], size_t verticesCount, GL
         mesh->textureCoordinates = NULL;
     }
 
+    if(!verticesCount) {
+        prError(PR_INCORRECT_DATA_ERROR, "Vertices data count cannot be zero. Aborting operation, nothing was modified");
+        return;
+    } else if(verticesCount % 3 != 0) {
+        prError(PR_INCORRECT_DATA_ERROR, "Vertices data count must be a multiple of 3. Aborting operation, nothing was modified");
+        return;
+    }
+
+    if(!indicesCount) {
+        prError(PR_INCORRECT_DATA_ERROR, "Indices data count cannot be zero. Aborting operation, nothing was modified");
+        return;
+    } else if(indicesCount % 2 != 0) {
+        prError(PR_INCORRECT_DATA_ERROR, "Indices data count must be a multiple of 2. Aborting operation, nothing was modified");
+        return;
+    }
+
+    if(textureCoordinatesCount % 2 != 0) {
+        prError(PR_INCORRECT_DATA_ERROR, "Texture coordinates data count must be a multiple of 2. Aborting operation, nothing was modified");
+        return;
+    }
+
     mesh->vertices = prMalloc(sizeof(GLfloat) * verticesCount);
     prMemcpy(mesh->vertices, vertices, sizeof(GLfloat) * verticesCount);
     mesh->verticesCount = verticesCount;
@@ -77,8 +99,8 @@ void prMeshUpdate(prMeshData* mesh, GLfloat vertices[], size_t verticesCount, GL
         mesh->GPUReadyBuffer[i * 5] = vertices[vertexIndex];
         mesh->GPUReadyBuffer[i * 5 + 1] = vertices[vertexIndex + 1];
         mesh->GPUReadyBuffer[i * 5 + 2] = vertices[vertexIndex + 2];
-        mesh->GPUReadyBuffer[i * 5 + 3] = textureCoordinates[textureCoordinatesIndex];
-        mesh->GPUReadyBuffer[i * 5 + 4] = textureCoordinates[textureCoordinatesIndex + 1];
+        mesh->GPUReadyBuffer[i * 5 + 3] = textureCoordinatesCount ? textureCoordinates[textureCoordinatesIndex] : 0.0f;
+        mesh->GPUReadyBuffer[i * 5 + 4] = textureCoordinatesCount ? textureCoordinates[textureCoordinatesIndex + 1] : 0.0f;
     }
     mesh->GPUReadyBufferCount = verticesCount + textureCoordinatesCount;
 

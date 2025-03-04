@@ -1,0 +1,73 @@
+#include <PR/shader.h>
+
+#include <stddef.h>
+#include <stdio.h>
+#include <PR/error.h>
+
+unsigned int prShaderGenerateDefaultProgram(GladGLContext* context) {
+    const char *vertexShaderSource = "\n\
+            #version 330 core\n\
+            layout (location = 0) in vec3 inputPosition;\n\
+            layout (location = 1) in vec2 inputTextureCoordinates;\n\
+            \n\
+            out vec2 textureCoordinates;\n\
+            \n\
+            void main() {\n\
+                gl_Position = vec4(inputPosition, 1.0);\n\
+                textureCoordinates = inputTextureCoordinates;\n\
+            }\n\
+        ";
+
+    const char *fragmentShaderSource = "\n\
+            #version 330 core\n\
+            out vec4 FragColor;\n\
+            \n\
+            in vec2 textureCoordinates;\n\
+            \n\
+            uniform sampler2D textureSampler;\n\
+            \n\
+            void main() {\n\
+                FragColor = texture(textureSampler, textureCoordinates);\n\
+            }\n\
+        ";
+
+    int success;
+    char infoLog[512];
+    char failMessage[768];
+
+    unsigned int vertexShader = context->CreateShader(GL_VERTEX_SHADER);
+    context->ShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
+    context->CompileShader(vertexShader);
+
+    context->GetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
+    if(!success) {
+        context->GetShaderInfoLog(vertexShader, 512, NULL, infoLog);
+        snprintf(failMessage, 768, "Vertex shader failed to compile with error: %s", infoLog);
+        prError(PR_GL_ERROR, failMessage);
+    }
+
+    unsigned int fragmentShader = context->CreateShader(GL_FRAGMENT_SHADER);
+    context->ShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
+    context->CompileShader(fragmentShader);
+
+    context->GetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
+    if(!success) {
+        context->GetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
+        snprintf(failMessage, 768, "Fragment shader failed to compile with error: %s", infoLog);
+        prError(PR_GL_ERROR, failMessage);
+    }
+
+    unsigned int shaderProgram = context->CreateProgram();
+    context->AttachShader(shaderProgram, vertexShader);
+    context->AttachShader(shaderProgram, fragmentShader);
+    context->LinkProgram(shaderProgram);
+
+    context->GetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
+    if(!success) {
+        context->GetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
+        snprintf(failMessage, 768, "Shader program failed to link with error: %s", infoLog);
+        prError(PR_GL_ERROR, failMessage);
+    }
+
+    return shaderProgram;
+}

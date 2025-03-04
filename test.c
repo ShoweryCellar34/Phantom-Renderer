@@ -4,28 +4,28 @@
 #include <PR/memory.h>
 
 float vertices[] = {
-    0.8f,  0.8f, 0.0f,  // top right
-    0.8f, -0.8f, 0.0f,  // bottom right
-   -0.8f, -0.8f, 0.0f,  // bottom left
-   -0.8f,  0.8f, 0.0f // top left
+    0.8f,  0.8f, 0.0f, // top right
+    0.8f, -0.8f, 0.0f, // bottom right
+   -0.8f, -0.8f, 0.0f, // bottom left
+   -0.8f,  0.8f, 0.0f  // top left
 };
 
 float vertices2[] = {
-    1.0f,  1.0f, 0.0f,  // top right
-    1.0f, -0.2f, 0.0f,  // bottom right
-   -0.2f, -0.2f, 0.0f,  // bottom left
-   -0.2f,  1.0f, 0.0f // top left
+    1.0f,  1.0f, 0.0f, // top right
+    1.0f, -0.2f, 0.0f, // bottom right
+   -0.2f, -0.2f, 0.0f, // bottom left
+   -0.2f,  1.0f, 0.0f  // top left
 };
 
 float textureCoordinates[] = {
-    1.0f,  1.0f,
-    1.0f,  0.0f,
-    0.0f,  0.0f,
-    0.0f,  1.0f
+    1.0f,  1.0f, // top right
+    1.0f,  0.0f, // bottom right
+    0.0f,  0.0f, // bottom left
+    0.0f, 1.0f   // top left
 };
 unsigned int indices[] = {
-   0, 1, 3,  // first Triangle
-   1, 2, 3,  // second Triangle
+   0, 1, 3, // first Triangle
+   1, 2, 3  // second Triangle
 };
 
 // void GLAPIENTRY MessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam) {
@@ -35,6 +35,9 @@ unsigned int indices[] = {
 // }
 
 int main(int argc, char** argv) {
+    prSetLogLevel(PR_LOG_LEVEL_TRACE);
+    prStartFileLogging();
+
     glfwInit();
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -50,15 +53,15 @@ int main(int argc, char** argv) {
     // test.openglContext.Enable(GL_DEBUG_OUTPUT);
     // test.openglContext.DebugMessageCallback(MessageCallback, 0);
     
-    unsigned int shaderProgram = prWindowGenDefaultShaderProgram(test);
+    unsigned int shaderProgram = prShaderGenerateDefaultProgram(test->openglContext);
 
     prMeshData* testMesh = prMeshCreate();
     prMeshLink(testMesh, test->openglContext);
-    prMeshUpdate(testMesh, vertices, 12, indices, 6, textureCoordinates, 8);
+    prMeshUpdate(testMesh, vertices, sizeof(vertices) / sizeof(float), indices, sizeof(indices) / sizeof(unsigned int), textureCoordinates, sizeof(textureCoordinates) / sizeof(float));
 
     prMeshData* testMesh2 = prMeshCreate();
     prMeshLink(testMesh2, test->openglContext);
-    prMeshUpdate(testMesh2, vertices2, 12, indices, 6, textureCoordinates, 8);
+    prMeshUpdate(testMesh2, vertices2, sizeof(vertices) / sizeof(float), indices, sizeof(indices) / sizeof(unsigned int), textureCoordinates, sizeof(textureCoordinates) / sizeof(float));
 
     FILE* textureFile = fopen("awesomeface.png", "rb");
     fseek(textureFile, 0L, SEEK_END);
@@ -88,15 +91,17 @@ int main(int argc, char** argv) {
 
         glfwPollEvents();
     }
-
+    
     prMeshDestroy(testMesh);
     testMesh = NULL;
-
+    
     prTextureDestroy(testTexture);
     testTexture = NULL;
-
+    
     prWindowDestroy(test);
     test = NULL;
-
+    
     glfwTerminate();
+
+    prEndFileLogging();
 }
