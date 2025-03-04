@@ -20,9 +20,10 @@ void prWindowInitContext(prWindow* window) {
 }
 
 void prWindowDestroy(prWindow* window) {
-    glfwDestroyWindow(window->window);
-    prFree(window->window);
     prFree(window->openglContext);
+    glfwDestroyWindow(window->window);
+
+    prFree(window);
 }
 
 void prWindowDrawMesh(prWindow* window, unsigned int shaderProgram, prMeshData* mesh, prTextureData* texture) {
