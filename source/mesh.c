@@ -77,8 +77,8 @@ void prMeshUpdate(prMeshData* mesh, GLfloat vertices[], size_t verticesCount, GL
         prError(PR_INVALID_DATA_ERROR, "Texture coordinates data count must be a multiple of 2. Aborting operation, nothing was modified");
         return;
     }
-    if(!textureCoordinates) {
-        prError(PR_INVALID_DATA_ERROR, "Texture coordinates data cannot be NULL. Aborting operation, nothing was modified");
+    if(!textureCoordinates && textureCoordinatesCount) {
+        prError(PR_INVALID_DATA_ERROR, "Texture coordinates data cannot be NULL while texture coordinates data count is not 0. Aborting operation, nothing was modified");
         return;
     }
 
