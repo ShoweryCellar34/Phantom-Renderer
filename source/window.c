@@ -8,6 +8,10 @@
 prWindow* prWindowCreate(const char* title, int width, int height) {
     prWindow* window = prMalloc(sizeof(prWindow));
 
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, GLFW_TRUE);
     window->window = glfwCreateWindow(width, height, title, NULL, NULL);
 
     return window;
@@ -26,15 +30,20 @@ void prWindowDestroy(prWindow* window) {
     prFree(window);
 }
 
-void prWindowDrawMesh(prWindow* window, unsigned int shaderProgram, prMeshData* mesh, prTextureData* texture) {
-    window->openglContext->UseProgram(shaderProgram);
+void prWindowClear(GladGLContext* context) {
+    context->ClearColor(0.3f, 0.5f, 0.7f, 1.0f);
+    context->Clear(GL_COLOR_BUFFER_BIT);
+}
 
-    window->openglContext->BindVertexArray(mesh->VAO);
+void prWindowDrawMesh(GladGLContext* context, unsigned int shaderProgram, prMeshData* mesh, prTextureData* texture) {
+    context->UseProgram(shaderProgram);
 
-    window->openglContext->ActiveTexture(GL_TEXTURE0);
-    window->openglContext->BindTexture(GL_TEXTURE_2D, texture->TBO);
+    context->BindVertexArray(mesh->VAO);
 
-    window->openglContext->DrawElements(GL_TRIANGLES, mesh->indicesCount, GL_UNSIGNED_INT, 0);
+    context->ActiveTexture(GL_TEXTURE0);
+    context->BindTexture(GL_TEXTURE_2D, texture->TBO);
 
-    window->openglContext->BindVertexArray(0);
+    context->DrawElements(GL_TRIANGLES, mesh->indicesCount, GL_UNSIGNED_INT, 0);
+
+    context->BindVertexArray(0);
 }

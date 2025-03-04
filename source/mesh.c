@@ -52,23 +52,33 @@ void prMeshUpdate(prMeshData* mesh, GLfloat vertices[], size_t verticesCount, GL
     }
 
     if(!verticesCount) {
-        prError(PR_INCORRECT_DATA_ERROR, "Vertices data count cannot be zero. Aborting operation, nothing was modified");
+        prError(PR_INVALID_DATA_ERROR, "Vertices data count cannot be zero. Aborting operation, nothing was modified");
         return;
     } else if(verticesCount % 3 != 0) {
-        prError(PR_INCORRECT_DATA_ERROR, "Vertices data count must be a multiple of 3. Aborting operation, nothing was modified");
+        prError(PR_INVALID_DATA_ERROR, "Vertices data count must be a multiple of 3. Aborting operation, nothing was modified");
+        return;
+    } else if(!vertices) {
+        prError(PR_INVALID_DATA_ERROR, "Vertices data cannot be NULL. Aborting operation, nothing was modified");
         return;
     }
 
     if(!indicesCount) {
-        prError(PR_INCORRECT_DATA_ERROR, "Indices data count cannot be zero. Aborting operation, nothing was modified");
+        prError(PR_INVALID_DATA_ERROR, "Indices data count cannot be zero. Aborting operation, nothing was modified");
         return;
     } else if(indicesCount % 2 != 0) {
-        prError(PR_INCORRECT_DATA_ERROR, "Indices data count must be a multiple of 2. Aborting operation, nothing was modified");
+        prError(PR_INVALID_DATA_ERROR, "Indices data count must be a multiple of 2. Aborting operation, nothing was modified");
+        return;
+    } else if(!indices) {
+        prError(PR_INVALID_DATA_ERROR, "Indices data cannot be NULL. Aborting operation, nothing was modified");
         return;
     }
 
     if(textureCoordinatesCount % 2 != 0) {
-        prError(PR_INCORRECT_DATA_ERROR, "Texture coordinates data count must be a multiple of 2. Aborting operation, nothing was modified");
+        prError(PR_INVALID_DATA_ERROR, "Texture coordinates data count must be a multiple of 2. Aborting operation, nothing was modified");
+        return;
+    }
+    if(!textureCoordinates) {
+        prError(PR_INVALID_DATA_ERROR, "Texture coordinates data cannot be NULL. Aborting operation, nothing was modified");
         return;
     }
 

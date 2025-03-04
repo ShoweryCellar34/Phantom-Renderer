@@ -28,11 +28,10 @@ unsigned int indices[] = {
    1, 2, 3  // second Triangle
 };
 
-// void GLAPIENTRY MessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam) {
-//     fprintf(stderr, "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n",
-//            ( type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : "" ),
-//             type, severity, message);
-// }
+void framebufferSizeCallback(GLFWwindow* window, int width, int height) {
+    GladGLContext* context = glfwGetWindowUserPointer(window);
+    context->Viewport(0, 0, width, height);
+}
 
 int main(int argc, char** argv) {
     prSetLogLevel(PR_LOG_LEVEL_TRACE);
@@ -40,29 +39,23 @@ int main(int argc, char** argv) {
 
     glfwInit();
 
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, GLFW_TRUE);
     prWindow* test = prWindowCreate("Test", 600, 600);
     prWindowInitContext(test);
-
+    glfwSetWindowUserPointer(test->window, test->openglContext);
+    
     prEnableBlending(test->openglContext);
     prEnableImageFlip();
-
-    // test.openglContext.Enable(GL_DEBUG_OUTPUT);
-    // test.openglContext.DebugMessageCallback(MessageCallback, 0);
     
     unsigned int shaderProgram = prShaderGenerateDefaultProgram(test->openglContext);
-
+    
     prMeshData* testMesh = prMeshCreate();
     prMeshLink(testMesh, test->openglContext);
     prMeshUpdate(testMesh, vertices, sizeof(vertices) / sizeof(float), indices, sizeof(indices) / sizeof(unsigned int), textureCoordinates, sizeof(textureCoordinates) / sizeof(float));
-
+    
     prMeshData* testMesh2 = prMeshCreate();
     prMeshLink(testMesh2, test->openglContext);
     prMeshUpdate(testMesh2, vertices2, sizeof(vertices) / sizeof(float), indices, sizeof(indices) / sizeof(unsigned int), textureCoordinates, sizeof(textureCoordinates) / sizeof(float));
-
+    
     FILE* textureFile = fopen("awesomeface.png", "rb");
     fseek(textureFile, 0L, SEEK_END);
     size_t textureFileSize = ftell(textureFile);
@@ -70,37 +63,35 @@ int main(int argc, char** argv) {
     unsigned char* textureData = prMalloc(textureFileSize + 1);
     fread(textureData, textureFileSize, 1, textureFile);
     fclose(textureFile);
-
+    
     prTextureData* testTexture = prTextureCreate();
     prTextureLink(testTexture, test->openglContext);
     prTextureUpdate(testTexture, textureData, textureFileSize);
     prFree(textureData);
-
-    int width, height;
-    glfwGetWindowSize(test->window, &width, &height);
-    test->openglContext->Viewport(0, 0, width, height);
+    
+    glfwMakeContextCurrent(test->window);
+    glfwSetFramebufferSizeCallback(test->window, framebufferSizeCallback);
 
     while(!glfwWindowShouldClose(test->window)) {
-        test->openglContext->ClearColor(0.3f, 0.5f, 0.7f, 1.0f);
-        test->openglContext->Clear(GL_COLOR_BUFFER_BIT);
+        prWindowClear(test->openglContext);
 
-        prWindowDrawMesh(test, shaderProgram, testMesh, testTexture);
-        prWindowDrawMesh(test, shaderProgram, testMesh2, testTexture);
+        prWindowDrawMesh(test->openglContext, shaderProgram, testMesh, testTexture);
+        prWindowDrawMesh(test->openglContext, shaderProgram, testMesh2, testTexture);
 
         glfwSwapBuffers(test->window);
 
         glfwPollEvents();
     }
-    
+
     prMeshDestroy(testMesh);
     testMesh = NULL;
-    
+
     prTextureDestroy(testTexture);
     testTexture = NULL;
-    
+
     prWindowDestroy(test);
     test = NULL;
-    
+
     glfwTerminate();
 
     prEndFileLogging();

@@ -1,14 +1,21 @@
 #include <PR/textureInternal.h>
 
-#include <PR/window.h>
+#include <PR/error.h>
 
 void i_prTextureCreateOnGPUSide(prTextureData* texture) {
     texture->context->GenTextures(1, &texture->TBO);
+    if(!texture->TBO) {
+        prError(PR_GL_ERROR, "Failed to create texture buffer object. Aborting operation, nothing was modified");
+        return;
+    } else {
+        prLogTrace("[GL]", "Successfully created texture buffer object");
+    }
+
     texture->context->BindTexture(GL_TEXTURE_2D, texture->TBO);
 
     texture->context->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);	
     texture->context->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    texture->context->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    texture->context->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     texture->context->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     texture->context->TexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texture->width, texture->height, 0, GL_RGBA, GL_UNSIGNED_BYTE, texture->textureData);

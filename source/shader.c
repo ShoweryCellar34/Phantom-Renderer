@@ -42,7 +42,8 @@ unsigned int prShaderGenerateDefaultProgram(GladGLContext* context) {
     context->GetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
     if(!success) {
         context->GetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-        snprintf(failMessage, 768, "Vertex shader failed to compile with error: %s", infoLog);
+        snprintf(failMessage, 768, "Vertex shader failed to compile. Aborting operation, nothing was modified: %s", infoLog);
+        context->DeleteShader(vertexShader);
         prError(PR_GL_ERROR, failMessage);
     }
 
@@ -53,7 +54,9 @@ unsigned int prShaderGenerateDefaultProgram(GladGLContext* context) {
     context->GetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
     if(!success) {
         context->GetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-        snprintf(failMessage, 768, "Fragment shader failed to compile with error: %s", infoLog);
+        snprintf(failMessage, 768, "Fragment shader failed to compile. Aborting operation, nothing was modified: %s", infoLog);
+        context->DeleteShader(vertexShader);
+        context->DeleteShader(fragmentShader);
         prError(PR_GL_ERROR, failMessage);
     }
 
@@ -65,7 +68,10 @@ unsigned int prShaderGenerateDefaultProgram(GladGLContext* context) {
     context->GetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
     if(!success) {
         context->GetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-        snprintf(failMessage, 768, "Shader program failed to link with error: %s", infoLog);
+        snprintf(failMessage, 768, "Shader program failed to link. Aborting operation, nothing was modified: %s", infoLog);
+        context->DeleteShader(vertexShader);
+        context->DeleteShader(fragmentShader);
+        context->DeleteProgram(shaderProgram);
         prError(PR_GL_ERROR, failMessage);
     }
 

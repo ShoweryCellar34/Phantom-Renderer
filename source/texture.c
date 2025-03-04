@@ -4,6 +4,7 @@
 
 #include <stb_image.h>
 #include <PR/memory.h>
+#include <PR/error.h>
 
 void prEnableBlending(GladGLContext* context) {
     context->Enable(GL_BLEND);
@@ -54,7 +55,18 @@ void prTextureUpdate(prTextureData* texture, unsigned char rawTextureData[], uns
         texture->textureData = NULL;
     }
 
+    if(!rawTextureDataCount) {
+        prError(PR_INVALID_DATA_ERROR, "Texture data count ccannot be zero. Aborting operation, nothing was modified");
+    } else if(!rawTextureData) {
+        prError(PR_INVALID_DATA_ERROR, "Texture data cannot be NULL. Aborting operation, nothing was modified");
+        return;
+    }
+
     texture->textureData = stbi_load_from_memory(rawTextureData, rawTextureDataCount, &texture->width, &texture->height, &texture->channels, 0);
+    if(!texture->textureData) {
+        prError(PR_INVALID_DATA_ERROR, "Texture data failed to unpack. Aborting operation, nothing was modified");
+        return;
+    }
 
     if(texture->context && !texture->TBO) {
         i_prTextureCreateOnGPUSide(texture);

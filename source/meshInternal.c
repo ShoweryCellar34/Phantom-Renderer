@@ -1,12 +1,36 @@
 #include <PR/meshInternal.h>
 
-#include <PR/window.h>
 #include <glad/gl.h>
+#include <PR/error.h>
 
 void i_prMeshCreateOnGPUSide(prMeshData* mesh) {
         mesh->context->GenVertexArrays(1, &mesh->VAO);
+        if(!mesh->VAO) {
+            prError(PR_GL_ERROR, "Failed to create vertex array object. Aborting operation, nothing was modified");
+            return;
+        } else {
+            prLogTrace("[GL]", "Successfully created vertex array object");
+        }
+
         mesh->context->GenBuffers(1, &mesh->VBO);
+        if(!mesh->VBO) {
+            mesh->context->DeleteVertexArrays(1, &mesh->VAO);
+            prError(PR_GL_ERROR, "Failed to create vertex buffer object. Aborting operation, nothing was modified");
+            return;
+        } else {
+            prLogTrace("[GL]", "Successfully created vertex buffer object");
+        }
+
         mesh->context->GenBuffers(1, &mesh->EBO);
+        if(!mesh->EBO) {
+            mesh->context->DeleteVertexArrays(1, &mesh->VAO);
+            mesh->context->DeleteBuffers(1, &mesh->VBO);
+            prError(PR_GL_ERROR, "Failed to create index buffer object. Aborting operation, nothing was modified");
+            return;
+        } else {
+            prLogTrace("[GL]", "Successfully created index buffer object");
+        }
+
         mesh->context->BindVertexArray(mesh->VAO);
 
         mesh->context->BindBuffer(GL_ARRAY_BUFFER, mesh->VBO);

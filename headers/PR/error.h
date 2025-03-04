@@ -1,8 +1,8 @@
 #pragma once
 
 #define PR_MEMORY_ERROR 0
-#define PR_INCORRECT_DATA_ERROR 1
-#define PR_GL_ERROR
+#define PR_INVALID_DATA_ERROR 1
+#define PR_GL_ERROR 2
 
 #define PR_LOG_LEVEL_FATAL 0
 #define PR_LOG_LEVEL_ERROR 1

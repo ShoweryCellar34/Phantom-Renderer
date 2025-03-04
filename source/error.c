@@ -79,12 +79,13 @@ void prError(unsigned int errorType, const char* message) {
             prLogFatal("[MEMORY]", message);
             break;
 
-        case PR_INCORRECT_DATA_ERROR:
+        case PR_INVALID_DATA_ERROR:
             prLogWarning("[DATA]", message);
             break;
 
         case PR_GL_ERROR:
             prLogError("[GL]", message);
+            break;
 
     default:
         break;
