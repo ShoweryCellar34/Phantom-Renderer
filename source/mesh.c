@@ -11,15 +11,18 @@ prMeshData* prMeshCreate() {
     mesh->context = NULL;
     mesh->vertices = NULL;
     mesh->textureCoordinates = NULL;
+    mesh->vertexColor = NULL;
     mesh->indices = NULL;
     mesh->verticesCount = 0;
     mesh->textureCoordinatesCount = 0;
+    mesh->vertexColorCount = 0;
     mesh->indicesCount = 0;
     mesh->VBO = 0;
     mesh->VAO = 0;
     mesh->EBO = 0;
     mesh->GPUReadyBuffer = NULL;
     mesh->GPUReadyBufferCount = 0;
+    mesh->GPUReadyBufferElementCount = 0;
 
     return mesh;
 }
@@ -39,7 +42,7 @@ void prMeshLink(prMeshData* mesh, GladGLContext* context) {
     }
 }
 
-void prMeshUpdate(prMeshData* mesh, GLfloat vertices[], size_t verticesCount, GLuint indices[], size_t indicesCount, GLfloat textureCoordinates[], size_t textureCoordinatesCount) {
+void prMeshUpdate(prMeshData* mesh, GLfloat vertices[], size_t verticesCount, GLuint indices[], size_t indicesCount, GLfloat textureCoordinates[], size_t textureCoordinatesCount, GLfloat vertexColor[], size_t vertexColorCount) {
     if(mesh->vertices) {
         prFree(mesh->vertices);
         prFree(mesh->indices);
@@ -80,6 +83,21 @@ void prMeshUpdate(prMeshData* mesh, GLfloat vertices[], size_t verticesCount, GL
     if(!textureCoordinates && textureCoordinatesCount) {
         prError(PR_INVALID_DATA_ERROR, "Texture coordinates data cannot be NULL while texture coordinates data count is not 0. Aborting operation, nothing was modified");
         return;
+    } else if(textureCoordinatesCount / 2 != verticesCount / 3 && textureCoordinatesCount != 0) {
+        prError(PR_INVALID_DATA_ERROR, "Texture coordinates data not enough for every vertex. Aborting operation, nothing was modified");
+        return;
+    }
+
+    if(vertexColorCount % 4 != 0) {
+        prError(PR_INVALID_DATA_ERROR, "Vertex color data count must be a multiple of 4. Aborting operation, nothing was modified");
+        return;
+    } else if(vertexColorCount / 4 != verticesCount / 3 && vertexColorCount != 0) {
+        prError(PR_INVALID_DATA_ERROR, "Vertex color data not enough for every vertex. Aborting operation, nothing was modified");
+        return;
+    }
+    if(!vertexColor && vertexColorCount) {
+        prError(PR_INVALID_DATA_ERROR, "Vertex color data cannot be NULL while texture coordinates data count is not 0. Aborting operation, nothing was modified");
+        return;
     }
 
     mesh->vertices = prMalloc(sizeof(GLfloat) * verticesCount);
@@ -93,26 +111,42 @@ void prMeshUpdate(prMeshData* mesh, GLfloat vertices[], size_t verticesCount, GL
     if(textureCoordinatesCount && textureCoordinates) {
         mesh->textureCoordinates = prMalloc(sizeof(GLfloat) * textureCoordinatesCount);
         prMemcpy(mesh->textureCoordinates, textureCoordinates, sizeof(GLfloat) * textureCoordinatesCount);
-        mesh->textureCoordinatesCount = textureCoordinatesCount;
     }
     mesh->textureCoordinatesCount = textureCoordinatesCount;
+
+    if(vertexColorCount && vertexColor) {
+        mesh->vertexColor = prMalloc(sizeof(GLfloat) * vertexColorCount);
+        prMemcpy(mesh->vertexColor, vertexColor, sizeof(GLfloat) * vertexColorCount);
+    }
+    mesh->vertexColorCount = vertexColorCount;
 
     if(mesh->GPUReadyBuffer) {
         prFree(mesh->GPUReadyBuffer);
         mesh->GPUReadyBuffer = NULL;
     }
 
-    mesh->GPUReadyBuffer = prMalloc((textureCoordinatesCount + verticesCount) * sizeof(GLfloat));
-    for(size_t i = 0; i < (verticesCount + textureCoordinatesCount) / 5; i++) {
-        size_t vertexIndex = i * 3;
-        size_t textureCoordinatesIndex = i * 2;
-        mesh->GPUReadyBuffer[i * 5] = vertices[vertexIndex];
-        mesh->GPUReadyBuffer[i * 5 + 1] = vertices[vertexIndex + 1];
-        mesh->GPUReadyBuffer[i * 5 + 2] = vertices[vertexIndex + 2];
-        mesh->GPUReadyBuffer[i * 5 + 3] = textureCoordinatesCount ? textureCoordinates[textureCoordinatesIndex] : 0.0f;
-        mesh->GPUReadyBuffer[i * 5 + 4] = textureCoordinatesCount ? textureCoordinates[textureCoordinatesIndex + 1] : 0.0f;
+    mesh->GPUReadyBufferElementCount = verticesCount + textureCoordinatesCount + vertexColorCount;
+    GLuint GPUReadyBufferAttributeCount = mesh->GPUReadyBufferElementCount / 4;
+    mesh->GPUReadyBuffer = prMalloc(mesh->GPUReadyBufferElementCount * sizeof(GLfloat));
+    for(size_t i = 0; i < mesh->GPUReadyBufferElementCount; i++) {
+        size_t vertexIndex = (i / GPUReadyBufferAttributeCount) * 3;
+        mesh->GPUReadyBuffer[i++] = vertices[vertexIndex];
+        mesh->GPUReadyBuffer[i++] = vertices[vertexIndex + 1];
+        mesh->GPUReadyBuffer[i++] = vertices[vertexIndex + 2];
+
+        if(textureCoordinatesCount) {
+            size_t textureCoordinatesIndex = (i / GPUReadyBufferAttributeCount) * 2;
+            mesh->GPUReadyBuffer[i++] = textureCoordinates[textureCoordinatesIndex];
+            mesh->GPUReadyBuffer[i] = textureCoordinates[textureCoordinatesIndex + 1];
+        }
+
+        if(vertexColorCount) {
+            size_t vertexColorIndex = (i / GPUReadyBufferAttributeCount) * 4;
+            mesh->GPUReadyBuffer[i++] = vertexColor[vertexColorIndex];
+            mesh->GPUReadyBuffer[i] = vertexColor[vertexColorIndex + 1];
+        }
     }
-    mesh->GPUReadyBufferCount = verticesCount + textureCoordinatesCount;
+    mesh->GPUReadyBufferCount = mesh->GPUReadyBufferElementCount;
 
     if(mesh->context && !mesh->VAO) {
         i_prMeshCreateOnGPUSide(mesh);

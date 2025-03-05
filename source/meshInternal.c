@@ -9,7 +9,7 @@ void i_prMeshCreateOnGPUSide(prMeshData* mesh) {
             prError(PR_GL_ERROR, "Failed to create vertex array object. Aborting operation, nothing was modified");
             return;
         } else {
-            prLogTrace("[GL]", "Successfully created vertex array object");
+            prLogInfo("[GL]", "Successfully created vertex array object");
         }
 
         mesh->context->GenBuffers(1, &mesh->VBO);
@@ -18,7 +18,7 @@ void i_prMeshCreateOnGPUSide(prMeshData* mesh) {
             prError(PR_GL_ERROR, "Failed to create vertex buffer object. Aborting operation, nothing was modified");
             return;
         } else {
-            prLogTrace("[GL]", "Successfully created vertex buffer object");
+            prLogInfo("[GL]", "Successfully created vertex buffer object");
         }
 
         mesh->context->GenBuffers(1, &mesh->EBO);
@@ -28,7 +28,7 @@ void i_prMeshCreateOnGPUSide(prMeshData* mesh) {
             prError(PR_GL_ERROR, "Failed to create index buffer object. Aborting operation, nothing was modified");
             return;
         } else {
-            prLogTrace("[GL]", "Successfully created index buffer object");
+            prLogInfo("[GL]", "Successfully created index buffer object");
         }
 
         mesh->context->BindVertexArray(mesh->VAO);
@@ -39,11 +39,20 @@ void i_prMeshCreateOnGPUSide(prMeshData* mesh) {
         mesh->context->BindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->EBO);
         mesh->context->BufferData(GL_ELEMENT_ARRAY_BUFFER, mesh->indicesCount * sizeof(GLuint), mesh->indices, GL_STATIC_DRAW);
 
-        mesh->context->VertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (void*)(0 * sizeof(GLfloat)));
-        mesh->context->EnableVertexAttribArray(0);
+        unsigned int i = 0;
 
-        mesh->context->VertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
-        mesh->context->EnableVertexAttribArray(1);
+        mesh->context->VertexAttribPointer(i, 3, GL_FLOAT, GL_FALSE, mesh->GPUReadyBufferElementCount / 4 * sizeof(GLfloat), (void*)(0 * sizeof(GLfloat)));
+        mesh->context->EnableVertexAttribArray(i++);
+
+        if(mesh->textureCoordinatesCount && mesh->textureCoordinates) {
+            mesh->context->VertexAttribPointer(i, 2, GL_FLOAT, GL_FALSE, mesh->GPUReadyBufferElementCount / 4 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
+            mesh->context->EnableVertexAttribArray(i++);
+        }
+
+        if(mesh->vertexColorCount && mesh->vertexColor) {
+            mesh->context->VertexAttribPointer(i, 3, GL_FLOAT, GL_FALSE, mesh->GPUReadyBufferElementCount / 4 * sizeof(GLfloat), (void*)(mesh->textureCoordinatesCount ? 5 : 3 * sizeof(GLfloat)));
+            mesh->context->EnableVertexAttribArray(i++);
+        }
 
         mesh->context->BindBuffer(GL_ARRAY_BUFFER, 0);
 
@@ -58,6 +67,18 @@ void i_prMeshUpdateOnGPUSide(prMeshData* mesh) {
 
 	mesh->context->BindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->EBO);
 	mesh->context->BufferData(GL_ELEMENT_ARRAY_BUFFER, mesh->indicesCount, mesh->indices, GL_STATIC_DRAW);
+
+    unsigned int i = 0;
+
+    if(mesh->textureCoordinatesCount && mesh->textureCoordinates) {
+        mesh->context->VertexAttribPointer(i, 2, GL_FLOAT, GL_FALSE, mesh->GPUReadyBufferElementCount / 4 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
+        mesh->context->EnableVertexAttribArray(i++);
+    }
+
+    if(mesh->vertexColorCount && mesh->vertexColor) {
+        mesh->context->VertexAttribPointer(i, 3, GL_FLOAT, GL_FALSE, mesh->GPUReadyBufferElementCount / 4 * sizeof(GLfloat), (void*)(mesh->textureCoordinatesCount ? 5 : 3 * sizeof(GLfloat)));
+        mesh->context->EnableVertexAttribArray(i++);
+    }
 
 	mesh->context->BindVertexArray(0);
 }

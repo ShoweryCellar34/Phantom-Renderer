@@ -16,7 +16,7 @@ void* prMalloc(size_t size) {
         prError(PR_MEMORY_ERROR, failMessage);
         return NULL;
     } else {
-        prLogInfo("[MEMORY]", successMessage);
+        prLogTrace("[MEMORY]", successMessage);
     }
 
     return memory;
@@ -33,7 +33,7 @@ void* prMemcpy(void* destinatonMemory, void* sourceMemory, size_t size) {
         prError(PR_MEMORY_ERROR, failMessage);
         return NULL;
     } else {
-        prLogInfo("[MEMORY]", successMessage);
+        prLogTrace("[MEMORY]", successMessage);
     }
 
     return memory;

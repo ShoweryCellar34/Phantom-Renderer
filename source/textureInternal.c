@@ -8,7 +8,7 @@ void i_prTextureCreateOnGPUSide(prTextureData* texture) {
         prError(PR_GL_ERROR, "Failed to create texture buffer object. Aborting operation, nothing was modified");
         return;
     } else {
-        prLogTrace("[GL]", "Successfully created texture buffer object");
+        prLogInfo("[GL]", "Successfully created texture buffer object");
     }
 
     texture->context->BindTexture(GL_TEXTURE_2D, texture->TBO);
