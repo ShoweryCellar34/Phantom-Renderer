@@ -132,18 +132,20 @@ void prMeshUpdate(prMeshData* mesh, GLfloat vertices[], size_t verticesCount, GL
         size_t vertexIndex = (i / GPUReadyBufferAttributeCount) * 3;
         mesh->GPUReadyBuffer[i++] = vertices[vertexIndex];
         mesh->GPUReadyBuffer[i++] = vertices[vertexIndex + 1];
-        mesh->GPUReadyBuffer[i++] = vertices[vertexIndex + 2];
+        mesh->GPUReadyBuffer[i] = vertices[vertexIndex + 2];
 
         if(textureCoordinatesCount) {
-            size_t textureCoordinatesIndex = (i / GPUReadyBufferAttributeCount) * 2;
+            size_t textureCoordinatesIndex = (i++ / GPUReadyBufferAttributeCount) * 2;
             mesh->GPUReadyBuffer[i++] = textureCoordinates[textureCoordinatesIndex];
             mesh->GPUReadyBuffer[i] = textureCoordinates[textureCoordinatesIndex + 1];
         }
 
         if(vertexColorCount) {
-            size_t vertexColorIndex = (i / GPUReadyBufferAttributeCount) * 4;
+            size_t vertexColorIndex = (i++ / GPUReadyBufferAttributeCount) * 4;
             mesh->GPUReadyBuffer[i++] = vertexColor[vertexColorIndex];
-            mesh->GPUReadyBuffer[i] = vertexColor[vertexColorIndex + 1];
+            mesh->GPUReadyBuffer[i++] = vertexColor[vertexColorIndex + 1];
+            mesh->GPUReadyBuffer[i++] = vertexColor[vertexColorIndex + 2];
+            mesh->GPUReadyBuffer[i] = vertexColor[vertexColorIndex + 3];
         }
     }
     mesh->GPUReadyBufferCount = mesh->GPUReadyBufferElementCount;

@@ -39,19 +39,17 @@ void i_prMeshCreateOnGPUSide(prMeshData* mesh) {
         mesh->context->BindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->EBO);
         mesh->context->BufferData(GL_ELEMENT_ARRAY_BUFFER, mesh->indicesCount * sizeof(GLuint), mesh->indices, GL_STATIC_DRAW);
 
-        unsigned int i = 0;
-
-        mesh->context->VertexAttribPointer(i, 3, GL_FLOAT, GL_FALSE, mesh->GPUReadyBufferElementCount / 4 * sizeof(GLfloat), (void*)(0 * sizeof(GLfloat)));
-        mesh->context->EnableVertexAttribArray(i++);
+        mesh->context->VertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, mesh->GPUReadyBufferElementCount / 4 * sizeof(GLfloat), (void*)(0 * sizeof(GLfloat)));
+        mesh->context->EnableVertexAttribArray(0);
 
         if(mesh->textureCoordinatesCount && mesh->textureCoordinates) {
-            mesh->context->VertexAttribPointer(i, 2, GL_FLOAT, GL_FALSE, mesh->GPUReadyBufferElementCount / 4 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
-            mesh->context->EnableVertexAttribArray(i++);
+            mesh->context->VertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, mesh->GPUReadyBufferElementCount / 4 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
+            mesh->context->EnableVertexAttribArray(1);
         }
 
         if(mesh->vertexColorCount && mesh->vertexColor) {
-            mesh->context->VertexAttribPointer(i, 3, GL_FLOAT, GL_FALSE, mesh->GPUReadyBufferElementCount / 4 * sizeof(GLfloat), (void*)(mesh->textureCoordinatesCount ? 5 : 3 * sizeof(GLfloat)));
-            mesh->context->EnableVertexAttribArray(i++);
+            mesh->context->VertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, mesh->GPUReadyBufferElementCount / 4 * sizeof(GLfloat), (void*)(mesh->textureCoordinatesCount ? 5 : 3 * sizeof(GLfloat)));
+            mesh->context->EnableVertexAttribArray(2);
         }
 
         mesh->context->BindBuffer(GL_ARRAY_BUFFER, 0);

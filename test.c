@@ -17,6 +17,13 @@ float vertices2[] = {
    -0.2f,  1.0f, 0.0f  // top left
 };
 
+float vertices3[] = {
+    0.2f,  0.2f, 0.0f, // top right
+    0.2f, -1.0f, 0.0f, // bottom right
+   -1.0f, -1.0f, 0.0f, // bottom left
+   -1.0f,  0.2f, 0.0f  // top left
+};
+
 float textureCoordinates[] = {
     1.0f,  1.0f, // top right
     1.0f,  0.0f, // bottom right
@@ -63,7 +70,11 @@ int main(int argc, char** argv) {
 
     prMeshData* testMesh2 = prMeshCreate();
     prMeshLink(testMesh2, test->openglContext);
-    prMeshUpdate(testMesh2, vertices2, sizeof(vertices) / sizeof(float), indices, sizeof(indices) / sizeof(unsigned int), textureCoordinates, sizeof(textureCoordinates) / sizeof(float), NULL, 0);
+    prMeshUpdate(testMesh2, vertices2, sizeof(vertices2) / sizeof(float), indices, sizeof(indices) / sizeof(unsigned int), textureCoordinates, sizeof(textureCoordinates) / sizeof(float), NULL, 0);
+
+    prMeshData* testMesh3 = prMeshCreate();
+    prMeshLink(testMesh3, test->openglContext);
+    prMeshUpdate(testMesh3, vertices3, sizeof(vertices3) / sizeof(float), indices, sizeof(indices) / sizeof(unsigned int), NULL, 0, vertexColor, sizeof(vertexColor) / sizeof(float));
 
     FILE* textureFile = fopen("awesomeface.png", "rb");
     fseek(textureFile, 0L, SEEK_END);
@@ -86,6 +97,7 @@ int main(int argc, char** argv) {
 
         prWindowDrawMesh(test->openglContext, shaderProgram, testMesh, testTexture);
         prWindowDrawMesh(test->openglContext, shaderProgram, testMesh2, testTexture);
+        prWindowDrawMesh(test->openglContext, shaderProgram, testMesh3, NULL);
 
         glfwSwapBuffers(test->window);
 
