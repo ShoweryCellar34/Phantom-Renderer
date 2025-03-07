@@ -14,6 +14,7 @@ typedef struct prMeshData {
     GLfloat* GPUReadyBuffer;
     GLuint GPUReadyBufferCount;
     GLuint GPUReadyBufferElementCount;
+    float mixRatio;
 } prMeshData;
 
 prMeshData* prMeshCreate();
@@ -23,3 +24,5 @@ void prMeshDestroy(prMeshData* mesh);
 void prMeshLink(prMeshData* mesh, GladGLContext* context);
 
 void prMeshUpdate(prMeshData* mesh, GLfloat vertices[], size_t verticesCount, GLuint indices[], size_t indicesCount, GLfloat textureCoordinates[], size_t textureCoordinatesCount, GLfloat vertexColor[], size_t vertexColorCount);
+
+void prMeshTextureToColorRatio(prMeshData* mesh, float mixRatio);

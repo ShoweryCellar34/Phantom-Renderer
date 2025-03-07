@@ -23,6 +23,7 @@ prMeshData* prMeshCreate() {
     mesh->GPUReadyBuffer = NULL;
     mesh->GPUReadyBufferCount = 0;
     mesh->GPUReadyBufferElementCount = 0;
+    mesh->mixRatio = 0.0f;
 
     return mesh;
 }
@@ -155,4 +156,8 @@ void prMeshUpdate(prMeshData* mesh, GLfloat vertices[], size_t verticesCount, GL
     } else if(mesh->context) {
         i_prMeshUpdateOnGPUSide(mesh);
     }
+}
+
+void prMeshTextureToColorRatio(prMeshData* mesh, float mixRatio) {
+    mesh->mixRatio = mixRatio;
 }

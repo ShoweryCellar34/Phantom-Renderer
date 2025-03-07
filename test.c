@@ -65,16 +65,18 @@ int main(int argc, char** argv) {
 
     prMeshData* testMesh = prMeshCreate();
     prMeshLink(testMesh, test->openglContext);
-    // prMeshUpdate(testMesh, vertices, sizeof(vertices) / sizeof(float), indices, sizeof(indices) / sizeof(unsigned int), textureCoordinates, sizeof(textureCoordinates) / sizeof(float));
     prMeshUpdate(testMesh, vertices, sizeof(vertices) / sizeof(float), indices, sizeof(indices) / sizeof(unsigned int), textureCoordinates, sizeof(textureCoordinates) / sizeof(float), vertexColor, sizeof(vertexColor) / sizeof(float));
+    prMeshTextureToColorRatio(testMesh, 0.5f);
 
     prMeshData* testMesh2 = prMeshCreate();
     prMeshLink(testMesh2, test->openglContext);
     prMeshUpdate(testMesh2, vertices2, sizeof(vertices2) / sizeof(float), indices, sizeof(indices) / sizeof(unsigned int), textureCoordinates, sizeof(textureCoordinates) / sizeof(float), NULL, 0);
+    prMeshTextureToColorRatio(testMesh2, 1.0f);
 
     prMeshData* testMesh3 = prMeshCreate();
     prMeshLink(testMesh3, test->openglContext);
     prMeshUpdate(testMesh3, vertices3, sizeof(vertices3) / sizeof(float), indices, sizeof(indices) / sizeof(unsigned int), NULL, 0, vertexColor, sizeof(vertexColor) / sizeof(float));
+    prMeshTextureToColorRatio(testMesh3, 0.0f);
 
     FILE* textureFile = fopen("awesomeface.png", "rb");
     fseek(textureFile, 0L, SEEK_END);

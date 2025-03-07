@@ -45,7 +45,7 @@ void prWindowDrawMesh(GladGLContext* context, unsigned int shaderProgram, prMesh
         context->BindTexture(GL_TEXTURE_2D, texture->TBO);
     }
     int mixRatioLocation = context->GetUniformLocation(shaderProgram, "mixRatio");
-    context->Uniform1f(mixRatioLocation, 0.5);
+    context->Uniform1f(mixRatioLocation, mesh->mixRatio);
 
     context->DrawElements(GL_TRIANGLES, mesh->indicesCount, GL_UNSIGNED_INT, 0);
 
