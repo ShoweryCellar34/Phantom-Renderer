@@ -4,24 +4,24 @@
 #include <PR/memory.h>
 
 float vertices[] = {
-    0.8f,  0.8f, 0.0f, // top right
-    0.8f, -0.8f, 0.0f, // bottom right
-   -0.8f, -0.8f, 0.0f, // bottom left
-   -0.8f,  0.8f, 0.0f  // top left
+    0.6f,  0.6f, 0.0f, // top right
+    0.6f, -0.6f, 0.0f, // bottom right
+   -0.6f, -0.6f, 0.0f, // bottom left
+   -0.6f,  0.6f, 0.0f  // top left
 };
 
 float vertices2[] = {
     1.0f,  1.0f, 0.0f, // top right
-    1.0f, -0.2f, 0.0f, // bottom right
-   -0.2f, -0.2f, 0.0f, // bottom left
-   -0.2f,  1.0f, 0.0f  // top left
+    1.0f, -0.0f, 0.0f, // bottom right
+   -0.0f, -0.0f, 0.0f, // bottom left
+   -0.0f,  1.0f, 0.0f  // top left
 };
 
 float vertices3[] = {
-    0.2f,  0.2f, 0.0f, // top right
-    0.2f, -1.0f, 0.0f, // bottom right
+    0.0f,  0.0f, 0.0f, // top right
+    0.0f, -1.0f, 0.0f, // bottom right
    -1.0f, -1.0f, 0.0f, // bottom left
-   -1.0f,  0.2f, 0.0f  // top left
+   -1.0f,  0.0f, 0.0f  // top left
 };
 
 float textureCoordinates[] = {
@@ -97,9 +97,9 @@ int main(int argc, char** argv) {
     while(!glfwWindowShouldClose(test->window)) {
         prWindowClear(test->openglContext);
 
-        prWindowDrawMesh(test->openglContext, shaderProgram, testMesh, testTexture);
         prWindowDrawMesh(test->openglContext, shaderProgram, testMesh2, testTexture);
         prWindowDrawMesh(test->openglContext, shaderProgram, testMesh3, NULL);
+        prWindowDrawMesh(test->openglContext, shaderProgram, testMesh, testTexture);
 
         glfwSwapBuffers(test->window);
 
