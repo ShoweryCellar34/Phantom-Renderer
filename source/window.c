@@ -34,20 +34,3 @@ void prWindowClear(GladGLContext* context) {
     context->ClearColor(0.3f, 0.5f, 0.7f, 1.0f);
     context->Clear(GL_COLOR_BUFFER_BIT);
 }
-
-void prWindowDrawMesh(GladGLContext* context, unsigned int shaderProgram, prMeshData* mesh, prTextureData* texture) {
-    context->UseProgram(shaderProgram);
-
-    context->BindVertexArray(mesh->VAO);
-
-    if(mesh->textureCoordinatesCount) {
-        context->ActiveTexture(GL_TEXTURE0);
-        context->BindTexture(GL_TEXTURE_2D, texture->TBO);
-    }
-    int mixRatioLocation = context->GetUniformLocation(shaderProgram, "mixRatio");
-    context->Uniform1f(mixRatioLocation, mesh->mixRatio);
-
-    context->DrawElements(GL_TRIANGLES, mesh->indicesCount, GL_UNSIGNED_INT, 0);
-
-    context->BindVertexArray(0);
-}

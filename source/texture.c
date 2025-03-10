@@ -30,6 +30,7 @@ prTextureData* prTextureCreate() {
     texture->width = 0;
     texture->height = 0;
     texture->channels = 0;
+    texture->TBO = 0;
 
     return texture;
 }

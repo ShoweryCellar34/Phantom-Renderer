@@ -3,6 +3,7 @@
 #include <PR/meshInternal.h>
 
 #include <PR/memory.h>
+#include <PR/texture.h>
 #include <PR/error.h>
 
 prMeshData* prMeshCreate() {
@@ -32,7 +33,7 @@ void prMeshDestroy(prMeshData* mesh) {
     prFree(mesh);
 }
 
-void prMeshLink(prMeshData* mesh, GladGLContext* context) {
+void prMeshLinkWindow(prMeshData* mesh, GladGLContext* context) {
     if(mesh->context && mesh->GPUReadyBuffer) {
         i_prMeshDestroyOnGPUSide(mesh);
     }
@@ -40,6 +41,15 @@ void prMeshLink(prMeshData* mesh, GladGLContext* context) {
     if(mesh->context && mesh->GPUReadyBuffer) {
         i_prMeshCreateOnGPUSide(mesh);
     }
+}
+
+void prMeshLinkTexture(prMeshData* mesh, prTextureData* texture) {
+    if(texture->context != mesh->context) {
+        prError(PR_GL_ERROR, "Texture context does not match mesh context. Aborting operation, nothing was modified");
+        return;
+    }
+
+    mesh->texture = texture;
 }
 
 void prMeshUpdate(prMeshData* mesh, GLfloat vertices[], size_t verticesCount, GLuint indices[], size_t indicesCount, GLfloat textureCoordinates[], size_t textureCoordinatesCount, GLfloat vertexColor[], size_t vertexColorCount) {
@@ -129,4 +139,24 @@ void prMeshUpdate(prMeshData* mesh, GLfloat vertices[], size_t verticesCount, GL
 
 void prMeshTextureToColorRatio(prMeshData* mesh, float mixRatio) {
     mesh->mixRatio = mixRatio;
+}
+
+void prMeshDraw(prMeshData* mesh, unsigned int shaderProgram) {
+    GladGLContext* context = mesh->context;
+    prTextureData* texture = mesh->texture;
+
+    context->UseProgram(shaderProgram);
+
+    context->BindVertexArray(mesh->VAO);
+
+    if(mesh->textureCoordinatesCount) {
+        context->ActiveTexture(GL_TEXTURE0);
+        context->BindTexture(GL_TEXTURE_2D, texture->TBO);
+    }
+    int mixRatioLocation = context->GetUniformLocation(shaderProgram, "mixRatio");
+    context->Uniform1f(mixRatioLocation, mesh->mixRatio);
+
+    context->DrawElements(GL_TRIANGLES, mesh->indicesCount, GL_UNSIGNED_INT, 0);
+
+    context->BindVertexArray(0);
 }

@@ -18,5 +18,3 @@ void prWindowDestroy(prWindow* window);
 void prWindowInitContext(prWindow* window);
 
 void prWindowClear(GladGLContext* context);
-
-void prWindowDrawMesh(GladGLContext* context, unsigned int shaderProgram, prMeshData* mesh, prTextureData* texture);
