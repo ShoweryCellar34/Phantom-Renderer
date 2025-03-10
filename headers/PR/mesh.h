@@ -2,6 +2,7 @@
 
 #include <stddef.h>
 #include <glad/gl.h>
+#include <cglm/cglm.h>
 
 typedef struct prTextureData prTextureData;
 
@@ -31,4 +32,4 @@ void prMeshUpdate(prMeshData* mesh, GLfloat vertices[], size_t verticesCount, GL
 
 void prMeshTextureToColorRatio(prMeshData* mesh, float mixRatio);
 
-void prMeshDraw(prMeshData* mesh, unsigned int shaderProgram);
+void prMeshDraw(prMeshData* mesh, mat4 translation, unsigned int shaderProgram);

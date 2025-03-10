@@ -141,13 +141,16 @@ void prMeshTextureToColorRatio(prMeshData* mesh, float mixRatio) {
     mesh->mixRatio = mixRatio;
 }
 
-void prMeshDraw(prMeshData* mesh, unsigned int shaderProgram) {
+void prMeshDraw(prMeshData* mesh, mat4 translation, unsigned int shaderProgram) {
     GladGLContext* context = mesh->context;
     prTextureData* texture = mesh->texture;
 
     context->UseProgram(shaderProgram);
 
     context->BindVertexArray(mesh->VAO);
+
+    int translationUniformLocation = context->GetUniformLocation(shaderProgram, "translation");
+    context->UniformMatrix4fv(translationUniformLocation, 1, GL_FALSE, translation[0]);
 
     if(mesh->textureCoordinatesCount) {
         context->ActiveTexture(GL_TEXTURE0);

@@ -1,6 +1,7 @@
 #include <PR/PR.h>
 
 #include <stdio.h>
+#include <cglm/cglm.h>
 #include <PR/memory.h>
 
 float vertices[] = {
@@ -43,9 +44,15 @@ unsigned int indices[] = {
    1, 2, 3  // second Triangle
 };
 
+size_t g_width = 0;
+size_t g_height = 0;
+
 void framebufferSizeCallback(GLFWwindow* window, int width, int height) {
     GladGLContext* context = glfwGetWindowUserPointer(window);
     context->Viewport(0, 0, width, height);
+
+    g_width = width;
+    g_height = height;
 }
 
 int main(int argc, char** argv) {
@@ -59,6 +66,7 @@ int main(int argc, char** argv) {
     glfwSetWindowUserPointer(test->window, test->openglContext);
 
     prEnableBlending(test->openglContext);
+    test->openglContext->Enable(GL_DEPTH_TEST);
     prEnableImageFlip();
 
     unsigned int shaderProgram = prShaderGenerateDefaultProgram(test->openglContext);
@@ -112,9 +120,33 @@ int main(int argc, char** argv) {
     while(!glfwWindowShouldClose(test->window)) {
         prWindowClear(test->openglContext);
 
-        prMeshDraw(testMesh2, shaderProgram);
-        prMeshDraw(testMesh3, shaderProgram);
-        prMeshDraw(testMesh, shaderProgram);
+        mat4 translation;
+        glm_mat4_identity(translation);
+        vec3 throwAwayVector;
+        throwAwayVector[0] = 1.0f;
+        throwAwayVector[1] = 0.0f;
+        throwAwayVector[2] = 0.0f;
+        glm_rotate(translation, -120.0f, throwAwayVector);
+
+        mat4 view;
+        glm_mat4_identity(view);
+        throwAwayVector[0] = 0.0f;
+        throwAwayVector[1] = 0.0f;
+        throwAwayVector[2] = -3.0f;
+        glm_translate(view, throwAwayVector);
+
+        mat4 projection;
+        glm_perspective(45.0f, (float)g_width/(float)g_height, 0.1f, 100.0f, projection);
+
+        int viewUniformLocation = test->openglContext->GetUniformLocation(shaderProgram, "view");
+        test->openglContext->UniformMatrix4fv(viewUniformLocation, 1, GL_FALSE, view[0]);
+
+        int projectionUniformLocation = test->openglContext->GetUniformLocation(shaderProgram, "projection");
+        test->openglContext->UniformMatrix4fv(projectionUniformLocation, 1, GL_FALSE, projection[0]);
+
+        prMeshDraw(testMesh2, translation, shaderProgram);
+        prMeshDraw(testMesh3, translation, shaderProgram);
+        prMeshDraw(testMesh, translation, shaderProgram);
 
         glfwSwapBuffers(test->window);
 

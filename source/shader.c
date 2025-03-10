@@ -15,8 +15,12 @@ unsigned int prShaderGenerateDefaultProgram(GladGLContext* context) {
             out vec2 textureCoordinates;\n\
             out vec4 vertexColor;\n\
             \n\
+            uniform mat4 translation;\n\
+            uniform mat4 view;\n\
+            uniform mat4 projection;\n\
+            \n\
             void main() {\n\
-                gl_Position = vec4(inputPosition, 1.0);\n\
+                gl_Position = projection * view * translation * vec4(inputPosition, 1.0);\n\
                 textureCoordinates = inputTextureCoordinates;\n\
                 vertexColor = inputVertexColor;\n\
             }\n\
