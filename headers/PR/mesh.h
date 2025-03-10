@@ -13,7 +13,6 @@ typedef struct prMeshData {
     GLuint VBO, VAO, EBO;
     GLfloat* GPUReadyBuffer;
     GLuint GPUReadyBufferCount;
-    GLuint GPUReadyBufferElementCount;
     float mixRatio;
 } prMeshData;
 

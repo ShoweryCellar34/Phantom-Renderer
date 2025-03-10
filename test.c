@@ -78,7 +78,7 @@ int main(int argc, char** argv) {
     prMeshUpdate(testMesh3, vertices3, sizeof(vertices3) / sizeof(float), indices, sizeof(indices) / sizeof(unsigned int), NULL, 0, vertexColor, sizeof(vertexColor) / sizeof(float));
     prMeshTextureToColorRatio(testMesh3, 0.0f);
 
-    FILE* textureFile = fopen("awesomeface.png", "rb");
+    FILE* textureFile = fopen("res/awesomeface.png", "rb");
     fseek(textureFile, 0L, SEEK_END);
     size_t textureFileSize = ftell(textureFile);
     fseek(textureFile, 0L, SEEK_SET);
@@ -91,13 +91,26 @@ int main(int argc, char** argv) {
     prTextureUpdate(testTexture, textureData, textureFileSize);
     prFree(textureData);
 
+    textureFile = fopen("res/container.jpg", "rb");
+    fseek(textureFile, 0L, SEEK_END);
+    textureFileSize = ftell(textureFile);
+    fseek(textureFile, 0L, SEEK_SET);
+    textureData = prMalloc(textureFileSize + 1);
+    fread(textureData, textureFileSize, 1, textureFile);
+    fclose(textureFile);
+
+    prTextureData* testTexture2 = prTextureCreate();
+    prTextureLink(testTexture2, test->openglContext);
+    prTextureUpdate(testTexture2, textureData, textureFileSize);
+    prFree(textureData);
+
     glfwMakeContextCurrent(test->window);
     glfwSetFramebufferSizeCallback(test->window, framebufferSizeCallback);
 
     while(!glfwWindowShouldClose(test->window)) {
         prWindowClear(test->openglContext);
 
-        prWindowDrawMesh(test->openglContext, shaderProgram, testMesh2, testTexture);
+        prWindowDrawMesh(test->openglContext, shaderProgram, testMesh2, testTexture2);
         prWindowDrawMesh(test->openglContext, shaderProgram, testMesh3, NULL);
         prWindowDrawMesh(test->openglContext, shaderProgram, testMesh, testTexture);
 

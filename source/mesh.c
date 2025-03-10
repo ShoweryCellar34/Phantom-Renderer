@@ -22,7 +22,6 @@ prMeshData* prMeshCreate() {
     mesh->EBO = 0;
     mesh->GPUReadyBuffer = NULL;
     mesh->GPUReadyBufferCount = 0;
-    mesh->GPUReadyBufferElementCount = 0;
     mesh->mixRatio = 0.0f;
 
     return mesh;
@@ -120,36 +119,6 @@ void prMeshUpdate(prMeshData* mesh, GLfloat vertices[], size_t verticesCount, GL
         prMemcpy(mesh->vertexColor, vertexColor, sizeof(GLfloat) * vertexColorCount);
     }
     mesh->vertexColorCount = vertexColorCount;
-
-    if(mesh->GPUReadyBuffer) {
-        prFree(mesh->GPUReadyBuffer);
-        mesh->GPUReadyBuffer = NULL;
-    }
-
-    mesh->GPUReadyBufferElementCount = verticesCount + textureCoordinatesCount + vertexColorCount;
-    GLuint GPUReadyBufferAttributeCount = mesh->GPUReadyBufferElementCount / 4;
-    mesh->GPUReadyBuffer = prMalloc(mesh->GPUReadyBufferElementCount * sizeof(GLfloat));
-    for(size_t i = 0; i < mesh->GPUReadyBufferElementCount; i++) {
-        size_t vertexIndex = (i / GPUReadyBufferAttributeCount) * 3;
-        mesh->GPUReadyBuffer[i++] = vertices[vertexIndex];
-        mesh->GPUReadyBuffer[i++] = vertices[vertexIndex + 1];
-        mesh->GPUReadyBuffer[i] = vertices[vertexIndex + 2];
-
-        if(textureCoordinatesCount) {
-            size_t textureCoordinatesIndex = (i++ / GPUReadyBufferAttributeCount) * 2;
-            mesh->GPUReadyBuffer[i++] = textureCoordinates[textureCoordinatesIndex];
-            mesh->GPUReadyBuffer[i] = textureCoordinates[textureCoordinatesIndex + 1];
-        }
-
-        if(vertexColorCount) {
-            size_t vertexColorIndex = (i++ / GPUReadyBufferAttributeCount) * 4;
-            mesh->GPUReadyBuffer[i++] = vertexColor[vertexColorIndex];
-            mesh->GPUReadyBuffer[i++] = vertexColor[vertexColorIndex + 1];
-            mesh->GPUReadyBuffer[i++] = vertexColor[vertexColorIndex + 2];
-            mesh->GPUReadyBuffer[i] = vertexColor[vertexColorIndex + 3];
-        }
-    }
-    mesh->GPUReadyBufferCount = mesh->GPUReadyBufferElementCount;
 
     if(mesh->context && !mesh->VAO) {
         i_prMeshCreateOnGPUSide(mesh);
