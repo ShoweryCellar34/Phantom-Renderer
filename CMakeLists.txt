@@ -29,8 +29,8 @@ if(GCC)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Wall -Wextra -pedantic -fsanitize=address,undefined -static")
 endif()
 
-option(buildExample "Build the example program" true)
+option(PR_BUILD_EXAMPLE "Build the example program" true)
 
-if(${buildExample})
+if(${PR_BUILD_EXAMPLE})
 add_subdirectory(example)
 endif()
