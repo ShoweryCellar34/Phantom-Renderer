@@ -8,6 +8,7 @@ typedef struct prCamera {
     mat4 view;
     mat4 projection;
     int viewportWidth, viewportHeight;
+    vec3 front;
 } prCamera;
 
 prCamera* prCameraCreate();
@@ -16,4 +17,4 @@ void prCameraDestroy(prCamera* camera);
 
 void prCameraLink(prCamera* camera, GladGLContext* context);
 
-void prCameraUpdate(prCamera* camera, vec3 position);
+void prCameraUpdate(prCamera* camera, vec3 position, vec3 rotation);

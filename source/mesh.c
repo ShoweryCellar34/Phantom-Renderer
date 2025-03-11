@@ -169,6 +169,9 @@ void prMeshDraw(prMeshData* mesh, mat4 translation, prCamera* camera,  unsigned 
     int blendAlphaUniformLocation = context->GetUniformLocation(shaderProgram, "blendAlpha");
     context->Uniform1i(blendAlphaUniformLocation, 0);
 
+    int alphaSupportUniformLocation = context->GetUniformLocation(shaderProgram, "alphaSupport");
+    context->Uniform1i(alphaSupportUniformLocation, 0);
+
     context->DrawElements(GL_TRIANGLES, mesh->indicesCount, GL_UNSIGNED_INT, 0);
 
     context->BindVertexArray(0);

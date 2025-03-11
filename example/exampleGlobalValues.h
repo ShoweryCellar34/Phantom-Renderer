@@ -8,10 +8,10 @@ float vertices[] = {
 };
 
 float vertices2[] = {
+    -0.0f,  1.0f, -1.0f,  // top left
     1.0f,  1.0f, 0.0f, // top right
     1.0f, -0.0f, 1.0f, // bottom right
    -0.0f, -0.0f, 0.0f, // bottom left
-   -0.0f,  1.0f, -1.0f  // top left
 };
 
 float vertices3[] = {
@@ -41,7 +41,12 @@ unsigned int indices[] = {
 };
 
 vec3 cameraPosition = {0.0f, 0.0f, 0.0f};
-vec3 cameraFront = {0.0f, 0.0f, -1.0f};
 vec3 cameraUp = {0.0f, 1.0f, 0.0f};
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
+
+bool firstMouseMovement = true;
+float pitch = 0.0f;
+float yaw = 270.0f;
+double lastX = 0.0f;
+double lastY = 0.0f;

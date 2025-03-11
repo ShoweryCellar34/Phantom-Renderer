@@ -26,29 +26,34 @@ int main(int argc, char** argv) {
     prTextureData* testTexture2 = prTextureCreate();
     loadTexture(testTexture2, test->openglContext, "res/container.jpg");
 
-    prMeshData* testMesh = prMeshCreate();
-    prMeshLinkWindow(testMesh, test->openglContext);
-    prMeshLinkTexture(testMesh, testTexture);
-    prMeshUpdate(testMesh, vertices, sizeof(vertices) / sizeof(float), indices, sizeof(indices) / sizeof(unsigned int), textureCoordinates, sizeof(textureCoordinates) / sizeof(float), vertexColor, sizeof(vertexColor) / sizeof(float));
-    prMeshTextureToColorRatio(testMesh, 0.5f);
+    prMeshData* testMeshMixed = prMeshCreate();
+    prMeshLinkWindow(testMeshMixed, test->openglContext);
+    prMeshLinkTexture(testMeshMixed, testTexture);
+    prMeshUpdate(testMeshMixed, vertices, sizeof(vertices) / sizeof(float), indices, sizeof(indices) / sizeof(unsigned int), textureCoordinates, sizeof(textureCoordinates) / sizeof(float), vertexColor, sizeof(vertexColor) / sizeof(float));
+    prMeshTextureToColorRatio(testMeshMixed, 0.5f);
 
-    prMeshData* testMesh2 = prMeshCreate();
-    prMeshLinkWindow(testMesh2, test->openglContext);
-    prMeshLinkTexture(testMesh2, testTexture2);
-    prMeshUpdate(testMesh2, vertices2, sizeof(vertices2) / sizeof(float), indices, sizeof(indices) / sizeof(unsigned int), textureCoordinates, sizeof(textureCoordinates) / sizeof(float), NULL, 0);
-    prMeshTextureToColorRatio(testMesh2, 1.0f);
+    prMeshData* testMeshTexture = prMeshCreate();
+    prMeshLinkWindow(testMeshTexture, test->openglContext);
+    prMeshLinkTexture(testMeshTexture, testTexture2);
+    prMeshUpdate(testMeshTexture, vertices2, sizeof(vertices2) / sizeof(float), indices, sizeof(indices) / sizeof(unsigned int), textureCoordinates, sizeof(textureCoordinates) / sizeof(float), NULL, 0);
+    prMeshTextureToColorRatio(testMeshTexture, 1.0f);
 
-    prMeshData* testMesh3 = prMeshCreate();
-    prMeshLinkWindow(testMesh3, test->openglContext);
-    prMeshUpdate(testMesh3, vertices3, sizeof(vertices3) / sizeof(float), indices, sizeof(indices) / sizeof(unsigned int), NULL, 0, vertexColor, sizeof(vertexColor) / sizeof(float));
-    prMeshTextureToColorRatio(testMesh3, 0.0f);
+    prMeshData* testMeshColor = prMeshCreate();
+    prMeshLinkWindow(testMeshColor, test->openglContext);
+    prMeshUpdate(testMeshColor, vertices3, sizeof(vertices3) / sizeof(float), indices, sizeof(indices) / sizeof(unsigned int), NULL, 0, vertexColor, sizeof(vertexColor) / sizeof(float));
+    prMeshTextureToColorRatio(testMeshColor, 0.0f);
 
     prCamera* camera = prCameraCreate();
     prCameraLink(camera, test->openglContext);
 
     glfwMakeContextCurrent(test->window);
     glfwSetFramebufferSizeCallback(test->window, framebufferSizeCallback);
-    glfwSetKeyCallback(test->window, keyCallback);
+    glfwSetCursorPosCallback(test->window, cursorPosCallback);
+    glfwSetInputMode(test->window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+    test->openglContext->Enable(GL_DEPTH_TEST);
+    test->openglContext->Enable(GL_BLEND);
+    test->openglContext->BlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     while(!glfwWindowShouldClose(test->window)) {
         prWindowClear(test->openglContext);
@@ -65,33 +70,27 @@ int main(int argc, char** argv) {
         offset[2] = -3.0f;
         glm_translate(translation, offset);
 
-        prCameraUpdate(camera, cameraPosition);
+        vec3 rotation = {yaw, pitch, 0.0f};
+        prCameraUpdate(camera, cameraPosition, rotation);
 
-        test->openglContext->Enable(GL_DEPTH_TEST);
-        test->openglContext->Enable(GL_BLEND);
-        test->openglContext->BlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-        prMeshDraw(testMesh3, translation, camera, shaderProgram);
-        prMeshDraw(testMesh2, translation, camera, shaderProgram);
-        prMeshDraw(testMesh, translation, camera, shaderProgram);
-
-        test->openglContext->Disable(GL_BLEND);
-        test->openglContext->Disable(GL_DEPTH);
+        prMeshDraw(testMeshTexture, translation, camera, shaderProgram);
+        prMeshDraw(testMeshMixed, translation, camera, shaderProgram);
+        prMeshDraw(testMeshColor, translation, camera, shaderProgram);
 
         glfwSwapBuffers(test->window);
-
         glfwPollEvents();
+        proccessInput(test->window, camera->front);
     }
 
     prCameraDestroy(camera);
     camera = NULL;
 
-    prMeshDestroy(testMesh);
-    testMesh = NULL;
-    prMeshDestroy(testMesh2);
-    testMesh2 = NULL;
-    prMeshDestroy(testMesh3);
-    testMesh3 = NULL;
+    prMeshDestroy(testMeshMixed);
+    testMeshMixed = NULL;
+    prMeshDestroy(testMeshTexture);
+    testMeshTexture = NULL;
+    prMeshDestroy(testMeshColor);
+    testMeshColor = NULL;
 
     prTextureDestroy(testTexture);
     testTexture = NULL;
