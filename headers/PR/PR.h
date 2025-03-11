@@ -4,6 +4,7 @@
 extern "C" {
 #endif
 
+#include <PR/camera.h>
 #include <PR/error.h>
 #include <PR/memory.h>
 #include <PR/mesh.h>

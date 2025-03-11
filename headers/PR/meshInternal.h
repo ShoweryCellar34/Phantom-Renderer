@@ -2,7 +2,7 @@
 
 #include <PR/mesh.h>
 
-void i_prComputeGPUReadyBuffer(prMeshData* mesh);
+void i_prMeshComputeGPUReadyBuffer(prMeshData* mesh);
 
 void i_prMeshCreateOnGPUSide(prMeshData* mesh);
 

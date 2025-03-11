@@ -4,7 +4,7 @@
 #include <PR/memory.h>
 #include <PR/error.h>
 
-void i_prComputeGPUReadyBuffer(prMeshData* mesh) {
+void i_prMeshComputeGPUReadyBuffer(prMeshData* mesh) {
     if(mesh->GPUReadyBuffer) {
         prFree(mesh->GPUReadyBuffer);
         mesh->GPUReadyBuffer = NULL;
@@ -58,7 +58,7 @@ void i_prMeshCreateOnGPUSide(prMeshData* mesh) {
         return;
     }
 
-    i_prComputeGPUReadyBuffer(mesh);
+    i_prMeshComputeGPUReadyBuffer(mesh);
 
     mesh->context->BindVertexArray(mesh->VAO);
 
@@ -87,7 +87,7 @@ void i_prMeshCreateOnGPUSide(prMeshData* mesh) {
 }
 
 void i_prMeshUpdateOnGPUSide(prMeshData* mesh) {
-    i_prComputeGPUReadyBuffer(mesh);
+    i_prMeshComputeGPUReadyBuffer(mesh);
 
 	mesh->context->BindVertexArray(mesh->VAO);
 
