@@ -6,11 +6,6 @@
 #include <PR/memory.h>
 #include <PR/error.h>
 
-void prEnableBlending(GladGLContext* context) {
-    context->Enable(GL_BLEND);
-    context->BlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-}
-
 void prEnableImageFlip() {
     stbi_set_flip_vertically_on_load(1);
 }

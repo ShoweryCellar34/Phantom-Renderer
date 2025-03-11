@@ -105,7 +105,7 @@ void i_prMeshUpdateOnGPUSide(prMeshData* mesh) {
     }
 
     if(mesh->vertexColorCount && mesh->vertexColor) {
-        mesh->context->VertexAttribPointer(i, 3, GL_FLOAT, GL_FALSE, mesh->GPUReadyBufferCount / 4 * sizeof(GLfloat), (void*)(mesh->textureCoordinatesCount ? 5 : 3 * sizeof(GLfloat)));
+        mesh->context->VertexAttribPointer(i, 4, GL_FLOAT, GL_FALSE, mesh->GPUReadyBufferCount / 4 * sizeof(GLfloat), (void*)(mesh->textureCoordinatesCount ? 5 : 3 * sizeof(GLfloat)));
         mesh->context->EnableVertexAttribArray(i++);
     }
 

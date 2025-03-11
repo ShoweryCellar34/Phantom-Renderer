@@ -4,6 +4,7 @@
 
 #include <PR/memory.h>
 #include <PR/texture.h>
+#include <PR/camera.h>
 #include <PR/error.h>
 
 prMeshData* prMeshCreate() {
@@ -106,7 +107,7 @@ void prMeshUpdate(prMeshData* mesh, GLfloat vertices[], size_t verticesCount, GL
         return;
     }
     if(!vertexColor && vertexColorCount) {
-        prError(PR_INVALID_DATA_ERROR, "Vertex color data cannot be NULL while texture coordinates data count is not 0. Aborting operation, nothing was modified");
+        prError(PR_INVALID_DATA_ERROR, "Vertex color data cannot be NULL while vertex color data count is not 0. Aborting operation, nothing was modified");
         return;
     }
 
@@ -141,13 +142,19 @@ void prMeshTextureToColorRatio(prMeshData* mesh, float mixRatio) {
     mesh->mixRatio = mixRatio;
 }
 
-void prMeshDraw(prMeshData* mesh, mat4 translation, unsigned int shaderProgram) {
+void prMeshDraw(prMeshData* mesh, mat4 translation, prCamera* camera,  unsigned int shaderProgram) {
     GladGLContext* context = mesh->context;
     prTextureData* texture = mesh->texture;
 
     context->UseProgram(shaderProgram);
 
     context->BindVertexArray(mesh->VAO);
+
+    int viewUniformLocation = context->GetUniformLocation(shaderProgram, "view");
+    context->UniformMatrix4fv(viewUniformLocation, 1, GL_FALSE, camera->view[0]);
+
+    int projectionUniformLocation = context->GetUniformLocation(shaderProgram, "projection");
+    context->UniformMatrix4fv(projectionUniformLocation, 1, GL_FALSE, camera->projection[0]);
 
     int translationUniformLocation = context->GetUniformLocation(shaderProgram, "translation");
     context->UniformMatrix4fv(translationUniformLocation, 1, GL_FALSE, translation[0]);
@@ -156,8 +163,11 @@ void prMeshDraw(prMeshData* mesh, mat4 translation, unsigned int shaderProgram) 
         context->ActiveTexture(GL_TEXTURE0);
         context->BindTexture(GL_TEXTURE_2D, texture->TBO);
     }
-    int mixRatioLocation = context->GetUniformLocation(shaderProgram, "mixRatio");
-    context->Uniform1f(mixRatioLocation, mesh->mixRatio);
+    int mixRatioUniformLocation = context->GetUniformLocation(shaderProgram, "mixRatio");
+    context->Uniform1f(mixRatioUniformLocation, mesh->mixRatio);
+
+    int blendAlphaUniformLocation = context->GetUniformLocation(shaderProgram, "blendAlpha");
+    context->Uniform1i(blendAlphaUniformLocation, 0);
 
     context->DrawElements(GL_TRIANGLES, mesh->indicesCount, GL_UNSIGNED_INT, 0);
 

@@ -28,20 +28,13 @@ void prCameraLink(prCamera* camera, GladGLContext* context) {
     }
 }
 
+vec3 up = {0.0f, 1.0f, 0.0f};
+vec3 front = {0.0f, 0.0f, -1.0f};
+
 void prCameraUpdate(prCamera* camera, vec3 position) {
     if(camera->context) {
         i_prCameraGetDimensions(camera);
     }
-
-    vec3 up;
-    up[0] = 0.0f;
-    up[1] = 1.0f;
-    up[2] = 0.0f;
-
-    vec3 front;
-    front[0] = 0.0f;
-    front[1] = 0.0f;
-    front[2] = -1.0f;
 
     vec3 temp;
     glm_vec3_add(position, front, temp);

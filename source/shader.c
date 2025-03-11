@@ -31,6 +31,7 @@ unsigned int prShaderGenerateDefaultProgram(GladGLContext* context) {
             out vec4 fragColor;\n\
             \n\
             uniform float mixRatio;\n\
+            uniform bool blendAlpha;\n\
             \n\
             in vec2 textureCoordinates;\n\
             in vec4 vertexColor;\n\
@@ -38,7 +39,12 @@ unsigned int prShaderGenerateDefaultProgram(GladGLContext* context) {
             uniform sampler2D textureSampler;\n\
             \n\
             void main() {\n\
-                fragColor = mix(vertexColor, texture(textureSampler, textureCoordinates), mixRatio);\n\
+                if(blendAlpha) {\n\
+                    fragColor = mix(vertexColor, texture(textureSampler, textureCoordinates), mixRatio);\n\
+                } else {\n\
+                    vec4 textureTexel = texture(textureSampler, textureCoordinates);\n\
+                    fragColor = vec4(mix(vertexColor.xyz, textureTexel.xyz, mixRatio), vertexColor.w + textureTexel.w);\n\
+                }\n\
             }\n\
         ";
 

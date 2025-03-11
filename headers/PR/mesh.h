@@ -5,6 +5,7 @@
 #include <cglm/cglm.h>
 
 typedef struct prTextureData prTextureData;
+typedef struct prCamera prCamera;
 
 typedef struct prMeshData {
     GladGLContext* context;
@@ -32,4 +33,4 @@ void prMeshUpdate(prMeshData* mesh, GLfloat vertices[], size_t verticesCount, GL
 
 void prMeshTextureToColorRatio(prMeshData* mesh, float mixRatio);
 
-void prMeshDraw(prMeshData* mesh, mat4 translation, unsigned int shaderProgram);
+void prMeshDraw(prMeshData* mesh, mat4 translation, prCamera* camera, unsigned int shaderProgram);

@@ -2,8 +2,6 @@
 
 #include <glad/gl.h>
 
-void prEnableBlending(GladGLContext* context);
-
 void prEnableImageFlip();
 
 void prDisableImageFlip();

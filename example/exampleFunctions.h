@@ -1,0 +1,55 @@
+#pragma once
+
+#include <GLFW/glfw3.h>
+
+void framebufferSizeCallback(GLFWwindow* window, int width, int height) {
+    GladGLContext* context = glfwGetWindowUserPointer(window);
+    context->Viewport(0, 0, width, height);
+}
+
+void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+    mat4x3 temp;
+    glm_mat4x3_zero(temp);
+
+    const float cameraSpeed = 7.5f * deltaTime;
+
+    if (glfwGetKey(window, GLFW_KEY_W) != GLFW_RELEASE) {
+        glm_vec3_scale(cameraFront, cameraSpeed, temp[0]);
+        glm_vec3_add(cameraPosition, temp[0], cameraPosition);
+    }
+
+    if (glfwGetKey(window, GLFW_KEY_S) != GLFW_RELEASE) {
+        glm_vec3_scale(cameraFront, cameraSpeed, temp[1]);
+        glm_vec3_sub(cameraPosition, temp[1], cameraPosition);
+    }
+
+    if (glfwGetKey(window, GLFW_KEY_A) != GLFW_RELEASE) {
+        glm_cross(cameraFront, cameraUp, temp[2]);
+        glm_normalize(temp[2]);
+        glm_vec3_scale(temp[2], cameraSpeed, temp[2]);
+        glm_vec3_sub(cameraPosition, temp[2], cameraPosition);
+        // cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+    }
+
+    if (glfwGetKey(window, GLFW_KEY_D) != GLFW_RELEASE) {
+        glm_cross(cameraFront, cameraUp, temp[3]);
+        glm_normalize(temp[3]);
+        glm_vec3_scale(temp[3], cameraSpeed, temp[3]);
+        glm_vec3_add(cameraPosition, temp[3], cameraPosition);
+        // cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+    }
+}
+
+void loadTexture(prTextureData* texture, GladGLContext* context, const char* path) {
+    FILE* textureFile = fopen(path, "rb");
+    fseek(textureFile, 0L, SEEK_END);
+    size_t textureFileSize = ftell(textureFile);
+    fseek(textureFile, 0L, SEEK_SET);
+    unsigned char* textureData = prMalloc(textureFileSize + 1);
+    fread(textureData, textureFileSize, 1, textureFile);
+    fclose(textureFile);
+
+    prTextureLink(texture, context);
+    prTextureUpdate(texture, textureData, textureFileSize);
+    prFree(textureData);
+}
