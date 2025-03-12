@@ -35,7 +35,7 @@ int main(int argc, char** argv) {
     prMeshData* testMeshTexture = prMeshCreate();
     prMeshLinkWindow(testMeshTexture, test->openglContext);
     prMeshLinkTexture(testMeshTexture, testTexture2);
-    prMeshUpdate(testMeshTexture, vertices2, sizeof(vertices2) / sizeof(float), indices, sizeof(indices) / sizeof(unsigned int), textureCoordinates, sizeof(textureCoordinates) / sizeof(float), NULL, 0);
+    prMeshUpdate(testMeshTexture, vertices2, sizeof(vertices2) / sizeof(float), indices, sizeof(indices) / sizeof(unsigned int), textureCoordinates2, sizeof(textureCoordinates2) / sizeof(float), NULL, 0);
     prMeshTextureToColorRatio(testMeshTexture, 1.0f);
 
     prMeshData* testMeshColor = prMeshCreate();
