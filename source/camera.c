@@ -13,6 +13,8 @@ prCamera* prCameraCreate() {
     camera->viewportWidth = 0;
     camera->viewportHeight = 0;
     glm_vec3_zero(camera->front);
+    glm_vec3_zero(camera->up);
+    camera->up[1] = 1.0f;
 
     return camera;
 }
@@ -30,17 +32,23 @@ void prCameraLink(prCamera* camera, GladGLContext* context) {
     }
 }
 
-vec3 up = {0.0f, 1.0f, 0.0f};
-
 void prCameraUpdate(prCamera* camera, vec3 position, vec3 rotation) {
     if(camera->context) {
         i_prCameraGetDimensions(camera);
     }
 
+    glm_vec3_zero(camera->up);
+    camera->up[1] = 1.0f;
     vec3 temp = {0.0f, 0.0f, 0.0f};
-
-    float yaw = (rotation[0] * M_PI) / 180.0;
+    
     float pitch = (rotation[1] * M_PI) / 180.0;
+    float yaw = (rotation[0] * M_PI) / 180.0;
+    // float roll = (rotation[2] * M_PI) / 180.0;
+
+    // mat4 rollMatrix;
+    // glm_mat4_identity(rollMatrix);
+    // glm_rotate(rollMatrix, roll, camera->front);
+    // glm_mat4_mulv3(rollMatrix, camera->up, 0.0f, camera->up);
 
     camera->front[0] = cos(yaw) * cos(pitch);
     camera->front[1] = sin(pitch);
@@ -50,7 +58,7 @@ void prCameraUpdate(prCamera* camera, vec3 position, vec3 rotation) {
     glm_vec3_add(position, camera->front, temp);
 
     glm_mat4_identity(camera->view);
-    glm_lookat(position, temp, up, camera->view);
+    glm_lookat(position, temp, camera->up, camera->view);
 
     glm_perspective(45.0f, (float)camera->viewportWidth/(float)camera->viewportHeight, 0.1f, 100.0f, camera->projection);
 }

@@ -12,7 +12,7 @@ int main(int argc, char** argv) {
 
     glfwInit();
 
-    prWindow* test = prWindowCreate("Test", 600, 600);
+    prWindow* test = prWindowCreate("Test", 1600, 900);
     prWindowInitContext(test);
     glfwSetWindowUserPointer(test->window, test->openglContext);
 
@@ -79,7 +79,7 @@ int main(int argc, char** argv) {
 
         glfwSwapBuffers(test->window);
         glfwPollEvents();
-        proccessInput(test->window, camera->front);
+        proccessInput(test->window, camera->front, camera->up);
     }
 
     prCameraDestroy(camera);

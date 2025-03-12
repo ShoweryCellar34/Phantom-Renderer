@@ -3,11 +3,17 @@
 #include <GLFW/glfw3.h>
 #include "exampleGlobalValues.h"
 
-void proccessInput(GLFWwindow* window, vec3 cameraFront) {
+void proccessInput(GLFWwindow* window, vec3 cameraFront, vec3 cameraUp) {
     mat4x3 temp;
     glm_mat4x3_zero(temp);
 
-    const float cameraSpeed = 7.5f * deltaTime;
+    float cameraSpeed = 7.5f * deltaTime;
+    if(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
+        cameraSpeed *= 2.0f;
+    }
+    if(glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
+        cameraSpeed /= 2.0f;
+    }
 
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
         glm_vec3_scale(cameraFront, cameraSpeed, temp[0]);
@@ -51,7 +57,7 @@ void cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
         lastY = ypos;
         firstMouseMovement = false;
     }
-  
+
     float xoffset = xpos - lastX;
     float yoffset = lastY - ypos; 
     lastX = xpos;

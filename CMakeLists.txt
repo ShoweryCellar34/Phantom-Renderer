@@ -1,3 +1,14 @@
+if(MSVC)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_CRT_SECURE_NO_WARNINGS /MP")
+endif()
+if(GCC)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Wall -Wextra -pedantic -fsanitize=address,undefined")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --static")
+set(CMAKE_STARIC_LINKER_FLAGS "${CMAKE_STARIC_LINKER_FLAGS} --static")
+set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} --static")
+set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} --static")
+endif()
+
 set(POSITION_INDEPENDENT_CODE true)
 
 cmake_minimum_required(VERSION 3.20)
@@ -6,8 +17,8 @@ file(GLOB source source/*.c)
 add_library(Phantom-Renderer ${source})
 target_include_directories(Phantom-Renderer PUBLIC headers)
 
-set(CGLM_SHARED ON)
-set(CGLM_STATIC OFF)
+set(CGLM_SHARED OFF)
+set(CGLM_STATIC ON)
 add_subdirectory(vendors/cglm)
 
 set(GLAD_LIBRARY_TYPE "STATIC")
@@ -22,15 +33,15 @@ add_subdirectory(vendors/stb)
 
 target_link_libraries(Phantom-Renderer cglm glad glfw stb)
 
-if(MSVC)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_CRT_SECURE_NO_WARNINGS /MP")
-endif()
-if(GCC)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Wall -Wextra -pedantic -fsanitize=address,undefined -static")
-endif()
-
 option(PR_BUILD_EXAMPLE "Build the example program" true)
 
 if(${PR_BUILD_EXAMPLE})
-add_subdirectory(example)
+add_executable(Example example/example.c)
+target_link_libraries(Example Phantom-Renderer)
+add_custom_target(delete_resources ALL COMMAND ${CMAKE_COMMAND} -E remove_directory ${PROJECT_BINARY_DIR}/res COMMENT "Deleting old resources in binary directory")
+add_custom_target(copy_resources ALL COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}/example/res ${PROJECT_BINARY_DIR}/res COMMENT "Copying resources into binary directory" DEPENDS delete_resources)
+
+install(TARGETS Example RUNTIME DESTINATION bin)
+install(DIRECTORY "${PROJECT_SOURCE_DIR}/example/res" DESTINATION "bin/res")
+include(CPack)
 endif()

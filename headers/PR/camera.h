@@ -9,6 +9,7 @@ typedef struct prCamera {
     mat4 projection;
     int viewportWidth, viewportHeight;
     vec3 front;
+    vec3 up;
 } prCamera;
 
 prCamera* prCameraCreate();

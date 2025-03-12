@@ -41,7 +41,6 @@ unsigned int indices[] = {
 };
 
 vec3 cameraPosition = {0.0f, 0.0f, 0.0f};
-vec3 cameraUp = {0.0f, 1.0f, 0.0f};
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
