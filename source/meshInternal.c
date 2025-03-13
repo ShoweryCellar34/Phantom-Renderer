@@ -5,35 +5,32 @@
 #include <PR/error.h>
 
 void i_prMeshComputeGPUReadyBuffer(prMeshData* mesh) {
-    if(mesh->GPUReadyBuffer) {
+    if (mesh->GPUReadyBuffer) {
         prFree(mesh->GPUReadyBuffer);
         mesh->GPUReadyBuffer = NULL;
     }
 
     mesh->GPUReadyBufferCount = mesh->verticesCount + mesh->textureCoordinatesCount + mesh->vertexColorCount;
-    GLuint GPUReadyBufferAttributeCount = mesh->GPUReadyBufferCount / 4;
     mesh->GPUReadyBuffer = prMalloc(mesh->GPUReadyBufferCount * sizeof(GLfloat));
-    for(size_t i = 0; i < mesh->GPUReadyBufferCount; i++) {
-        size_t vertexIndex = (i / GPUReadyBufferAttributeCount) * 3;
-        mesh->GPUReadyBuffer[i++] = mesh->vertices[vertexIndex];
-        mesh->GPUReadyBuffer[i++] = mesh->vertices[vertexIndex + 1];
-        mesh->GPUReadyBuffer[i] = mesh->vertices[vertexIndex + 2];
+
+    size_t index = 0;
+    for(size_t i = 0; i < mesh->verticesCount / 3; i++) {
+        mesh->GPUReadyBuffer[index++] = mesh->vertices[i * 3];
+        mesh->GPUReadyBuffer[index++] = mesh->vertices[i * 3 + 1];
+        mesh->GPUReadyBuffer[index++] = mesh->vertices[i * 3 + 2];
 
         if(mesh->textureCoordinatesCount) {
-            size_t textureCoordinatesIndex = (i++ / GPUReadyBufferAttributeCount) * 2;
-            mesh->GPUReadyBuffer[i++] = mesh->textureCoordinates[textureCoordinatesIndex];
-            mesh->GPUReadyBuffer[i] = mesh->textureCoordinates[textureCoordinatesIndex + 1];
+            mesh->GPUReadyBuffer[index++] = mesh->textureCoordinates[i * 2];
+            mesh->GPUReadyBuffer[index++] = mesh->textureCoordinates[i * 2 + 1];
         }
 
         if(mesh->vertexColorCount) {
-            size_t vertexColorIndex = (i++ / GPUReadyBufferAttributeCount) * 4;
-            mesh->GPUReadyBuffer[i++] = mesh->vertexColor[vertexColorIndex];
-            mesh->GPUReadyBuffer[i++] = mesh->vertexColor[vertexColorIndex + 1];
-            mesh->GPUReadyBuffer[i++] = mesh->vertexColor[vertexColorIndex + 2];
-            mesh->GPUReadyBuffer[i] = mesh->vertexColor[vertexColorIndex + 3];
+            mesh->GPUReadyBuffer[index++] = mesh->vertexColor[i * 4];
+            mesh->GPUReadyBuffer[index++] = mesh->vertexColor[i * 4 + 1];
+            mesh->GPUReadyBuffer[index++] = mesh->vertexColor[i * 4 + 2];
+            mesh->GPUReadyBuffer[index++] = mesh->vertexColor[i * 4 + 3];
         }
     }
-    mesh->GPUReadyBufferCount = mesh->GPUReadyBufferCount;
 }
 
 void i_prMeshCreateOnGPUSide(prMeshData* mesh) {

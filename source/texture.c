@@ -32,6 +32,11 @@ prTextureData* prTextureCreate() {
 
 void prTextureDestroy(prTextureData* texture) {
     i_prTextureDestroyOnGPUSide(texture);
+
+    if(texture->textureData) {
+        prFree(texture->textureData);
+    }
+
     prFree(texture);
 }
 

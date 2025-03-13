@@ -91,3 +91,13 @@ void loadTexture(prTextureData* texture, GladGLContext* context, const char* pat
     prTextureUpdate(texture, textureData, textureFileSize);
     prFree(textureData);
 }
+
+mat4* translationsToMatrix(mat4* matrix, vec3 position, vec3 rotation) {
+    glm_mat4_identity(matrix);
+    glm_rotate(matrix, rotation[0], (vec3){1.0f, 0.0f, 0.0f});
+    glm_rotate(matrix, rotation[1], (vec3){0.0f, 1.0f, 0.0f});
+    glm_rotate(matrix, rotation[2], (vec3){0.0f, 0.0f, 1.0f});
+    glm_translate(matrix, position);
+
+    return matrix;
+}

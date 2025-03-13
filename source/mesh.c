@@ -31,6 +31,23 @@ prMeshData* prMeshCreate() {
 
 void prMeshDestroy(prMeshData* mesh) {
     i_prMeshDestroyOnGPUSide(mesh);
+
+    if(mesh->vertices) {
+        prFree(mesh->vertices);
+    }
+    if(mesh->textureCoordinates) {
+        prFree(mesh->textureCoordinates);
+    }
+    if(mesh->vertexColor) {
+        prFree(mesh->vertexColor);
+    }
+    if(mesh->indices) {
+        prFree(mesh->indices);
+    }
+    if(mesh->GPUReadyBuffer) {
+        prFree(mesh->GPUReadyBuffer);
+    }
+
     prFree(mesh);
 }
 

@@ -60,5 +60,5 @@ void prCameraUpdate(prCamera* camera, vec3 position, vec3 rotation) {
     glm_mat4_identity(camera->view);
     glm_lookat(position, temp, camera->up, camera->view);
 
-    glm_perspective(45.0f, (float)camera->viewportWidth/(float)camera->viewportHeight, 0.1f, 100.0f, camera->projection);
+    glm_perspective(45.0f, (float)camera->viewportWidth/(float)camera->viewportHeight, 0.001f, 10000.0f, camera->projection);
 }

@@ -35,12 +35,12 @@ int main(int argc, char** argv) {
     prMeshData* testMeshTexture = prMeshCreate();
     prMeshLinkWindow(testMeshTexture, test->openglContext);
     prMeshLinkTexture(testMeshTexture, testTexture2);
-    prMeshUpdate(testMeshTexture, vertices2, sizeof(vertices2) / sizeof(float), indices, sizeof(indices) / sizeof(unsigned int), textureCoordinates2, sizeof(textureCoordinates2) / sizeof(float), NULL, 0);
+    prMeshUpdate(testMeshTexture, vertices, sizeof(vertices) / sizeof(float), indices, sizeof(indices) / sizeof(unsigned int), textureCoordinates, sizeof(textureCoordinates) / sizeof(float), NULL, 0);
     prMeshTextureToColorRatio(testMeshTexture, 1.0f);
 
     prMeshData* testMeshColor = prMeshCreate();
     prMeshLinkWindow(testMeshColor, test->openglContext);
-    prMeshUpdate(testMeshColor, vertices3, sizeof(vertices3) / sizeof(float), indices, sizeof(indices) / sizeof(unsigned int), NULL, 0, vertexColor, sizeof(vertexColor) / sizeof(float));
+    prMeshUpdate(testMeshColor, vertices, sizeof(vertices) / sizeof(float), indices, sizeof(indices) / sizeof(unsigned int), NULL, 0, vertexColor, sizeof(vertexColor) / sizeof(float));
     prMeshTextureToColorRatio(testMeshColor, 0.0f);
 
     prCamera* camera = prCameraCreate();
@@ -63,12 +63,6 @@ int main(int argc, char** argv) {
         lastFrame = currentFrame;  
 
         mat4 translation;
-        glm_mat4_identity(translation);
-        vec3 offset;
-        offset[0] = 0.0f;
-        offset[1] = 0.0f;
-        offset[2] = -3.0f;
-        glm_translate(translation, offset);
 
         vec3 rotation = {yaw, pitch, 0.0f};
         prCameraUpdate(camera, cameraPosition, rotation);
