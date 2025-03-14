@@ -35,7 +35,7 @@ int main(int argc, char** argv) {
     prMeshData* testMeshTexture = prMeshCreate();
     prMeshLinkWindow(testMeshTexture, test->openglContext);
     prMeshLinkTexture(testMeshTexture, testTexture2);
-    prMeshUpdate(testMeshTexture, vertices, sizeof(vertices) / sizeof(float), indices, sizeof(indices) / sizeof(unsigned int), textureCoordinates, sizeof(textureCoordinates) / sizeof(float), NULL, 0);
+    prMeshUpdate(testMeshTexture, vertices2, sizeof(vertices2) / sizeof(float), indices2, sizeof(indices2) / sizeof(unsigned int), textureCoordinates2, sizeof(textureCoordinates2) / sizeof(float), NULL, 0);
     prMeshTextureToColorRatio(testMeshTexture, 1.0f);
 
     prMeshData* testMeshColor = prMeshCreate();
@@ -55,6 +55,7 @@ int main(int argc, char** argv) {
     test->openglContext->Enable(GL_BLEND);
     test->openglContext->BlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+    size_t val = 0;
     while(!glfwWindowShouldClose(test->window)) {
         prWindowClear(test->openglContext);
 
@@ -67,8 +68,13 @@ int main(int argc, char** argv) {
         vec3 rotation = {yaw, pitch, 0.0f};
         prCameraUpdate(camera, cameraPosition, rotation);
 
+        translationsToMatrix(translation, (vec3){1.0f, 0.0f, 0.0f}, (vec3){45.0f, 0.0f, 0.0f}, GLM_VEC3_ONE);
         prMeshDraw(testMeshTexture, translation, camera, shaderProgram);
+
+        translationsToMatrix(translation, (vec3){0.0f, 0.0f, 0.0f}, (vec3){0.0f, 45.0f, 0.0f}, (vec3){1.0f, 3.0f, 1.0f});
         prMeshDraw(testMeshMixed, translation, camera, shaderProgram);
+
+        translationsToMatrix(translation, (vec3){-1.0f, 0.0f, 0.0f}, (vec3){0.0f, 0.0f, 45.0f}, (vec3){1.0f, 1.0f, 3.0f});
         prMeshDraw(testMeshColor, translation, camera, shaderProgram);
 
         glfwSwapBuffers(test->window);

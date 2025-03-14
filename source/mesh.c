@@ -96,8 +96,8 @@ void prMeshUpdate(prMeshData* mesh, GLfloat vertices[], size_t verticesCount, GL
     if(!indicesCount) {
         prError(PR_INVALID_DATA_ERROR, "Indices data count cannot be zero. Aborting operation, nothing was modified");
         return;
-    } else if(indicesCount % 2 != 0) {
-        prError(PR_INVALID_DATA_ERROR, "Indices data count must be a multiple of 2. Aborting operation, nothing was modified");
+    } else if(indicesCount % 3 != 0) {
+        prError(PR_INVALID_DATA_ERROR, "Indices data count must be a multiple of 3. Aborting operation, nothing was modified");
         return;
     } else if(!indices) {
         prError(PR_INVALID_DATA_ERROR, "Indices data cannot be NULL. Aborting operation, nothing was modified");
