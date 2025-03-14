@@ -5,6 +5,7 @@
 
 void proccessInput(GLFWwindow* window, vec3 cameraFront, vec3 cameraUp) {
     mat4x3 temp;
+    mat2x3 temp2;
     glm_mat4x3_zero(temp);
 
     float cameraSpeed = 7.5f * deltaTime;
@@ -15,30 +16,36 @@ void proccessInput(GLFWwindow* window, vec3 cameraFront, vec3 cameraUp) {
         cameraSpeed /= 2.0f;
     }
 
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+    if(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
         glm_vec3_scale(cameraFront, cameraSpeed, temp[0]);
         glm_vec3_add(cameraPosition, temp[0], cameraPosition);
     }
-
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+    if(glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
         glm_vec3_scale(cameraFront, cameraSpeed, temp[1]);
         glm_vec3_sub(cameraPosition, temp[1], cameraPosition);
     }
-
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+    if(glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
         glm_cross(cameraFront, cameraUp, temp[2]);
         glm_normalize(temp[2]);
         glm_vec3_scale(temp[2], cameraSpeed, temp[2]);
         glm_vec3_sub(cameraPosition, temp[2], cameraPosition);
         // cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
     }
-
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+    if(glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
         glm_cross(cameraFront, cameraUp, temp[3]);
         glm_normalize(temp[3]);
         glm_vec3_scale(temp[3], cameraSpeed, temp[3]);
         glm_vec3_add(cameraPosition, temp[3], cameraPosition);
         // cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+    }
+
+    if(glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) {
+        glm_vec3_scale(cameraUp, cameraSpeed, temp2[0]);
+        glm_vec3_add(cameraPosition, temp2[0], cameraPosition);
+    }
+    if(glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) {
+        glm_vec3_scale(cameraUp, cameraSpeed, temp2[1]);
+        glm_vec3_sub(cameraPosition, temp2[1], cameraPosition);
     }
 
     if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {

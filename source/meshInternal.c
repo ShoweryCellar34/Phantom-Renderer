@@ -18,12 +18,12 @@ void i_prMeshComputeGPUReadyBuffer(prMeshData* mesh) {
         mesh->GPUReadyBuffer[index++] = mesh->vertices[i * 3];
         mesh->GPUReadyBuffer[index++] = mesh->vertices[i * 3 + 1];
         mesh->GPUReadyBuffer[index++] = mesh->vertices[i * 3 + 2];
-        printf("Vertex %i:\n  XYZ:  %.3f, %.3f, %.3f\n", i, mesh->GPUReadyBuffer[index - 3], mesh->GPUReadyBuffer[index - 2], mesh->GPUReadyBuffer[index - 1]);
+        // printf("Vertex %i:\n  XYZ:  %.3f, %.3f, %.3f\n", i, mesh->GPUReadyBuffer[index - 3], mesh->GPUReadyBuffer[index - 2], mesh->GPUReadyBuffer[index - 1]);
 
         if(mesh->textureCoordinatesCount) {
             mesh->GPUReadyBuffer[index++] = mesh->textureCoordinates[i * 2];
             mesh->GPUReadyBuffer[index++] = mesh->textureCoordinates[i * 2 + 1];
-            printf("  UV:   %.3f, %.3f\n", mesh->GPUReadyBuffer[index - 2], mesh->GPUReadyBuffer[index - 1]);
+            // printf("  UV:   %.3f, %.3f\n", mesh->GPUReadyBuffer[index - 2], mesh->GPUReadyBuffer[index - 1]);
         }
 
         if(mesh->vertexColorCount) {
@@ -31,7 +31,7 @@ void i_prMeshComputeGPUReadyBuffer(prMeshData* mesh) {
             mesh->GPUReadyBuffer[index++] = mesh->vertexColor[i * 4 + 1];
             mesh->GPUReadyBuffer[index++] = mesh->vertexColor[i * 4 + 2];
             mesh->GPUReadyBuffer[index++] = mesh->vertexColor[i * 4 + 3];
-            printf("  RGBA: %.3f, %.3f, %.3f, %.3f\n", mesh->GPUReadyBuffer[index - 4], mesh->GPUReadyBuffer[index - 3], mesh->GPUReadyBuffer[index - 2], mesh->GPUReadyBuffer[index - 1]);
+            // printf("  RGBA: %.3f, %.3f, %.3f, %.3f\n", mesh->GPUReadyBuffer[index - 4], mesh->GPUReadyBuffer[index - 3], mesh->GPUReadyBuffer[index - 2], mesh->GPUReadyBuffer[index - 1]);
         }
     }
 }

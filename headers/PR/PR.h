@@ -6,6 +6,7 @@ extern "C" {
 
 #include <PR/camera.h>
 #include <PR/error.h>
+#include <PR/light.h>
 #include <PR/memory.h>
 #include <PR/mesh.h>
 #include <PR/shader.h>
