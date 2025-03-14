@@ -40,7 +40,7 @@ void prTextureDestroy(prTextureData* texture) {
     prFree(texture);
 }
 
-void prTextureLink(prTextureData* texture, GladGLContext* context) {
+void prTextureLinkContext(prTextureData* texture, GladGLContext* context) {
     if(texture->context && texture->textureData) {
         i_prTextureDestroyOnGPUSide(texture);
     }

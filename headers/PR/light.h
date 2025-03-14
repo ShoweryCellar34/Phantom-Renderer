@@ -17,7 +17,7 @@ prLightData* prLightCreate();
 
 void prLightDestroy(prLightData* light);
 
-void prLightLinkWindow(prLightData* light, GladGLContext* context);
+void prLightLinkContext(prLightData* light, GladGLContext* context);
 
 void prLightUpdate(prLightData* light, vec4 color);
 

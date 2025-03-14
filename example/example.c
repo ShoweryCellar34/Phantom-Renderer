@@ -27,24 +27,24 @@ int main(int argc, char** argv) {
     loadTexture(testTexture2, test->openglContext, "res/container.jpg");
 
     prMeshData* testMeshMixed = prMeshCreate();
-    prMeshLinkWindow(testMeshMixed, test->openglContext);
+    prMeshLinkContext(testMeshMixed, test->openglContext);
     prMeshLinkTexture(testMeshMixed, testTexture);
     prMeshUpdate(testMeshMixed, vertices, sizeof(vertices) / sizeof(float), indices, sizeof(indices) / sizeof(unsigned int), textureCoordinates, sizeof(textureCoordinates) / sizeof(float), vertexColor, sizeof(vertexColor) / sizeof(float));
     prMeshTextureToColorRatio(testMeshMixed, 0.5f);
 
     prMeshData* testMeshTexture = prMeshCreate();
-    prMeshLinkWindow(testMeshTexture, test->openglContext);
+    prMeshLinkContext(testMeshTexture, test->openglContext);
     prMeshLinkTexture(testMeshTexture, testTexture2);
     prMeshUpdate(testMeshTexture, vertices2, sizeof(vertices2) / sizeof(float), indices2, sizeof(indices2) / sizeof(unsigned int), textureCoordinates2, sizeof(textureCoordinates2) / sizeof(float), NULL, 0);
     prMeshTextureToColorRatio(testMeshTexture, 1.0f);
 
     prMeshData* testMeshColor = prMeshCreate();
-    prMeshLinkWindow(testMeshColor, test->openglContext);
+    prMeshLinkContext(testMeshColor, test->openglContext);
     prMeshUpdate(testMeshColor, vertices, sizeof(vertices) / sizeof(float), indices, sizeof(indices) / sizeof(unsigned int), NULL, 0, vertexColor, sizeof(vertexColor) / sizeof(float));
     prMeshTextureToColorRatio(testMeshColor, 0.0f);
 
     prCamera* camera = prCameraCreate();
-    prCameraLink(camera, test->openglContext);
+    prCameraLinkContext(camera, test->openglContext);
 
     glfwMakeContextCurrent(test->window);
     glfwSetFramebufferSizeCallback(test->window, framebufferSizeCallback);
@@ -55,7 +55,6 @@ int main(int argc, char** argv) {
     test->openglContext->Enable(GL_BLEND);
     test->openglContext->BlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    size_t val = 0;
     while(!glfwWindowShouldClose(test->window)) {
         prWindowClear(test->openglContext);
 

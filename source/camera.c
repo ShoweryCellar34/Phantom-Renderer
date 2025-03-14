@@ -23,7 +23,7 @@ void prCameraDestroy(prCamera* camera) {
     prFree(camera);
 }
 
-void prCameraLink(prCamera* camera, GladGLContext* context) {
+void prCameraLinkContext(prCamera* camera, GladGLContext* context) {
     camera->context = context;
     if(camera->context) {
         i_prCameraGetDimensions(camera);

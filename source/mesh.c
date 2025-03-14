@@ -51,7 +51,7 @@ void prMeshDestroy(prMeshData* mesh) {
     prFree(mesh);
 }
 
-void prMeshLinkWindow(prMeshData* mesh, GladGLContext* context) {
+void prMeshLinkContext(prMeshData* mesh, GladGLContext* context) {
     if(mesh->context && mesh->GPUReadyBuffer) {
         i_prMeshDestroyOnGPUSide(mesh);
     }

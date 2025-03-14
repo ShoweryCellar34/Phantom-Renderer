@@ -16,6 +16,6 @@ prCamera* prCameraCreate();
 
 void prCameraDestroy(prCamera* camera);
 
-void prCameraLink(prCamera* camera, GladGLContext* context);
+void prCameraLinkContext(prCamera* camera, GladGLContext* context);
 
 void prCameraUpdate(prCamera* camera, vec3 position, vec3 rotation);

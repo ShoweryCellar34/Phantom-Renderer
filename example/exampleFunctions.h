@@ -94,7 +94,7 @@ void loadTexture(prTextureData* texture, GladGLContext* context, const char* pat
     fread(textureData, textureFileSize, 1, textureFile);
     fclose(textureFile);
 
-    prTextureLink(texture, context);
+    prTextureLinkContext(texture, context);
     prTextureUpdate(texture, textureData, textureFileSize);
     prFree(textureData);
 }

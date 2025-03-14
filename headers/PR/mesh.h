@@ -25,7 +25,7 @@ prMeshData* prMeshCreate();
 
 void prMeshDestroy(prMeshData* mesh);
 
-void prMeshLinkWindow(prMeshData* mesh, GladGLContext* context);
+void prMeshLinkContext(prMeshData* mesh, GladGLContext* context);
 
 void prMeshLinkTexture(prMeshData* mesh, prTextureData* texture);
 
