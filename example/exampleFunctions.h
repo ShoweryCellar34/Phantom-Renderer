@@ -87,6 +87,11 @@ void cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
 
 void loadTexture(prTextureData* texture, GladGLContext* context, const char* path) {
     FILE* textureFile = fopen(path, "rb");
+    if(textureFile == NULL) {
+        prLogFatal("[USER]", "Failed to load file");
+        exit(EXIT_FAILURE);
+    }
+
     fseek(textureFile, 0L, SEEK_END);
     size_t textureFileSize = ftell(textureFile);
     fseek(textureFile, 0L, SEEK_SET);
