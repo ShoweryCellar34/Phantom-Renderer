@@ -32,7 +32,7 @@ void prCameraLinkContext(prCamera* camera, GladGLContext* context) {
     }
 }
 
-void prCameraUpdate(prCamera* camera, vec3 position, vec3 rotation) {
+void prCameraUpdate(prCamera* camera, vec3 position, vec3 rotation, float FOV, float closePlane, float farPlane) {
     if(camera->context) {
         i_prCameraGetDimensions(camera);
     }
@@ -60,5 +60,5 @@ void prCameraUpdate(prCamera* camera, vec3 position, vec3 rotation) {
     glm_mat4_identity(camera->view);
     glm_lookat(position, temp, camera->up, camera->view);
 
-    glm_perspective(45.0f, (float)camera->viewportWidth/(float)camera->viewportHeight, 0.001f, 10000.0f, camera->projection);
+    glm_perspective(FOV, (float)camera->viewportWidth/(float)camera->viewportHeight, closePlane, farPlane, camera->projection);
 }

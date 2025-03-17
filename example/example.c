@@ -65,7 +65,7 @@ int main(int argc, char** argv) {
         mat4 translation;
 
         vec3 rotation = {yaw, pitch, 0.0f};
-        prCameraUpdate(camera, cameraPosition, rotation);
+        prCameraUpdate(camera, cameraPosition, rotation, 45.0f, 0.001f, 10000.0f);
 
         translationsToMatrix(translation, (vec3){1.5f, 0.0f, 0.0f}, GLM_VEC3_ZERO, GLM_VEC3_ONE);
         prMeshDraw(testMeshTexture, translation, camera, shaderProgram);

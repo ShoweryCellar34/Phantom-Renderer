@@ -32,7 +32,7 @@ unsigned int prShaderGenerateDefaultProgram(GladGLContext* context) {
             \n\
             uniform float mixRatio;\n\
             uniform bool blendAlpha;\n\
-            uniform bool alphaSupport = false;\n\
+            bool alphaSupport = false;\n\
             \n\
             in vec2 textureCoordinates;\n\
             in vec4 vertexColor;\n\

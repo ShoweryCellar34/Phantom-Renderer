@@ -115,7 +115,7 @@ void i_prMeshUpdateOnGPUSide(prMeshData* mesh) {
 
 	mesh->context->BindVertexArray(0);
 
-    prLogInfo("[GL]", "Successfully created vertex array object and set data");
+    prLogInfo("[GL]", "Successfully updated vertex array object and set data");
 }
 
 void i_prMeshDestroyOnGPUSide(prMeshData* mesh) {

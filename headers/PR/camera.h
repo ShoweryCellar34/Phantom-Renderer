@@ -18,4 +18,4 @@ void prCameraDestroy(prCamera* camera);
 
 void prCameraLinkContext(prCamera* camera, GladGLContext* context);
 
-void prCameraUpdate(prCamera* camera, vec3 position, vec3 rotation);
+void prCameraUpdate(prCamera* camera, vec3 position, vec3 rotation, float FOV, float closePlane, float farPlane);
