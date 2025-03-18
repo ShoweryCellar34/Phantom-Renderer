@@ -5,6 +5,7 @@
 
 typedef struct prCamera {
     GladGLContext* context;
+    vec3 position;
     mat4 view;
     mat4 projection;
     int viewportWidth, viewportHeight;

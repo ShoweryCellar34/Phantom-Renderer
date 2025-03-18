@@ -11,13 +11,17 @@ prMeshData* prMeshCreate() {
     prMeshData* mesh = prMalloc(sizeof(prMeshData));
 
     mesh->context = NULL;
+    mesh->texture = NULL;
+    mesh->material = NULL;
     mesh->vertices = NULL;
     mesh->textureCoordinates = NULL;
     mesh->vertexColor = NULL;
+    mesh->vertexNormals = NULL;
     mesh->indices = NULL;
     mesh->verticesCount = 0;
     mesh->textureCoordinatesCount = 0;
     mesh->vertexColorCount = 0;
+    mesh->vertexNormalsCount = 0;
     mesh->indicesCount = 0;
     mesh->VBO = 0;
     mesh->VAO = 0;
@@ -70,7 +74,15 @@ void prMeshLinkTexture(prMeshData* mesh, prTextureData* texture) {
     mesh->texture = texture;
 }
 
-void prMeshUpdate(prMeshData* mesh, GLfloat vertices[], size_t verticesCount, GLuint indices[], size_t indicesCount, GLfloat textureCoordinates[], size_t textureCoordinatesCount, GLfloat vertexColor[], size_t vertexColorCount) {
+void prMeshLinkMaterial(prMeshData* mesh, prMaterialData* material) {
+    mesh->material = material;
+}
+
+void prMeshUpdate(prMeshData* mesh, GLfloat vertices[], size_t verticesCount, 
+    GLuint indices[], size_t indicesCount, 
+    GLfloat textureCoordinates[], size_t textureCoordinatesCount, 
+    GLfloat vertexColor[], size_t vertexColorCount, 
+    GLfloat vertexNormals[], size_t vertexNormalsCount) {
     if(mesh->vertices) {
         prFree(mesh->vertices);
         prFree(mesh->indices);
@@ -128,6 +140,18 @@ void prMeshUpdate(prMeshData* mesh, GLfloat vertices[], size_t verticesCount, GL
         return;
     }
 
+    if(vertexNormalsCount % 3 != 0) {
+        prError(PR_INVALID_DATA_ERROR, "Vertex normal data count must be a multiple of 3. Aborting operation, nothing was modified");
+        return;
+    }
+    if(!vertexNormals && vertexNormalsCount) {
+        prError(PR_INVALID_DATA_ERROR, "Vertex normal data cannot be NULL while vertex normals data count is not 0. Aborting operation, nothing was modified");
+        return;
+    } else if(vertexNormalsCount != verticesCount && vertexNormalsCount != 0) {
+        prError(PR_INVALID_DATA_ERROR, "Vertex normal data not enough for every vertex. Aborting operation, nothing was modified");
+        return;
+    }
+
     mesh->vertices = prMalloc(sizeof(GLfloat) * verticesCount);
     prMemcpy(mesh->vertices, vertices, sizeof(GLfloat) * verticesCount);
     mesh->verticesCount = verticesCount;
@@ -147,6 +171,12 @@ void prMeshUpdate(prMeshData* mesh, GLfloat vertices[], size_t verticesCount, GL
         prMemcpy(mesh->vertexColor, vertexColor, sizeof(GLfloat) * vertexColorCount);
     }
     mesh->vertexColorCount = vertexColorCount;
+
+    if(vertexNormalsCount && vertexNormals) {
+        mesh->vertexNormals = prMalloc(sizeof(GLfloat) * vertexNormalsCount);
+        prMemcpy(mesh->vertexNormals, vertexNormals, sizeof(GLfloat) * vertexNormalsCount);
+    }
+    mesh->vertexNormalsCount = vertexNormalsCount;
 
     if(mesh->context && !mesh->VAO) {
         i_prMeshCreateOnGPUSide(mesh);
@@ -185,6 +215,41 @@ void prMeshDraw(prMeshData* mesh, mat4 translation, prCamera* camera,  unsigned 
 
     int blendAlphaUniformLocation = context->GetUniformLocation(shaderProgram, "blendAlpha");
     context->Uniform1i(blendAlphaUniformLocation, 0);
+
+    int cameraPositionUniformLocation = context->GetUniformLocation(shaderProgram, "cameraPosition");
+    context->Uniform3f(cameraPositionUniformLocation, camera->position[0], camera->position[1], camera->position[2]);
+
+    static prMaterialData defaultMaterial = {.shininess = -255.0f};
+    if(defaultMaterial.shininess == -255.0f) {
+        glm_vec3_copy((vec3){1.0f, 1.0f, 1.0f}, defaultMaterial.ambient);
+        glm_vec3_copy((vec3){1.0f, 1.0f, 1.0f}, defaultMaterial.diffuse);
+        glm_vec3_copy((vec3){1.0f, 1.0f, 1.0f}, defaultMaterial.specular);
+        defaultMaterial.shininess = 32.0f;
+        defaultMaterial.ambientStrength = 0.15f;
+        defaultMaterial.diffuseStrength = 1.0f;
+        defaultMaterial.specularStrength = 0.5f;
+    }
+
+    prMaterialData* material = mesh->material;
+    if(!mesh->material) {
+        material = &defaultMaterial;
+    }
+
+    int ambientColorStrengthUniformLocation = context->GetUniformLocation(shaderProgram, "ambientStrength");
+    context->Uniform1f(ambientColorStrengthUniformLocation, material->ambientStrength);
+    int diffuseStrengthUniformLocation = context->GetUniformLocation(shaderProgram, "diffuseStrength");
+    context->Uniform1f(diffuseStrengthUniformLocation, material->diffuseStrength);
+    int specularStrengthUniformLocation = context->GetUniformLocation(shaderProgram, "specularStrength");
+    context->Uniform1f(specularStrengthUniformLocation, material->specularStrength);
+
+    int ambientUniformLocation = context->GetUniformLocation(shaderProgram, "material.ambient");
+    context->Uniform3f(ambientUniformLocation, material->ambient[0], material->ambient[1], material->ambient[2]);
+    int diffuseUniformLocation = context->GetUniformLocation(shaderProgram, "material.diffuse");
+    context->Uniform3f(diffuseUniformLocation, material->diffuse[0], material->diffuse[1], material->diffuse[2]);
+    int specularUniformLocation = context->GetUniformLocation(shaderProgram, "material.specular");
+    context->Uniform3f(specularUniformLocation, material->specular[0], material->specular[1], material->specular[2]);
+    int shininessUniformLocation = context->GetUniformLocation(shaderProgram, "material.shininess");
+    context->Uniform1f(shininessUniformLocation, material->shininess);
 
     context->DrawElements(GL_TRIANGLES, mesh->indicesCount, GL_UNSIGNED_INT, 0);
 

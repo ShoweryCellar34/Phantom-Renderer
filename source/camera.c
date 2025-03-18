@@ -8,13 +8,13 @@ prCamera* prCameraCreate() {
     prCamera* camera = prMalloc(sizeof(prCamera));
 
     camera->context = NULL;
+    glm_vec3_zero(camera->position);
     glm_mat4_copy(GLM_MAT4_ZERO, camera->view);
     glm_mat4_copy(GLM_MAT4_ZERO, camera->projection);
     camera->viewportWidth = 0;
     camera->viewportHeight = 0;
     glm_vec3_zero(camera->front);
-    glm_vec3_zero(camera->up);
-    camera->up[1] = 1.0f;
+    glm_vec3_copy((vec3){0.0f, 1.0f, 0.0f}, camera->up);
 
     return camera;
 }
@@ -37,8 +37,8 @@ void prCameraUpdate(prCamera* camera, vec3 position, vec3 rotation, float FOV, f
         i_prCameraGetDimensions(camera);
     }
 
-    glm_vec3_zero(camera->up);
-    camera->up[1] = 1.0f;
+    glm_vec3_copy(position, camera->position);
+
     vec3 temp = {0.0f, 0.0f, 0.0f};
     
     float pitch = (rotation[1] * M_PI) / 180.0;

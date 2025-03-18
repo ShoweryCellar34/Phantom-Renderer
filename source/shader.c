@@ -11,9 +11,12 @@ unsigned int prShaderGenerateDefaultProgram(GladGLContext* context) {
             layout (location = 0) in vec3 inputPosition;\n\
             layout (location = 1) in vec2 inputTextureCoordinates;\n\
             layout (location = 2) in vec4 inputVertexColor;\n\
+            layout (location = 3) in vec3 inputVertexNormals;\n\
             \n\
+            out vec3 fragmentPosition;\n\
             out vec2 textureCoordinates;\n\
             out vec4 vertexColor;\n\
+            out vec3 vertexNormals;\n\
             \n\
             uniform mat4 translation;\n\
             uniform mat4 view;\n\
@@ -21,8 +24,10 @@ unsigned int prShaderGenerateDefaultProgram(GladGLContext* context) {
             \n\
             void main() {\n\
                 gl_Position = projection * view * translation * vec4(inputPosition, 1.0);\n\
+                fragmentPosition = vec3(translation * vec4(inputPosition, 1.0));\n\
                 textureCoordinates = inputTextureCoordinates;\n\
                 vertexColor = inputVertexColor;\n\
+                vertexNormals = mat3(transpose(inverse(translation))) * inputVertexNormals;\n\
             }\n\
         ";
 
@@ -33,19 +38,50 @@ unsigned int prShaderGenerateDefaultProgram(GladGLContext* context) {
             uniform float mixRatio;\n\
             uniform bool blendAlpha;\n\
             bool alphaSupport = false;\n\
-            \n\
-            in vec2 textureCoordinates;\n\
-            in vec4 vertexColor;\n\
-            \n\
             uniform sampler2D textureSampler;\n\
             \n\
+            uniform float ambientStrength;\n\
+            uniform float diffuseStrength;\n\
+            uniform float specularStrength;\n\
+            uniform vec3 cameraPosition;\n\
+            \n\
+            in vec3 fragmentPosition;\n\
+            in vec2 textureCoordinates;\n\
+            in vec4 vertexColor;\n\
+            in vec3 vertexNormals;\n\
+            \n\
+            struct Material {\n\
+                vec3 ambient;\n\
+                vec3 diffuse;\n\
+                vec3 specular;\n\
+                float shininess;\n\
+            };\n\
+            uniform Material material;\n\
+            \n\
             void main() {\n\
+                vec3 lightPos = vec3(0.0, 1.0, 0.0);\n\
+                vec3 lightCol = vec3(1.0, 1.0, 1.0);\n\
+                \n\
+                vec3 ambient = material.ambient * ambientStrength;\n\
+                \n\
+                vec3 normal = normalize(vertexNormals);\n\
+                vec3 lightDirection = normalize(lightPos - fragmentPosition);\n\
+                float diff = max(dot(normal, lightDirection), 0.0);\n\
+                vec3 diffuse = (diffuseStrength * diff * material.diffuse) * lightCol;\n\
+                \n\
+                vec3 viewDirection = normalize(cameraPosition - fragmentPosition);\n\
+                vec3 reflectDirection = reflect(-lightDirection, normal);\n\
+                float spec = pow(max(dot(viewDirection, reflectDirection), 0.0), material.shininess);\n\
+                vec3 specular = (specularStrength * spec * material.specular) * lightCol;\n\
+                \n\
+                vec3 result = (diffuse + specular + ambient);\n\
+                \n\
                 if(blendAlpha) {\n\
                     vec4 texel = texture(textureSampler, textureCoordinates);\n\
-                    fragColor = vec4(mix(vertexColor.xyz, texel.xyz, mixRatio), alphaSupport ? mix(vertexColor.w, texel.w, mixRatio) : 1.0);\n\
+                    fragColor = vec4(mix(vertexColor.xyz, texel.xyz, mixRatio) * result, alphaSupport ? mix(vertexColor.w, texel.w, mixRatio) : 1.0);\n\
                 } else {\n\
                     vec4 texel = texture(textureSampler, textureCoordinates);\n\
-                    fragColor = vec4(mix(vertexColor.xyz, texel.xyz, mixRatio), alphaSupport ? vertexColor.w + texel.w : 1.0);\n\
+                    fragColor = vec4(mix(vertexColor.xyz, texel.xyz, mixRatio) * result, alphaSupport ? vertexColor.w + texel.w : 1.0);\n\
                 }\n\
             }\n\
         ";
