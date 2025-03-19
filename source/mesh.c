@@ -11,7 +11,6 @@ prMeshData* prMeshCreate() {
     prMeshData* mesh = prMalloc(sizeof(prMeshData));
 
     mesh->context = NULL;
-    mesh->texture = NULL;
     mesh->material = NULL;
     mesh->vertices = NULL;
     mesh->textureCoordinates = NULL;
@@ -63,15 +62,6 @@ void prMeshLinkContext(prMeshData* mesh, GladGLContext* context) {
     if(mesh->context && mesh->GPUReadyBuffer) {
         i_prMeshCreateOnGPUSide(mesh);
     }
-}
-
-void prMeshLinkTexture(prMeshData* mesh, prTextureData* texture) {
-    if(texture->context != mesh->context) {
-        prError(PR_GL_ERROR, "Texture context does not match mesh context. Aborting operation, nothing was modified");
-        return;
-    }
-
-    mesh->texture = texture;
 }
 
 void prMeshLinkMaterial(prMeshData* mesh, prMaterialData* material) {
@@ -191,11 +181,68 @@ void prMeshTextureToColorRatio(prMeshData* mesh, float mixRatio) {
 
 void prMeshDraw(prMeshData* mesh, mat4 translation, prCamera* camera,  unsigned int shaderProgram) {
     GladGLContext* context = mesh->context;
-    prTextureData* texture = mesh->texture;
+
+    static prMaterialData defaultMaterial = {.shininess = -255.0f};
+    prMaterialData* material = mesh->material;
+
+    if(!mesh->material) {
+        prLogWarning("[GL]", "Material not set, using default material");
+        if(defaultMaterial.shininess == -255.0f) {
+            defaultMaterial.texture = NULL;
+            defaultMaterial.specularMap = NULL;
+            defaultMaterial.ambientMap = NULL;
+            defaultMaterial.diffuseMap = NULL;
+            defaultMaterial.specularMap = NULL;
+            defaultMaterial.shininess = 32.0f;
+            defaultMaterial.ambientStrength = 0.15f;
+            defaultMaterial.diffuseStrength = 1.0f;
+            defaultMaterial.specularStrength = 0.5f;
+        }
+
+        material = &defaultMaterial;
+    }
+
+    if(material->texture) {
+        if(mesh->material->texture->context != context) {
+            prError(PR_GL_ERROR, "Material texture context does not match mesh context. Aborting operation, nothing was modified");
+            return;
+        }
+    }
+    if(material->specularMap) {
+        if(mesh->material->specularMap->context != context) {
+            prError(PR_GL_ERROR, "Material specular map context does not match mesh context. Aborting operation, nothing was modified");
+            return;
+        }
+    }
 
     context->UseProgram(shaderProgram);
 
     context->BindVertexArray(mesh->VAO);
+
+    if(mesh->textureCoordinatesCount && mesh->material->texture) {
+        if(mesh->material->texture->TBO && mesh->material->texture->context == context) {
+            context->ActiveTexture(GL_TEXTURE0);
+            context->BindTexture(GL_TEXTURE_2D, mesh->material->texture->TBO);
+        }
+    }
+    if(mesh->textureCoordinatesCount && mesh->material->ambientMap) {
+        if(mesh->material->ambientMap->TBO) {
+            context->ActiveTexture(GL_TEXTURE1);
+            context->BindTexture(GL_TEXTURE_2D, mesh->material->ambientMap->TBO);
+        }
+    }
+    if(mesh->textureCoordinatesCount && mesh->material->diffuseMap) {
+        if(mesh->material->diffuseMap->TBO) {
+            context->ActiveTexture(GL_TEXTURE2);
+            context->BindTexture(GL_TEXTURE_2D, mesh->material->diffuseMap->TBO);
+        }
+    }
+    if(mesh->textureCoordinatesCount && mesh->material->specularMap) {
+        if(mesh->material->specularMap->TBO) {
+            context->ActiveTexture(GL_TEXTURE3);
+            context->BindTexture(GL_TEXTURE_2D, mesh->material->specularMap->TBO);
+        }
+    }
 
     int viewUniformLocation = context->GetUniformLocation(shaderProgram, "view");
     context->UniformMatrix4fv(viewUniformLocation, 1, GL_FALSE, camera->view[0]);
@@ -206,10 +253,6 @@ void prMeshDraw(prMeshData* mesh, mat4 translation, prCamera* camera,  unsigned 
     int translationUniformLocation = context->GetUniformLocation(shaderProgram, "translation");
     context->UniformMatrix4fv(translationUniformLocation, 1, GL_FALSE, translation[0]);
 
-    if(mesh->textureCoordinatesCount) {
-        context->ActiveTexture(GL_TEXTURE0);
-        context->BindTexture(GL_TEXTURE_2D, texture->TBO);
-    }
     int mixRatioUniformLocation = context->GetUniformLocation(shaderProgram, "mixRatio");
     context->Uniform1f(mixRatioUniformLocation, mesh->mixRatio);
 
@@ -219,37 +262,21 @@ void prMeshDraw(prMeshData* mesh, mat4 translation, prCamera* camera,  unsigned 
     int cameraPositionUniformLocation = context->GetUniformLocation(shaderProgram, "cameraPosition");
     context->Uniform3f(cameraPositionUniformLocation, camera->position[0], camera->position[1], camera->position[2]);
 
-    static prMaterialData defaultMaterial = {.shininess = -255.0f};
-    if(defaultMaterial.shininess == -255.0f) {
-        glm_vec3_copy((vec3){1.0f, 1.0f, 1.0f}, defaultMaterial.ambient);
-        glm_vec3_copy((vec3){1.0f, 1.0f, 1.0f}, defaultMaterial.diffuse);
-        glm_vec3_copy((vec3){1.0f, 1.0f, 1.0f}, defaultMaterial.specular);
-        defaultMaterial.shininess = 32.0f;
-        defaultMaterial.ambientStrength = 0.15f;
-        defaultMaterial.diffuseStrength = 1.0f;
-        defaultMaterial.specularStrength = 0.5f;
-    }
-
-    prMaterialData* material = mesh->material;
-    if(!mesh->material) {
-        material = &defaultMaterial;
-    }
-
-    int ambientColorStrengthUniformLocation = context->GetUniformLocation(shaderProgram, "ambientStrength");
-    context->Uniform1f(ambientColorStrengthUniformLocation, material->ambientStrength);
-    int diffuseStrengthUniformLocation = context->GetUniformLocation(shaderProgram, "diffuseStrength");
-    context->Uniform1f(diffuseStrengthUniformLocation, material->diffuseStrength);
-    int specularStrengthUniformLocation = context->GetUniformLocation(shaderProgram, "specularStrength");
-    context->Uniform1f(specularStrengthUniformLocation, material->specularStrength);
-
     int ambientUniformLocation = context->GetUniformLocation(shaderProgram, "material.ambient");
-    context->Uniform3f(ambientUniformLocation, material->ambient[0], material->ambient[1], material->ambient[2]);
+    context->Uniform1i(ambientUniformLocation, 1);
     int diffuseUniformLocation = context->GetUniformLocation(shaderProgram, "material.diffuse");
-    context->Uniform3f(diffuseUniformLocation, material->diffuse[0], material->diffuse[1], material->diffuse[2]);
+    context->Uniform1i(diffuseUniformLocation, 2);
     int specularUniformLocation = context->GetUniformLocation(shaderProgram, "material.specular");
-    context->Uniform3f(specularUniformLocation, material->specular[0], material->specular[1], material->specular[2]);
+    context->Uniform1i(specularUniformLocation, 3);
     int shininessUniformLocation = context->GetUniformLocation(shaderProgram, "material.shininess");
     context->Uniform1f(shininessUniformLocation, material->shininess);
+
+    int ambientColorStrengthUniformLocation = context->GetUniformLocation(shaderProgram, "material.ambientStrength");
+    context->Uniform1f(ambientColorStrengthUniformLocation, material->ambientStrength);
+    int diffuseStrengthUniformLocation = context->GetUniformLocation(shaderProgram, "material.diffuseStrength");
+    context->Uniform1f(diffuseStrengthUniformLocation, material->diffuseStrength);
+    int specularStrengthUniformLocation = context->GetUniformLocation(shaderProgram, "material.specularStrength");
+    context->Uniform1f(specularStrengthUniformLocation, material->specularStrength);
 
     context->DrawElements(GL_TRIANGLES, mesh->indicesCount, GL_UNSIGNED_INT, 0);
 

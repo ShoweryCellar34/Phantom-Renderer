@@ -1,5 +1,7 @@
 #pragma once
 
+#include <PR/defines.h>
+
 #include <stddef.h>
 #include <glad/gl.h>
 #include <cglm/cglm.h>
@@ -10,7 +12,6 @@ typedef struct prCamera prCamera;
 
 typedef struct prMeshData {
     GladGLContext* context;
-    prTextureData* texture;
     prMaterialData* material;
     GLfloat* vertices;
     GLfloat* textureCoordinates;
@@ -29,8 +30,6 @@ prMeshData* prMeshCreate();
 void prMeshDestroy(prMeshData* mesh);
 
 void prMeshLinkContext(prMeshData* mesh, GladGLContext* context);
-
-void prMeshLinkTexture(prMeshData* mesh, prTextureData* texture);
 
 void prMeshLinkMaterial(prMeshData* mesh, prMaterialData* material);
 

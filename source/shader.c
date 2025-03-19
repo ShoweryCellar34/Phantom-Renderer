@@ -1,5 +1,7 @@
 #include <PR/shader.h>
 
+#include <PR/defines.h>
+
 #include <stddef.h>
 #include <string.h>
 #include <stdio.h>
@@ -38,11 +40,7 @@ unsigned int prShaderGenerateDefaultProgram(GladGLContext* context) {
             uniform float mixRatio;\n\
             uniform bool blendAlpha;\n\
             bool alphaSupport = false;\n\
-            uniform sampler2D textureSampler;\n\
             \n\
-            uniform float ambientStrength;\n\
-            uniform float diffuseStrength;\n\
-            uniform float specularStrength;\n\
             uniform vec3 cameraPosition;\n\
             \n\
             in vec3 fragmentPosition;\n\
@@ -51,36 +49,40 @@ unsigned int prShaderGenerateDefaultProgram(GladGLContext* context) {
             in vec3 vertexNormals;\n\
             \n\
             struct Material {\n\
-                vec3 ambient;\n\
-                vec3 diffuse;\n\
-                vec3 specular;\n\
+                sampler2D texture;\n\
+                sampler2D ambient;\n\
+                sampler2D diffuse;\n\
+                sampler2D specular;\n\
                 float shininess;\n\
+                float ambientStrength;\n\
+                float diffuseStrength;\n\
+                float specularStrength;\n\
             };\n\
             uniform Material material;\n\
             \n\
             void main() {\n\
-                vec3 lightPos = vec3(0.0, 1.0, 0.0);\n\
+                vec3 lightPos = vec3(0.0, 2.0, 0.0);\n\
                 vec3 lightCol = vec3(1.0, 1.0, 1.0);\n\
                 \n\
-                vec3 ambient = material.ambient * ambientStrength;\n\
+                vec3 ambient = vec3(texture(material.ambient, textureCoordinates)) * material.ambientStrength;\n\
                 \n\
                 vec3 normal = normalize(vertexNormals);\n\
                 vec3 lightDirection = normalize(lightPos - fragmentPosition);\n\
                 float diff = max(dot(normal, lightDirection), 0.0);\n\
-                vec3 diffuse = (diffuseStrength * diff * material.diffuse) * lightCol;\n\
+                vec3 diffuse = (vec3(texture(material.diffuse, textureCoordinates)) * material.diffuseStrength * diff) * lightCol;\n\
                 \n\
                 vec3 viewDirection = normalize(cameraPosition - fragmentPosition);\n\
                 vec3 reflectDirection = reflect(-lightDirection, normal);\n\
                 float spec = pow(max(dot(viewDirection, reflectDirection), 0.0), material.shininess);\n\
-                vec3 specular = (specularStrength * spec * material.specular) * lightCol;\n\
+                vec3 specular = (vec3(texture(material.specular, textureCoordinates)) * material.specularStrength * spec) * lightCol;\n\
                 \n\
                 vec3 result = (diffuse + specular + ambient);\n\
                 \n\
                 if(blendAlpha) {\n\
-                    vec4 texel = texture(textureSampler, textureCoordinates);\n\
+                    vec4 texel = texture(material.texture, textureCoordinates);\n\
                     fragColor = vec4(mix(vertexColor.xyz, texel.xyz, mixRatio) * result, alphaSupport ? mix(vertexColor.w, texel.w, mixRatio) : 1.0);\n\
                 } else {\n\
-                    vec4 texel = texture(textureSampler, textureCoordinates);\n\
+                    vec4 texel = texture(material.texture, textureCoordinates);\n\
                     fragColor = vec4(mix(vertexColor.xyz, texel.xyz, mixRatio) * result, alphaSupport ? vertexColor.w + texel.w : 1.0);\n\
                 }\n\
             }\n\

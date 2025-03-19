@@ -5,6 +5,7 @@ extern "C" {
 #endif
 
 #include <PR/camera.h>
+#include <PR/defines.h>
 #include <PR/error.h>
 #include <PR/light.h>
 #include <PR/memory.h>

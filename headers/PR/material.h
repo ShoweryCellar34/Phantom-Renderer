@@ -2,10 +2,13 @@
 
 #include <cglm/cglm.h>
 
+typedef struct prTextureData prTextureData;
+
 typedef struct prMaterialData {
-    vec3 ambient;
-    vec3 diffuse;
-    vec3 specular;
+    prTextureData* texture;
+    prTextureData* ambientMap;
+    prTextureData* diffuseMap;
+    prTextureData* specularMap;
     float shininess;
     float ambientStrength;
     float diffuseStrength;
@@ -18,10 +21,18 @@ prMaterialData* prMaterialCreateDefaults();
 
 void prMaterialDestroy(prMaterialData* material);
 
-void prMaterialSetAmbient(prMaterialData* material, vec3 ambient);
+void prMaterialLinkTexture(prMaterialData* material, prTextureData* texture);
 
-void prMaterialSetDiffuse(prMaterialData* material, vec3 diffuse);
+void prMaterialLinkAmbientMap(prMaterialData* material, prTextureData* ambientMap);
 
-void prMaterialSetSpecular(prMaterialData* material, vec3 specular);
+void prMaterialLinkDiffuseMap(prMaterialData* material, prTextureData* diffuseMap);
+
+void prMaterialLinkSpecularMap(prMaterialData* material, prTextureData* specularMap);
 
 void prMaterialSetShininess(prMaterialData* material, float shininess);
+
+void prMaterialSetAmbientStrength(prMaterialData* material, float ambientStrength);
+
+void prMaterialSetDiffuseStrength(prMaterialData* material, float diffuseStrength);
+
+void prMaterialSetSpecularStrength(prMaterialData* material, float specularStrength);

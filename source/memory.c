@@ -1,5 +1,7 @@
 #include <PR/memory.h>
 
+#include <PR/defines.h>
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <memory.h>

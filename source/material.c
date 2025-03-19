@@ -1,13 +1,18 @@
 #include <PR/material.h>
 
+#include <PR/defines.h>
+
 #include <PR/memory.h>
+#include <PR/texture.h>
+#include <PR/error.h>
 
 prMaterialData* prMaterialCreate() {
     prMaterialData* material = prMalloc(sizeof(prMaterialData));
 
-    glm_vec3_zero(material->ambient);
-    glm_vec3_zero(material->diffuse);
-    glm_vec3_zero(material->specular);
+    material->texture = NULL;
+    material->ambientMap = NULL;
+    material->diffuseMap = NULL;
+    material->specularMap = NULL;
     material->shininess = 0.0f;
     material->ambientStrength = 0.0f;
     material->diffuseStrength = 0.0f;
@@ -19,9 +24,11 @@ prMaterialData* prMaterialCreate() {
 prMaterialData* prMaterialCreateDefaults() {
     prMaterialData* material = prMalloc(sizeof(prMaterialData));
 
-    glm_vec3_copy((vec3){1.0f, 1.0f, 1.0f}, material->ambient);
-    glm_vec3_copy((vec3){1.0f, 1.0f, 1.0f}, material->diffuse);
-    glm_vec3_copy((vec3){1.0f, 1.0f, 1.0f}, material->specular);
+    material->texture = NULL;
+    material->specularMap = NULL;
+    material->ambientMap = NULL;
+    material->diffuseMap = NULL;
+    material->specularMap = NULL;
     material->shininess = 32.0f;
     material->ambientStrength = 0.15f;
     material->diffuseStrength = 1.0f;
@@ -34,16 +41,20 @@ void prMaterialDestroy(prMaterialData* material) {
     prFree(material);
 }
 
-void prMaterialSetAmbient(prMaterialData* material, vec3 ambient) {
-    glm_vec3_copy(ambient, material->ambient);
+void prMaterialLinkTexture(prMaterialData* material, prTextureData* texture) {
+    material->texture = texture;
 }
 
-void prMaterialSetDiffuse(prMaterialData* material, vec3 diffuse) {
-    glm_vec3_copy(diffuse, material->diffuse);
+void prMaterialLinkAmbientMap(prMaterialData* material, prTextureData* ambientMap) {
+    material->ambientMap = ambientMap;
 }
 
-void prMaterialSetSpecular(prMaterialData* material, vec3 specular) {
-    glm_vec3_copy(specular, material->specular);
+void prMaterialLinkDiffuseMap(prMaterialData* material, prTextureData* diffuseMap) {
+    material->diffuseMap = diffuseMap;
+}
+
+void prMaterialLinkSpecularMap(prMaterialData* material, prTextureData* specularMap) {
+    material->specularMap = specularMap;
 }
 
 void prMaterialSetShininess(prMaterialData* material, float shininess) {

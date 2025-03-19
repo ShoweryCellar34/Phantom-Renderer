@@ -1,5 +1,7 @@
 #include <PR/texture.h>
 
+#include <PR/defines.h>
+
 #include <PR/textureInternal.h>
 
 #include <stb_image.h>

@@ -1,5 +1,7 @@
 #include <PR/error.h>
 
+#include <PR/defines.h>
+
 #include <time.h>
 #include <stdio.h>
 

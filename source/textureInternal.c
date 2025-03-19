@@ -1,5 +1,7 @@
 #include <PR/textureInternal.h>
 
+#include <PR/defines.h>
+
 #include <PR/error.h>
 
 void i_prTextureCreateOnGPUSide(prTextureData* texture) {
