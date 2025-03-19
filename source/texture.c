@@ -4,6 +4,10 @@
 
 #include <PR/textureInternal.h>
 
+#define STBI_MALLOC(size) prMalloc(size)
+#define STBI_REALLOC(size) prRealloc(size)
+#define STBI_FREE(size) prFree(size)
+
 #include <stb_image.h>
 #include <PR/memory.h>
 #include <PR/error.h>
@@ -70,6 +74,28 @@ void prTextureUpdate(prTextureData* texture, unsigned char rawTextureData[], uns
         prError(PR_INVALID_DATA_ERROR, "Texture data failed to unpack. Aborting operation, nothing was modified");
         return;
     }
+
+    if(texture->context && !texture->TBO) {
+        i_prTextureCreateOnGPUSide(texture);
+    } else if(texture->context) {
+        i_prTextureUpdateOnGPUSide(texture);
+    }
+}
+
+void prTextureSingleColor(prTextureData* texture, GLfloat color[4]) {
+    if(texture->textureData) {
+        stbi_image_free(texture->textureData);
+        texture->textureData = NULL;
+    }
+
+    texture->textureData = prMalloc(4 * sizeof(GLubyte));
+    texture->textureData[0] = color[0] * 255.0f;
+    texture->textureData[1] = color[1] * 255.0f;
+    texture->textureData[2] = color[2] * 255.0f;
+    texture->textureData[3] = color[3] * 255.0f;
+    texture->channels = 4;
+    texture->height = 1;
+    texture->width = 1;
 
     if(texture->context && !texture->TBO) {
         i_prTextureCreateOnGPUSide(texture);

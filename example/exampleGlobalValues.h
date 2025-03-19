@@ -1,77 +1,7 @@
 #pragma once
 
-float vertices[] = {
-    0.5f,  0.5f, 0.0f, // top right
-    0.5f, -0.5f, 0.0f, // bottom right
-   -0.5f, -0.5f, 0.0f, // bottom left
-   -0.5f,  0.5f, 0.0f  // top left
-};
-
-float textureCoordinates[] = {
-    1.0f,  1.0f, // top right
-    1.0f,  0.0f, // bottom right
-    0.0f,  0.0f, // bottom left
-    0.0f,  1.0f   // top left
-};
-
-float vertexColor[] = {
-    1.0f, 0.0f, 0.0f, 1.0f,
-    0.0f, 1.0f, 0.0f, 1.0f,
-    0.0f, 0.0f, 1.0f, 1.0f,
-    0.0f, 0.0f, 0.0f, 0.0f
-};
-
-float vertexColor2[] = {
-    1.0f, 1.0f, 1.0f, 1.0f,
-    1.0f, 1.0f, 1.0f, 1.0f,
-    1.0f, 1.0f, 1.0f, 1.0f,
-    1.0f, 1.0f, 1.0f, 1.0f,
-    1.0f, 1.0f, 1.0f, 1.0f,
-    1.0f, 1.0f, 1.0f, 1.0f,
-
-    1.0f, 1.0f, 1.0f, 1.0f,
-    1.0f, 1.0f, 1.0f, 1.0f,
-    1.0f, 1.0f, 1.0f, 1.0f,
-    1.0f, 1.0f, 1.0f, 1.0f,
-    1.0f, 1.0f, 1.0f, 1.0f,
-    1.0f, 1.0f, 1.0f, 1.0f,
-
-    1.0f, 1.0f, 1.0f, 1.0f,
-    1.0f, 1.0f, 1.0f, 1.0f,
-    1.0f, 1.0f, 1.0f, 1.0f,
-    1.0f, 1.0f, 1.0f, 1.0f,
-    1.0f, 1.0f, 1.0f, 1.0f,
-    1.0f, 1.0f, 1.0f, 1.0f,
-
-    1.0f, 1.0f, 1.0f, 1.0f,
-    1.0f, 1.0f, 1.0f, 1.0f,
-    1.0f, 1.0f, 1.0f, 1.0f,
-    1.0f, 1.0f, 1.0f, 1.0f,
-    1.0f, 1.0f, 1.0f, 1.0f,
-    1.0f, 1.0f, 1.0f, 1.0f,
-
-    1.0f, 1.0f, 1.0f, 1.0f,
-    1.0f, 1.0f, 1.0f, 1.0f,
-    1.0f, 1.0f, 1.0f, 1.0f,
-    1.0f, 1.0f, 1.0f, 1.0f,
-    1.0f, 1.0f, 1.0f, 1.0f,
-    1.0f, 1.0f, 1.0f, 1.0f,
-
-    1.0f, 1.0f, 1.0f, 1.0f,
-    1.0f, 1.0f, 1.0f, 1.0f,
-    1.0f, 1.0f, 1.0f, 1.0f,
-    1.0f, 1.0f, 1.0f, 1.0f,
-    1.0f, 1.0f, 1.0f, 1.0f,
-    1.0f, 1.0f, 1.0f, 1.0f
-};
-
-unsigned int indices[] = {
-    0, 1, 3, // first Triangle
-    1, 2, 3  // second Triangle
-};
-
 // Vertices of a cube
-float vertices2[] = {
+float vertices[] = {
    -0.5f, -0.5f, -0.5f,
     0.5f, -0.5f, -0.5f,
     0.5f,  0.5f, -0.5f,
@@ -115,7 +45,7 @@ float vertices2[] = {
    -0.5f,  0.5f, -0.5f
 };
 
-unsigned int indices2[] = {
+unsigned int indices[] = {
     0, 1, 2, 3, 4, 5,
     6, 7, 8, 9, 10, 11,
     12, 13, 14, 15, 16, 17,
@@ -124,7 +54,7 @@ unsigned int indices2[] = {
     30, 31, 32, 33, 34, 35
 };
 
-float textureCoordinates2[] = {
+float textureCoordinates[] = {
     0.0f, 0.0f,
     1.0f, 0.0f,
     1.0f, 1.0f,
@@ -163,7 +93,7 @@ float textureCoordinates2[] = {
     0.0f, 1.0f
 };
 
-float normals2[] = {
+float normals[] = {
     // Front face (0.0f, 0.0f, -1.0f)
      0.0f,  0.0f, -1.0f,
      0.0f,  0.0f, -1.0f,

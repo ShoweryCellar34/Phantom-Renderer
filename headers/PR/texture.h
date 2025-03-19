@@ -22,3 +22,5 @@ void prTextureDestroy(prTextureData* texture);
 void prTextureLinkContext(prTextureData* texture, GladGLContext* context);
 
 void prTextureUpdate(prTextureData* texture, unsigned char rawTextureData[], unsigned int rawTextureDataCount);
+
+void prTextureSingleColor(prTextureData* texture, GLfloat color[4]);

@@ -41,6 +41,23 @@ void* prMemcpy(void* destinatonMemory, void* sourceMemory, size_t size) {
     return memory;
 }
 
+void* prRealloc(void* sourceMemory, size_t size) {
+    void* memory = realloc(sourceMemory, size);
+
+    char failMessage[96];
+    snprintf(failMessage, 96, "Failed to reallocate %zu bytes of memory", size);
+    char successMessage[96];
+    snprintf(successMessage, 96, "Succesfully reallocated %zu bytes of memory", size);
+    if(!memory) {
+        prError(PR_MEMORY_ERROR, failMessage);
+        return NULL;
+    } else {
+        prLogTrace("[MEMORY]", successMessage);
+    }
+
+    return memory;
+}
+
 void prFree(void* memory) {
     free(memory);
 

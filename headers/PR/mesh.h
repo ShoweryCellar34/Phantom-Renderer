@@ -15,14 +15,12 @@ typedef struct prMeshData {
     prMaterialData* material;
     GLfloat* vertices;
     GLfloat* textureCoordinates;
-    GLfloat* vertexColor;
     GLfloat* vertexNormals;
     GLuint* indices;
-    GLuint verticesCount, textureCoordinatesCount, vertexColorCount, vertexNormalsCount, indicesCount;
+    GLuint verticesCount, textureCoordinatesCount, vertexNormalsCount, indicesCount;
     GLuint VBO, VAO, EBO;
     GLfloat* GPUReadyBuffer;
     GLuint GPUReadyBufferCount;
-    float mixRatio;
 } prMeshData;
 
 prMeshData* prMeshCreate();
@@ -38,7 +36,5 @@ void prMeshUpdate(prMeshData* mesh, GLfloat vertices[], size_t verticesCount,
     GLfloat textureCoordinates[], size_t textureCoordinatesCount, 
     GLfloat vertexColor[], size_t vertexColorCount, 
     GLfloat vertexNormal[], size_t vertexNormalCount);
-
-void prMeshTextureToColorRatio(prMeshData* mesh, float mixRatio);
 
 void prMeshDraw(prMeshData* mesh, mat4 translation, prCamera* camera, unsigned int shaderProgram);

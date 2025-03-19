@@ -10,7 +10,7 @@ void i_prMeshComputeGPUReadyBuffer(prMeshData* mesh) {
         mesh->GPUReadyBuffer = NULL;
     }
 
-    mesh->GPUReadyBufferCount = mesh->verticesCount + mesh->textureCoordinatesCount + mesh->vertexColorCount + mesh->vertexNormalsCount;
+    mesh->GPUReadyBufferCount = mesh->verticesCount + mesh->textureCoordinatesCount + mesh->vertexNormalsCount;
     mesh->GPUReadyBuffer = prMalloc(mesh->GPUReadyBufferCount * sizeof(GLfloat));
 
     size_t index = 0;
@@ -24,14 +24,6 @@ void i_prMeshComputeGPUReadyBuffer(prMeshData* mesh) {
             mesh->GPUReadyBuffer[index++] = mesh->textureCoordinates[i * 2];
             mesh->GPUReadyBuffer[index++] = mesh->textureCoordinates[i * 2 + 1];
             // printf("  UV:   %.3f, %.3f\n", mesh->GPUReadyBuffer[index - 2], mesh->GPUReadyBuffer[index - 1]);
-        }
-
-        if(mesh->vertexColorCount) {
-            mesh->GPUReadyBuffer[index++] = mesh->vertexColor[i * 4];
-            mesh->GPUReadyBuffer[index++] = mesh->vertexColor[i * 4 + 1];
-            mesh->GPUReadyBuffer[index++] = mesh->vertexColor[i * 4 + 2];
-            mesh->GPUReadyBuffer[index++] = mesh->vertexColor[i * 4 + 3];
-            // printf("  RGBA: %.3f, %.3f, %.3f, %.3f\n", mesh->GPUReadyBuffer[index - 4], mesh->GPUReadyBuffer[index - 3], mesh->GPUReadyBuffer[index - 2], mesh->GPUReadyBuffer[index - 1]);
         }
 
         if(mesh->vertexNormalsCount) {
@@ -69,7 +61,6 @@ void i_prMeshCreateOnGPUSide(prMeshData* mesh) {
 
     int stride = 3;
     stride += mesh->textureCoordinatesCount ? 2 : 0;
-    stride += mesh->vertexColorCount ? 4 : 0;
     stride += mesh->vertexNormalsCount ? 3 : 0;
 
     mesh->context->BindVertexArray(mesh->VAO);
@@ -88,16 +79,9 @@ void i_prMeshCreateOnGPUSide(prMeshData* mesh) {
         mesh->context->EnableVertexAttribArray(1);
     }
 
-    if(mesh->vertexColorCount && mesh->vertexColor) {
-        mesh->context->VertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, stride * sizeof(GLfloat), (void*)((mesh->textureCoordinatesCount ? 5 : 3) * sizeof(GLfloat)));
-        mesh->context->EnableVertexAttribArray(2);
-    }
-
     if(mesh->vertexNormalsCount && mesh->vertexNormals) {
-        int offset = mesh->textureCoordinatesCount ? 5 : 3;
-        offset += mesh->vertexColorCount ? 4 : 0;
-        mesh->context->VertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, stride * sizeof(GLfloat), (void*)(offset * sizeof(GLfloat)));
-        mesh->context->EnableVertexAttribArray(3);
+        mesh->context->VertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, stride * sizeof(GLfloat), (void*)((mesh->textureCoordinatesCount ? 5 : 3) * sizeof(GLfloat)));
+        mesh->context->EnableVertexAttribArray(2);
     }
 
     mesh->context->BindBuffer(GL_ARRAY_BUFFER, 0);
@@ -110,7 +94,6 @@ void i_prMeshUpdateOnGPUSide(prMeshData* mesh) {
 
     int stride = 3;
     stride += mesh->textureCoordinatesCount ? 2 : 0;
-    stride += mesh->vertexColorCount ? 4 : 0;
     stride += mesh->vertexNormalsCount ? 3 : 0;
 
 	mesh->context->BindVertexArray(mesh->VAO);
@@ -128,16 +111,9 @@ void i_prMeshUpdateOnGPUSide(prMeshData* mesh) {
         mesh->context->EnableVertexAttribArray(1);
     }
 
-    if(mesh->vertexColorCount && mesh->vertexColor) {
-        mesh->context->VertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, stride * sizeof(GLfloat), (void*)((mesh->textureCoordinatesCount ? 5 : 3) * sizeof(GLfloat)));
-        mesh->context->EnableVertexAttribArray(2);
-    }
-
     if(mesh->vertexNormalsCount && mesh->vertexNormals) {
-        int offset = mesh->textureCoordinatesCount ? 5 : 3;
-        offset += mesh->vertexColorCount ? 4 : 0;
-        mesh->context->VertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, stride * sizeof(GLfloat), (void*)(offset * sizeof(GLfloat)));
-        mesh->context->EnableVertexAttribArray(3);
+        mesh->context->VertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, stride * sizeof(GLfloat), (void*)((mesh->textureCoordinatesCount ? 5 : 3) * sizeof(GLfloat)));
+        mesh->context->EnableVertexAttribArray(2);
     }
 
 	mesh->context->BindVertexArray(0);

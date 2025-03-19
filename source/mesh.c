@@ -14,12 +14,10 @@ prMeshData* prMeshCreate() {
     mesh->material = NULL;
     mesh->vertices = NULL;
     mesh->textureCoordinates = NULL;
-    mesh->vertexColor = NULL;
     mesh->vertexNormals = NULL;
     mesh->indices = NULL;
     mesh->verticesCount = 0;
     mesh->textureCoordinatesCount = 0;
-    mesh->vertexColorCount = 0;
     mesh->vertexNormalsCount = 0;
     mesh->indicesCount = 0;
     mesh->VBO = 0;
@@ -27,7 +25,6 @@ prMeshData* prMeshCreate() {
     mesh->EBO = 0;
     mesh->GPUReadyBuffer = NULL;
     mesh->GPUReadyBufferCount = 0;
-    mesh->mixRatio = 0.0f;
 
     return mesh;
 }
@@ -40,9 +37,6 @@ void prMeshDestroy(prMeshData* mesh) {
     }
     if(mesh->textureCoordinates) {
         prFree(mesh->textureCoordinates);
-    }
-    if(mesh->vertexColor) {
-        prFree(mesh->vertexColor);
     }
     if(mesh->indices) {
         prFree(mesh->indices);
@@ -156,12 +150,6 @@ void prMeshUpdate(prMeshData* mesh, GLfloat vertices[], size_t verticesCount,
     }
     mesh->textureCoordinatesCount = textureCoordinatesCount;
 
-    if(vertexColorCount && vertexColor) {
-        mesh->vertexColor = prMalloc(sizeof(GLfloat) * vertexColorCount);
-        prMemcpy(mesh->vertexColor, vertexColor, sizeof(GLfloat) * vertexColorCount);
-    }
-    mesh->vertexColorCount = vertexColorCount;
-
     if(vertexNormalsCount && vertexNormals) {
         mesh->vertexNormals = prMalloc(sizeof(GLfloat) * vertexNormalsCount);
         prMemcpy(mesh->vertexNormals, vertexNormals, sizeof(GLfloat) * vertexNormalsCount);
@@ -175,10 +163,6 @@ void prMeshUpdate(prMeshData* mesh, GLfloat vertices[], size_t verticesCount,
     }
 }
 
-void prMeshTextureToColorRatio(prMeshData* mesh, float mixRatio) {
-    mesh->mixRatio = mixRatio;
-}
-
 void prMeshDraw(prMeshData* mesh, mat4 translation, prCamera* camera,  unsigned int shaderProgram) {
     GladGLContext* context = mesh->context;
 
@@ -188,26 +172,16 @@ void prMeshDraw(prMeshData* mesh, mat4 translation, prCamera* camera,  unsigned 
     if(!mesh->material) {
         prLogWarning("[GL]", "Material not set, using default material");
         if(defaultMaterial.shininess == -255.0f) {
-            defaultMaterial.texture = NULL;
             defaultMaterial.specularMap = NULL;
             defaultMaterial.ambientMap = NULL;
             defaultMaterial.diffuseMap = NULL;
             defaultMaterial.specularMap = NULL;
             defaultMaterial.shininess = 32.0f;
-            defaultMaterial.ambientStrength = 0.15f;
-            defaultMaterial.diffuseStrength = 1.0f;
-            defaultMaterial.specularStrength = 0.5f;
         }
 
         material = &defaultMaterial;
     }
 
-    if(material->texture) {
-        if(mesh->material->texture->context != context) {
-            prError(PR_GL_ERROR, "Material texture context does not match mesh context. Aborting operation, nothing was modified");
-            return;
-        }
-    }
     if(material->specularMap) {
         if(mesh->material->specularMap->context != context) {
             prError(PR_GL_ERROR, "Material specular map context does not match mesh context. Aborting operation, nothing was modified");
@@ -219,12 +193,6 @@ void prMeshDraw(prMeshData* mesh, mat4 translation, prCamera* camera,  unsigned 
 
     context->BindVertexArray(mesh->VAO);
 
-    if(mesh->textureCoordinatesCount && mesh->material->texture) {
-        if(mesh->material->texture->TBO && mesh->material->texture->context == context) {
-            context->ActiveTexture(GL_TEXTURE0);
-            context->BindTexture(GL_TEXTURE_2D, mesh->material->texture->TBO);
-        }
-    }
     if(mesh->textureCoordinatesCount && mesh->material->ambientMap) {
         if(mesh->material->ambientMap->TBO) {
             context->ActiveTexture(GL_TEXTURE1);
@@ -253,9 +221,6 @@ void prMeshDraw(prMeshData* mesh, mat4 translation, prCamera* camera,  unsigned 
     int translationUniformLocation = context->GetUniformLocation(shaderProgram, "translation");
     context->UniformMatrix4fv(translationUniformLocation, 1, GL_FALSE, translation[0]);
 
-    int mixRatioUniformLocation = context->GetUniformLocation(shaderProgram, "mixRatio");
-    context->Uniform1f(mixRatioUniformLocation, mesh->mixRatio);
-
     int blendAlphaUniformLocation = context->GetUniformLocation(shaderProgram, "blendAlpha");
     context->Uniform1i(blendAlphaUniformLocation, 0);
 
@@ -270,13 +235,6 @@ void prMeshDraw(prMeshData* mesh, mat4 translation, prCamera* camera,  unsigned 
     context->Uniform1i(specularUniformLocation, 3);
     int shininessUniformLocation = context->GetUniformLocation(shaderProgram, "material.shininess");
     context->Uniform1f(shininessUniformLocation, material->shininess);
-
-    int ambientColorStrengthUniformLocation = context->GetUniformLocation(shaderProgram, "material.ambientStrength");
-    context->Uniform1f(ambientColorStrengthUniformLocation, material->ambientStrength);
-    int diffuseStrengthUniformLocation = context->GetUniformLocation(shaderProgram, "material.diffuseStrength");
-    context->Uniform1f(diffuseStrengthUniformLocation, material->diffuseStrength);
-    int specularStrengthUniformLocation = context->GetUniformLocation(shaderProgram, "material.specularStrength");
-    context->Uniform1f(specularStrengthUniformLocation, material->specularStrength);
 
     context->DrawElements(GL_TRIANGLES, mesh->indicesCount, GL_UNSIGNED_INT, 0);
 

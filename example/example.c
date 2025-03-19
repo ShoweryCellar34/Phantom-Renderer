@@ -12,7 +12,7 @@ int main(int argc, char** argv) {
 
     glfwInit();
 
-    prWindow* test = prWindowCreate("Test", 1600, 900);
+    prWindow* test = prWindowCreate("Test", 800, 450);
     prWindowInitContext(test);
     glfwSetWindowUserPointer(test->window, test->openglContext);
 
@@ -29,64 +29,64 @@ int main(int argc, char** argv) {
     prTextureData* containerMetalTexture = prTextureCreate();
     loadTexture(containerMetalTexture, test->openglContext, "res/container2.png");
 
+    prTextureData* containerMetalSpecularTexture = prTextureCreate();
+    loadTexture(containerMetalSpecularTexture, test->openglContext, "res/container2_specular.png");
+
     prTextureData* steelTexture = prTextureCreate();
     loadTexture(steelTexture, test->openglContext, "res/steel.jpg");
 
-    prMaterialData* materialMetal = prMaterialCreateDefaults();
-    prMaterialLinkTexture(materialMetal, steelTexture);
+    prTextureData* blackTexture = prTextureCreate();
+    prTextureLinkContext(blackTexture, test->openglContext);
+    prTextureSingleColor(blackTexture, (float[4]){0.0f, 0.0f, 0.0f, 0.0f});
+
+    prTextureData* whiteTexture = prTextureCreate();
+    prTextureLinkContext(whiteTexture, test->openglContext);
+    prTextureSingleColor(whiteTexture, (float[4]){1.0f, 1.0f, 1.0f, 0.0f});
+
+    prMaterialData* materialMetal = prMaterialCreate();
     prMaterialLinkAmbientMap(materialMetal, steelTexture);
     prMaterialLinkDiffuseMap(materialMetal, steelTexture);
-    prMaterialLinkSpecularMap(materialMetal, steelTexture);
-    materialMetal->specularStrength = 1.0f;
+    prMaterialLinkSpecularMap(materialMetal, whiteTexture);
     materialMetal->shininess = 256.0f;
-    materialMetal->diffuseStrength = 2.5f;
-    materialMetal->ambientStrength = 0.4f;
 
-    prMaterialData* materialWood = prMaterialCreateDefaults();
-    prMaterialLinkTexture(materialWood, containerTexture);
+    prMaterialData* materialWood = prMaterialCreate();
     prMaterialLinkAmbientMap(materialWood, containerTexture);
     prMaterialLinkDiffuseMap(materialWood, containerTexture);
-    prMaterialLinkSpecularMap(materialWood, containerTexture);
-    materialWood->specularStrength = 0.2f;
-    materialWood->ambientStrength = 0.3f;
+    prMaterialLinkSpecularMap(materialWood, blackTexture);
+    prMaterialSetShininess(materialWood, 32.0f);
 
-    prMaterialData* materialWoodMetal = prMaterialCreateDefaults();
-    prMaterialLinkTexture(materialWoodMetal, containerMetalTexture);
+    prMaterialData* materialWoodMetal = prMaterialCreate();
     prMaterialLinkAmbientMap(materialWoodMetal, containerMetalTexture);
     prMaterialLinkDiffuseMap(materialWoodMetal, containerMetalTexture);
-    prMaterialLinkSpecularMap(materialWoodMetal, containerMetalTexture);
-    materialWoodMetal->specularStrength = 0.2f;
-    materialWoodMetal->ambientStrength = 0.3f;
+    prMaterialLinkSpecularMap(materialWoodMetal, containerMetalSpecularTexture);
+    prMaterialSetShininess(materialWoodMetal, 256.0f);
 
-    prMeshData* testMeshMetal = prMeshCreate();
-    prMeshLinkContext(testMeshMetal, test->openglContext);
-    prMeshUpdate(testMeshMetal, vertices2, sizeof(vertices2) / sizeof(float), 
-        indices2, sizeof(indices2) / sizeof(unsigned int), 
-        textureCoordinates2, sizeof(textureCoordinates2) / sizeof(float), 
+    prMeshData* meshMetal = prMeshCreate();
+    prMeshLinkContext(meshMetal, test->openglContext);
+    prMeshUpdate(meshMetal, vertices, sizeof(vertices) / sizeof(float), 
+        indices, sizeof(indices) / sizeof(unsigned int), 
+        textureCoordinates, sizeof(textureCoordinates) / sizeof(float), 
         NULL, 0, 
-        normals2, sizeof(normals2) / sizeof(float));
-    prMeshTextureToColorRatio(testMeshMetal, 1.0f);
-    prMeshLinkMaterial(testMeshMetal, materialMetal);
+        normals, sizeof(normals) / sizeof(float));
+    prMeshLinkMaterial(meshMetal, materialMetal);
 
-    prMeshData* testMeshWood = prMeshCreate();
-    prMeshLinkContext(testMeshWood, test->openglContext);
-    prMeshUpdate(testMeshWood, vertices2, sizeof(vertices2) / sizeof(float), 
-        indices2, sizeof(indices2) / sizeof(unsigned int), 
-        textureCoordinates2, sizeof(textureCoordinates2) / sizeof(float), 
+    prMeshData* meshWood = prMeshCreate();
+    prMeshLinkContext(meshWood, test->openglContext);
+    prMeshUpdate(meshWood, vertices, sizeof(vertices) / sizeof(float), 
+        indices, sizeof(indices) / sizeof(unsigned int), 
+        textureCoordinates, sizeof(textureCoordinates) / sizeof(float), 
         NULL, 0, 
-        normals2, sizeof(normals2) / sizeof(float));
-    prMeshTextureToColorRatio(testMeshWood, 1.0f);
-    prMeshLinkMaterial(testMeshWood, materialWood);
+        normals, sizeof(normals) / sizeof(float));
+    prMeshLinkMaterial(meshWood, materialWood);
 
-    prMeshData* testMeshWoodMetal = prMeshCreate();
-    prMeshLinkContext(testMeshWoodMetal, test->openglContext);
-    prMeshUpdate(testMeshWoodMetal, vertices2, sizeof(vertices2) / sizeof(float), 
-        indices2, sizeof(indices2) / sizeof(unsigned int), 
-        textureCoordinates2, sizeof(textureCoordinates2) / sizeof(float), 
+    prMeshData* meshWoodMetal = prMeshCreate();
+    prMeshLinkContext(meshWoodMetal, test->openglContext);
+    prMeshUpdate(meshWoodMetal, vertices, sizeof(vertices) / sizeof(float), 
+        indices, sizeof(indices) / sizeof(unsigned int), 
+        textureCoordinates, sizeof(textureCoordinates) / sizeof(float), 
         NULL, 0, 
-        normals2, sizeof(normals2) / sizeof(float));
-    prMeshTextureToColorRatio(testMeshWoodMetal, 1.0f);
-    prMeshLinkMaterial(testMeshWoodMetal, materialWoodMetal);
+        normals, sizeof(normals) / sizeof(float));
+    prMeshLinkMaterial(meshWoodMetal, materialWoodMetal);
 
     prCamera* camera = prCameraCreate();
     prCameraLinkContext(camera, test->openglContext);
@@ -112,14 +112,14 @@ int main(int argc, char** argv) {
         vec3 rotation = {yaw, pitch, 0.0f};
         prCameraUpdate(camera, cameraPosition, rotation, 45.0f, 0.001f, 10000.0f);
 
-        translationsToMatrix(translation, (vec3){1.5f, 0.0f, 0.0f}, (vec3){0.0f, sin((glfwGetTimerValue() * 0.5f) / glfwGetTimerFrequency()), 0.0f}, GLM_VEC3_ONE);
-        prMeshDraw(testMeshMetal, translation, camera, shaderProgram);
+        translationsToMatrix(translation, (vec3){0.0f, 0.0f, -3.0f}, GLM_VEC3_ZERO, (vec3){10.0f, 10.0f, 0.5f});
+        prMeshDraw(meshMetal, translation, camera, shaderProgram);
 
-        translationsToMatrix(translation, (vec3){0.0f, 0.0f, 0.0f}, (vec3){0.0f, cos((glfwGetTimerValue() * 0.5f) / glfwGetTimerFrequency()), 0.0f}, GLM_VEC3_ONE);
-        prMeshDraw(testMeshWood, translation, camera, shaderProgram);
+        translationsToMatrix(translation, (vec3){1.0f, 0.0f, 0.0f}, (vec3){0.0f, cos((glfwGetTimerValue() * 0.5f) / glfwGetTimerFrequency()), 0.0f}, GLM_VEC3_ONE);
+        prMeshDraw(meshWood, translation, camera, shaderProgram);
 
-        translationsToMatrix(translation, (vec3){-1.5f, 0.0f, 0.0f}, (vec3){0.0f, sin((glfwGetTimerValue() * 0.5f) / glfwGetTimerFrequency()), 0.0f}, GLM_VEC3_ONE);
-        prMeshDraw(testMeshWoodMetal, translation, camera, shaderProgram);
+        translationsToMatrix(translation, (vec3){-1.0f, 0.0f, 0.0f}, (vec3){0.0f, sin((glfwGetTimerValue() * 0.5f) / glfwGetTimerFrequency()), 0.0f}, GLM_VEC3_ONE);
+        prMeshDraw(meshWoodMetal, translation, camera, shaderProgram);
 
         glfwSwapBuffers(test->window);
         glfwPollEvents();
@@ -129,26 +129,34 @@ int main(int argc, char** argv) {
     prCameraDestroy(camera);
     camera = NULL;
 
-    prMeshDestroy(testMeshMetal);
-    testMeshMetal = NULL;
-    prMeshDestroy(testMeshWood);
-    testMeshWood = NULL;
+    prMeshDestroy(meshWoodMetal);
+    meshWoodMetal = NULL;
+    prMeshDestroy(meshWood);
+    meshWood = NULL;
+    prMeshDestroy(meshMetal);
+    meshMetal = NULL;
 
-    prMaterialDestroy(materialMetal);
-    materialMetal = NULL;
-    prMaterialDestroy(materialWood);
-    materialWood = NULL;
     prMaterialDestroy(materialWoodMetal);
     materialWoodMetal = NULL;
+    prMaterialDestroy(materialWood);
+    materialWood = NULL;
+    prMaterialDestroy(materialMetal);
+    materialMetal = NULL;
 
-    prTextureDestroy(faceTexture);
-    faceTexture = NULL;
-    prTextureDestroy(containerTexture);
-    containerTexture = NULL;
-    prTextureDestroy(containerMetalTexture);
-    containerMetalTexture = NULL;
+    prTextureDestroy(whiteTexture);
+    whiteTexture = NULL;
+    prTextureDestroy(blackTexture);
+    blackTexture = NULL;
     prTextureDestroy(steelTexture);
     steelTexture = NULL;
+    prTextureDestroy(containerMetalSpecularTexture);
+    containerMetalSpecularTexture = NULL;
+    prTextureDestroy(containerMetalTexture);
+    containerMetalTexture = NULL;
+    prTextureDestroy(containerTexture);
+    containerTexture = NULL;
+    prTextureDestroy(faceTexture);
+    faceTexture = NULL;
 
     prWindowDestroy(test);
     test = NULL;
