@@ -14,11 +14,9 @@ prMeshData* prMeshCreate() {
     mesh->material = NULL;
     mesh->vertices = NULL;
     mesh->textureCoordinates = NULL;
-    mesh->vertexNormals = NULL;
     mesh->indices = NULL;
     mesh->verticesCount = 0;
     mesh->textureCoordinatesCount = 0;
-    mesh->vertexNormalsCount = 0;
     mesh->indicesCount = 0;
     mesh->VBO = 0;
     mesh->VAO = 0;
@@ -64,9 +62,7 @@ void prMeshLinkMaterial(prMeshData* mesh, prMaterialData* material) {
 
 void prMeshUpdate(prMeshData* mesh, GLfloat vertices[], size_t verticesCount, 
     GLuint indices[], size_t indicesCount, 
-    GLfloat textureCoordinates[], size_t textureCoordinatesCount, 
-    GLfloat vertexColor[], size_t vertexColorCount, 
-    GLfloat vertexNormals[], size_t vertexNormalsCount) {
+    GLfloat textureCoordinates[], size_t textureCoordinatesCount) {
     if(mesh->vertices) {
         prFree(mesh->vertices);
         prFree(mesh->indices);
@@ -95,44 +91,18 @@ void prMeshUpdate(prMeshData* mesh, GLfloat vertices[], size_t verticesCount,
     } else if(indicesCount % 3 != 0) {
         prError(PR_INVALID_DATA_ERROR, "Indices data count must be a multiple of 3. Aborting operation, nothing was modified");
         return;
-    } else if(!indices) {
+    }
+    if(!indices) {
         prError(PR_INVALID_DATA_ERROR, "Indices data cannot be NULL. Aborting operation, nothing was modified");
         return;
     }
 
-    if(textureCoordinatesCount % 2 != 0) {
-        prError(PR_INVALID_DATA_ERROR, "Texture coordinates data count must be a multiple of 2. Aborting operation, nothing was modified");
-        return;
-    }
-    if(!textureCoordinates && textureCoordinatesCount) {
-        prError(PR_INVALID_DATA_ERROR, "Texture coordinates data cannot be NULL while texture coordinates data count is not 0. Aborting operation, nothing was modified");
-        return;
-    } else if(textureCoordinatesCount / 2 != verticesCount / 3 && textureCoordinatesCount != 0) {
+    if(textureCoordinatesCount / 2 != verticesCount / 3) {
         prError(PR_INVALID_DATA_ERROR, "Texture coordinates data not enough for every vertex. Aborting operation, nothing was modified");
         return;
     }
-
-    if(vertexColorCount % 4 != 0) {
-        prError(PR_INVALID_DATA_ERROR, "Vertex color data count must be a multiple of 4. Aborting operation, nothing was modified");
-        return;
-    } else if(vertexColorCount / 4 != verticesCount / 3 && vertexColorCount != 0) {
-        prError(PR_INVALID_DATA_ERROR, "Vertex color data not enough for every vertex. Aborting operation, nothing was modified");
-        return;
-    }
-    if(!vertexColor && vertexColorCount) {
-        prError(PR_INVALID_DATA_ERROR, "Vertex color data cannot be NULL while vertex color data count is not 0. Aborting operation, nothing was modified");
-        return;
-    }
-
-    if(vertexNormalsCount % 3 != 0) {
-        prError(PR_INVALID_DATA_ERROR, "Vertex normal data count must be a multiple of 3. Aborting operation, nothing was modified");
-        return;
-    }
-    if(!vertexNormals && vertexNormalsCount) {
-        prError(PR_INVALID_DATA_ERROR, "Vertex normal data cannot be NULL while vertex normals data count is not 0. Aborting operation, nothing was modified");
-        return;
-    } else if(vertexNormalsCount != verticesCount && vertexNormalsCount != 0) {
-        prError(PR_INVALID_DATA_ERROR, "Vertex normal data not enough for every vertex. Aborting operation, nothing was modified");
+    if(!textureCoordinates) {
+        prError(PR_INVALID_DATA_ERROR, "Texture coordinates data cannot be NULL. Aborting operation, nothing was modified");
         return;
     }
 
@@ -149,12 +119,6 @@ void prMeshUpdate(prMeshData* mesh, GLfloat vertices[], size_t verticesCount,
         prMemcpy(mesh->textureCoordinates, textureCoordinates, sizeof(GLfloat) * textureCoordinatesCount);
     }
     mesh->textureCoordinatesCount = textureCoordinatesCount;
-
-    if(vertexNormalsCount && vertexNormals) {
-        mesh->vertexNormals = prMalloc(sizeof(GLfloat) * vertexNormalsCount);
-        prMemcpy(mesh->vertexNormals, vertexNormals, sizeof(GLfloat) * vertexNormalsCount);
-    }
-    mesh->vertexNormalsCount = vertexNormalsCount;
 
     if(mesh->context && !mesh->VAO) {
         i_prMeshCreateOnGPUSide(mesh);
@@ -193,22 +157,28 @@ void prMeshDraw(prMeshData* mesh, mat4 translation, prCamera* camera,  unsigned 
 
     context->BindVertexArray(mesh->VAO);
 
-    if(mesh->textureCoordinatesCount && mesh->material->ambientMap) {
+    if(mesh->material->ambientMap) {
         if(mesh->material->ambientMap->TBO) {
-            context->ActiveTexture(GL_TEXTURE1);
+            context->ActiveTexture(GL_TEXTURE0);
             context->BindTexture(GL_TEXTURE_2D, mesh->material->ambientMap->TBO);
         }
     }
-    if(mesh->textureCoordinatesCount && mesh->material->diffuseMap) {
+    if(mesh->material->diffuseMap) {
         if(mesh->material->diffuseMap->TBO) {
-            context->ActiveTexture(GL_TEXTURE2);
+            context->ActiveTexture(GL_TEXTURE1);
             context->BindTexture(GL_TEXTURE_2D, mesh->material->diffuseMap->TBO);
         }
     }
-    if(mesh->textureCoordinatesCount && mesh->material->specularMap) {
+    if(mesh->material->specularMap) {
         if(mesh->material->specularMap->TBO) {
-            context->ActiveTexture(GL_TEXTURE3);
+            context->ActiveTexture(GL_TEXTURE2);
             context->BindTexture(GL_TEXTURE_2D, mesh->material->specularMap->TBO);
+        }
+    }
+    if(mesh->material->normalMap) {
+        if(mesh->material->normalMap->TBO) {
+            context->ActiveTexture(GL_TEXTURE3);
+            context->BindTexture(GL_TEXTURE_2D, mesh->material->normalMap->TBO);
         }
     }
 
@@ -221,18 +191,17 @@ void prMeshDraw(prMeshData* mesh, mat4 translation, prCamera* camera,  unsigned 
     int translationUniformLocation = context->GetUniformLocation(shaderProgram, "translation");
     context->UniformMatrix4fv(translationUniformLocation, 1, GL_FALSE, translation[0]);
 
-    int blendAlphaUniformLocation = context->GetUniformLocation(shaderProgram, "blendAlpha");
-    context->Uniform1i(blendAlphaUniformLocation, 0);
-
     int cameraPositionUniformLocation = context->GetUniformLocation(shaderProgram, "cameraPosition");
     context->Uniform3f(cameraPositionUniformLocation, camera->position[0], camera->position[1], camera->position[2]);
 
     int ambientUniformLocation = context->GetUniformLocation(shaderProgram, "material.ambient");
-    context->Uniform1i(ambientUniformLocation, 1);
+    context->Uniform1i(ambientUniformLocation, 0);
     int diffuseUniformLocation = context->GetUniformLocation(shaderProgram, "material.diffuse");
-    context->Uniform1i(diffuseUniformLocation, 2);
+    context->Uniform1i(diffuseUniformLocation, 1);
     int specularUniformLocation = context->GetUniformLocation(shaderProgram, "material.specular");
-    context->Uniform1i(specularUniformLocation, 3);
+    context->Uniform1i(specularUniformLocation, 2);
+    int normalUniformLocation = context->GetUniformLocation(shaderProgram, "material.normal");
+    context->Uniform1i(normalUniformLocation, 3);
     int shininessUniformLocation = context->GetUniformLocation(shaderProgram, "material.shininess");
     context->Uniform1f(shininessUniformLocation, material->shininess);
 

@@ -12,11 +12,9 @@ unsigned int prShaderGenerateDefaultProgram(GladGLContext* context) {
             #version 330 core\n\
             layout (location = 0) in vec3 inputPosition;\n\
             layout (location = 1) in vec2 inputTextureCoordinates;\n\
-            layout (location = 2) in vec3 inputVertexNormals;\n\
             \n\
             out vec3 fragmentPosition;\n\
             out vec2 textureCoordinates;\n\
-            out vec3 vertexNormals;\n\
             \n\
             uniform mat4 translation;\n\
             uniform mat4 view;\n\
@@ -26,7 +24,6 @@ unsigned int prShaderGenerateDefaultProgram(GladGLContext* context) {
                 gl_Position = projection * view * translation * vec4(inputPosition, 1.0);\n\
                 fragmentPosition = vec3(translation * vec4(inputPosition, 1.0));\n\
                 textureCoordinates = inputTextureCoordinates;\n\
-                vertexNormals = mat3(transpose(inverse(translation))) * inputVertexNormals;\n\
             }\n\
         ";
 
@@ -34,65 +31,101 @@ unsigned int prShaderGenerateDefaultProgram(GladGLContext* context) {
             #version 330 core\n\
             out vec4 fragmentColor;\n\
             \n\
-            uniform float mixRatio;\n\
-            uniform bool blendAlpha;\n\
-            bool alphaSupport = false;\n\
-            \n\
             uniform vec3 cameraPosition;\n\
+            uniform mat4 translation;\n\
             \n\
             in vec3 fragmentPosition;\n\
             in vec2 textureCoordinates;\n\
-            in vec3 vertexNormals;\n\
             \n\
             struct Material {\n\
                 sampler2D ambient;\n\
                 sampler2D diffuse;\n\
                 sampler2D specular;\n\
+                sampler2D normal;\n\
                 float shininess;\n\
             };\n\
             uniform Material material;\n\
             \n\
-            struct Light {\n\
-                int type;\n\
-                vec3 position;\n\
+            struct directionalLight {\n\
                 vec3 direction;\n\
-                vec4 color;\n\
+                \n\
+                vec3 ambient;\n\
+                vec3 diffuse;\n\
+                vec3 specular;\n\
+            };\n\
+            #define NR_DIRECTIONAL_LIGHTS 4\n\
+            uniform directionalLight directionalLights[NR_DIRECTIONAL_LIGHTS];\n\
+            \n\
+            struct pointLight {\n\
+                vec3 position;\n\
+                \n\
                 float constant;\n\
                 float linear;\n\
                 float quadratic;\n\
-                float cutOff;\n\
+                \n\
+                vec3 ambient;\n\
+                vec3 diffuse;\n\
+                vec3 specular;\n\
             };\n\
+            #define NR_POINT_LIGHTS 4\n\
+            uniform pointLight pointLights[NR_POINT_LIGHTS];\n\
             \n\
-            void main() {\n\
-                Light light = Light(1, vec3(0.0, 0.0, 10.0), vec3(0.0, 0.0, 1.0), vec4(1.0, 1.0, 1.0, 1.0), 1.0, 0.045, 0.0075, 45.0);\n\
-                vec3 lightDirection;\n\
-                switch(light.type) {\n\
-                    case 0:\n\
-                        lightDirection = normalize(-light.direction);\n\
-                        break;\n\
-                    \n\
-                    case 1:\n\
-                        lightDirection = normalize(light.position - fragmentPosition);\n\
-                        break;\n\
-                }\n\
+            vec3 calculateDirectionalLight(directionalLight light, vec3 viewDirection, vec3 ambient, vec3 diffuse, vec3 specular, vec3 normal) {\n\
+                vec3 lightDir = normalize(-light.direction);\n\
+                \n\
+                float difference = max(dot(normal, lightDir), 0.0);\n\
+                \n\
+                vec3 reflectDir = reflect(-lightDir, normal);\n\
+                float spec = pow(max(dot(viewDirection, reflectDir), 0.0), material.shininess);\n\
+                \n\
+                vec3 ambientOutput  = light.ambient * ambient;\n\
+                vec3 diffuseOutput  = light.diffuse * difference * diffuse;\n\
+                vec3 specularOutput = light.specular * spec * specular;\n\
+                \n\
+                return (ambientOutput + diffuseOutput + specularOutput);\n\
+            }\n\
+            \n\
+            vec3 calculatePointLight(pointLight light, vec3 viewDirection, vec3 fragmentPosition, vec3 ambient, vec3 diffuse, vec3 specular, vec3 normal) {\n\
+                vec3 lightDir = normalize(light.position - fragmentPosition);\n\
+                \n\
+                float difference = max(dot(normal, lightDir), 0.0);\n\
+                \n\
+                vec3 reflectDirection = reflect(-lightDir, normal);\n\
+                float spec = pow(max(dot(viewDirection, reflectDirection), 0.0), material.shininess);\n\
                 \n\
                 float distance = length(light.position - fragmentPosition);\n\
-                float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));\n\
+                float attenuation = 1.0 / (light.constant + light.linear * distance + \n\
+                            light.quadratic * (distance * distance));    \n\
                 \n\
-                vec4 ambient = texture(material.ambient, textureCoordinates) * 0.15 * light.color;\n\
+                vec3 ambientOutput = light.ambient * ambient;\n\
+                vec3 diffuseOutput = light.diffuse * difference * diffuse;\n\
+                vec3 specularOutput = light.specular * spec * specular;\n\
+                ambientOutput *= attenuation;\n\
+                diffuseOutput *= attenuation;\n\
+                specularOutput *= attenuation;\n\
                 \n\
-                vec3 normal = normalize(vertexNormals);\n\
-                float diff = max(dot(normal, lightDirection), 0.0);\n\
-                vec4 diffuse = texture(material.diffuse, textureCoordinates) * diff * light.color * attenuation;\n\
+                return (ambientOutput + diffuseOutput + specularOutput);\n\
+            }\n\
+            \n\
+            void main() {\n\
+                vec3 ambient = texture(material.ambient, textureCoordinates).xyz;\n\
+                vec3 diffuse = texture(material.diffuse, textureCoordinates).xyz;\n\
+                vec3 specular = texture(material.specular, textureCoordinates).xxx;\n\
+                vec3 normal = normalize(mat3(transpose(inverse(translation))) * texture(material.normal, textureCoordinates).xyz);\n\
                 \n\
                 vec3 viewDirection = normalize(cameraPosition - fragmentPosition);\n\
-                vec3 reflectDirection = reflect(-lightDirection, normal);\n\
-                float spec = pow(max(dot(viewDirection, reflectDirection), 0.0), material.shininess);\n\
-                vec4 specular = texture(material.specular, textureCoordinates) * spec * light.color * attenuation;\n\
                 \n\
-                vec4 result = (diffuse + specular + ambient);\n\
+                vec3 result = vec3(0.0, 0.0, 0.0);\n\
                 \n\
-                fragmentColor = vec4(result.xyz, alphaSupport ? result.w : 1.0);\n\
+                for(int i = 0; i < NR_DIRECTIONAL_LIGHTS; i++) {\n\
+                    result += calculateDirectionalLight(directionalLights[i], viewDirection, ambient, diffuse, specular, normal);\n\
+                }\n\
+                \n\
+                for(int i = 0; i < NR_POINT_LIGHTS; i++) {\n\
+                    result += calculatePointLight(pointLights[i], viewDirection, fragmentPosition, ambient, diffuse, specular, normal);\n\
+                }\n\
+                \n\
+                fragmentColor = vec4(result, 1.0);\n\
             }\n\
         ";
 

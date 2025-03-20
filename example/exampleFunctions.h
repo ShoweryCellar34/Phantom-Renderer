@@ -85,7 +85,9 @@ void cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
     }
 }
 
-void loadTexture(prTextureData* texture, GladGLContext* context, const char* path) {
+prTextureData* loadTexture(GladGLContext* context, const char* path) {
+    prTextureData* texture = prTextureCreate();
+
     FILE* textureFile = fopen(path, "rb");
     if(textureFile == NULL) {
         prLogFatal("[USER]", "Failed to load file");
@@ -102,6 +104,8 @@ void loadTexture(prTextureData* texture, GladGLContext* context, const char* pat
     prTextureLinkContext(texture, context);
     prTextureUpdate(texture, textureData, textureFileSize);
     prFree(textureData);
+
+    return texture;
 }
 
 void translationsToMatrix(mat4 matrix, vec3 position, vec3 rotation, vec3 scale) {

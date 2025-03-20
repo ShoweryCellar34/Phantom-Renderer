@@ -12,7 +12,7 @@ int main(int argc, char** argv) {
 
     glfwInit();
 
-    prWindow* test = prWindowCreate("Test", 800, 450);
+    prWindow* test = prWindowCreate("Test", 1280, 720);
     prWindowInitContext(test);
     glfwSetWindowUserPointer(test->window, test->openglContext);
 
@@ -20,20 +20,19 @@ int main(int argc, char** argv) {
 
     unsigned int shaderProgram = prShaderGenerateDefaultProgram(test->openglContext);
 
-    prTextureData* faceTexture = prTextureCreate();
-    loadTexture(faceTexture, test->openglContext, "res/awesomeface.png");
+    prTextureData* containerTexture = loadTexture(test->openglContext, "res/container.jpg");
 
-    prTextureData* containerTexture = prTextureCreate();
-    loadTexture(containerTexture, test->openglContext, "res/container.jpg");
+    prTextureData* containerMetalTexture = loadTexture(test->openglContext, "res/container2.png");
 
-    prTextureData* containerMetalTexture = prTextureCreate();
-    loadTexture(containerMetalTexture, test->openglContext, "res/container2.png");
+    prTextureData* containerMetalSpecularTexture = loadTexture(test->openglContext, "res/container2_specular.png");
 
-    prTextureData* containerMetalSpecularTexture = prTextureCreate();
-    loadTexture(containerMetalSpecularTexture, test->openglContext, "res/container2_specular.png");
+    prTextureData* steelTexture = loadTexture(test->openglContext, "res/steel.jpg");
 
-    prTextureData* steelTexture = prTextureCreate();
-    loadTexture(steelTexture, test->openglContext, "res/steel.jpg");
+    prTextureData* brickWallDiffuseTexture = loadTexture(test->openglContext, "res/brickWallDiffuse.tga");
+
+    prTextureData* brickWallNormalTexture = loadTexture(test->openglContext, "res/brickWallNormal.tga");
+
+    prTextureData* brickWallSpecularTexture = loadTexture(test->openglContext, "res/brickWallSpecular.tga");
 
     prTextureData* blackTexture = prTextureCreate();
     prTextureLinkContext(blackTexture, test->openglContext);
@@ -61,32 +60,57 @@ int main(int argc, char** argv) {
     prMaterialLinkSpecularMap(materialWoodMetal, containerMetalSpecularTexture);
     prMaterialSetShininess(materialWoodMetal, 256.0f);
 
+    prMaterialData* materialBrick = prMaterialCreate();
+    prMaterialLinkAmbientMap(materialBrick, brickWallDiffuseTexture);
+    prMaterialLinkDiffuseMap(materialBrick, brickWallDiffuseTexture);
+    prMaterialLinkSpecularMap(materialBrick, brickWallSpecularTexture);
+    prMaterialLinkNormalMap(materialBrick, brickWallNormalTexture);
+    prMaterialSetShininess(materialBrick, 32.0f);
+
     prMeshData* meshMetal = prMeshCreate();
     prMeshLinkContext(meshMetal, test->openglContext);
-    prMeshUpdate(meshMetal, vertices, sizeof(vertices) / sizeof(float), 
-        indices, sizeof(indices) / sizeof(unsigned int), 
-        textureCoordinates, sizeof(textureCoordinates) / sizeof(float), 
-        NULL, 0, 
-        normals, sizeof(normals) / sizeof(float));
+    prMeshUpdate(meshMetal,
+        vertices, sizeof(vertices) / sizeof(float),
+        indices, sizeof(indices) / sizeof(unsigned int),
+        textureCoordinates, sizeof(textureCoordinates) / sizeof(float));
     prMeshLinkMaterial(meshMetal, materialMetal);
 
     prMeshData* meshWood = prMeshCreate();
     prMeshLinkContext(meshWood, test->openglContext);
-    prMeshUpdate(meshWood, vertices, sizeof(vertices) / sizeof(float), 
-        indices, sizeof(indices) / sizeof(unsigned int), 
-        textureCoordinates, sizeof(textureCoordinates) / sizeof(float), 
-        NULL, 0, 
-        normals, sizeof(normals) / sizeof(float));
+    prMeshUpdate(meshWood,
+        vertices, sizeof(vertices) / sizeof(float),
+        indices, sizeof(indices) / sizeof(unsigned int),
+        textureCoordinates, sizeof(textureCoordinates) / sizeof(float));
     prMeshLinkMaterial(meshWood, materialWood);
 
     prMeshData* meshWoodMetal = prMeshCreate();
     prMeshLinkContext(meshWoodMetal, test->openglContext);
-    prMeshUpdate(meshWoodMetal, vertices, sizeof(vertices) / sizeof(float), 
-        indices, sizeof(indices) / sizeof(unsigned int), 
-        textureCoordinates, sizeof(textureCoordinates) / sizeof(float), 
-        NULL, 0, 
-        normals, sizeof(normals) / sizeof(float));
+    prMeshUpdate(meshWoodMetal,
+        vertices, sizeof(vertices) / sizeof(float),
+        indices, sizeof(indices) / sizeof(unsigned int),
+        textureCoordinates, sizeof(textureCoordinates) / sizeof(float));
     prMeshLinkMaterial(meshWoodMetal, materialWoodMetal);
+
+    prMeshData* meshBrick = prMeshCreate();
+    prMeshLinkContext(meshBrick, test->openglContext);
+    prMeshUpdate(meshBrick,
+        vertices, sizeof(vertices) / sizeof(float),
+        indices, sizeof(indices) / sizeof(unsigned int),
+        textureCoordinates, sizeof(textureCoordinates) / sizeof(float));
+    prMeshLinkMaterial(meshBrick, materialBrick);
+
+    prDirectionalLightData* sun = prDirectionalLightCreate();
+    prDirectionalLightSetDirection(sun, (vec3){-1.0f, -1.0f, -1.0f});
+    prDirectionalLightSetAmbient(sun, (vec3){0.4, 0.4, 0.2});
+    prDirectionalLightSetDiffuse(sun, (vec3){1.0f, 1.0f, 0.7f});
+    int sunDirectionUniformLocation = test->openglContext->GetUniformLocation(shaderProgram, "directionalLights[0].direction");
+    test->openglContext->Uniform3f(sunDirectionUniformLocation, sun->direction[0], sun->direction[1], sun->direction[2]);
+    int sunAmbientUniformLocation = test->openglContext->GetUniformLocation(shaderProgram, "directionalLights[0].ambient");
+    test->openglContext->Uniform3f(sunAmbientUniformLocation, sun->ambient[0], sun->ambient[1], sun->ambient[2]);
+    int sunDiffuseUniformLocation = test->openglContext->GetUniformLocation(shaderProgram, "directionalLights[0].diffuse");
+    test->openglContext->Uniform3f(sunDiffuseUniformLocation, sun->diffuse[0], sun->diffuse[1], sun->diffuse[2]);
+    int sunSpecularUniformLocation = test->openglContext->GetUniformLocation(shaderProgram, "directionalLights[0].specular");
+    test->openglContext->Uniform3f(sunSpecularUniformLocation, sun->specular[0], sun->specular[1], sun->specular[2]);
 
     prCamera* camera = prCameraCreate();
     prCameraLinkContext(camera, test->openglContext);
@@ -115,11 +139,14 @@ int main(int argc, char** argv) {
         translationsToMatrix(translation, (vec3){0.0f, 0.0f, -3.0f}, GLM_VEC3_ZERO, (vec3){10.0f, 10.0f, 0.5f});
         prMeshDraw(meshMetal, translation, camera, shaderProgram);
 
-        translationsToMatrix(translation, (vec3){1.0f, 0.0f, 0.0f}, (vec3){0.0f, cos((glfwGetTimerValue() * 0.5f) / glfwGetTimerFrequency()), 0.0f}, GLM_VEC3_ONE);
+        translationsToMatrix(translation, (vec3){1.0f, 0.0f, 0.0f}, (vec3){0.0f, sin((glfwGetTimerValue() * 0.5f) / glfwGetTimerFrequency()), 0.0f}, GLM_VEC3_ONE);
         prMeshDraw(meshWood, translation, camera, shaderProgram);
 
-        translationsToMatrix(translation, (vec3){-1.0f, 0.0f, 0.0f}, (vec3){0.0f, sin((glfwGetTimerValue() * 0.5f) / glfwGetTimerFrequency()), 0.0f}, GLM_VEC3_ONE);
+        translationsToMatrix(translation, (vec3){-1.0f, 0.0f, 0.0f}, (vec3){0.0f, cos((glfwGetTimerValue() * 0.5f) / glfwGetTimerFrequency()), 0.0f}, GLM_VEC3_ONE);
         prMeshDraw(meshWoodMetal, translation, camera, shaderProgram);
+
+        translationsToMatrix(translation, (vec3){0.0f, 1.5f, 0.0f}, (vec3){0.0f, tan((glfwGetTimerValue() * 0.5f) / glfwGetTimerFrequency()), 0.0f}, GLM_VEC3_ONE);
+        prMeshDraw(meshBrick, translation, camera, shaderProgram);
 
         glfwSwapBuffers(test->window);
         glfwPollEvents();
@@ -135,7 +162,7 @@ int main(int argc, char** argv) {
     meshWood = NULL;
     prMeshDestroy(meshMetal);
     meshMetal = NULL;
-
+    
     prMaterialDestroy(materialWoodMetal);
     materialWoodMetal = NULL;
     prMaterialDestroy(materialWood);
@@ -147,6 +174,12 @@ int main(int argc, char** argv) {
     whiteTexture = NULL;
     prTextureDestroy(blackTexture);
     blackTexture = NULL;
+    prTextureDestroy(brickWallNormalTexture);
+    brickWallNormalTexture = NULL;
+    prTextureDestroy(brickWallSpecularTexture);
+    brickWallSpecularTexture = NULL;
+    prTextureDestroy(brickWallDiffuseTexture);
+    brickWallDiffuseTexture = NULL;
     prTextureDestroy(steelTexture);
     steelTexture = NULL;
     prTextureDestroy(containerMetalSpecularTexture);
@@ -155,8 +188,6 @@ int main(int argc, char** argv) {
     containerMetalTexture = NULL;
     prTextureDestroy(containerTexture);
     containerTexture = NULL;
-    prTextureDestroy(faceTexture);
-    faceTexture = NULL;
 
     prWindowDestroy(test);
     test = NULL;

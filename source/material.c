@@ -12,6 +12,7 @@ prMaterialData* prMaterialCreate() {
     material->ambientMap = NULL;
     material->diffuseMap = NULL;
     material->specularMap = NULL;
+    material->normalMap = NULL;
     material->shininess = 0.0f;
 
     return material;
@@ -31,6 +32,10 @@ void prMaterialLinkDiffuseMap(prMaterialData* material, prTextureData* diffuseMa
 
 void prMaterialLinkSpecularMap(prMaterialData* material, prTextureData* specularMap) {
     material->specularMap = specularMap;
+}
+
+void prMaterialLinkNormalMap(prMaterialData* material, prTextureData* normalMap) {
+    material->normalMap = normalMap;
 }
 
 void prMaterialSetShininess(prMaterialData* material, float shininess) {

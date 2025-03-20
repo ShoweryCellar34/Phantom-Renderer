@@ -8,6 +8,7 @@ typedef struct prMaterialData {
     prTextureData* ambientMap;
     prTextureData* diffuseMap;
     prTextureData* specularMap;
+    prTextureData* normalMap;
     float shininess;
 } prMaterialData;
 
@@ -22,5 +23,7 @@ void prMaterialLinkAmbientMap(prMaterialData* material, prTextureData* ambientMa
 void prMaterialLinkDiffuseMap(prMaterialData* material, prTextureData* diffuseMap);
 
 void prMaterialLinkSpecularMap(prMaterialData* material, prTextureData* specularMap);
+
+void prMaterialLinkNormalMap(prMaterialData* material, prTextureData* normalMap);
 
 void prMaterialSetShininess(prMaterialData* material, float shininess);
