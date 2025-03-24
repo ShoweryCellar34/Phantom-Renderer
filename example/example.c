@@ -99,10 +99,20 @@ int main(int argc, char** argv) {
         textureCoordinates, sizeof(textureCoordinates) / sizeof(float));
     prMeshLinkMaterial(meshBrick, materialBrick);
 
+    test->openglContext->UseProgram(shaderProgram);
     prDirectionalLightData* sun = prDirectionalLightCreate();
     prDirectionalLightSetDirection(sun, (vec3){-1.0f, -1.0f, -1.0f});
-    prDirectionalLightSetAmbient(sun, (vec3){0.4, 0.4, 0.2});
-    prDirectionalLightSetDiffuse(sun, (vec3){1.0f, 1.0f, 0.7f});
+    prDirectionalLightSetAmbient(sun, (vec3){0.1, 0.1, 0.1});
+    prDirectionalLightSetDiffuse(sun, (vec3){0.3f, 0.3f, 0.2f});
+    prDirectionalLightSetSpecular(sun, (vec3){0.6, 0.6, 0.6});
+
+    prPointLightData* point = prPointLightCreate();
+    point->constant = 1.0;
+    point->linear = 0.7f;
+    point->quadratic = 1.8f;
+    prPointLightSetPosition(point, (vec3){0.0f, 0.0f, 0.0f});
+    prPointLightSetDiffuse(point, (vec3){0.6f, 0.6f, 1.8f});
+
     int sunDirectionUniformLocation = test->openglContext->GetUniformLocation(shaderProgram, "directionalLights[0].direction");
     test->openglContext->Uniform3f(sunDirectionUniformLocation, sun->direction[0], sun->direction[1], sun->direction[2]);
     int sunAmbientUniformLocation = test->openglContext->GetUniformLocation(shaderProgram, "directionalLights[0].ambient");
@@ -111,6 +121,22 @@ int main(int argc, char** argv) {
     test->openglContext->Uniform3f(sunDiffuseUniformLocation, sun->diffuse[0], sun->diffuse[1], sun->diffuse[2]);
     int sunSpecularUniformLocation = test->openglContext->GetUniformLocation(shaderProgram, "directionalLights[0].specular");
     test->openglContext->Uniform3f(sunSpecularUniformLocation, sun->specular[0], sun->specular[1], sun->specular[2]);
+
+    int pointConstantUniformLocation = test->openglContext->GetUniformLocation(shaderProgram, "pointLights[0].constant");
+    test->openglContext->Uniform1f(pointConstantUniformLocation, point->constant);
+    int pointLinearUniformLocation = test->openglContext->GetUniformLocation(shaderProgram, "pointLights[0].linear");
+    test->openglContext->Uniform1f(pointLinearUniformLocation, point->linear);
+    int pointQuadraticUniformLocation = test->openglContext->GetUniformLocation(shaderProgram, "pointLights[0].quadratic");
+    test->openglContext->Uniform1f(pointQuadraticUniformLocation, point->quadratic);
+
+    int pointPositionUniformLocation = test->openglContext->GetUniformLocation(shaderProgram, "pointLights[0].position");
+    test->openglContext->Uniform3f(pointPositionUniformLocation, point->position[0], point->position[1], point->position[2]);
+    int pointAmbientUniformLocation = test->openglContext->GetUniformLocation(shaderProgram, "pointLights[0].ambient");
+    test->openglContext->Uniform3f(pointAmbientUniformLocation, point->ambient[0], point->ambient[1], point->ambient[2]);
+    int pointDiffuseUniformLocation = test->openglContext->GetUniformLocation(shaderProgram, "pointLights[0].diffuse");
+    test->openglContext->Uniform3f(pointDiffuseUniformLocation, point->diffuse[0], point->diffuse[1], point->diffuse[2]);
+    int pointSpecularUniformLocation = test->openglContext->GetUniformLocation(shaderProgram, "pointLights[0].specular");
+    test->openglContext->Uniform3f(pointSpecularUniformLocation, point->specular[0], point->specular[1], point->specular[2]);
 
     prCamera* camera = prCameraCreate();
     prCameraLinkContext(camera, test->openglContext);

@@ -36,6 +36,7 @@ unsigned int prShaderGenerateDefaultProgram(GladGLContext* context) {
             \n\
             in vec3 fragmentPosition;\n\
             in vec2 textureCoordinates;\n\
+            in mat3 TBN;\n\
             \n\
             struct Material {\n\
                 sampler2D ambient;\n\
@@ -53,7 +54,7 @@ unsigned int prShaderGenerateDefaultProgram(GladGLContext* context) {
                 vec3 diffuse;\n\
                 vec3 specular;\n\
             };\n\
-            #define NR_DIRECTIONAL_LIGHTS 4\n\
+            #define NR_DIRECTIONAL_LIGHTS 1\n\
             uniform directionalLight directionalLights[NR_DIRECTIONAL_LIGHTS];\n\
             \n\
             struct pointLight {\n\
@@ -67,7 +68,7 @@ unsigned int prShaderGenerateDefaultProgram(GladGLContext* context) {
                 vec3 diffuse;\n\
                 vec3 specular;\n\
             };\n\
-            #define NR_POINT_LIGHTS 4\n\
+            #define NR_POINT_LIGHTS 1\n\
             uniform pointLight pointLights[NR_POINT_LIGHTS];\n\
             \n\
             vec3 calculateDirectionalLight(directionalLight light, vec3 viewDirection, vec3 ambient, vec3 diffuse, vec3 specular, vec3 normal) {\n\
@@ -112,6 +113,8 @@ unsigned int prShaderGenerateDefaultProgram(GladGLContext* context) {
                 vec3 diffuse = texture(material.diffuse, textureCoordinates).xyz;\n\
                 vec3 specular = texture(material.specular, textureCoordinates).xxx;\n\
                 vec3 normal = normalize(mat3(transpose(inverse(translation))) * texture(material.normal, textureCoordinates).xyz);\n\
+                normal = normal * 2.0 - 1.0;\n\
+                normal = normalize(TBN * normal);\n\
                 \n\
                 vec3 viewDirection = normalize(cameraPosition - fragmentPosition);\n\
                 \n\
