@@ -4,7 +4,7 @@
 
 #include <PR/error.h>
 
-void i_prTextureCreateOnGPUSide(prTextureData* texture) {
+void i_prTextureCreateOnGPU(prTextureData* texture) {
     texture->context->GenTextures(1, &texture->TBO);
     if(!texture->TBO) {
         prError(PR_GL_ERROR, "Failed to create texture buffer object. Aborting operation, nothing was modified");
@@ -14,7 +14,7 @@ void i_prTextureCreateOnGPUSide(prTextureData* texture) {
     int format = GL_RGBA;
     switch(texture->channels) {
         case 1:
-            format = GL_RED;
+            format = GL_ALPHA;
             break;
 
         case 2:
@@ -32,10 +32,10 @@ void i_prTextureCreateOnGPUSide(prTextureData* texture) {
 
     texture->context->BindTexture(GL_TEXTURE_2D, texture->TBO);
 
-    texture->context->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);	
-    texture->context->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    texture->context->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    texture->context->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    texture->context->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, texture->wrappingMode);	
+    texture->context->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, texture->wrappingMode);
+    texture->context->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, (texture->pixelated ? GL_NEAREST : GL_LINEAR));
+    texture->context->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, (texture->pixelated ? GL_NEAREST : GL_LINEAR));
 
     texture->context->TexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texture->width, texture->height, 0, format, GL_UNSIGNED_BYTE, texture->textureData);
     texture->context->GenerateMipmap(GL_TEXTURE_2D);
@@ -47,13 +47,18 @@ void i_prTextureCreateOnGPUSide(prTextureData* texture) {
     prLogInfo("[GL]", "Successfully created texture buffer object and set data");
 }
 
-void i_prTextureUpdateOnGPUSide(prTextureData* texture) {
+void i_prTextureUpdateOnGPU(prTextureData* texture) {
     texture->context->BindTexture(GL_TEXTURE_2D, texture->TBO);
+
+    texture->context->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, texture->wrappingMode);	
+    texture->context->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, texture->wrappingMode);
+    texture->context->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, (texture->pixelated ? GL_NEAREST : GL_LINEAR));
+    texture->context->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, (texture->pixelated ? GL_NEAREST : GL_LINEAR));
 
     texture->context->TexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texture->width, texture->height, 0, GL_RGBA, GL_UNSIGNED_BYTE, texture->textureData);
     texture->context->GenerateMipmap(GL_TEXTURE_2D);
 }
 
-void i_prTextureDestroyOnGPUSide(prTextureData* texture) {
+void i_prTextureDestroyOnGPU(prTextureData* texture) {
     texture->context->DeleteTextures(1, &texture->TBO);
 }

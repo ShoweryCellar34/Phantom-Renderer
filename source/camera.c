@@ -40,9 +40,7 @@ void prCameraUpdate(prCamera* camera, vec3 position, vec3 rotation, float FOV, f
     glm_vec3_copy(position, camera->position);
 
     vec3 temp = {0.0f, 0.0f, 0.0f};
-    
-    float pitch = (rotation[1] * M_PI) / 180.0;
-    float yaw = (rotation[0] * M_PI) / 180.0;
+
     // float roll = (rotation[2] * M_PI) / 180.0;
 
     // mat4 rollMatrix;
@@ -50,9 +48,9 @@ void prCameraUpdate(prCamera* camera, vec3 position, vec3 rotation, float FOV, f
     // glm_rotate(rollMatrix, roll, camera->front);
     // glm_mat4_mulv3(rollMatrix, camera->up, 0.0f, camera->up);
 
-    camera->front[0] = cos(yaw) * cos(pitch);
-    camera->front[1] = sin(pitch);
-    camera->front[2] = sin(yaw) * cos(pitch);
+    camera->front[0] = cos(rotation[0]) * cos(rotation[1]);
+    camera->front[1] = sin(rotation[1]);
+    camera->front[2] = sin(rotation[0]) * cos(rotation[1]);
 
     glm_normalize(camera->front);
     glm_vec3_add(position, camera->front, temp);

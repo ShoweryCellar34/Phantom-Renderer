@@ -20,14 +20,12 @@ void prDisableImageFlip() {
     stbi_set_flip_vertically_on_load(0);
 }
 
-void prDisableBlending(GladGLContext* context) {
-    context->Disable(GL_BLEND);
-}
-
 prTextureData* prTextureCreate() {
     prTextureData* texture = prMalloc(sizeof(prTextureData));
 
     texture->textureData = NULL;
+    texture->wrappingMode = 0;
+    texture->pixelated = false;
     texture->width = 0;
     texture->height = 0;
     texture->channels = 0;
@@ -37,7 +35,9 @@ prTextureData* prTextureCreate() {
 }
 
 void prTextureDestroy(prTextureData* texture) {
-    i_prTextureDestroyOnGPUSide(texture);
+    if(texture->TBO) {
+        i_prTextureDestroyOnGPU(texture);
+    }
 
     if(texture->textureData) {
         prFree(texture->textureData);
@@ -48,22 +48,17 @@ void prTextureDestroy(prTextureData* texture) {
 
 void prTextureLinkContext(prTextureData* texture, GladGLContext* context) {
     if(texture->context && texture->textureData) {
-        i_prTextureDestroyOnGPUSide(texture);
+        i_prTextureDestroyOnGPU(texture);
     }
     texture->context = context;
     if(texture->context && texture->textureData) {
-        i_prTextureCreateOnGPUSide(texture);
+        i_prTextureCreateOnGPU(texture);
     }
 }
 
-void prTextureUpdate(prTextureData* texture, unsigned char rawTextureData[], unsigned int rawTextureDataCount) {
-    if(texture->textureData) {
-        stbi_image_free(texture->textureData);
-        texture->textureData = NULL;
-    }
-
+void prTextureUpdate(prTextureData* texture, int wrappingMode, GLubyte rawTextureData[], size_t rawTextureDataCount) {
     if(!rawTextureDataCount) {
-        prError(PR_INVALID_DATA_ERROR, "Texture data count ccannot be zero. Aborting operation, nothing was modified");
+        prError(PR_INVALID_DATA_ERROR, "Texture data count cannot be zero. Aborting operation, nothing was modified");
     } else if(!rawTextureData) {
         prError(PR_INVALID_DATA_ERROR, "Texture data cannot be NULL. Aborting operation, nothing was modified");
         return;
@@ -75,31 +70,25 @@ void prTextureUpdate(prTextureData* texture, unsigned char rawTextureData[], uns
         return;
     }
 
-    if(texture->context && !texture->TBO) {
-        i_prTextureCreateOnGPUSide(texture);
-    } else if(texture->context) {
-        i_prTextureUpdateOnGPUSide(texture);
+    if((wrappingMode != PR_TEXTURE_WRAPPING_REPEAT) | (wrappingMode != PR_TEXTURE_WRAPPING_REPEAT_MIRRORED) | (wrappingMode != PR_TEXTURE_WRAPPING_EDGE) | (wrappingMode != PR_TEXTURE_WRAPPING_COLOR)) {
+        prLogWarning("[DATA]", "Invalid wrapping mode for texture, using repeating wrapping mode");
+        texture->wrappingMode = PR_TEXTURE_WRAPPING_REPEAT;
+    } else {
+        texture->wrappingMode = wrappingMode;
     }
-}
 
-void prTextureSingleColor(prTextureData* texture, GLfloat color[4]) {
     if(texture->textureData) {
         stbi_image_free(texture->textureData);
         texture->textureData = NULL;
     }
 
-    texture->textureData = prMalloc(4 * sizeof(GLubyte));
-    texture->textureData[0] = color[0] * 255.0f;
-    texture->textureData[1] = color[1] * 255.0f;
-    texture->textureData[2] = color[2] * 255.0f;
-    texture->textureData[3] = color[3] * 255.0f;
-    texture->channels = 4;
-    texture->height = 1;
-    texture->width = 1;
-
     if(texture->context && !texture->TBO) {
-        i_prTextureCreateOnGPUSide(texture);
+        i_prTextureCreateOnGPU(texture);
     } else if(texture->context) {
-        i_prTextureUpdateOnGPUSide(texture);
+        i_prTextureUpdateOnGPU(texture);
     }
+}
+
+void prTextureSetPixelated(prTextureData* texture, bool pixelated) {
+    texture->pixelated = pixelated;
 }

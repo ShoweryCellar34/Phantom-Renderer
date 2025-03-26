@@ -1,6 +1,7 @@
 #pragma once
 
 #include <GLFW/glfw3.h>
+#include <PR/textureInternal.h>
 #include "exampleGlobalValues.h"
 
 void proccessInput(GLFWwindow* window, vec3 cameraFront, vec3 cameraUp) {
@@ -102,8 +103,67 @@ prTextureData* loadTexture(GladGLContext* context, const char* path) {
     fclose(textureFile);
 
     prTextureLinkContext(texture, context);
-    prTextureUpdate(texture, textureData, textureFileSize);
+    prTextureUpdate(texture, PR_TEXTURE_WRAPPING_EDGE, textureData, textureFileSize);
     prFree(textureData);
+
+    return texture;
+}
+
+prTextureData* makeTextureSingleColor(GladGLContext* context, float* color) {
+    prTextureData* texture = prTextureCreate();
+    prTextureLinkContext(texture, context);
+
+    texture->textureData = prMalloc(4 * sizeof(GLubyte));
+    texture->textureData[0] = color[0] * 255.0f;
+    texture->textureData[1] = color[1] * 255.0f;
+    texture->textureData[2] = color[2] * 255.0f;
+    texture->textureData[3] = color[3] * 255.0f;
+    texture->channels = 4;
+    texture->height = 1;
+    texture->width = 1;
+
+    i_prTextureCreateOnGPU(texture);
+
+    return texture;
+}
+
+prTextureData* makeTextureDefault(GladGLContext* context, size_t scale) {
+    prTextureData* texture = prTextureCreate();
+    prTextureLinkContext(texture, context);
+
+    bool* template = prMalloc(scale * scale * sizeof(bool));
+    for(size_t i = 0; i < scale * scale; i++) {
+        static bool offset = false;
+        if(!(i % scale) && !(scale % 2)) {
+            offset = !offset;
+        }
+
+        if((i + offset) % 2) {
+            template[i] = false;
+        } else {
+            template[i] = true;
+        }
+    }
+
+    texture->textureData = prMalloc(scale * scale * 4 * sizeof(GLubyte));
+    texture->wrappingMode = PR_TEXTURE_WRAPPING_REPEAT;
+    texture->pixelated = true;
+
+    for(size_t i = 0; i < scale * scale; i++) {
+        size_t index = i * 4;
+        texture->textureData[index++] = (template[i] ? 255 : 0);
+        texture->textureData[index++] = 0;
+        texture->textureData[index++] = (template[i] ? 255 : 0);
+        texture->textureData[index] = 255;
+    }
+
+    prFree(template);
+
+    texture->channels = 4;
+    texture->height = scale;
+    texture->width = scale;
+
+    i_prTextureCreateOnGPU(texture);
 
     return texture;
 }
@@ -115,4 +175,8 @@ void translationsToMatrix(mat4 matrix, vec3 position, vec3 rotation, vec3 scale)
     glm_rotate(matrix, rotation[1], (vec3){0.0f, 1.0f, 0.0f});
     glm_rotate(matrix, rotation[0], (vec3){1.0f, 0.0f, 0.0f});
     glm_scale(matrix, scale);
+}
+
+float radians(float degrees) {
+    return degrees * (M_PI / 180);
 }

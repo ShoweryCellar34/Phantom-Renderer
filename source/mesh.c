@@ -28,7 +28,9 @@ prMeshData* prMeshCreate() {
 }
 
 void prMeshDestroy(prMeshData* mesh) {
-    i_prMeshDestroyOnGPUSide(mesh);
+    if(mesh->VAO) {
+        i_prMeshDestroyOnGPU(mesh);
+    }
 
     if(mesh->vertices) {
         prFree(mesh->vertices);
@@ -48,11 +50,11 @@ void prMeshDestroy(prMeshData* mesh) {
 
 void prMeshLinkContext(prMeshData* mesh, GladGLContext* context) {
     if(mesh->context && mesh->GPUReadyBuffer) {
-        i_prMeshDestroyOnGPUSide(mesh);
+        i_prMeshDestroyOnGPU(mesh);
     }
     mesh->context = context;
     if(mesh->context && mesh->GPUReadyBuffer) {
-        i_prMeshCreateOnGPUSide(mesh);
+        i_prMeshCreateOnGPU(mesh);
     }
 }
 
@@ -63,17 +65,6 @@ void prMeshLinkMaterial(prMeshData* mesh, prMaterialData* material) {
 void prMeshUpdate(prMeshData* mesh, GLfloat vertices[], size_t verticesCount, 
     GLuint indices[], size_t indicesCount, 
     GLfloat textureCoordinates[], size_t textureCoordinatesCount) {
-    if(mesh->vertices) {
-        prFree(mesh->vertices);
-        prFree(mesh->indices);
-        mesh->vertices = NULL;
-        mesh->indices = NULL;
-    }
-    if(mesh->textureCoordinates) {
-        prFree(mesh->textureCoordinates);
-        mesh->textureCoordinates = NULL;
-    }
-
     if(!verticesCount) {
         prError(PR_INVALID_DATA_ERROR, "Vertices data count cannot be zero. Aborting operation, nothing was modified");
         return;
@@ -106,6 +97,17 @@ void prMeshUpdate(prMeshData* mesh, GLfloat vertices[], size_t verticesCount,
         return;
     }
 
+    if(mesh->vertices) {
+        prFree(mesh->vertices);
+        prFree(mesh->indices);
+        mesh->vertices = NULL;
+        mesh->indices = NULL;
+    }
+    if(mesh->textureCoordinates) {
+        prFree(mesh->textureCoordinates);
+        mesh->textureCoordinates = NULL;
+    }
+
     mesh->vertices = prMalloc(sizeof(GLfloat) * verticesCount);
     prMemcpy(mesh->vertices, vertices, sizeof(GLfloat) * verticesCount);
     mesh->verticesCount = verticesCount;
@@ -121,9 +123,9 @@ void prMeshUpdate(prMeshData* mesh, GLfloat vertices[], size_t verticesCount,
     mesh->textureCoordinatesCount = textureCoordinatesCount;
 
     if(mesh->context && !mesh->VAO) {
-        i_prMeshCreateOnGPUSide(mesh);
+        i_prMeshCreateOnGPU(mesh);
     } else if(mesh->context) {
-        i_prMeshUpdateOnGPUSide(mesh);
+        i_prMeshUpdateOnGPU(mesh);
     }
 }
 

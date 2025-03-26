@@ -34,16 +34,13 @@ int main(int argc, char** argv) {
 
     prTextureData* brickWallSpecularTexture = loadTexture(test->openglContext, "res/brickWallSpecular.tga");
 
-    prTextureData* blackTexture = prTextureCreate();
-    prTextureLinkContext(blackTexture, test->openglContext);
-    prTextureSingleColor(blackTexture, (float[4]){0.0f, 0.0f, 0.0f, 0.0f});
+    prTextureData* blackTexture = makeTextureSingleColor(test->openglContext, (float[4]){0.0f, 0.0f, 0.0f, 1.0f});
 
-    prTextureData* whiteTexture = prTextureCreate();
-    prTextureLinkContext(whiteTexture, test->openglContext);
-    prTextureSingleColor(whiteTexture, (float[4]){1.0f, 1.0f, 1.0f, 0.0f});
+    prTextureData* whiteTexture = makeTextureSingleColor(test->openglContext, (float[4]){1.0f, 1.0f, 1.0f, 1.0f});
+    prTextureData* defaultTexture = makeTextureDefault(test->openglContext, 12);
 
     prMaterialData* materialMetal = prMaterialCreate();
-    prMaterialLinkAmbientMap(materialMetal, steelTexture);
+    prMaterialLinkAmbientMap(materialMetal, defaultTexture);
     prMaterialLinkDiffuseMap(materialMetal, steelTexture);
     prMaterialLinkSpecularMap(materialMetal, whiteTexture);
     materialMetal->shininess = 256.0f;
@@ -102,9 +99,9 @@ int main(int argc, char** argv) {
     test->openglContext->UseProgram(shaderProgram);
     prDirectionalLightData* sun = prDirectionalLightCreate();
     prDirectionalLightSetDirection(sun, (vec3){-1.0f, -1.0f, -1.0f});
-    prDirectionalLightSetAmbient(sun, (vec3){0.1, 0.1, 0.1});
-    prDirectionalLightSetDiffuse(sun, (vec3){0.3f, 0.3f, 0.2f});
-    prDirectionalLightSetSpecular(sun, (vec3){0.6, 0.6, 0.6});
+    prDirectionalLightSetAmbient(sun, (vec3){0.2, 0.2, 0.15});
+    prDirectionalLightSetDiffuse(sun, (vec3){0.5f, 0.5f, 0.4f});
+    prDirectionalLightSetSpecular(sun, (vec3){0.7, 0.7, 0.7});
 
     prPointLightData* point = prPointLightCreate();
     point->constant = 1.0;
@@ -159,19 +156,19 @@ int main(int argc, char** argv) {
 
         mat4 translation;
 
-        vec3 rotation = {yaw, pitch, 0.0f};
+        vec3 rotation = {radians(yaw), radians(pitch), radians(0.0f)};
         prCameraUpdate(camera, cameraPosition, rotation, 45.0f, 0.001f, 10000.0f);
 
         translationsToMatrix(translation, (vec3){0.0f, 0.0f, -3.0f}, GLM_VEC3_ZERO, (vec3){10.0f, 10.0f, 0.5f});
         prMeshDraw(meshMetal, translation, camera, shaderProgram);
 
-        translationsToMatrix(translation, (vec3){1.0f, 0.0f, 0.0f}, (vec3){0.0f, sin((glfwGetTimerValue() * 0.5f) / glfwGetTimerFrequency()), 0.0f}, GLM_VEC3_ONE);
+        translationsToMatrix(translation, (vec3){1.0f, 0.0f, 0.0f}, (vec3){0.0f, sin(radians((glfwGetTimerValue() * 5.0f) / glfwGetTimerFrequency())), 0.0f}, GLM_VEC3_ONE);
         prMeshDraw(meshWood, translation, camera, shaderProgram);
 
-        translationsToMatrix(translation, (vec3){-1.0f, 0.0f, 0.0f}, (vec3){0.0f, cos((glfwGetTimerValue() * 0.5f) / glfwGetTimerFrequency()), 0.0f}, GLM_VEC3_ONE);
+        translationsToMatrix(translation, (vec3){-1.0f, 0.0f, 0.0f}, (vec3){0.0f, cos(radians((glfwGetTimerValue() * 5.0f) / glfwGetTimerFrequency())), 0.0f}, GLM_VEC3_ONE);
         prMeshDraw(meshWoodMetal, translation, camera, shaderProgram);
 
-        translationsToMatrix(translation, (vec3){0.0f, 1.5f, 0.0f}, (vec3){0.0f, tan((glfwGetTimerValue() * 0.5f) / glfwGetTimerFrequency()), 0.0f}, GLM_VEC3_ONE);
+        translationsToMatrix(translation, (vec3){0.0f, 1.5f, 0.0f}, (vec3){0.0f, tan(radians((glfwGetTimerValue() * 5.0f) / glfwGetTimerFrequency())), 0.0f}, GLM_VEC3_ONE);
         prMeshDraw(meshBrick, translation, camera, shaderProgram);
 
         glfwSwapBuffers(test->window);
@@ -196,6 +193,8 @@ int main(int argc, char** argv) {
     prMaterialDestroy(materialMetal);
     materialMetal = NULL;
 
+    prTextureDestroy(defaultTexture);
+    defaultTexture = NULL;
     prTextureDestroy(whiteTexture);
     whiteTexture = NULL;
     prTextureDestroy(blackTexture);

@@ -11,6 +11,7 @@ cmake_minimum_required(VERSION 3.20)
 project(Phantom-Renderer DESCRIPTION "A Basic File Resource Manager" LANGUAGES C HOMEPAGE_URL "https://github.com/ShoweryCellar34/Phantom-Renderer")
 file(GLOB source source/*.c)
 add_library(Phantom-Renderer STATIC ${source})
+set_property(TARGET Phantom-Renderer PROPERTY C_STANDARD 99)
 target_include_directories(Phantom-Renderer PUBLIC headers)
 
 set(CGLM_SHARED OFF)

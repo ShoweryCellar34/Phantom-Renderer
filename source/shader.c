@@ -1,11 +1,73 @@
 #include <PR/shader.h>
 
+#include <PR/shaderInternal.h>
+
 #include <PR/defines.h>
 
 #include <stddef.h>
 #include <string.h>
 #include <stdio.h>
+#include <PR/memory.h>
 #include <PR/error.h>
+
+prShaderProgramData* prShaderProgramCreate() {
+    prShaderProgramData* shaderProgram = prMalloc(sizeof(prShaderProgramData));
+
+    shaderProgram->context = NULL;
+    shaderProgram->vertexShaderData = NULL;
+    shaderProgram->fragmentShaderData = NULL;
+    shaderProgram->shaderProgramObject = 0;
+
+    return shaderProgram;
+}
+
+void prShaderProgramDestroy(prShaderProgramData* shaderProgram) {
+    if(shaderProgram->shaderProgramObject) {
+        i_prShaderProgramDestroyOnGPU(shaderProgram);
+    }
+
+    prFree(shaderProgram);
+}
+
+void prShaderProgramLinkContext(prShaderProgramData* shaderProgram, GladGLContext* context) {
+    if(shaderProgram->context && shaderProgram->shaderProgramObject) {
+        i_prShaderProgramDestroyOnGPU(shaderProgram);
+    }
+    shaderProgram->context = context;
+    if(shaderProgram->context && shaderProgram->vertexShaderData) {
+        i_prShaderProgramCreateOnGPU(shaderProgram);
+    }
+}
+
+void prShaderProgramUpdate(prShaderProgramData* shaderProgram, char* vertexShader, char* fragmentShader) {
+    if(!vertexShader) {
+        prError(PR_INVALID_DATA_ERROR, "Vertex shader data cannot be NULL. Aborting operation, nothing was modified");
+        return;
+    }
+    if(!fragmentShader) {
+        prError(PR_INVALID_DATA_ERROR, "Fragment shader data cannot be NULL. Aborting operation, nothing was modified");
+        return;
+    }
+
+    if(shaderProgram->vertexShaderData) {
+        prFree(shaderProgram->vertexShaderData);
+        prFree(shaderProgram->fragmentShaderData);
+        shaderProgram->vertexShaderData = NULL;
+        shaderProgram->fragmentShaderData = NULL;
+    }
+
+    shaderProgram->vertexShaderData = prMalloc(strlen(vertexShader) + 1);
+    prMemcpy(shaderProgram->vertexShaderData, vertexShader, strlen(vertexShader) + 1);
+
+    shaderProgram->fragmentShaderData = prMalloc(strlen(fragmentShader) + 1);
+    prMemcpy(shaderProgram->fragmentShaderData, fragmentShader, strlen(fragmentShader) + 1);
+
+    if(shaderProgram->context && !shaderProgram->shaderProgramObject) {
+        i_prShaderProgramCreateOnGPU(shaderProgram);
+    } else if(shaderProgram->context) {
+        i_prShaderProgramUpdateOnGPU(shaderProgram);
+    }
+}
 
 unsigned int prShaderGenerateDefaultProgram(GladGLContext* context) {
     const char* vertexShaderSource = "\n\
@@ -111,7 +173,7 @@ unsigned int prShaderGenerateDefaultProgram(GladGLContext* context) {
             void main() {\n\
                 vec3 ambient = texture(material.ambient, textureCoordinates).xyz;\n\
                 vec3 diffuse = texture(material.diffuse, textureCoordinates).xyz;\n\
-                vec3 specular = texture(material.specular, textureCoordinates).xxx;\n\
+                vec3 specular = texture(material.specular, textureCoordinates).www;\n\
                 vec3 normal = normalize(mat3(transpose(inverse(translation))) * texture(material.normal, textureCoordinates).xyz);\n\
                 normal = normal * 2.0 - 1.0;\n\
                 normal = normalize(TBN * normal);\n\

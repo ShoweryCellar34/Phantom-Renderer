@@ -28,7 +28,7 @@ void i_prMeshComputeGPUReadyBuffer(prMeshData* mesh) {
     }
 }
 
-void i_prMeshCreateOnGPUSide(prMeshData* mesh) {
+void i_prMeshCreateOnGPU(prMeshData* mesh) {
     mesh->context->GenVertexArrays(1, &mesh->VAO);
     if(!mesh->VAO) {
         prError(PR_GL_ERROR, "Failed to create vertex array object. Aborting operation, nothing was modified");
@@ -76,7 +76,7 @@ void i_prMeshCreateOnGPUSide(prMeshData* mesh) {
     mesh->context->BindVertexArray(0);
 }
 
-void i_prMeshUpdateOnGPUSide(prMeshData* mesh) {
+void i_prMeshUpdateOnGPU(prMeshData* mesh) {
     i_prMeshComputeGPUReadyBuffer(mesh);
 
     int stride = 3;
@@ -102,7 +102,7 @@ void i_prMeshUpdateOnGPUSide(prMeshData* mesh) {
     prLogInfo("[GL]", "Successfully updated vertex array object and set data");
 }
 
-void i_prMeshDestroyOnGPUSide(prMeshData* mesh) {
+void i_prMeshDestroyOnGPU(prMeshData* mesh) {
     mesh->context->DeleteVertexArrays(1, &mesh->VAO);
     mesh->context->DeleteBuffers(1, &mesh->VBO);
     mesh->context->DeleteBuffers(1, &mesh->EBO);
