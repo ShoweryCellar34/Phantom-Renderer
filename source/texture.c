@@ -24,7 +24,7 @@ prTextureData* prTextureCreate() {
     prTextureData* texture = prMalloc(sizeof(prTextureData));
 
     texture->textureData = NULL;
-    texture->wrappingMode = 0;
+    texture->wrappingMode = PR_TEXTURE_WRAPPING_EDGE;
     texture->pixelated = false;
     texture->width = 0;
     texture->height = 0;
@@ -70,7 +70,7 @@ void prTextureUpdate(prTextureData* texture, int wrappingMode, GLubyte rawTextur
         return;
     }
 
-    if((wrappingMode != PR_TEXTURE_WRAPPING_REPEAT) | (wrappingMode != PR_TEXTURE_WRAPPING_REPEAT_MIRRORED) | (wrappingMode != PR_TEXTURE_WRAPPING_EDGE) | (wrappingMode != PR_TEXTURE_WRAPPING_COLOR)) {
+    if((wrappingMode != PR_TEXTURE_WRAPPING_REPEAT) & (wrappingMode != PR_TEXTURE_WRAPPING_REPEAT_MIRRORED) & (wrappingMode != PR_TEXTURE_WRAPPING_EDGE) & (wrappingMode != PR_TEXTURE_WRAPPING_COLOR)) {
         prLogWarning("[DATA]", "Invalid wrapping mode for texture, using repeating wrapping mode");
         texture->wrappingMode = PR_TEXTURE_WRAPPING_REPEAT;
     } else {

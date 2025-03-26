@@ -18,7 +18,11 @@ int main(int argc, char** argv) {
 
     prEnableImageFlip();
 
-    unsigned int shaderProgram = prShaderGenerateDefaultProgram(test->openglContext);
+    prShaderProgramData* shaderProgram = prShaderProgramCreate();
+    prShaderProgramLinkContext(shaderProgram, test->openglContext);
+    prShaderProgramUpdate(shaderProgram, vertexShader, fragmentShader);
+
+    prTextureData* defaultTexture = makeTextureDefault(test->openglContext, 8);
 
     prTextureData* containerTexture = loadTexture(test->openglContext, "res/container.jpg");
 
@@ -37,7 +41,6 @@ int main(int argc, char** argv) {
     prTextureData* blackTexture = makeTextureSingleColor(test->openglContext, (float[4]){0.0f, 0.0f, 0.0f, 1.0f});
 
     prTextureData* whiteTexture = makeTextureSingleColor(test->openglContext, (float[4]){1.0f, 1.0f, 1.0f, 1.0f});
-    prTextureData* defaultTexture = makeTextureDefault(test->openglContext, 12);
 
     prMaterialData* materialMetal = prMaterialCreate();
     prMaterialLinkAmbientMap(materialMetal, defaultTexture);
@@ -96,7 +99,7 @@ int main(int argc, char** argv) {
         textureCoordinates, sizeof(textureCoordinates) / sizeof(float));
     prMeshLinkMaterial(meshBrick, materialBrick);
 
-    test->openglContext->UseProgram(shaderProgram);
+    test->openglContext->UseProgram(shaderProgram->shaderProgramObject);
     prDirectionalLightData* sun = prDirectionalLightCreate();
     prDirectionalLightSetDirection(sun, (vec3){-1.0f, -1.0f, -1.0f});
     prDirectionalLightSetAmbient(sun, (vec3){0.2, 0.2, 0.15});
@@ -110,30 +113,19 @@ int main(int argc, char** argv) {
     prPointLightSetPosition(point, (vec3){0.0f, 0.0f, 0.0f});
     prPointLightSetDiffuse(point, (vec3){0.6f, 0.6f, 1.8f});
 
-    int sunDirectionUniformLocation = test->openglContext->GetUniformLocation(shaderProgram, "directionalLights[0].direction");
-    test->openglContext->Uniform3f(sunDirectionUniformLocation, sun->direction[0], sun->direction[1], sun->direction[2]);
-    int sunAmbientUniformLocation = test->openglContext->GetUniformLocation(shaderProgram, "directionalLights[0].ambient");
-    test->openglContext->Uniform3f(sunAmbientUniformLocation, sun->ambient[0], sun->ambient[1], sun->ambient[2]);
-    int sunDiffuseUniformLocation = test->openglContext->GetUniformLocation(shaderProgram, "directionalLights[0].diffuse");
-    test->openglContext->Uniform3f(sunDiffuseUniformLocation, sun->diffuse[0], sun->diffuse[1], sun->diffuse[2]);
-    int sunSpecularUniformLocation = test->openglContext->GetUniformLocation(shaderProgram, "directionalLights[0].specular");
-    test->openglContext->Uniform3f(sunSpecularUniformLocation, sun->specular[0], sun->specular[1], sun->specular[2]);
+    prShaderProgramUniform3f(shaderProgram, "directionalLights[0].direction", sun->direction[0], sun->direction[1], sun->direction[2]);
+    prShaderProgramUniform3f(shaderProgram, "directionalLights[0].ambient", sun->ambient[0], sun->ambient[1], sun->ambient[2]);
+    prShaderProgramUniform3f(shaderProgram, "directionalLights[0].diffuse", sun->diffuse[0], sun->diffuse[1], sun->diffuse[2]);
+    prShaderProgramUniform3f(shaderProgram, "directionalLights[0].specular", sun->specular[0], sun->specular[1], sun->specular[2]);
 
-    int pointConstantUniformLocation = test->openglContext->GetUniformLocation(shaderProgram, "pointLights[0].constant");
-    test->openglContext->Uniform1f(pointConstantUniformLocation, point->constant);
-    int pointLinearUniformLocation = test->openglContext->GetUniformLocation(shaderProgram, "pointLights[0].linear");
-    test->openglContext->Uniform1f(pointLinearUniformLocation, point->linear);
-    int pointQuadraticUniformLocation = test->openglContext->GetUniformLocation(shaderProgram, "pointLights[0].quadratic");
-    test->openglContext->Uniform1f(pointQuadraticUniformLocation, point->quadratic);
+    prShaderProgramUniform1f(shaderProgram, "pointLights[0].constant", point->constant);
+    prShaderProgramUniform1f(shaderProgram, "pointLights[0].linear", point->linear);
+    prShaderProgramUniform1f(shaderProgram, "pointLights[0].quadratic", point->quadratic);
 
-    int pointPositionUniformLocation = test->openglContext->GetUniformLocation(shaderProgram, "pointLights[0].position");
-    test->openglContext->Uniform3f(pointPositionUniformLocation, point->position[0], point->position[1], point->position[2]);
-    int pointAmbientUniformLocation = test->openglContext->GetUniformLocation(shaderProgram, "pointLights[0].ambient");
-    test->openglContext->Uniform3f(pointAmbientUniformLocation, point->ambient[0], point->ambient[1], point->ambient[2]);
-    int pointDiffuseUniformLocation = test->openglContext->GetUniformLocation(shaderProgram, "pointLights[0].diffuse");
-    test->openglContext->Uniform3f(pointDiffuseUniformLocation, point->diffuse[0], point->diffuse[1], point->diffuse[2]);
-    int pointSpecularUniformLocation = test->openglContext->GetUniformLocation(shaderProgram, "pointLights[0].specular");
-    test->openglContext->Uniform3f(pointSpecularUniformLocation, point->specular[0], point->specular[1], point->specular[2]);
+    prShaderProgramUniform3f(shaderProgram, "pointLights[0].position", point->position[0], point->position[1], point->position[2]);
+    prShaderProgramUniform3f(shaderProgram, "pointLights[0].ambient", point->ambient[0], point->ambient[1], point->ambient[2]);
+    prShaderProgramUniform3f(shaderProgram, "pointLights[0].diffuse", point->diffuse[0], point->diffuse[1], point->diffuse[2]);
+    prShaderProgramUniform3f(shaderProgram, "pointLights[0].specular", point->specular[0], point->specular[1], point->specular[2]);
 
     prCamera* camera = prCameraCreate();
     prCameraLinkContext(camera, test->openglContext);
@@ -193,8 +185,6 @@ int main(int argc, char** argv) {
     prMaterialDestroy(materialMetal);
     materialMetal = NULL;
 
-    prTextureDestroy(defaultTexture);
-    defaultTexture = NULL;
     prTextureDestroy(whiteTexture);
     whiteTexture = NULL;
     prTextureDestroy(blackTexture);
@@ -213,6 +203,11 @@ int main(int argc, char** argv) {
     containerMetalTexture = NULL;
     prTextureDestroy(containerTexture);
     containerTexture = NULL;
+    prTextureDestroy(defaultTexture);
+    defaultTexture = NULL;
+
+    prShaderProgramDestroy(shaderProgram);
+    shaderProgram = NULL;
 
     prWindowDestroy(test);
     test = NULL;

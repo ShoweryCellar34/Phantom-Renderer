@@ -5,6 +5,7 @@
 #include <PR/memory.h>
 #include <PR/texture.h>
 #include <PR/camera.h>
+#include <PR/shader.h>
 #include <PR/error.h>
 
 prMeshData* prMeshCreate() {
@@ -129,7 +130,7 @@ void prMeshUpdate(prMeshData* mesh, GLfloat vertices[], size_t verticesCount,
     }
 }
 
-void prMeshDraw(prMeshData* mesh, mat4 translation, prCamera* camera,  unsigned int shaderProgram) {
+void prMeshDraw(prMeshData* mesh, mat4 translation, prCamera* camera, prShaderProgramData* shaderProgram) {
     GladGLContext* context = mesh->context;
 
     static prMaterialData defaultMaterial = {.shininess = -255.0f};
@@ -155,7 +156,7 @@ void prMeshDraw(prMeshData* mesh, mat4 translation, prCamera* camera,  unsigned 
         }
     }
 
-    context->UseProgram(shaderProgram);
+    context->UseProgram(shaderProgram->shaderProgramObject);
 
     context->BindVertexArray(mesh->VAO);
 
@@ -184,28 +185,19 @@ void prMeshDraw(prMeshData* mesh, mat4 translation, prCamera* camera,  unsigned 
         }
     }
 
-    int viewUniformLocation = context->GetUniformLocation(shaderProgram, "view");
-    context->UniformMatrix4fv(viewUniformLocation, 1, GL_FALSE, camera->view[0]);
+    prShaderProgramUniformMatrix4fv(shaderProgram, "view", camera->view[0]);
 
-    int projectionUniformLocation = context->GetUniformLocation(shaderProgram, "projection");
-    context->UniformMatrix4fv(projectionUniformLocation, 1, GL_FALSE, camera->projection[0]);
+    prShaderProgramUniformMatrix4fv(shaderProgram, "projection", camera->projection[0]);
 
-    int translationUniformLocation = context->GetUniformLocation(shaderProgram, "translation");
-    context->UniformMatrix4fv(translationUniformLocation, 1, GL_FALSE, translation[0]);
+    prShaderProgramUniformMatrix4fv(shaderProgram, "translation", translation[0]);
 
-    int cameraPositionUniformLocation = context->GetUniformLocation(shaderProgram, "cameraPosition");
-    context->Uniform3f(cameraPositionUniformLocation, camera->position[0], camera->position[1], camera->position[2]);
+    prShaderProgramUniform3f(shaderProgram, "cameraPosition", camera->position[0], camera->position[1], camera->position[2]);
 
-    int ambientUniformLocation = context->GetUniformLocation(shaderProgram, "material.ambient");
-    context->Uniform1i(ambientUniformLocation, 0);
-    int diffuseUniformLocation = context->GetUniformLocation(shaderProgram, "material.diffuse");
-    context->Uniform1i(diffuseUniformLocation, 1);
-    int specularUniformLocation = context->GetUniformLocation(shaderProgram, "material.specular");
-    context->Uniform1i(specularUniformLocation, 2);
-    int normalUniformLocation = context->GetUniformLocation(shaderProgram, "material.normal");
-    context->Uniform1i(normalUniformLocation, 3);
-    int shininessUniformLocation = context->GetUniformLocation(shaderProgram, "material.shininess");
-    context->Uniform1f(shininessUniformLocation, material->shininess);
+    prShaderProgramUniform1f(shaderProgram, "material.ambient", 0);
+    prShaderProgramUniform1f(shaderProgram, "material.diffuse", 1);
+    prShaderProgramUniform1f(shaderProgram, "material.specular", 2);
+    prShaderProgramUniform1f(shaderProgram, "material.normal", 3);
+    prShaderProgramUniform1f(shaderProgram, "material.shininess", material->shininess);
 
     context->DrawElements(GL_TRIANGLES, mesh->indicesCount, GL_UNSIGNED_INT, 0);
 

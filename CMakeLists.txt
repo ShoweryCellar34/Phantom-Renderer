@@ -6,8 +6,8 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Wall -Wextra -pedantic -fsaniti
 endif()
 
 set(POSITION_INDEPENDENT_CODE true)
-
 cmake_minimum_required(VERSION 3.20)
+
 project(Phantom-Renderer DESCRIPTION "A Basic File Resource Manager" LANGUAGES C HOMEPAGE_URL "https://github.com/ShoweryCellar34/Phantom-Renderer")
 file(GLOB source source/*.c)
 add_library(Phantom-Renderer STATIC ${source})

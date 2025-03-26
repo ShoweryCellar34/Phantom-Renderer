@@ -2,8 +2,8 @@
 
 #include <PR/shader.h>
 
-void i_prShaderProgramCreateOnGPU(prShaderProgramData* shaderProgram);
+int i_prShaderProgramUniformBoilerPlate(prShaderProgramData* shaderProgram, const char* uniformName);
 
-void i_prShaderProgramUpdateOnGPU(prShaderProgramData* shaderProgram);
+void i_prShaderProgramCreateOnGPU(prShaderProgramData* shaderProgram);
 
 void i_prShaderProgramDestroyOnGPU(prShaderProgramData* shaderProgram);
