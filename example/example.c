@@ -8,6 +8,7 @@
 
 int main(int argc, char** argv) {
     prLogSetLevel(PR_LOG_TRCE);
+    prLogSetStream(stdout);
 
     glfwInit();
 
