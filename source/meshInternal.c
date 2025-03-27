@@ -31,14 +31,14 @@ void i_prMeshComputeGPUReadyBuffer(prMeshData* mesh) {
 void i_prMeshCreateOnGPU(prMeshData* mesh) {
     mesh->context->GenVertexArrays(1, &mesh->VAO);
     if(!mesh->VAO) {
-        prError(PR_GL_ERROR, "Failed to create vertex array object. Aborting operation, nothing was modified");
+        prLogEvent(PR_OPGL_EVENT, PR_LOG_WARN, "Failed to create vertex array object. Aborting operation, nothing was modified");
         return;
     }
 
     mesh->context->GenBuffers(1, &mesh->VBO);
     if(!mesh->VBO) {
         mesh->context->DeleteVertexArrays(1, &mesh->VAO);
-        prError(PR_GL_ERROR, "Failed to create vertex buffer object. Aborting operation, nothing was modified");
+        prLogEvent(PR_OPGL_EVENT, PR_LOG_WARN, "Failed to create vertex buffer object. Aborting operation, nothing was modified");
         return;
     }
 
@@ -46,7 +46,7 @@ void i_prMeshCreateOnGPU(prMeshData* mesh) {
     if(!mesh->EBO) {
         mesh->context->DeleteVertexArrays(1, &mesh->VAO);
         mesh->context->DeleteBuffers(1, &mesh->VBO);
-        prError(PR_GL_ERROR, "Failed to create index buffer object. Aborting operation, nothing was modified");
+        prLogEvent(PR_OPGL_EVENT, PR_LOG_WARN, "Failed to create index buffer object. Aborting operation, nothing was modified");
         return;
     }
 
@@ -99,7 +99,7 @@ void i_prMeshUpdateOnGPU(prMeshData* mesh) {
 
 	mesh->context->BindVertexArray(0);
 
-    prLogInfo("[GL]", "Successfully updated vertex array object and set data");
+    prLogEvent(PR_OPGL_EVENT, PR_LOG_TRCE, "Successfully updated vertex array object and set data");
 }
 
 void i_prMeshDestroyOnGPU(prMeshData* mesh) {

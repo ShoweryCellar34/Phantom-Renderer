@@ -7,7 +7,7 @@
 void i_prTextureCreateOnGPU(prTextureData* texture) {
     texture->context->GenTextures(1, &texture->TBO);
     if(!texture->TBO) {
-        prError(PR_GL_ERROR, "Failed to create texture buffer object. Aborting operation, nothing was modified");
+        prLogEvent(PR_OPGL_EVENT, PR_LOG_WARN, "Failed to create texture buffer object. Aborting operation, nothing was modified");
         return;
     }
 
@@ -44,7 +44,7 @@ void i_prTextureCreateOnGPU(prTextureData* texture) {
 
     texture->context->BindTexture(GL_TEXTURE_2D, texture->TBO);
 
-    prLogInfo("[GL]", "Successfully created texture buffer object and set data");
+    prLogEvent(PR_OPGL_EVENT, PR_LOG_TRCE, "Successfully created texture buffer object and set data");
 }
 
 void i_prTextureUpdateOnGPU(prTextureData* texture) {

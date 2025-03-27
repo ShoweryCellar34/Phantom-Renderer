@@ -67,34 +67,34 @@ void prMeshUpdate(prMeshData* mesh, GLfloat vertices[], size_t verticesCount,
     GLuint indices[], size_t indicesCount, 
     GLfloat textureCoordinates[], size_t textureCoordinatesCount) {
     if(!verticesCount) {
-        prError(PR_INVALID_DATA_ERROR, "Vertices data count cannot be zero. Aborting operation, nothing was modified");
+        prLogEvent(PR_DATA_EVENT, PR_LOG_EROR, "Vertices data count cannot be zero. Aborting operation, nothing was modified");
         return;
     } else if(verticesCount % 3 != 0) {
-        prError(PR_INVALID_DATA_ERROR, "Vertices data count must be a multiple of 3. Aborting operation, nothing was modified");
+        prLogEvent(PR_DATA_EVENT, PR_LOG_EROR, "Vertices data count must be a multiple of 3. Aborting operation, nothing was modified");
         return;
     } else if(!vertices) {
-        prError(PR_INVALID_DATA_ERROR, "Vertices data cannot be NULL. Aborting operation, nothing was modified");
+        prLogEvent(PR_DATA_EVENT, PR_LOG_EROR, "Vertices data cannot be NULL. Aborting operation, nothing was modified");
         return;
     }
 
     if(!indicesCount) {
-        prError(PR_INVALID_DATA_ERROR, "Indices data count cannot be zero. Aborting operation, nothing was modified");
+        prLogEvent(PR_DATA_EVENT, PR_LOG_EROR, "Indices data count cannot be zero. Aborting operation, nothing was modified");
         return;
     } else if(indicesCount % 3 != 0) {
-        prError(PR_INVALID_DATA_ERROR, "Indices data count must be a multiple of 3. Aborting operation, nothing was modified");
+        prLogEvent(PR_DATA_EVENT, PR_LOG_EROR, "Indices data count must be a multiple of 3. Aborting operation, nothing was modified");
         return;
     }
     if(!indices) {
-        prError(PR_INVALID_DATA_ERROR, "Indices data cannot be NULL. Aborting operation, nothing was modified");
+        prLogEvent(PR_DATA_EVENT, PR_LOG_EROR, "Indices data cannot be NULL. Aborting operation, nothing was modified");
         return;
     }
 
     if(textureCoordinatesCount / 2 != verticesCount / 3) {
-        prError(PR_INVALID_DATA_ERROR, "Texture coordinates data not enough for every vertex. Aborting operation, nothing was modified");
+        prLogEvent(PR_DATA_EVENT, PR_LOG_EROR, "Texture coordinates data not enough for every vertex. Aborting operation, nothing was modified");
         return;
     }
     if(!textureCoordinates) {
-        prError(PR_INVALID_DATA_ERROR, "Texture coordinates data cannot be NULL. Aborting operation, nothing was modified");
+        prLogEvent(PR_DATA_EVENT, PR_LOG_EROR, "Texture coordinates data cannot be NULL. Aborting operation, nothing was modified");
         return;
     }
 
@@ -137,7 +137,7 @@ void prMeshDraw(prMeshData* mesh, mat4 translation, prCamera* camera, prShaderPr
     prMaterialData* material = mesh->material;
 
     if(!mesh->material) {
-        prLogWarning("[GL]", "Material not set, using default material");
+        prLogEvent(PR_DATA_EVENT, PR_LOG_WARN, "Material not set, using default material");
         if(defaultMaterial.shininess == -255.0f) {
             defaultMaterial.specularMap = NULL;
             defaultMaterial.ambientMap = NULL;
@@ -151,7 +151,7 @@ void prMeshDraw(prMeshData* mesh, mat4 translation, prCamera* camera, prShaderPr
 
     if(material->specularMap) {
         if(mesh->material->specularMap->context != context) {
-            prError(PR_GL_ERROR, "Material specular map context does not match mesh context. Aborting operation, nothing was modified");
+            prLogEvent(PR_DATA_EVENT, PR_LOG_EROR, "Material specular map context does not match mesh context. Aborting operation, nothing was modified");
             return;
         }
     }
@@ -185,13 +185,13 @@ void prMeshDraw(prMeshData* mesh, mat4 translation, prCamera* camera, prShaderPr
         }
     }
 
+    prShaderProgramUniform3f(shaderProgram, "cameraPosition", camera->position[0], camera->position[1], camera->position[2]);
+
     prShaderProgramUniformMatrix4fv(shaderProgram, "view", camera->view[0]);
 
     prShaderProgramUniformMatrix4fv(shaderProgram, "projection", camera->projection[0]);
 
     prShaderProgramUniformMatrix4fv(shaderProgram, "translation", translation[0]);
-
-    prShaderProgramUniform3f(shaderProgram, "cameraPosition", camera->position[0], camera->position[1], camera->position[2]);
 
     prShaderProgramUniform1f(shaderProgram, "material.ambient", 0);
     prShaderProgramUniform1f(shaderProgram, "material.diffuse", 1);

@@ -7,8 +7,7 @@
 #include "exampleFunctions.h"
 
 int main(int argc, char** argv) {
-    prSetLogLevel(PR_LOG_LEVEL_TRACE);
-    prStartFileLogging();
+    prLogSetLevel(PR_LOG_TRCE);
 
     glfwInit();
 
@@ -213,6 +212,4 @@ int main(int argc, char** argv) {
     test = NULL;
 
     glfwTerminate();
-
-    prEndFileLogging();
 }

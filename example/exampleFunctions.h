@@ -1,5 +1,6 @@
 #pragma once
 
+#include <math.h>
 #include <GLFW/glfw3.h>
 #include <PR/textureInternal.h>
 #include "exampleGlobalValues.h"
@@ -91,7 +92,7 @@ prTextureData* loadTexture(GladGLContext* context, const char* path) {
 
     FILE* textureFile = fopen(path, "rb");
     if(textureFile == NULL) {
-        prLogFatal("[USER]", "Failed to load file");
+        prLogEvent(PR_USER_EVENT, PR_LOG_EROR, "Failed to load file");
         exit(EXIT_FAILURE);
     }
 
@@ -103,7 +104,7 @@ prTextureData* loadTexture(GladGLContext* context, const char* path) {
     fclose(textureFile);
 
     prTextureLinkContext(texture, context);
-    prTextureUpdate(texture, PR_TEXTURE_WRAPPING_EDGE, textureData, textureFileSize);
+    prTextureUpdate(texture, PR_WRAPPING_EDGE, textureData, textureFileSize);
     prFree(textureData);
 
     return texture;
@@ -146,7 +147,7 @@ prTextureData* makeTextureDefault(GladGLContext* context, size_t scale) {
     }
 
     texture->textureData = prMalloc(scale * scale * 4 * sizeof(GLubyte));
-    texture->wrappingMode = PR_TEXTURE_WRAPPING_REPEAT;
+    texture->wrappingMode = PR_WRAPPING_REPEAT;
     texture->pixelated = true;
 
     for(size_t i = 0; i < scale * scale; i++) {

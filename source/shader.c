@@ -10,7 +10,7 @@
 #include <PR/memory.h>
 #include <PR/error.h>
 
-#define UNIFORM_BOILERPLATE int uniformLocation = i_prShaderProgramUniformBoilerPlate(shaderProgram, uniformName); if(uniformLocation < 0) {return;} shaderProgram->context->UseProgram(shaderProgram->shaderProgramObject)
+#define UNIFORM_BOILERPLATE int uniformLocation = i_prShaderProgramUniformBoilerPlate(shaderProgram, uniformName); if(uniformLocation < 0) {return;}
 
 prShaderProgramData* prShaderProgramCreate() {
     prShaderProgramData* shaderProgram = prMalloc(sizeof(prShaderProgramData));
@@ -43,11 +43,11 @@ void prShaderProgramLinkContext(prShaderProgramData* shaderProgram, GladGLContex
 
 void prShaderProgramUpdate(prShaderProgramData* shaderProgram, const char* vertexShader, const char* fragmentShader) {
     if(!vertexShader) {
-        prError(PR_INVALID_DATA_ERROR, "Vertex shader data cannot be NULL. Aborting operation, nothing was modified");
+        prLogEvent(PR_DATA_EVENT, PR_LOG_EROR, "Vertex shader data cannot be NULL. Aborting operation, nothing was modified");
         return;
     }
     if(!fragmentShader) {
-        prError(PR_INVALID_DATA_ERROR, "Fragment shader data cannot be NULL. Aborting operation, nothing was modified");
+        prLogEvent(PR_DATA_EVENT, PR_LOG_EROR, "Fragment shader data cannot be NULL. Aborting operation, nothing was modified");
         return;
     }
 

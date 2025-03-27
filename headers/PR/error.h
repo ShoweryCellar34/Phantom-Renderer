@@ -1,21 +1,15 @@
 #pragma once
 
-void prSetLogLevel(int level);
+#include <PR/defines.h>
 
-void prStartFileLogging();
+#include <stdio.h>
 
-void prEndFileLogging();
+void prLogSetLevel(prLogLevel_t level);
 
-void prLogRaw(const char* message);
+void prLogSetStream(FILE* stream);
 
-void prLogTrace(const char* tag, const char* message);
+void _prLog(prLogLevel_t level, const char* format, ...);
 
-void prLogInfo(const char* tag, const char* message);
+#define prLog(level, fmt, ...) _prLog(level, fmt"\n", ##__VA_ARGS__)
 
-void prLogWarning(const char* tag, const char* message);
-
-void prLogError(const char* tag, const char* message);
-
-void prLogFatal(const char* tag, const char* message);
-
-void prError(unsigned int errorType, const char* message);
+void prLogEvent(prError_t errorType, prLogLevel_t level, const char* message);

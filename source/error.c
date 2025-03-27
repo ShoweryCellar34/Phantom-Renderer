@@ -2,94 +2,88 @@
 
 #include <PR/defines.h>
 
+#include <stdarg.h>
+#include <string.h>
 #include <time.h>
-#include <stdio.h>
 
-FILE* logFile = NULL;
-int logLevel = 4;
+#define MAX_LEVELSTR_LENGTH 16
+#define MAX_TIMESTR_LENGTH 32
+#define MAX_LOGSTR_LENGTH 1024
 
-void prSetLogLevel(int level) {
-    logLevel = level;
+FILE* i_logStream = NULL;
+prLogLevel_t i_logLevel = PR_LOG_TRCE;
+
+void prLogSetLevel(prLogLevel_t level) {
+    i_logLevel = level;
 }
 
-void prStartFileLogging() {
-    if(!logFile) {
-        logFile = fopen("PR.log", "w");
+void prLogSetStream(FILE* stream) {
+    i_logStream = stream;
+}
+
+void _prLog(prLogLevel_t level, const char* format, ...) {
+    va_list arg;
+
+    if(level > i_logLevel) {
+        return;
     }
-}
 
-void prEndFileLogging() {
-    if(logFile) {
-        fclose(logFile);
+    char levelString[MAX_LEVELSTR_LENGTH];
+    switch(level) {
+        case PR_LOG_TRCE:
+            strncpy(levelString, "[TRCE]", MAX_LEVELSTR_LENGTH);
+            break;
+
+        case PR_LOG_INFO:
+            strncpy(levelString, "[INFO]", MAX_LEVELSTR_LENGTH);
+            break;
+
+        case PR_LOG_WARN:
+            strncpy(levelString, "[WARN]", MAX_LEVELSTR_LENGTH);
+            break;
+    
+        case PR_LOG_EROR:
+            strncpy(levelString, "[EROR]", MAX_LEVELSTR_LENGTH);
+            break;
+
+        case PR_LOG_FTAL:
+            strncpy(levelString, "[FTAL]", MAX_LEVELSTR_LENGTH);
+            break;
+
+        default:
+            strncpy(levelString, "[UNKW]", MAX_LEVELSTR_LENGTH);
+            break;
     }
-    logFile = NULL;
+
+    time_t timer = time(NULL);
+    struct tm* timeInfo = localtime(&timer);
+    char timeString[MAX_TIMESTR_LENGTH];
+    int bytesWritten = strftime(timeString, MAX_TIMESTR_LENGTH, "%Y-%m-%d %H:%M:%S", timeInfo);
+
+    char computedFormat[MAX_LOGSTR_LENGTH];
+    snprintf(computedFormat, MAX_LOGSTR_LENGTH, "%s%s%s", levelString, timeString, format);
+
+    va_start(arg, format);
+    vfprintf(i_logStream, computedFormat, arg);
+    va_end(arg);
 }
 
-void i_prLog(const char* level, const char* tag, const char* message) {
-    time_t timer;
-    char timeString[26];
-    struct tm* timeInfo;
-
-    timer = time(NULL);
-    timeInfo = localtime(&timer);
-
-    strftime(timeString, 26, "%Y-%m-%d %H:%M:%S", timeInfo);
-    printf("[PR]%s%s[%s] %s\n", level, tag, timeString, message);
-
-    if(logFile) {
-        fprintf(logFile, "[PR]%s%s[%s] %s\n", level, tag, timeString, message);
-    }
-}
-
-void prLogRaw(const char* message) {
-    i_prLog("", "", message);
-}
-
-void prLogTrace(const char* tag, const char* message) {
-    if(logLevel >= 4) {
-        i_prLog("[TRACE]", tag, message);
-    }
-}
-
-void prLogInfo(const char* tag, const char* message) {
-    if(logLevel >= 3) {
-        i_prLog("[INFO]", tag, message);
-    }
-}
-
-void prLogWarning(const char* tag, const char* message) {
-    if(logLevel >= 2) {
-        i_prLog("[WARNING]", tag, message);
-    }
-}
-
-void prLogError(const char* tag, const char* message) {
-    if(logLevel >= 1) {
-        i_prLog("[ERROR]", tag, message);
-    }
-}
-
-void prLogFatal(const char* tag, const char* message) {
-    if(logLevel >= 0) {
-        i_prLog("[FATAL]", tag, message);
-    }
-}
-
-void prError(unsigned int errorType, const char* message) {
+void prLogEvent(prLogLevel_t errorType, prLogLevel_t level, const char* message) {
     switch(errorType) {
-        case PR_MEMORY_ERROR:
-            prLogFatal("[MEMORY]", message);
+        case PR_MMRY_EVENT:
+            prLog(level, "[MMRY]%s", message);
             break;
 
-        case PR_INVALID_DATA_ERROR:
-            prLogWarning("[DATA]", message);
+        case PR_DATA_EVENT:
+            prLog(level, "[DATA]%s", message);
             break;
 
-        case PR_GL_ERROR:
-            prLogError("[GL]", message);
+        case PR_OPGL_EVENT:
+            prLog(level, "[OPGL]%s", message);
             break;
 
-    default:
-        break;
+        case PR_USER_EVENT:
+            prLog(level, "[USER]%s", message);
+            break;
     }
 }

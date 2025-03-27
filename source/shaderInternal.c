@@ -2,23 +2,27 @@
 
 #include <PR/defines.h>
 
+#include <string.h>
 #include <stddef.h>
 #include <stdio.h>
+#include <PR/memory.h>
 #include <PR/error.h>
 
-#define INFO_MESSAGE_LENGTH 512
-#define FAIL_MESSAGE_LENGTH 786
+#define MAX_MESSAGESTR_LENGTH 1024
 
 int i_prShaderProgramUniformBoilerPlate(prShaderProgramData* shaderProgram, const char* uniformName) {
     if(!shaderProgram->shaderProgramObject) {
-        prError(PR_GL_ERROR, "Shader not initialized. Aborting operation, nothing was modified");
+        prLogEvent(PR_OPGL_EVENT, PR_LOG_WARN, "Shader not initialized. Aborting operation, nothing was modified");
         return -1;
     }
 
     int uniformLocation = shaderProgram->context->GetUniformLocation(shaderProgram->shaderProgramObject, uniformName);
 
-    if(uniformLocation < 0) {
-        prError(PR_GL_ERROR, "No uniform found. Aborting operation, nothing was modified");
+    if(uniformLocation == -1) {
+        const char* format = "No uniform with name \"%s\" found. Aborting operation, nothing was modified";
+        char message[MAX_MESSAGESTR_LENGTH];
+        snprintf(message, MAX_MESSAGESTR_LENGTH, format, uniformName);
+        prLogEvent(PR_OPGL_EVENT, PR_LOG_WARN, message);
         return -1;
     }
 
@@ -29,8 +33,8 @@ void i_prShaderProgramCreateOnGPU(prShaderProgramData* shaderProgram) {
     GladGLContext* context = shaderProgram->context;
 
     int success;
-    char infoLog[INFO_MESSAGE_LENGTH];
-    char failMessage[FAIL_MESSAGE_LENGTH];
+    char infoLog[MAX_MESSAGESTR_LENGTH];
+    char failMessage[MAX_MESSAGESTR_LENGTH];
 
     unsigned int vertexShader = context->CreateShader(GL_VERTEX_SHADER);
     context->ShaderSource(vertexShader, 1, (const GLchar* const*)&shaderProgram->vertexShaderData, NULL);
@@ -38,10 +42,10 @@ void i_prShaderProgramCreateOnGPU(prShaderProgramData* shaderProgram) {
 
     context->GetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
     if(!success) {
-        context->GetShaderInfoLog(vertexShader, INFO_MESSAGE_LENGTH, NULL, infoLog);
-        snprintf(failMessage, FAIL_MESSAGE_LENGTH, "Vertex shader failed to compile. Aborting operation, nothing was modified: %s", infoLog);
+        context->GetShaderInfoLog(vertexShader, MAX_MESSAGESTR_LENGTH, NULL, infoLog);
+        snprintf(failMessage, MAX_MESSAGESTR_LENGTH, "Vertex shader failed to compile. Aborting operation, nothing was modified: %s", infoLog);
         context->DeleteShader(vertexShader);
-        prError(PR_GL_ERROR, failMessage);
+        prLogEvent(PR_OPGL_EVENT, PR_LOG_WARN, failMessage);
         return;
     }
 
@@ -51,11 +55,11 @@ void i_prShaderProgramCreateOnGPU(prShaderProgramData* shaderProgram) {
 
     context->GetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
     if(!success) {
-        context->GetShaderInfoLog(fragmentShader, INFO_MESSAGE_LENGTH, NULL, infoLog);
-        snprintf(failMessage, FAIL_MESSAGE_LENGTH, "Fragment shader failed to compile. Aborting operation, nothing was modified: %s", infoLog);
+        context->GetShaderInfoLog(fragmentShader, MAX_MESSAGESTR_LENGTH, NULL, infoLog);
+        snprintf(failMessage, MAX_MESSAGESTR_LENGTH, "Fragment shader failed to compile. Aborting operation, nothing was modified: %s", infoLog);
         context->DeleteShader(vertexShader);
         context->DeleteShader(fragmentShader);
-        prError(PR_GL_ERROR, failMessage);
+        prLogEvent(PR_OPGL_EVENT, PR_LOG_WARN, failMessage);
         return;
     }
 
@@ -66,12 +70,12 @@ void i_prShaderProgramCreateOnGPU(prShaderProgramData* shaderProgram) {
 
     context->GetProgramiv(shaderProgram->shaderProgramObject, GL_LINK_STATUS, &success);
     if(!success) {
-        context->GetProgramInfoLog(shaderProgram->shaderProgramObject, INFO_MESSAGE_LENGTH, NULL, infoLog);
-        snprintf(failMessage, FAIL_MESSAGE_LENGTH, "Shader program failed to link. Aborting operation, nothing was modified: %s", infoLog);
+        context->GetProgramInfoLog(shaderProgram->shaderProgramObject, MAX_MESSAGESTR_LENGTH, NULL, infoLog);
+        snprintf(failMessage, MAX_MESSAGESTR_LENGTH, "Shader program failed to link. Aborting operation, nothing was modified: %s", infoLog);
         context->DeleteShader(vertexShader);
         context->DeleteShader(fragmentShader);
         context->DeleteProgram(shaderProgram->shaderProgramObject);
-        prError(PR_GL_ERROR, failMessage);
+        prLogEvent(PR_OPGL_EVENT, PR_LOG_WARN, failMessage);
         return;
     }
 

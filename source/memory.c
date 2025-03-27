@@ -15,10 +15,10 @@ void* prMalloc(size_t size) {
     char successMessage[96];
     snprintf(successMessage, 96, "Succesfully allocated %zu bytes of memory", size);
     if(!memory) {
-        prError(PR_MEMORY_ERROR, failMessage);
+        prLogEvent(PR_MMRY_EVENT, PR_LOG_FTAL, failMessage);
         return NULL;
     } else {
-        prLogTrace("[MEMORY]", successMessage);
+        prLogEvent(PR_MMRY_EVENT, PR_LOG_TRCE, successMessage);
     }
 
     return memory;
@@ -32,10 +32,10 @@ void* prMemcpy(void* destinatonMemory, void* sourceMemory, size_t size) {
     char successMessage[96];
     snprintf(successMessage, 96, "Succesfully copied %zu bytes of memory", size);
     if(!memory) {
-        prError(PR_MEMORY_ERROR, failMessage);
+        prLogEvent(PR_MMRY_EVENT, PR_LOG_FTAL, failMessage);
         return NULL;
     } else {
-        prLogTrace("[MEMORY]", successMessage);
+        prLogEvent(PR_MMRY_EVENT, PR_LOG_TRCE, successMessage);
     }
 
     return memory;
@@ -49,10 +49,10 @@ void* prRealloc(void* sourceMemory, size_t size) {
     char successMessage[96];
     snprintf(successMessage, 96, "Succesfully reallocated %zu bytes of memory", size);
     if(!memory) {
-        prError(PR_MEMORY_ERROR, failMessage);
+        prLogEvent(PR_MMRY_EVENT, PR_LOG_FTAL, failMessage);
         return NULL;
     } else {
-        prLogTrace("[MEMORY]", successMessage);
+        prLogEvent(PR_MMRY_EVENT, PR_LOG_TRCE, successMessage);
     }
 
     return memory;
@@ -61,5 +61,5 @@ void* prRealloc(void* sourceMemory, size_t size) {
 void prFree(void* memory) {
     free(memory);
 
-    prLogTrace("[MEMORY]", "Successfully deallocated memory");
+    prLogEvent(PR_MMRY_EVENT, PR_LOG_TRCE, "Successfully deallocated memory");
 }
