@@ -65,7 +65,7 @@ void prTextureUpdate(prTextureData* texture, int wrappingMode, GLubyte rawTextur
     }
 
     if((wrappingMode != PR_WRAPPING_REPEAT) & (wrappingMode != PR_WRAPPING_REPEAT_MIRRORED) & (wrappingMode != PR_WRAPPING_EDGE) & (wrappingMode != PR_WRAPPING_COLOR)) {
-        prLogEvent(PR_DATA_EVENT, PR_LOG_WARN, "Invalid wrapping mode for texture, using repeating wrapping mode");
+        prLogEvent(PR_DATA_EVENT, PR_LOG_WARN, "Invalid wrapping mode for texture (was %i), using repeating wrapping mode", wrappingMode);
         texture->wrappingMode = PR_WRAPPING_REPEAT;
     } else {
         texture->wrappingMode = wrappingMode;

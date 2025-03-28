@@ -6,10 +6,12 @@
 
 void prLogSetLevel(prLogLevel_t level);
 
-void prLogSetStream(FILE* stream);
+void prLogSetStream(int streamCount, FILE** stream);
 
 void _prLog(prLogLevel_t level, const char* format, ...);
 
-#define prLog(level, fmt, ...) _prLog(level, fmt"\n", ##__VA_ARGS__)
+#define prLog(level, format, ...) _prLog(level, format"\n", ##__VA_ARGS__)
 
-void prLogEvent(prError_t errorType, prLogLevel_t level, const char* message);
+void _prLogEvent(prError_t errorType, prLogLevel_t level, const char* format, ...);
+
+#define prLogEvent(errorType, level, format, ...) _prLogEvent(errorType, level, format"\n", ##__VA_ARGS__)

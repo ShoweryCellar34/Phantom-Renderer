@@ -1,5 +1,6 @@
 #pragma once
 
+#define M_PI 3.14159265358979323846
 #include <math.h>
 #include <GLFW/glfw3.h>
 #include <PR/textureInternal.h>
@@ -92,7 +93,7 @@ prTextureData* loadTexture(GladGLContext* context, const char* path) {
 
     FILE* textureFile = fopen(path, "rb");
     if(textureFile == NULL) {
-        prLogEvent(PR_USER_EVENT, PR_LOG_EROR, "Failed to load file");
+        prLogEvent(PR_USER_EVENT, PR_LOG_EROR, "Failed to load file \"%s\"", path);
         exit(EXIT_FAILURE);
     }
 

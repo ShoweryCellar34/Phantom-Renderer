@@ -70,7 +70,7 @@ void prMeshUpdate(prMeshData* mesh, GLfloat vertices[], size_t verticesCount,
         prLogEvent(PR_DATA_EVENT, PR_LOG_EROR, "Vertices data count cannot be zero. Aborting operation, nothing was modified");
         return;
     } else if(verticesCount % 3 != 0) {
-        prLogEvent(PR_DATA_EVENT, PR_LOG_EROR, "Vertices data count must be a multiple of 3. Aborting operation, nothing was modified");
+        prLogEvent(PR_DATA_EVENT, PR_LOG_EROR, "Vertices data count must be a multiple of 3 (was %zu). Aborting operation, nothing was modified", verticesCount);
         return;
     } else if(!vertices) {
         prLogEvent(PR_DATA_EVENT, PR_LOG_EROR, "Vertices data cannot be NULL. Aborting operation, nothing was modified");
@@ -81,7 +81,7 @@ void prMeshUpdate(prMeshData* mesh, GLfloat vertices[], size_t verticesCount,
         prLogEvent(PR_DATA_EVENT, PR_LOG_EROR, "Indices data count cannot be zero. Aborting operation, nothing was modified");
         return;
     } else if(indicesCount % 3 != 0) {
-        prLogEvent(PR_DATA_EVENT, PR_LOG_EROR, "Indices data count must be a multiple of 3. Aborting operation, nothing was modified");
+        prLogEvent(PR_DATA_EVENT, PR_LOG_EROR, "Indices data count must be a multiple of 3 (was %zu). Aborting operation, nothing was modified", indicesCount);
         return;
     }
     if(!indices) {
@@ -90,7 +90,7 @@ void prMeshUpdate(prMeshData* mesh, GLfloat vertices[], size_t verticesCount,
     }
 
     if(textureCoordinatesCount / 2 != verticesCount / 3) {
-        prLogEvent(PR_DATA_EVENT, PR_LOG_EROR, "Texture coordinates data not enough for every vertex. Aborting operation, nothing was modified");
+        prLogEvent(PR_DATA_EVENT, PR_LOG_EROR, "Texture coordinates data not enough for every vertex (was %zu). Aborting operation, nothing was modified", textureCoordinatesCount);
         return;
     }
     if(!textureCoordinates) {

@@ -10,14 +10,16 @@
 #define MAX_TIMESTR_LENGTH 32
 #define MAX_LOGSTR_LENGTH 1024
 
-FILE* i_logStream = NULL;
+int i_logStreamCount = 0;
+FILE** i_logStream = NULL;
 prLogLevel_t i_logLevel = PR_LOG_TRCE;
 
 void prLogSetLevel(prLogLevel_t level) {
     i_logLevel = level;
 }
 
-void prLogSetStream(FILE* stream) {
+void prLogSetStream(int streamCount, FILE** stream) {
+    i_logStreamCount = streamCount;
     i_logStream = stream;
 }
 
@@ -63,27 +65,31 @@ void _prLog(prLogLevel_t level, const char* format, ...) {
     char computedFormat[MAX_LOGSTR_LENGTH];
     snprintf(computedFormat, MAX_LOGSTR_LENGTH, "%s%s%s", levelString, timeString, format);
 
-    va_start(arg, format);
-    vfprintf(i_logStream, computedFormat, arg);
-    va_end(arg);
+    for(int i = 0; i < i_logStreamCount; i++) {
+        va_start(arg, format);
+        vfprintf(i_logStream[i], computedFormat, arg);
+        va_end(arg);
+    }
 }
 
-void prLogEvent(prLogLevel_t errorType, prLogLevel_t level, const char* message) {
+void _prLogEvent(prLogLevel_t errorType, prLogLevel_t level, const char* format, ...) {
+    va_list arg;
+
     switch(errorType) {
         case PR_MMRY_EVENT:
-            prLog(level, "[MMRY]%s", message);
+            _prLog(level, "[MMRY]%s", format, arg);
             break;
 
         case PR_DATA_EVENT:
-            prLog(level, "[DATA]%s", message);
+            _prLog(level, "[DATA]%s", format, arg);
             break;
 
         case PR_OPGL_EVENT:
-            prLog(level, "[OPGL]%s", message);
+            _prLog(level, "[OPGL]%s", format, arg);
             break;
 
         case PR_USER_EVENT:
-            prLog(level, "[USER]%s", message);
+            _prLog(level, "[USER]%s", format, arg);
             break;
     }
 }

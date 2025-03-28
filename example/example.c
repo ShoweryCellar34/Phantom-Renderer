@@ -8,7 +8,8 @@
 
 int main(int argc, char** argv) {
     prLogSetLevel(PR_LOG_TRCE);
-    prLogSetStream(stdout);
+    FILE* logFile = fopen("prLog.txt", "w");
+    prLogSetStream(2, (FILE*[]){stdout, logFile});
 
     glfwInit();
 
@@ -111,7 +112,7 @@ int main(int argc, char** argv) {
     point->linear = 0.7f;
     point->quadratic = 1.8f;
     prPointLightSetPosition(point, (vec3){0.0f, 0.0f, 0.0f});
-    prPointLightSetDiffuse(point, (vec3){0.6f, 0.6f, 1.8f});
+    prPointLightSetDiffuse(point, (vec3){0.6f, 0.6f, 1.0f});
 
     prShaderProgramUniform3f(shaderProgram, "directionalLights[0].direction", sun->direction[0], sun->direction[1], sun->direction[2]);
     prShaderProgramUniform3f(shaderProgram, "directionalLights[0].ambient", sun->ambient[0], sun->ambient[1], sun->ambient[2]);
@@ -213,4 +214,7 @@ int main(int argc, char** argv) {
     test = NULL;
 
     glfwTerminate();
+
+    fclose(logFile);
+    logFile = NULL;
 }

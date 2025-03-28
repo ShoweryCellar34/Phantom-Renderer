@@ -10,15 +10,11 @@
 void* prMalloc(size_t size) {
     void* memory = malloc(size);
 
-    char failMessage[96];
-    snprintf(failMessage, 96, "Failed to allocate %zu bytes of memory", size);
-    char successMessage[96];
-    snprintf(successMessage, 96, "Succesfully allocated %zu bytes of memory", size);
     if(!memory) {
-        prLogEvent(PR_MMRY_EVENT, PR_LOG_FTAL, failMessage);
+        prLogEvent(PR_MMRY_EVENT, PR_LOG_FTAL, "Failed to allocate %zu bytes of memory", size);
         return NULL;
     } else {
-        prLogEvent(PR_MMRY_EVENT, PR_LOG_TRCE, successMessage);
+        prLogEvent(PR_MMRY_EVENT, PR_LOG_TRCE, "Succesfully allocated %zu bytes of memory", size);
     }
 
     return memory;
@@ -27,15 +23,11 @@ void* prMalloc(size_t size) {
 void* prMemcpy(void* destinatonMemory, void* sourceMemory, size_t size) {
     void* memory = memcpy(destinatonMemory, sourceMemory, size);
 
-    char failMessage[96];
-    snprintf(failMessage, 96, "Failed to copy %zu bytes of memory", size);
-    char successMessage[96];
-    snprintf(successMessage, 96, "Succesfully copied %zu bytes of memory", size);
     if(!memory) {
-        prLogEvent(PR_MMRY_EVENT, PR_LOG_FTAL, failMessage);
+        prLogEvent(PR_MMRY_EVENT, PR_LOG_FTAL, "Failed to copy %zu bytes of memory", size);
         return NULL;
     } else {
-        prLogEvent(PR_MMRY_EVENT, PR_LOG_TRCE, successMessage);
+        prLogEvent(PR_MMRY_EVENT, PR_LOG_TRCE, "Succesfully copied %zu bytes of memory", size);
     }
 
     return memory;
@@ -44,15 +36,11 @@ void* prMemcpy(void* destinatonMemory, void* sourceMemory, size_t size) {
 void* prRealloc(void* sourceMemory, size_t size) {
     void* memory = realloc(sourceMemory, size);
 
-    char failMessage[96];
-    snprintf(failMessage, 96, "Failed to reallocate %zu bytes of memory", size);
-    char successMessage[96];
-    snprintf(successMessage, 96, "Succesfully reallocated %zu bytes of memory", size);
     if(!memory) {
-        prLogEvent(PR_MMRY_EVENT, PR_LOG_FTAL, failMessage);
+        prLogEvent(PR_MMRY_EVENT, PR_LOG_FTAL, "Failed to reallocate %zu bytes of memory", size);
         return NULL;
     } else {
-        prLogEvent(PR_MMRY_EVENT, PR_LOG_TRCE, successMessage);
+        prLogEvent(PR_MMRY_EVENT, PR_LOG_TRCE, "Succesfully reallocated %zu bytes of memory", size);
     }
 
     return memory;

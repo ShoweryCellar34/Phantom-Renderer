@@ -1,7 +1,7 @@
 #pragma once
 
 const char* vertexShader = "\n\
-#version 330 core\n\
+#version 460 core\n\
 layout (location = 0) in vec3 inputPosition;\n\
 layout (location = 1) in vec2 inputTextureCoordinates;\n\
 \n\
@@ -20,7 +20,7 @@ void main() {\n\
 ";
 
 const char* fragmentShader = "\n\
-#version 330 core\n\
+#version 460 core\n\
 out vec4 fragmentColor;\n\
 \n\
 uniform vec3 cameraPosition;\n\
@@ -28,7 +28,6 @@ uniform mat4 translation;\n\
 \n\
 in vec3 fragmentPosition;\n\
 in vec2 textureCoordinates;\n\
-in mat3 TBN;\n\
 \n\
 struct Material {\n\
     sampler2D ambient;\n\
@@ -105,8 +104,6 @@ void main() {\n\
     vec3 diffuse = texture(material.diffuse, textureCoordinates).xyz;\n\
     vec3 specular = texture(material.specular, textureCoordinates).www;\n\
     vec3 normal = normalize(mat3(transpose(inverse(translation))) * texture(material.normal, textureCoordinates).xyz);\n\
-    normal = normal * 2.0 - 1.0;\n\
-    normal = normalize(TBN * normal);\n\
     \n\
     vec3 viewDirection = normalize(cameraPosition - fragmentPosition);\n\
     \n\
