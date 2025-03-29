@@ -1,7 +1,5 @@
 #pragma once
 
-#include <stddef.h>
-#include <glad/gl.h>
 #include <cglm/cglm.h>
 
 typedef struct prDirectionalLightData {

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <PR/texture.h>
+typedef struct prTextureData prTextureData;
 
 void i_prTextureCreateOnGPU(prTextureData* texture);
 

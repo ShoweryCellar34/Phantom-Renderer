@@ -4,15 +4,16 @@
 extern "C" {
 #endif
 
-#include <PR/camera.h>
-#include <PR/defines.h>
-#include <PR/error.h>
-#include <PR/light.h>
-#include <PR/memory.h>
-#include <PR/mesh.h>
-#include <PR/shader.h>
-#include <PR/texture.h>
-#include <PR/window.h>
+#include "camera.h"
+#include "defines.h"
+#include "light.h"
+#include "logger.h"
+#include "material.h"
+#include "memory.h"
+#include "mesh.h"
+#include "shader.h"
+#include "texture.h"
+#include "window.h"
 
 #ifdef __cplusplus
 }

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <PR/mesh.h>
+typedef struct prMeshData prMeshData;
 
 void i_prMeshComputeGPUReadyBuffer(prMeshData* mesh);
 

@@ -4,7 +4,7 @@
 
 #include <PR/memory.h>
 #include <PR/texture.h>
-#include <PR/error.h>
+#include <PR/logger.h>
 
 prMaterialData* prMaterialCreate() {
     prMaterialData* material = prMalloc(sizeof(prMaterialData));

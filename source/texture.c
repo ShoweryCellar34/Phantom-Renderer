@@ -10,7 +10,7 @@
 
 #include <stb_image.h>
 #include <PR/memory.h>
-#include <PR/error.h>
+#include <PR/logger.h>
 
 void prEnableImageFlip() {
     stbi_set_flip_vertically_on_load(1);
@@ -58,14 +58,14 @@ void prTextureLinkContext(prTextureData* texture, GladGLContext* context) {
 
 void prTextureUpdate(prTextureData* texture, int wrappingMode, GLubyte rawTextureData[], size_t rawTextureDataCount) {
     if(!rawTextureDataCount) {
-        prLogEvent(PR_DATA_EVENT, PR_LOG_EROR, "Texture data count cannot be zero. Aborting operation, nothing was modified");
+        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "Texture data count cannot be zero. Aborting operation, nothing was modified");
     } else if(!rawTextureData) {
-        prLogEvent(PR_DATA_EVENT, PR_LOG_EROR, "Texture data cannot be NULL. Aborting operation, nothing was modified");
+        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "Texture data cannot be NULL. Aborting operation, nothing was modified");
         return;
     }
 
     if((wrappingMode != PR_WRAPPING_REPEAT) & (wrappingMode != PR_WRAPPING_REPEAT_MIRRORED) & (wrappingMode != PR_WRAPPING_EDGE) & (wrappingMode != PR_WRAPPING_COLOR)) {
-        prLogEvent(PR_DATA_EVENT, PR_LOG_WARN, "Invalid wrapping mode for texture (was %i), using repeating wrapping mode", wrappingMode);
+        prLogEvent(PR_EVENT_DATA, PR_LOG_WARNING, "Invalid wrapping mode for texture (was %i), using repeating wrapping mode", wrappingMode);
         texture->wrappingMode = PR_WRAPPING_REPEAT;
     } else {
         texture->wrappingMode = wrappingMode;
@@ -73,7 +73,7 @@ void prTextureUpdate(prTextureData* texture, int wrappingMode, GLubyte rawTextur
 
     stbi_uc* temp = stbi_load_from_memory(rawTextureData, rawTextureDataCount, &texture->width, &texture->height, &texture->channels, 0);
     if(!temp) {
-        prLogEvent(PR_DATA_EVENT, PR_LOG_EROR, "Texture data failed to unpack. Aborting operation, nothing was modified");
+        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "Texture data failed to unpack. Aborting operation, nothing was modified");
         return;
     }
 

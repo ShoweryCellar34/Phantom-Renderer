@@ -2,7 +2,8 @@
 
 #include <glad/gl.h>
 #include <PR/memory.h>
-#include <PR/error.h>
+#include <PR/logger.h>
+#include <PR/mesh.h>
 
 void i_prMeshComputeGPUReadyBuffer(prMeshData* mesh) {
     if (mesh->GPUReadyBuffer) {
@@ -29,16 +30,18 @@ void i_prMeshComputeGPUReadyBuffer(prMeshData* mesh) {
 }
 
 void i_prMeshCreateOnGPU(prMeshData* mesh) {
+    prLogEvent(PR_EVENT_OPENGL, PR_LOG_INFO, "Creating mesh on GPU. Verticies: %i Indices: %i, Texture coordinates: %i", mesh->verticesCount, mesh->indicesCount, mesh->textureCoordinatesCount);
+
     mesh->context->GenVertexArrays(1, &mesh->VAO);
     if(!mesh->VAO) {
-        prLogEvent(PR_OPGL_EVENT, PR_LOG_WARN, "Failed to create vertex array object. Aborting operation, nothing was modified");
+        prLogEvent(PR_EVENT_OPENGL, PR_LOG_WARNING, "Failed to create vertex array object. Aborting operation, nothing was modified");
         return;
     }
 
     mesh->context->GenBuffers(1, &mesh->VBO);
     if(!mesh->VBO) {
         mesh->context->DeleteVertexArrays(1, &mesh->VAO);
-        prLogEvent(PR_OPGL_EVENT, PR_LOG_WARN, "Failed to create vertex buffer object. Aborting operation, nothing was modified");
+        prLogEvent(PR_EVENT_OPENGL, PR_LOG_WARNING, "Failed to create vertex buffer object. Aborting operation, nothing was modified");
         return;
     }
 
@@ -46,7 +49,7 @@ void i_prMeshCreateOnGPU(prMeshData* mesh) {
     if(!mesh->EBO) {
         mesh->context->DeleteVertexArrays(1, &mesh->VAO);
         mesh->context->DeleteBuffers(1, &mesh->VBO);
-        prLogEvent(PR_OPGL_EVENT, PR_LOG_WARN, "Failed to create index buffer object. Aborting operation, nothing was modified");
+        prLogEvent(PR_EVENT_OPENGL, PR_LOG_WARNING, "Failed to create index buffer object. Aborting operation, nothing was modified");
         return;
     }
 
@@ -77,6 +80,8 @@ void i_prMeshCreateOnGPU(prMeshData* mesh) {
 }
 
 void i_prMeshUpdateOnGPU(prMeshData* mesh) {
+    prLogEvent(PR_EVENT_OPENGL, PR_LOG_TRACE, "Updating mesh on GPU. Verticies: %i Indices: %i, Texture coordinates: %i", mesh->verticesCount, mesh->indicesCount, mesh->textureCoordinatesCount);
+
     i_prMeshComputeGPUReadyBuffer(mesh);
 
     int stride = 3;
@@ -99,10 +104,12 @@ void i_prMeshUpdateOnGPU(prMeshData* mesh) {
 
 	mesh->context->BindVertexArray(0);
 
-    prLogEvent(PR_OPGL_EVENT, PR_LOG_TRCE, "Successfully updated vertex array object and set data");
+    prLogEvent(PR_EVENT_OPENGL, PR_LOG_TRACE, "Successfully updated vertex array object and set data");
 }
 
 void i_prMeshDestroyOnGPU(prMeshData* mesh) {
+    prLogEvent(PR_EVENT_OPENGL, PR_LOG_TRACE, "Destroying mesh on GPU");
+
     mesh->context->DeleteVertexArrays(1, &mesh->VAO);
     mesh->context->DeleteBuffers(1, &mesh->VBO);
     mesh->context->DeleteBuffers(1, &mesh->EBO);

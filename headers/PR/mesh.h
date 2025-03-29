@@ -2,12 +2,10 @@
 
 #include <PR/defines.h>
 
-#include <stddef.h>
 #include <glad/gl.h>
 #include <cglm/cglm.h>
-#include <PR/material.h>
 
-typedef struct prTextureData prTextureData;
+typedef struct prMaterialData prMaterialData;
 typedef struct prCamera prCamera;
 typedef struct prShaderProgramData prShaderProgramData;
 

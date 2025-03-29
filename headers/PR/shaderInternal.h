@@ -1,6 +1,6 @@
 #pragma once
 
-#include <PR/shader.h>
+typedef struct prShaderProgramData prShaderProgramData;
 
 int i_prShaderProgramUniformBoilerPlate(prShaderProgramData* shaderProgram, const char* uniformName);
 

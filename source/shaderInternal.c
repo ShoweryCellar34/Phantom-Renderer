@@ -5,21 +5,21 @@
 #include <string.h>
 #include <stddef.h>
 #include <stdio.h>
+#include <glad/gl.h>
+#include <PR/shader.h>
 #include <PR/memory.h>
-#include <PR/error.h>
-
-#define MAX_MESSAGESTR_LENGTH 1024
+#include <PR/logger.h>
 
 int i_prShaderProgramUniformBoilerPlate(prShaderProgramData* shaderProgram, const char* uniformName) {
     if(!shaderProgram->shaderProgramObject) {
-        prLogEvent(PR_OPGL_EVENT, PR_LOG_WARN, "Shader not initialized. Aborting operation, nothing was modified");
+        prLogEvent(PR_EVENT_OPENGL, PR_LOG_WARNING, "Shader not initialized. Aborting operation, nothing was modified");
         return -1;
     }
 
     int uniformLocation = shaderProgram->context->GetUniformLocation(shaderProgram->shaderProgramObject, uniformName);
 
     if(uniformLocation == -1) {
-        prLogEvent(PR_OPGL_EVENT, PR_LOG_WARN, "No uniform with name \"%s\" found. Aborting operation, nothing was modified", uniformName);
+        prLogEvent(PR_EVENT_OPENGL, PR_LOG_WARNING, "No uniform with name \"%s\" found. Aborting operation, nothing was modified", uniformName);
         return -1;
     }
 
@@ -27,10 +27,12 @@ int i_prShaderProgramUniformBoilerPlate(prShaderProgramData* shaderProgram, cons
 }
 
 void i_prShaderProgramCreateOnGPU(prShaderProgramData* shaderProgram) {
+    prLogEvent(PR_EVENT_OPENGL, PR_LOG_INFO, "Creating shader program");
+
     GladGLContext* context = shaderProgram->context;
 
     int success;
-    char infoLog[MAX_MESSAGESTR_LENGTH];
+    char infoLog[PR_MAXSTR_LEN];
 
     unsigned int vertexShader = context->CreateShader(GL_VERTEX_SHADER);
     context->ShaderSource(vertexShader, 1, (const GLchar* const*)&shaderProgram->vertexShaderData, NULL);
@@ -38,9 +40,9 @@ void i_prShaderProgramCreateOnGPU(prShaderProgramData* shaderProgram) {
 
     context->GetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
     if(!success) {
-        context->GetShaderInfoLog(vertexShader, MAX_MESSAGESTR_LENGTH, NULL, infoLog);
+        context->GetShaderInfoLog(vertexShader, PR_MAXSTR_LEN, NULL, infoLog);
         context->DeleteShader(vertexShader);
-        prLogEvent(PR_OPGL_EVENT, PR_LOG_WARN, "Vertex shader failed to compile. Aborting operation, nothing was modified:\n%s", infoLog);
+        prLogEvent(PR_EVENT_OPENGL, PR_LOG_WARNING, "Vertex shader failed to compile. Aborting operation, nothing was modified:\n%s", infoLog);
         return;
     }
 
@@ -50,10 +52,10 @@ void i_prShaderProgramCreateOnGPU(prShaderProgramData* shaderProgram) {
 
     context->GetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
     if(!success) {
-        context->GetShaderInfoLog(fragmentShader, MAX_MESSAGESTR_LENGTH, NULL, infoLog);
+        context->GetShaderInfoLog(fragmentShader, PR_MAXSTR_LEN, NULL, infoLog);
         context->DeleteShader(vertexShader);
         context->DeleteShader(fragmentShader);
-        prLogEvent(PR_OPGL_EVENT, PR_LOG_WARN, "Fragment shader failed to compile. Aborting operation, nothing was modified: %s", infoLog);
+        prLogEvent(PR_EVENT_OPENGL, PR_LOG_WARNING, "Fragment shader failed to compile. Aborting operation, nothing was modified: %s", infoLog);
         return;
     }
 
@@ -64,11 +66,11 @@ void i_prShaderProgramCreateOnGPU(prShaderProgramData* shaderProgram) {
 
     context->GetProgramiv(shaderProgram->shaderProgramObject, GL_LINK_STATUS, &success);
     if(!success) {
-        context->GetProgramInfoLog(shaderProgram->shaderProgramObject, MAX_MESSAGESTR_LENGTH, NULL, infoLog);
+        context->GetProgramInfoLog(shaderProgram->shaderProgramObject, PR_MAXSTR_LEN, NULL, infoLog);
         context->DeleteShader(vertexShader);
         context->DeleteShader(fragmentShader);
         context->DeleteProgram(shaderProgram->shaderProgramObject);
-        prLogEvent(PR_OPGL_EVENT, PR_LOG_WARN, "Shader program failed to link. Aborting operation, nothing was modified: %s", infoLog);
+        prLogEvent(PR_EVENT_OPENGL, PR_LOG_WARNING, "Shader program failed to link. Aborting operation, nothing was modified: %s", infoLog);
         return;
     }
 
@@ -77,6 +79,8 @@ void i_prShaderProgramCreateOnGPU(prShaderProgramData* shaderProgram) {
 }
 
 void i_prShaderProgramDestroyOnGPU(prShaderProgramData* shaderProgram) {
+    prLogEvent(PR_EVENT_OPENGL, PR_LOG_TRACE, "Destroying shader program");
+
     shaderProgram->context->DeleteProgram(shaderProgram->shaderProgramObject);
     shaderProgram->shaderProgramObject = 0;
 }

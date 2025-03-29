@@ -1,7 +1,8 @@
 #pragma once
 
-#include <glad/gl.h>
 #include <cglm/cglm.h>
+
+typedef struct GladGLContext GladGLContext;
 
 typedef struct prCamera {
     GladGLContext* context;
@@ -20,3 +21,5 @@ void prCameraDestroy(prCamera* camera);
 void prCameraLinkContext(prCamera* camera, GladGLContext* context);
 
 void prCameraUpdate(prCamera* camera, vec3 position, vec3 rotation, float FOV, float closePlane, float farPlane);
+
+void prCameraUpdateDimentions(prCamera* camera);

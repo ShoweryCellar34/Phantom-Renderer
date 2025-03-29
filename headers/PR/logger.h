@@ -12,6 +12,6 @@ void _prLog(prLogLevel_t level, const char* format, ...);
 
 #define prLog(level, format, ...) _prLog(level, format"\n", ##__VA_ARGS__)
 
-void _prLogEvent(prError_t errorType, prLogLevel_t level, const char* format, ...);
+void _prLogEvent(prEvent_t event, prLogLevel_t level, const char* format, ...);
 
-#define prLogEvent(errorType, level, format, ...) _prLogEvent(errorType, level, format"\n", ##__VA_ARGS__)
+#define prLogEvent(event, level, format, ...) _prLogEvent(event, level, format"\n", ##__VA_ARGS__)

@@ -1,8 +1,7 @@
 #pragma once
 
-#include <glad/gl.h>
-#include <GLFW/glfw3.h>
-
+typedef struct GLFWwindow GLFWwindow;
+typedef struct GladGLContext GladGLContext;
 typedef struct prMeshData prMeshData;
 typedef struct prTextureData prTextureData;
 

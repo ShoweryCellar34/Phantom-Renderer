@@ -1,6 +1,6 @@
 #pragma once
 
-#include <glad/gl.h>
+typedef struct GladGLContext GladGLContext;
 
 typedef struct prShaderProgramData {
     GladGLContext* context;
@@ -16,6 +16,8 @@ void prShaderProgramDestroy(prShaderProgramData* shaderProgram);
 void prShaderProgramLinkContext(prShaderProgramData* shaderProgram, GladGLContext* context);
 
 void prShaderProgramUpdate(prShaderProgramData* shaderProgram, const char* vertexShader, const char* fragmentShader);
+
+void prShaderProgramUniform1i(prShaderProgramData* shaderProgram, const char* uniformName, int number);
 
 void prShaderProgramUniform1f(prShaderProgramData* shaderProgram, const char* uniformName, float number);
 

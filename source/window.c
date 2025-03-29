@@ -1,9 +1,9 @@
 #include <PR/window.h>
 
 #include <stdio.h>
+#include <glad/gl.h>
+#include <GLFW/glfw3.h>
 #include <PR/memory.h>
-#include <PR/mesh.h>
-#include <PR/texture.h>
 
 prWindow* prWindowCreate(const char* title, int width, int height) {
     prWindow* window = prMalloc(sizeof(prWindow));
@@ -23,7 +23,9 @@ void prWindowInitContext(prWindow* window) {
 }
 
 void prWindowDestroy(prWindow* window) {
-    prFree(window->openglContext);
+    if(window->openglContext) {
+        prFree(window->openglContext);
+    }
     glfwDestroyWindow(window->window);
 
     prFree(window);

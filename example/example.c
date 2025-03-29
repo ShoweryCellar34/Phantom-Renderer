@@ -1,4 +1,5 @@
 #include <PR/PR.h>
+#include <PR/helperStuffs.h>
 
 #include <stdio.h>
 #include <cglm/cglm.h>
@@ -7,7 +8,7 @@
 #include "exampleFunctions.h"
 
 int main(int argc, char** argv) {
-    prLogSetLevel(PR_LOG_TRCE);
+    prLogSetLevel(PR_LOG_TRACE);
     FILE* logFile = fopen("prLog.txt", "w");
     prLogSetStream(2, (FILE*[]){stdout, logFile});
 
@@ -19,9 +20,7 @@ int main(int argc, char** argv) {
 
     prEnableImageFlip();
 
-    prShaderProgramData* shaderProgram = prShaderProgramCreate();
-    prShaderProgramLinkContext(shaderProgram, test->openglContext);
-    prShaderProgramUpdate(shaderProgram, vertexShader, fragmentShader);
+    prShaderProgramData* shaderProgram = loadDefaultShader(test->openglContext);
 
     prTextureData* defaultTexture = makeTextureDefault(test->openglContext, 8);
 
@@ -44,21 +43,24 @@ int main(int argc, char** argv) {
     prTextureData* whiteTexture = makeTextureSingleColor(test->openglContext, (float[4]){1.0f, 1.0f, 1.0f, 1.0f});
 
     prMaterialData* materialMetal = prMaterialCreate();
-    prMaterialLinkAmbientMap(materialMetal, defaultTexture);
+    prMaterialLinkAmbientMap(materialMetal, steelTexture);
     prMaterialLinkDiffuseMap(materialMetal, steelTexture);
     prMaterialLinkSpecularMap(materialMetal, whiteTexture);
+    prMaterialLinkNormalMap(materialMetal, whiteTexture);
     materialMetal->shininess = 256.0f;
 
     prMaterialData* materialWood = prMaterialCreate();
     prMaterialLinkAmbientMap(materialWood, containerTexture);
     prMaterialLinkDiffuseMap(materialWood, containerTexture);
     prMaterialLinkSpecularMap(materialWood, blackTexture);
+    prMaterialLinkNormalMap(materialWood, whiteTexture);
     prMaterialSetShininess(materialWood, 32.0f);
 
     prMaterialData* materialWoodMetal = prMaterialCreate();
     prMaterialLinkAmbientMap(materialWoodMetal, containerMetalTexture);
     prMaterialLinkDiffuseMap(materialWoodMetal, containerMetalTexture);
     prMaterialLinkSpecularMap(materialWoodMetal, containerMetalSpecularTexture);
+    prMaterialLinkNormalMap(materialWoodMetal, whiteTexture);
     prMaterialSetShininess(materialWoodMetal, 256.0f);
 
     prMaterialData* materialBrick = prMaterialCreate();
@@ -128,7 +130,7 @@ int main(int argc, char** argv) {
     prShaderProgramUniform3f(shaderProgram, "pointLights[0].diffuse", point->diffuse[0], point->diffuse[1], point->diffuse[2]);
     prShaderProgramUniform3f(shaderProgram, "pointLights[0].specular", point->specular[0], point->specular[1], point->specular[2]);
 
-    prCamera* camera = prCameraCreate();
+    camera = prCameraCreate();
     prCameraLinkContext(camera, test->openglContext);
 
     glfwMakeContextCurrent(test->window);
@@ -155,13 +157,13 @@ int main(int argc, char** argv) {
         translationsToMatrix(translation, (vec3){0.0f, 0.0f, -3.0f}, GLM_VEC3_ZERO, (vec3){10.0f, 10.0f, 0.5f});
         prMeshDraw(meshMetal, translation, camera, shaderProgram);
 
-        translationsToMatrix(translation, (vec3){1.0f, 0.0f, 0.0f}, (vec3){0.0f, sin(radians((glfwGetTimerValue() * 5.0f) / glfwGetTimerFrequency())), 0.0f}, GLM_VEC3_ONE);
+        translationsToMatrix(translation, (vec3){1.0f, 0.0f, 0.0f}, (vec3){0.0f, sin((glfwGetTimerValue() * 0.5f) / glfwGetTimerFrequency()), 0.0f}, GLM_VEC3_ONE);
         prMeshDraw(meshWood, translation, camera, shaderProgram);
 
-        translationsToMatrix(translation, (vec3){-1.0f, 0.0f, 0.0f}, (vec3){0.0f, cos(radians((glfwGetTimerValue() * 5.0f) / glfwGetTimerFrequency())), 0.0f}, GLM_VEC3_ONE);
+        translationsToMatrix(translation, (vec3){-1.0f, 0.0f, 0.0f}, (vec3){0.0f, sin((glfwGetTimerValue() * 0.5f) / glfwGetTimerFrequency()), 0.0f}, GLM_VEC3_ONE);
         prMeshDraw(meshWoodMetal, translation, camera, shaderProgram);
 
-        translationsToMatrix(translation, (vec3){0.0f, 1.5f, 0.0f}, (vec3){0.0f, tan(radians((glfwGetTimerValue() * 5.0f) / glfwGetTimerFrequency())), 0.0f}, GLM_VEC3_ONE);
+        translationsToMatrix(translation, (vec3){0.0f, 1.5f, 0.0f}, (vec3){0.0f, cos((glfwGetTimerValue() * 0.5f) / glfwGetTimerFrequency()), 0.0f}, GLM_VEC3_ONE);
         prMeshDraw(meshBrick, translation, camera, shaderProgram);
 
         glfwSwapBuffers(test->window);

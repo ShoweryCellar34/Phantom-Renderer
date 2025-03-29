@@ -3,7 +3,6 @@
 #define M_PI 3.14159265358979323846
 #include <math.h>
 #include <GLFW/glfw3.h>
-#include <PR/textureInternal.h>
 #include "exampleGlobalValues.h"
 
 void proccessInput(GLFWwindow* window, vec3 cameraFront, vec3 cameraUp) {
@@ -59,6 +58,7 @@ void proccessInput(GLFWwindow* window, vec3 cameraFront, vec3 cameraUp) {
 void framebufferSizeCallback(GLFWwindow* window, int width, int height) {
     GladGLContext* context = glfwGetWindowUserPointer(window);
     context->Viewport(0, 0, width, height);
+    prCameraUpdateDimentions(camera);
 }
 
 void cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
@@ -86,88 +86,6 @@ void cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
     if(pitch < -89.0f) {
         pitch = -89.0f;
     }
-}
-
-prTextureData* loadTexture(GladGLContext* context, const char* path) {
-    prTextureData* texture = prTextureCreate();
-
-    FILE* textureFile = fopen(path, "rb");
-    if(textureFile == NULL) {
-        prLogEvent(PR_USER_EVENT, PR_LOG_EROR, "Failed to load file \"%s\"", path);
-        exit(EXIT_FAILURE);
-    }
-
-    fseek(textureFile, 0L, SEEK_END);
-    size_t textureFileSize = ftell(textureFile);
-    fseek(textureFile, 0L, SEEK_SET);
-    unsigned char* textureData = prMalloc(textureFileSize + 1);
-    fread(textureData, textureFileSize, 1, textureFile);
-    fclose(textureFile);
-
-    prTextureLinkContext(texture, context);
-    prTextureUpdate(texture, PR_WRAPPING_EDGE, textureData, textureFileSize);
-    prFree(textureData);
-
-    return texture;
-}
-
-prTextureData* makeTextureSingleColor(GladGLContext* context, float* color) {
-    prTextureData* texture = prTextureCreate();
-    prTextureLinkContext(texture, context);
-
-    texture->textureData = prMalloc(4 * sizeof(GLubyte));
-    texture->textureData[0] = color[0] * 255.0f;
-    texture->textureData[1] = color[1] * 255.0f;
-    texture->textureData[2] = color[2] * 255.0f;
-    texture->textureData[3] = color[3] * 255.0f;
-    texture->channels = 4;
-    texture->height = 1;
-    texture->width = 1;
-
-    i_prTextureCreateOnGPU(texture);
-
-    return texture;
-}
-
-prTextureData* makeTextureDefault(GladGLContext* context, size_t scale) {
-    prTextureData* texture = prTextureCreate();
-    prTextureLinkContext(texture, context);
-
-    bool* template = prMalloc(scale * scale * sizeof(bool));
-    for(size_t i = 0; i < scale * scale; i++) {
-        static bool offset = false;
-        if(!(i % scale) && !(scale % 2)) {
-            offset = !offset;
-        }
-
-        if((i + offset) % 2) {
-            template[i] = false;
-        } else {
-            template[i] = true;
-        }
-    }
-
-    texture->textureData = prMalloc(scale * scale * 4 * sizeof(GLubyte));
-    texture->wrappingMode = PR_WRAPPING_REPEAT;
-    texture->pixelated = true;
-
-    for(size_t i = 0; i < scale * scale; i++) {
-        size_t index = i * 4;
-        texture->textureData[index++] = (template[i] ? 255 : 0);
-        texture->textureData[index++] = 0;
-        texture->textureData[index++] = (template[i] ? 255 : 0);
-        texture->textureData[index] = 255;
-    }
-
-    prFree(template);
-
-    texture->channels = 4;
-    texture->height = scale;
-    texture->width = scale;
-
-    i_prTextureCreateOnGPU(texture);
-
-    return texture;
 }
 
 void translationsToMatrix(mat4 matrix, vec3 position, vec3 rotation, vec3 scale) {

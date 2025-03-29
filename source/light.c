@@ -2,7 +2,7 @@
 
 #include <PR/memory.h>
 #include <PR/camera.h>
-#include <PR/error.h>
+#include <PR/logger.h>
 
 prDirectionalLightData* prDirectionalLightCreate() {
     prDirectionalLightData* light = prMalloc(sizeof(prDirectionalLightData));

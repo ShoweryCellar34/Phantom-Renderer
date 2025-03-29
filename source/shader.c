@@ -7,8 +7,9 @@
 #include <stddef.h>
 #include <string.h>
 #include <stdio.h>
+#include <glad/gl.h>
 #include <PR/memory.h>
-#include <PR/error.h>
+#include <PR/logger.h>
 
 #define UNIFORM_BOILERPLATE int uniformLocation = i_prShaderProgramUniformBoilerPlate(shaderProgram, uniformName); if(uniformLocation < 0) {return;}
 
@@ -43,11 +44,11 @@ void prShaderProgramLinkContext(prShaderProgramData* shaderProgram, GladGLContex
 
 void prShaderProgramUpdate(prShaderProgramData* shaderProgram, const char* vertexShader, const char* fragmentShader) {
     if(!vertexShader) {
-        prLogEvent(PR_DATA_EVENT, PR_LOG_EROR, "Vertex shader data cannot be NULL. Aborting operation, nothing was modified");
+        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "Vertex shader data cannot be NULL. Aborting operation, nothing was modified");
         return;
     }
     if(!fragmentShader) {
-        prLogEvent(PR_DATA_EVENT, PR_LOG_EROR, "Fragment shader data cannot be NULL. Aborting operation, nothing was modified");
+        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "Fragment shader data cannot be NULL. Aborting operation, nothing was modified");
         return;
     }
 
@@ -76,6 +77,12 @@ void prShaderProgramUniform1f(prShaderProgramData* shaderProgram, const char* un
     UNIFORM_BOILERPLATE;
 
     shaderProgram->context->Uniform1f(uniformLocation, number);
+}
+
+void prShaderProgramUniform1i(prShaderProgramData* shaderProgram, const char* uniformName, int number) {
+    UNIFORM_BOILERPLATE;
+
+    shaderProgram->context->Uniform1i(uniformLocation, number);
 }
 
 void prShaderProgramUniform3f(prShaderProgramData* shaderProgram, const char* uniformName, float number1, float number2, float number3) {

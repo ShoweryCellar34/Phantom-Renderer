@@ -2,12 +2,16 @@
 
 #include <PR/defines.h>
 
-#include <PR/error.h>
+#include <glad/gl.h>
+#include <PR/logger.h>
+#include <PR/texture.h>
 
 void i_prTextureCreateOnGPU(prTextureData* texture) {
+    prLogEvent(PR_EVENT_OPENGL, PR_LOG_INFO, "Creating texture buffer object. Width: %i Height: %i Channels: %i", texture->width, texture->height, texture->channels);
+
     texture->context->GenTextures(1, &texture->TBO);
     if(!texture->TBO) {
-        prLogEvent(PR_OPGL_EVENT, PR_LOG_WARN, "Failed to create texture buffer object. Aborting operation, nothing was modified");
+        prLogEvent(PR_EVENT_OPENGL, PR_LOG_WARNING, "Failed to create texture buffer object. Aborting operation, nothing was modified");
         return;
     }
 
@@ -15,10 +19,6 @@ void i_prTextureCreateOnGPU(prTextureData* texture) {
     switch(texture->channels) {
         case 1:
             format = GL_ALPHA;
-            break;
-
-        case 2:
-            format = GL_RG;
             break;
 
         case 3:
@@ -43,8 +43,6 @@ void i_prTextureCreateOnGPU(prTextureData* texture) {
     texture->context->BindTexture(GL_TEXTURE_2D, 0);
 
     texture->context->BindTexture(GL_TEXTURE_2D, texture->TBO);
-
-    prLogEvent(PR_OPGL_EVENT, PR_LOG_TRCE, "Successfully created texture buffer object and set data");
 }
 
 void i_prTextureUpdateOnGPU(prTextureData* texture) {
@@ -60,5 +58,7 @@ void i_prTextureUpdateOnGPU(prTextureData* texture) {
 }
 
 void i_prTextureDestroyOnGPU(prTextureData* texture) {
+    prLogEvent(PR_EVENT_OPENGL, PR_LOG_TRACE, "Destroying texture buffer object");
+
     texture->context->DeleteTextures(1, &texture->TBO);
 }

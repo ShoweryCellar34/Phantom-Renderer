@@ -5,49 +5,49 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <memory.h>
-#include <PR/error.h>
+#include <PR/logger.h>
 
-void* prMalloc(size_t size) {
+void* prMalloc(memorySize_t size) {
+    prLogEvent(PR_EVENT_MEMORY, PR_LOG_TRACE, "Allocating %zu bytes of memory", size);
+
     void* memory = malloc(size);
 
     if(!memory) {
-        prLogEvent(PR_MMRY_EVENT, PR_LOG_FTAL, "Failed to allocate %zu bytes of memory", size);
+        prLogEvent(PR_EVENT_MEMORY, PR_LOG_FATAL, "Failed to allocate %zu bytes of memory", size);
         return NULL;
-    } else {
-        prLogEvent(PR_MMRY_EVENT, PR_LOG_TRCE, "Succesfully allocated %zu bytes of memory", size);
     }
 
     return memory;
 }
 
-void* prMemcpy(void* destinatonMemory, void* sourceMemory, size_t size) {
+void* prMemcpy(void* destinatonMemory, void* sourceMemory, memorySize_t size) {
+    prLogEvent(PR_EVENT_MEMORY, PR_LOG_TRACE, "Copying %zu bytes of memory", size);
+
     void* memory = memcpy(destinatonMemory, sourceMemory, size);
 
     if(!memory) {
-        prLogEvent(PR_MMRY_EVENT, PR_LOG_FTAL, "Failed to copy %zu bytes of memory", size);
+        prLogEvent(PR_EVENT_MEMORY, PR_LOG_FATAL, "Failed to copy %zu bytes of memory", size);
         return NULL;
-    } else {
-        prLogEvent(PR_MMRY_EVENT, PR_LOG_TRCE, "Succesfully copied %zu bytes of memory", size);
     }
 
     return memory;
 }
 
-void* prRealloc(void* sourceMemory, size_t size) {
+void* prRealloc(void* sourceMemory, memorySize_t size) {
+    prLogEvent(PR_EVENT_MEMORY, PR_LOG_TRACE, "Reallocating %zu bytes of memory", size);
+
     void* memory = realloc(sourceMemory, size);
 
     if(!memory) {
-        prLogEvent(PR_MMRY_EVENT, PR_LOG_FTAL, "Failed to reallocate %zu bytes of memory", size);
+        prLogEvent(PR_EVENT_MEMORY, PR_LOG_FATAL, "Failed to reallocate %zu bytes of memory", size);
         return NULL;
-    } else {
-        prLogEvent(PR_MMRY_EVENT, PR_LOG_TRCE, "Succesfully reallocated %zu bytes of memory", size);
     }
 
     return memory;
 }
 
 void prFree(void* memory) {
-    free(memory);
+    prLogEvent(PR_EVENT_MEMORY, PR_LOG_TRACE, "Deallocating memory");
 
-    prLogEvent(PR_MMRY_EVENT, PR_LOG_TRCE, "Successfully deallocated memory");
+    free(memory);
 }
