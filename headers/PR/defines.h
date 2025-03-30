@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdint.h>
+#include <stddef.h>
 
 typedef int8_t prLogLevel_t;
 typedef int8_t prEvent_t;
