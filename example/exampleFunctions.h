@@ -5,7 +5,7 @@
 #include <GLFW/glfw3.h>
 #include "exampleGlobalValues.h"
 
-void proccessInput(GLFWwindow* window, vec3 cameraFront, vec3 cameraUp) {
+void proccessInput(GLFWwindow* window) {
     mat4x3 temp;
     mat2x3 temp2;
     glm_mat4x3_zero(temp);
@@ -19,22 +19,22 @@ void proccessInput(GLFWwindow* window, vec3 cameraFront, vec3 cameraUp) {
     }
 
     if(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-        glm_vec3_scale(cameraFront, cameraSpeed, temp[0]);
+        glm_vec3_scale(camera->front, cameraSpeed, temp[0]);
         glm_vec3_add(cameraPosition, temp[0], cameraPosition);
     }
     if(glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-        glm_vec3_scale(cameraFront, cameraSpeed, temp[1]);
+        glm_vec3_scale(camera->front, cameraSpeed, temp[1]);
         glm_vec3_sub(cameraPosition, temp[1], cameraPosition);
     }
     if(glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-        glm_cross(cameraFront, cameraUp, temp[2]);
+        glm_cross(camera->front, camera->up, temp[2]);
         glm_normalize(temp[2]);
         glm_vec3_scale(temp[2], cameraSpeed, temp[2]);
         glm_vec3_sub(cameraPosition, temp[2], cameraPosition);
         // cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
     }
     if(glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-        glm_cross(cameraFront, cameraUp, temp[3]);
+        glm_cross(camera->front, camera->up, temp[3]);
         glm_normalize(temp[3]);
         glm_vec3_scale(temp[3], cameraSpeed, temp[3]);
         glm_vec3_add(cameraPosition, temp[3], cameraPosition);
@@ -42,11 +42,11 @@ void proccessInput(GLFWwindow* window, vec3 cameraFront, vec3 cameraUp) {
     }
 
     if(glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) {
-        glm_vec3_scale(cameraUp, cameraSpeed, temp2[0]);
+        glm_vec3_scale(camera->up, cameraSpeed, temp2[0]);
         glm_vec3_add(cameraPosition, temp2[0], cameraPosition);
     }
     if(glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) {
-        glm_vec3_scale(cameraUp, cameraSpeed, temp2[1]);
+        glm_vec3_scale(camera->up, cameraSpeed, temp2[1]);
         glm_vec3_sub(cameraPosition, temp2[1], cameraPosition);
     }
 
@@ -99,4 +99,8 @@ void translationsToMatrix(mat4 matrix, vec3 position, vec3 rotation, vec3 scale)
 
 float radians(float degrees) {
     return degrees * (M_PI / 180);
+}
+
+float smoothOvertime() {
+    return sin(1);
 }

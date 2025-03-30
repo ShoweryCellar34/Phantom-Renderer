@@ -90,7 +90,7 @@ void prMeshUpdate(prMeshData* mesh, GLfloat vertices[], size_t verticesCount,
         return;
     }
 
-    if(textureCoordinatesCount / 2 != verticesCount / 3) {
+    if(textureCoordinatesCount / 2 != verticesCount / 3 && textureCoordinatesCount < verticesCount) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "Texture coordinates data not enough for every vertex (was %zu). Aborting operation, nothing was modified", textureCoordinatesCount);
         return;
     }

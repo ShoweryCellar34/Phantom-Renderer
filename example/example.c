@@ -22,7 +22,7 @@ int main(int argc, char** argv) {
 
     prShaderProgramData* shaderProgram = loadDefaultShader(test->openglContext);
 
-    prTextureData* defaultTexture = makeTextureDefault(test->openglContext, 8);
+    prTextureData* defaultTexture = makeTextureCheckerboard(test->openglContext, 8, (float[4]){1.0f, 0.0f, 1.0f, 1.0f}, (float[4]){0.0f, 0.0f, 0.0f, 0.0f});
 
     prTextureData* containerTexture = loadTexture(test->openglContext, "res/container.jpg");
 
@@ -41,6 +41,9 @@ int main(int argc, char** argv) {
     prTextureData* blackTexture = makeTextureSingleColor(test->openglContext, (float[4]){0.0f, 0.0f, 0.0f, 1.0f});
 
     prTextureData* whiteTexture = makeTextureSingleColor(test->openglContext, (float[4]){1.0f, 1.0f, 1.0f, 1.0f});
+
+    prMaterialData* defaultMaterial = makeMaterialOneTexture(defaultTexture);
+    defaultMaterial->shininess = 48.0f;
 
     prMaterialData* materialMetal = prMaterialCreate();
     prMaterialLinkAmbientMap(materialMetal, steelTexture);
@@ -102,6 +105,14 @@ int main(int argc, char** argv) {
         textureCoordinates, sizeof(textureCoordinates) / sizeof(float));
     prMeshLinkMaterial(meshBrick, materialBrick);
 
+    prMeshData* meshTetrahedron = prMeshCreate();
+    prMeshLinkContext(meshTetrahedron, test->openglContext);
+    prMeshUpdate(meshTetrahedron,
+        vertices2, sizeof(vertices2)/ sizeof(float),
+        indices2, sizeof(indices2) / sizeof(unsigned int),
+        textureCoordinates2, sizeof(textureCoordinates2) / sizeof(float));
+    prMeshLinkMaterial(meshTetrahedron, defaultMaterial);
+
     test->openglContext->UseProgram(shaderProgram->shaderProgramObject);
     prDirectionalLightData* sun = prDirectionalLightCreate();
     prDirectionalLightSetDirection(sun, (vec3){-1.0f, -1.0f, -1.0f});
@@ -157,18 +168,21 @@ int main(int argc, char** argv) {
         translationsToMatrix(translation, (vec3){0.0f, 0.0f, -3.0f}, GLM_VEC3_ZERO, (vec3){10.0f, 10.0f, 0.5f});
         prMeshDraw(meshMetal, translation, camera, shaderProgram);
 
-        translationsToMatrix(translation, (vec3){1.0f, 0.0f, 0.0f}, (vec3){0.0f, sin((glfwGetTimerValue() * 0.5f) / glfwGetTimerFrequency()), 0.0f}, GLM_VEC3_ONE);
+        translationsToMatrix(translation, (vec3){1.0f, 0.0f, 0.0f}, (vec3){0.0f, smoothOvertime(), 0.0f}, GLM_VEC3_ONE);
         prMeshDraw(meshWood, translation, camera, shaderProgram);
 
-        translationsToMatrix(translation, (vec3){-1.0f, 0.0f, 0.0f}, (vec3){0.0f, sin((glfwGetTimerValue() * 0.5f) / glfwGetTimerFrequency()), 0.0f}, GLM_VEC3_ONE);
+        translationsToMatrix(translation, (vec3){-1.0f, 0.0f, 0.0f}, (vec3){0.0f, smoothOvertime(), 0.0f}, GLM_VEC3_ONE);
         prMeshDraw(meshWoodMetal, translation, camera, shaderProgram);
 
-        translationsToMatrix(translation, (vec3){0.0f, 1.5f, 0.0f}, (vec3){0.0f, cos((glfwGetTimerValue() * 0.5f) / glfwGetTimerFrequency()), 0.0f}, GLM_VEC3_ONE);
+        translationsToMatrix(translation, (vec3){0.0f, 1.5f, 0.0f}, (vec3){0.0f, smoothOvertime(), 0.0f}, GLM_VEC3_ONE);
         prMeshDraw(meshBrick, translation, camera, shaderProgram);
+
+        translationsToMatrix(translation, (vec3){0.0f, -1.5f, 0.0f}, (vec3){radians(90.0f), radians(45.0f), 0.0f}, (vec3){smoothOvertime(), smoothOvertime(), smoothOvertime()});
+        prMeshDraw(meshTetrahedron, translation, camera, shaderProgram);
 
         glfwSwapBuffers(test->window);
         glfwPollEvents();
-        proccessInput(test->window, camera->front, camera->up);
+        proccessInput(test->window);
     }
 
     prCameraDestroy(camera);
@@ -187,6 +201,8 @@ int main(int argc, char** argv) {
     materialWood = NULL;
     prMaterialDestroy(materialMetal);
     materialMetal = NULL;
+    prMaterialDestroy(defaultMaterial);
+    defaultMaterial = NULL;
 
     prTextureDestroy(whiteTexture);
     whiteTexture = NULL;

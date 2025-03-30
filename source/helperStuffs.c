@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <PR/shader.h>
+#include <PR/material.h>
 #include <PR/texture.h>
 #include <PR/textureInternal.h>
 #include <PR/logger.h>
@@ -14,6 +15,17 @@ prShaderProgramData* loadDefaultShader(GladGLContext* context) {
     prShaderProgramUpdate(shaderProgram, BASE_VERTEX_SHADER, BASE_FRAGMENT_SHADER);
 
     return shaderProgram;
+}
+
+prMaterialData* makeMaterialOneTexture(prTextureData* texture) {
+    prMaterialData* material = prMaterialCreate();
+
+    prMaterialLinkAmbientMap(material, texture);
+    prMaterialLinkDiffuseMap(material, texture);
+    prMaterialLinkSpecularMap(material, texture);
+    prMaterialLinkNormalMap(material, texture);
+
+    return material;
 }
 
 prTextureData* loadTexture(GladGLContext* context, const char* path) {
@@ -57,7 +69,7 @@ prTextureData* makeTextureSingleColor(GladGLContext* context, float* color) {
     return texture;
 }
 
-prTextureData* makeTextureDefault(GladGLContext* context, size_t scale) {
+prTextureData* makeTextureCheckerboard(GladGLContext* context, size_t scale, float* color1, float* color2) {
     prTextureData* texture = prTextureCreate();
     prTextureLinkContext(texture, context);
 
@@ -81,10 +93,10 @@ prTextureData* makeTextureDefault(GladGLContext* context, size_t scale) {
 
     for(size_t i = 0; i < scale * scale; i++) {
         size_t index = i * 4;
-        texture->textureData[index++] = (template[i] ? 255 : 0);
-        texture->textureData[index++] = 0;
-        texture->textureData[index++] = (template[i] ? 255 : 0);
-        texture->textureData[index] = 255;
+        texture->textureData[index++] = (template[i] ? color1[0] * 255 : color2[0] * 255);
+        texture->textureData[index++] = (template[i] ? color1[1] * 255 : color2[1] * 255);
+        texture->textureData[index++] = (template[i] ? color1[2] * 255 : color2[2] * 255);
+        texture->textureData[index] = (template[i] ? color1[3] * 255 : color2[3] * 255);
     }
 
     prFree(template);
