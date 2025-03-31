@@ -17,10 +17,6 @@ void i_prTextureCreateOnGPU(prTextureData* texture) {
 
     int format = GL_RGBA;
     switch(texture->channels) {
-        case 1:
-            format = GL_ALPHA;
-            break;
-
         case 3:
             format = GL_RGB;
             break;
@@ -37,6 +33,7 @@ void i_prTextureCreateOnGPU(prTextureData* texture) {
     texture->context->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, (texture->pixelated ? GL_NEAREST : GL_LINEAR));
     texture->context->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, (texture->pixelated ? GL_NEAREST : GL_LINEAR));
 
+    texture->context->PixelStorei(GL_UNPACK_ALIGNMENT, 1);
     texture->context->TexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texture->width, texture->height, 0, format, GL_UNSIGNED_BYTE, texture->textureData);
     texture->context->GenerateMipmap(GL_TEXTURE_2D);
 

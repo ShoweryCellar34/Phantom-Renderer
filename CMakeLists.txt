@@ -26,6 +26,8 @@ add_subdirectory(vendors/stb)
 target_link_libraries(Phantom-Renderer cglm glad glfw stb)
 
 if(MSVC)
+add_custom_target(delete_resources_msvc ALL COMMAND ${CMAKE_COMMAND} -E remove_directory ${PROJECT_BINARY_DIR}/$<CONFIG>/res COMMENT "Deleting old resources in binary directory")
+add_custom_target(copy_resources_msvc ALL COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}/example/res ${PROJECT_BINARY_DIR}/$<CONFIG>/res COMMENT "Copying resources into binary directory" DEPENDS delete_resources_msvc)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_CRT_SECURE_NO_WARNINGS /MP")
 add_compile_definitions(/arch:AVX2)
 endif()

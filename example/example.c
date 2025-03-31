@@ -36,7 +36,7 @@ int main(int argc, char** argv) {
 
     prTextureData* brickWallNormalTexture = loadTexture(test->openglContext, "res/brickWallNormal.tga");
 
-    prTextureData* brickWallSpecularTexture = loadTexture(test->openglContext, "res/brickWallSpecular.tga");
+    prTextureData* brickWallSpecularTexture = loadTexture(test->openglContext, "res/brickWallSpecular.png");
 
     prTextureData* blackTexture = makeTextureSingleColor(test->openglContext, (float[4]){0.0f, 0.0f, 0.0f, 1.0f});
 
@@ -44,6 +44,9 @@ int main(int argc, char** argv) {
 
     prMaterialData* defaultMaterial = makeMaterialOneTexture(defaultTexture);
     defaultMaterial->shininess = 48.0f;
+
+    prMaterialData* materialWhite = makeMaterialOneTexture(whiteTexture);
+    materialWhite->shininess = 0.0f;
 
     prMaterialData* materialMetal = prMaterialCreate();
     prMaterialLinkAmbientMap(materialMetal, steelTexture);
@@ -72,6 +75,15 @@ int main(int argc, char** argv) {
     prMaterialLinkSpecularMap(materialBrick, brickWallSpecularTexture);
     prMaterialLinkNormalMap(materialBrick, brickWallNormalTexture);
     prMaterialSetShininess(materialBrick, 32.0f);
+
+    prMeshData* meshSun = prMeshCreate();
+    prMeshLinkContext(meshSun, test->openglContext);
+    prMeshUpdate(meshSun,
+        vertices, sizeof(vertices) / sizeof(float),
+        normals, sizeof(normals) / sizeof(float),
+        textureCoordinates, sizeof(textureCoordinates) / sizeof(float),
+        indices, sizeof(indices) / sizeof(unsigned int));
+    prMeshLinkMaterial(meshSun, materialWhite);
 
     prMeshData* meshMetal = prMeshCreate();
     prMeshLinkContext(meshMetal, test->openglContext);
@@ -170,7 +182,10 @@ int main(int argc, char** argv) {
         vec3 rotation = {radians(yaw), radians(pitch), radians(0.0f)};
         prCameraUpdate(camera, cameraPosition, rotation, 45.0f, 0.001f, 10000.0f);
 
-        translationsToMatrix(translation, (vec3){0.0f, 0.0f, -3.0f}, GLM_VEC3_ZERO, (vec3){10.0f, 10.0f, 0.5f});
+        translationsToMatrix(translation, (vec3){50.0f, 50.0f, 50.0f}, GLM_VEC3_ZERO, (vec3){5.0f, 5.0f, 5.0f});
+        prMeshDraw(meshSun, translation, camera, shaderProgram);
+
+        translationsToMatrix(translation, (vec3){0.0f, 0.0f, -20.0f}, GLM_VEC3_ZERO, (vec3){30.0f, 30.0f, 5.0f});
         prMeshDraw(meshMetal, translation, camera, shaderProgram);
 
         translationsToMatrix(translation, (vec3){1.0f, 0.0f, 0.0f}, (vec3){0.0f, smoothOvertime(), 0.0f}, GLM_VEC3_ONE);
@@ -199,6 +214,8 @@ int main(int argc, char** argv) {
     meshWood = NULL;
     prMeshDestroy(meshMetal);
     meshMetal = NULL;
+    prMeshDestroy(meshSun);
+    meshSun = NULL;
     
     prMaterialDestroy(materialWoodMetal);
     materialWoodMetal = NULL;
@@ -206,6 +223,8 @@ int main(int argc, char** argv) {
     materialWood = NULL;
     prMaterialDestroy(materialMetal);
     materialMetal = NULL;
+    prMaterialDestroy(materialWhite);
+    materialWhite = NULL;
     prMaterialDestroy(defaultMaterial);
     defaultMaterial = NULL;
 

@@ -71,7 +71,7 @@ void prTextureUpdate(prTextureData* texture, int wrappingMode, GLubyte rawTextur
         texture->wrappingMode = wrappingMode;
     }
 
-    stbi_uc* temp = stbi_load_from_memory(rawTextureData, rawTextureDataCount, &texture->width, &texture->height, &texture->channels, 0);
+    unsigned char* temp = stbi_load_from_memory(rawTextureData, rawTextureDataCount, &texture->width, &texture->height, &texture->channels, 0);
     if(!temp) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "Texture data failed to unpack. Aborting operation, nothing was modified");
         return;

@@ -168,13 +168,6 @@ void prMeshDraw(prMeshData* mesh, mat4 translation, prCamera* camera, prShaderPr
         material = &defaultMaterial;
     }
 
-    if(material->specularMap) {
-        if(mesh->material->specularMap->context != context) {
-            prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "Material specular map context does not match mesh context. Aborting operation, nothing was modified");
-            return;
-        }
-    }
-
     context->UseProgram(shaderProgram->shaderProgramObject);
 
     context->BindVertexArray(mesh->VAO);
@@ -204,6 +197,12 @@ void prMeshDraw(prMeshData* mesh, mat4 translation, prCamera* camera, prShaderPr
         } else {
             context->ActiveTexture(GL_TEXTURE2);
             context->BindTexture(GL_TEXTURE_2D, 0);
+        }
+    }
+    if(material->specularMap) {
+        if(mesh->material->specularMap->context != context) {
+            prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "Material specular map context does not match mesh context. Aborting operation, nothing was modified");
+            return;
         }
     }
     if(mesh->material->normalMap) {

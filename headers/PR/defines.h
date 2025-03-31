@@ -25,6 +25,7 @@ typedef size_t memorySize_t;
 #define PR_WRAPPING_EDGE               GL_CLAMP_TO_EDGE
 #define PR_WRAPPING_COLOR              GL_CLAMP_TO_BORDER
 
+#ifndef BASE_VERTEX_SHADER
 #define BASE_VERTEX_SHADER "\n\
 #version 460 core\n\
 layout (location = 0) in vec3 inputPosition;\n\
@@ -46,7 +47,9 @@ void main() {\n\
     textureCoordinates = inputTextureCoordinates;\n\
 }\n\
 "
+#endif
 
+#ifndef BASE_FRAGMENT_SHADER
 #define BASE_FRAGMENT_SHADER "\n\
 #version 460 core\n\
 out vec4 fragmentColor;\n\
@@ -129,10 +132,12 @@ vec3 calculatePointLight(pointLight light, vec3 viewDirection, vec3 fragmentPosi
 }\n\
 \n\
 void main() {\n\
-    vec3 ambient = texture(material.ambient, textureCoordinates).xyz;\n\
-    vec3 diffuse = texture(material.diffuse, textureCoordinates).xyz;\n\
-    vec3 specular = texture(material.specular, textureCoordinates).xyz;\n\
-    vec3 normal = normalize(normals * texture(material.normal, textureCoordinates).xyz);\n\
+    vec3 ambient = texture(material.ambient, textureCoordinates).rgb;\n\
+    vec3 diffuse = texture(material.diffuse, textureCoordinates).rgb;\n\
+    vec3 specular = texture(material.specular, textureCoordinates).rgb;\n\
+    vec3 normal = texture(material.normal, textureCoordinates).rgb;\n\
+    normal = normal * 2.0 - 1.0;\n\
+    normal = normalize(normals * normal);\n\
     \n\
     vec3 viewDirection = normalize(cameraPosition - fragmentPosition);\n\
     \n\
@@ -149,3 +154,4 @@ void main() {\n\
     fragmentColor = vec4(result, 1.0);\n\
 }\n\
 "
+#endif
