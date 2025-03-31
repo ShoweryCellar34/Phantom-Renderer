@@ -11,7 +11,7 @@ void i_prMeshComputeGPUReadyBuffer(prMeshData* mesh) {
         mesh->GPUReadyBuffer = NULL;
     }
 
-    mesh->GPUReadyBufferCount = mesh->verticesCount + mesh->textureCoordinatesCount;
+    mesh->GPUReadyBufferCount = mesh->verticesCount + mesh->normalsCount + mesh->textureCoordinatesCount;
     mesh->GPUReadyBuffer = prMalloc(mesh->GPUReadyBufferCount * sizeof(GLfloat));
 
     size_t index = 0;
@@ -19,18 +19,21 @@ void i_prMeshComputeGPUReadyBuffer(prMeshData* mesh) {
         mesh->GPUReadyBuffer[index++] = mesh->vertices[i * 3];
         mesh->GPUReadyBuffer[index++] = mesh->vertices[i * 3 + 1];
         mesh->GPUReadyBuffer[index++] = mesh->vertices[i * 3 + 2];
-        // printf("Vertex %i:\n  XYZ:  %.3f, %.3f, %.3f\n", i, mesh->GPUReadyBuffer[index - 3], mesh->GPUReadyBuffer[index - 2], mesh->GPUReadyBuffer[index - 1]);
+        // printf("Vertex %i:\n    XYZ:  %.3f, %.3f, %.3f\n", i, mesh->GPUReadyBuffer[index - 3], mesh->GPUReadyBuffer[index - 2], mesh->GPUReadyBuffer[index - 1]);
 
-        if(mesh->textureCoordinatesCount) {
-            mesh->GPUReadyBuffer[index++] = mesh->textureCoordinates[i * 2];
-            mesh->GPUReadyBuffer[index++] = mesh->textureCoordinates[i * 2 + 1];
-            // printf("  UV:   %.3f, %.3f\n", mesh->GPUReadyBuffer[index - 2], mesh->GPUReadyBuffer[index - 1]);
-        }
+        mesh->GPUReadyBuffer[index++] = mesh->normals[i * 3];
+        mesh->GPUReadyBuffer[index++] = mesh->normals[i * 3 + 1];
+        mesh->GPUReadyBuffer[index++] = mesh->normals[i * 3 + 2];
+        // printf("NORMAL:  %.3f, %.3f, %.3f\n", i, mesh->GPUReadyBuffer[index - 3], mesh->GPUReadyBuffer[index - 2], mesh->GPUReadyBuffer[index - 1]);
+
+        mesh->GPUReadyBuffer[index++] = mesh->textureCoordinates[i * 2];
+        mesh->GPUReadyBuffer[index++] = mesh->textureCoordinates[i * 2 + 1];
+        // printf("    UV:   %.3f, %.3f\n", mesh->GPUReadyBuffer[index - 2], mesh->GPUReadyBuffer[index - 1]);
     }
 }
 
 void i_prMeshCreateOnGPU(prMeshData* mesh) {
-    prLogEvent(PR_EVENT_OPENGL, PR_LOG_INFO, "Creating mesh on GPU. Verticies: %i Indices: %i, Texture coordinates: %i", mesh->verticesCount, mesh->indicesCount, mesh->textureCoordinatesCount);
+    prLogEvent(PR_EVENT_OPENGL, PR_LOG_INFO, "Creating mesh on GPU. Verticies: %i Normals: %i Texture coordinates: %i Indices: %i", mesh->verticesCount, mesh->normalsCount, mesh->textureCoordinatesCount, mesh->indicesCount);
 
     mesh->context->GenVertexArrays(1, &mesh->VAO);
     if(!mesh->VAO) {
@@ -55,8 +58,7 @@ void i_prMeshCreateOnGPU(prMeshData* mesh) {
 
     i_prMeshComputeGPUReadyBuffer(mesh);
 
-    int stride = 3;
-    stride += mesh->textureCoordinatesCount ? 2 : 0;
+    int stride = 8;
 
     mesh->context->BindVertexArray(mesh->VAO);
 
@@ -69,10 +71,11 @@ void i_prMeshCreateOnGPU(prMeshData* mesh) {
     mesh->context->VertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride * sizeof(GLfloat), (void*)(0 * sizeof(GLfloat)));
     mesh->context->EnableVertexAttribArray(0);
 
-    if(mesh->textureCoordinatesCount && mesh->textureCoordinates) {
-        mesh->context->VertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, stride * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
-        mesh->context->EnableVertexAttribArray(1);
-    }
+    mesh->context->VertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
+    mesh->context->EnableVertexAttribArray(1);
+
+    mesh->context->VertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, stride * sizeof(GLfloat), (void*)(6 * sizeof(GLfloat)));
+    mesh->context->EnableVertexAttribArray(2);
 
     mesh->context->BindBuffer(GL_ARRAY_BUFFER, 0);
 
@@ -80,12 +83,11 @@ void i_prMeshCreateOnGPU(prMeshData* mesh) {
 }
 
 void i_prMeshUpdateOnGPU(prMeshData* mesh) {
-    prLogEvent(PR_EVENT_OPENGL, PR_LOG_TRACE, "Updating mesh on GPU. Verticies: %i Indices: %i, Texture coordinates: %i", mesh->verticesCount, mesh->indicesCount, mesh->textureCoordinatesCount);
+    prLogEvent(PR_EVENT_OPENGL, PR_LOG_INFO, "Updating mesh on GPU. Verticies: %i Normals: %i Texture coordinates: %i Indices: %i", mesh->verticesCount, mesh->normalsCount, mesh->textureCoordinatesCount, mesh->indicesCount);
 
     i_prMeshComputeGPUReadyBuffer(mesh);
 
-    int stride = 3;
-    stride += mesh->textureCoordinatesCount ? 2 : 0;
+    int stride = 8;
 
 	mesh->context->BindVertexArray(mesh->VAO);
 
@@ -95,12 +97,14 @@ void i_prMeshUpdateOnGPU(prMeshData* mesh) {
 	mesh->context->BindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->EBO);
 	mesh->context->BufferData(GL_ELEMENT_ARRAY_BUFFER, mesh->indicesCount, mesh->indices, GL_STATIC_DRAW);
 
-    unsigned int i = 0;
+    mesh->context->VertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride * sizeof(GLfloat), (void*)(0 * sizeof(GLfloat)));
+    mesh->context->EnableVertexAttribArray(0);
 
-    if(mesh->textureCoordinatesCount && mesh->textureCoordinates) {
-        mesh->context->VertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, stride * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
-        mesh->context->EnableVertexAttribArray(1);
-    }
+    mesh->context->VertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
+    mesh->context->EnableVertexAttribArray(1);
+
+    mesh->context->VertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, stride * sizeof(GLfloat), (void*)(6 * sizeof(GLfloat)));
+    mesh->context->EnableVertexAttribArray(2);
 
 	mesh->context->BindVertexArray(0);
 

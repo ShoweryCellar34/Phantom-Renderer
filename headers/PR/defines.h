@@ -28,9 +28,11 @@ typedef size_t memorySize_t;
 #define BASE_VERTEX_SHADER "\n\
 #version 460 core\n\
 layout (location = 0) in vec3 inputPosition;\n\
-layout (location = 1) in vec2 inputTextureCoordinates;\n\
+layout (location = 1) in vec3 inputNormals;\n\
+layout (location = 2) in vec2 inputTextureCoordinates;\n\
 \n\
 out vec3 fragmentPosition;\n\
+out vec3 normals;\n\
 out vec2 textureCoordinates;\n\
 \n\
 uniform mat4 translation;\n\
@@ -40,6 +42,7 @@ uniform mat4 projection;\n\
 void main() {\n\
     gl_Position = projection * view * translation * vec4(inputPosition, 1.0);\n\
     fragmentPosition = vec3(translation * vec4(inputPosition, 1.0));\n\
+    normals = mat3(transpose(inverse(translation))) * inputNormals;\n\
     textureCoordinates = inputTextureCoordinates;\n\
 }\n\
 "
@@ -52,6 +55,7 @@ uniform vec3 cameraPosition;\n\
 uniform mat4 translation;\n\
 \n\
 in vec3 fragmentPosition;\n\
+in vec3 normals;\n\
 in vec2 textureCoordinates;\n\
 \n\
 struct Material {\n\
@@ -128,7 +132,7 @@ void main() {\n\
     vec3 ambient = texture(material.ambient, textureCoordinates).xyz;\n\
     vec3 diffuse = texture(material.diffuse, textureCoordinates).xyz;\n\
     vec3 specular = texture(material.specular, textureCoordinates).xyz;\n\
-    vec3 normal = normalize(mat3(transpose(inverse(translation))) * texture(material.normal, textureCoordinates).xyz);\n\
+    vec3 normal = normalize(normals * texture(material.normal, textureCoordinates).xyz);\n\
     \n\
     vec3 viewDirection = normalize(cameraPosition - fragmentPosition);\n\
     \n\

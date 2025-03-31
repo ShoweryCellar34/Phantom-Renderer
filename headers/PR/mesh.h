@@ -13,9 +13,10 @@ typedef struct prMeshData {
     GladGLContext* context;
     prMaterialData* material;
     GLfloat* vertices;
+    GLfloat* normals;
     GLfloat* textureCoordinates;
     GLuint* indices;
-    GLuint verticesCount, textureCoordinatesCount, indicesCount;
+    GLuint verticesCount, normalsCount, textureCoordinatesCount, indicesCount;
     GLuint VBO, VAO, EBO;
     GLfloat* GPUReadyBuffer;
     GLuint GPUReadyBufferCount;
@@ -29,8 +30,9 @@ void prMeshLinkContext(prMeshData* mesh, GladGLContext* context);
 
 void prMeshLinkMaterial(prMeshData* mesh, prMaterialData* material);
 
-void prMeshUpdate(prMeshData* mesh, GLfloat vertices[], size_t verticesCount, 
-    GLuint indices[], size_t indicesCount, 
-    GLfloat textureCoordinates[], size_t textureCoordinatesCount);
+void prMeshUpdate(prMeshData* mesh, GLfloat vertices[], size_t verticesCount,
+    GLfloat normals[], size_t normalsCount,
+    GLfloat textureCoordinates[], size_t textureCoordinatesCount,
+    GLuint indices[], size_t indicesCount);
 
 void prMeshDraw(prMeshData* mesh, mat4 translation, prCamera* camera, prShaderProgramData* shaderProgram);

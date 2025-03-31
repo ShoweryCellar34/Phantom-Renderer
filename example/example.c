@@ -77,40 +77,45 @@ int main(int argc, char** argv) {
     prMeshLinkContext(meshMetal, test->openglContext);
     prMeshUpdate(meshMetal,
         vertices, sizeof(vertices) / sizeof(float),
-        indices, sizeof(indices) / sizeof(unsigned int),
-        textureCoordinates, sizeof(textureCoordinates) / sizeof(float));
+        normals, sizeof(normals) / sizeof(float),
+        textureCoordinates, sizeof(textureCoordinates) / sizeof(float),
+        indices, sizeof(indices) / sizeof(unsigned int));
     prMeshLinkMaterial(meshMetal, materialMetal);
 
     prMeshData* meshWood = prMeshCreate();
     prMeshLinkContext(meshWood, test->openglContext);
     prMeshUpdate(meshWood,
         vertices, sizeof(vertices) / sizeof(float),
-        indices, sizeof(indices) / sizeof(unsigned int),
-        textureCoordinates, sizeof(textureCoordinates) / sizeof(float));
+        normals, sizeof(normals) / sizeof(float),
+        textureCoordinates, sizeof(textureCoordinates) / sizeof(float),
+        indices, sizeof(indices) / sizeof(unsigned int));
     prMeshLinkMaterial(meshWood, materialWood);
 
     prMeshData* meshWoodMetal = prMeshCreate();
     prMeshLinkContext(meshWoodMetal, test->openglContext);
     prMeshUpdate(meshWoodMetal,
         vertices, sizeof(vertices) / sizeof(float),
-        indices, sizeof(indices) / sizeof(unsigned int),
-        textureCoordinates, sizeof(textureCoordinates) / sizeof(float));
+        normals, sizeof(normals) / sizeof(float),
+        textureCoordinates, sizeof(textureCoordinates) / sizeof(float),
+        indices, sizeof(indices) / sizeof(unsigned int));
     prMeshLinkMaterial(meshWoodMetal, materialWoodMetal);
 
     prMeshData* meshBrick = prMeshCreate();
     prMeshLinkContext(meshBrick, test->openglContext);
     prMeshUpdate(meshBrick,
         vertices, sizeof(vertices) / sizeof(float),
-        indices, sizeof(indices) / sizeof(unsigned int),
-        textureCoordinates, sizeof(textureCoordinates) / sizeof(float));
+        normals, sizeof(normals) / sizeof(float),
+        textureCoordinates, sizeof(textureCoordinates) / sizeof(float),
+        indices, sizeof(indices) / sizeof(unsigned int));
     prMeshLinkMaterial(meshBrick, materialBrick);
 
     prMeshData* meshTetrahedron = prMeshCreate();
     prMeshLinkContext(meshTetrahedron, test->openglContext);
     prMeshUpdate(meshTetrahedron,
-        vertices2, sizeof(vertices2)/ sizeof(float),
-        indices2, sizeof(indices2) / sizeof(unsigned int),
-        textureCoordinates2, sizeof(textureCoordinates2) / sizeof(float));
+        vertices2, sizeof(vertices2) / sizeof(float),
+        normals2, sizeof(normals2) / sizeof(float),
+        textureCoordinates2, sizeof(textureCoordinates2) / sizeof(float),
+        indices2, sizeof(indices2) / sizeof(unsigned int));
     prMeshLinkMaterial(meshTetrahedron, defaultMaterial);
 
     test->openglContext->UseProgram(shaderProgram->shaderProgramObject);

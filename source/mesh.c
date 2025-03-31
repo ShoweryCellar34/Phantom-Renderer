@@ -15,9 +15,11 @@ prMeshData* prMeshCreate() {
     mesh->context = NULL;
     mesh->material = NULL;
     mesh->vertices = NULL;
+    mesh->normals = NULL;
     mesh->textureCoordinates = NULL;
     mesh->indices = NULL;
     mesh->verticesCount = 0;
+    mesh->normalsCount = 0;
     mesh->textureCoordinatesCount = 0;
     mesh->indicesCount = 0;
     mesh->VBO = 0;
@@ -64,9 +66,10 @@ void prMeshLinkMaterial(prMeshData* mesh, prMaterialData* material) {
     mesh->material = material;
 }
 
-void prMeshUpdate(prMeshData* mesh, GLfloat vertices[], size_t verticesCount, 
-    GLuint indices[], size_t indicesCount, 
-    GLfloat textureCoordinates[], size_t textureCoordinatesCount) {
+void prMeshUpdate(prMeshData* mesh, GLfloat vertices[], size_t verticesCount,
+    GLfloat normals[], size_t normalsCount,
+    GLfloat textureCoordinates[], size_t textureCoordinatesCount,
+    GLuint indices[], size_t indicesCount) {
     if(!verticesCount) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "Vertices data count cannot be zero. Aborting operation, nothing was modified");
         return;
@@ -75,6 +78,24 @@ void prMeshUpdate(prMeshData* mesh, GLfloat vertices[], size_t verticesCount,
         return;
     } else if(!vertices) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "Vertices data cannot be NULL. Aborting operation, nothing was modified");
+        return;
+    }
+
+    if(normalsCount < verticesCount) {
+        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "Normals data not enough for every vertex (was %zu). Aborting operation, nothing was modified", normalsCount);
+        return;
+    }
+    if(!normals) {
+        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "Normals data cannot be NULL. Aborting operation, nothing was modified");
+        return;
+    }
+
+    if(textureCoordinatesCount / 2 != verticesCount / 3 && textureCoordinatesCount < verticesCount) {
+        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "Texture coordinates data not enough for every vertex (was %zu). Aborting operation, nothing was modified", textureCoordinatesCount);
+        return;
+    }
+    if(!textureCoordinates) {
+        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "Texture coordinates data cannot be NULL. Aborting operation, nothing was modified");
         return;
     }
 
@@ -90,20 +111,15 @@ void prMeshUpdate(prMeshData* mesh, GLfloat vertices[], size_t verticesCount,
         return;
     }
 
-    if(textureCoordinatesCount / 2 != verticesCount / 3 && textureCoordinatesCount < verticesCount) {
-        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "Texture coordinates data not enough for every vertex (was %zu). Aborting operation, nothing was modified", textureCoordinatesCount);
-        return;
-    }
-    if(!textureCoordinates) {
-        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "Texture coordinates data cannot be NULL. Aborting operation, nothing was modified");
-        return;
-    }
-
     if(mesh->vertices) {
         prFree(mesh->vertices);
         prFree(mesh->indices);
         mesh->vertices = NULL;
         mesh->indices = NULL;
+    }
+    if(mesh->normals) {
+        prFree(mesh->normals);
+        mesh->normals = NULL;
     }
     if(mesh->textureCoordinates) {
         prFree(mesh->textureCoordinates);
@@ -114,15 +130,17 @@ void prMeshUpdate(prMeshData* mesh, GLfloat vertices[], size_t verticesCount,
     prMemcpy(mesh->vertices, vertices, sizeof(GLfloat) * verticesCount);
     mesh->verticesCount = verticesCount;
 
+    mesh->normals = prMalloc(sizeof(GLfloat) * normalsCount);
+    prMemcpy(mesh->normals, normals, sizeof(GLfloat) * normalsCount);
+    mesh->normalsCount = normalsCount;
+
+    mesh->textureCoordinates = prMalloc(sizeof(GLfloat) * textureCoordinatesCount);
+    prMemcpy(mesh->textureCoordinates, textureCoordinates, sizeof(GLfloat) * textureCoordinatesCount);
+    mesh->textureCoordinatesCount = textureCoordinatesCount;
+
     mesh->indices = prMalloc(sizeof(GLuint) * indicesCount);
     prMemcpy(mesh->indices, indices, sizeof(GLuint) * indicesCount);
     mesh->indicesCount = indicesCount;
-
-    if(textureCoordinatesCount && textureCoordinates) {
-        mesh->textureCoordinates = prMalloc(sizeof(GLfloat) * textureCoordinatesCount);
-        prMemcpy(mesh->textureCoordinates, textureCoordinates, sizeof(GLfloat) * textureCoordinatesCount);
-    }
-    mesh->textureCoordinatesCount = textureCoordinatesCount;
 
     if(mesh->context && !mesh->VAO) {
         i_prMeshCreateOnGPU(mesh);
