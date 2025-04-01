@@ -59,21 +59,9 @@ void _prLogEvent(prEvent_t event, prLogLevel_t level, const char* format, ...) {
     char computedFormat[PR_MAXSTR_LEN];
     snprintf(computedFormat, PR_MAXSTR_LEN, "\n%s%s%s %s", levelString, i_logGetEventString(event), timeString, format);
 
-    char finalMessage[PR_MAXSTR_LEN];
-    char message[PR_MAXSTR_LEN];
-    static char lastMessage[PR_MAXSTR_LEN];
-    static size_t repeatIteration = 1;
-    va_start(arg, format);
-    vsnprintf(message, PR_MAXSTR_LEN, computedFormat, arg);
-    va_end(arg);
-    if(!strcmp(message, lastMessage)) {
-        snprintf(finalMessage, PR_MAXSTR_LEN, repeatIteration > 1 ? " x%zu" : " x%zu", repeatIteration++);
-    } else {
-        snprintf(finalMessage, PR_MAXSTR_LEN, message);
-        repeatIteration = 1;
-    }
     for(int i = 0; i < i_logStreamCount; i++) {
-        fprintf(i_logStream[i], finalMessage);
+        va_start(arg, format);
+        vfprintf(i_logStream[i], computedFormat, arg);
+        va_end(arg);
     }
-    strncpy(lastMessage, message, PR_MAXSTR_LEN);
 }
