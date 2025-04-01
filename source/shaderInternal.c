@@ -16,6 +16,7 @@ int i_prShaderProgramUniformBoilerPlate(prShaderProgramData* shaderProgram, cons
         return -1;
     }
 
+    shaderProgram->context->UseProgram(shaderProgram->shaderProgramObject);
     int uniformLocation = shaderProgram->context->GetUniformLocation(shaderProgram->shaderProgramObject, uniformName);
 
     if(uniformLocation == -1) {

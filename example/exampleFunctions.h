@@ -102,5 +102,9 @@ float radians(float degrees) {
 }
 
 float smoothOvertime() {
-    return sin(glfwGetTimerValue() / 1000.0f);
+    return (glfwGetTimerValue() * 2.5f) / 5.0f / glfwGetTimerFrequency();
+}
+
+float smoothOvertimeSin() {
+    return sin((glfwGetTimerValue() * 2.5f) / 5.0f / glfwGetTimerFrequency());
 }

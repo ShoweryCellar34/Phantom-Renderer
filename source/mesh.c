@@ -173,44 +173,34 @@ void prMeshDraw(prMeshData* mesh, mat4 translation, prCamera* camera, prShaderPr
     context->BindVertexArray(mesh->VAO);
 
     if(mesh->material->ambientMap) {
+        context->ActiveTexture(GL_TEXTURE0);
         if(mesh->material->ambientMap->TBO) {
-            context->ActiveTexture(GL_TEXTURE0);
             context->BindTexture(GL_TEXTURE_2D, mesh->material->ambientMap->TBO);
         } else {
-            context->ActiveTexture(GL_TEXTURE0);
             context->BindTexture(GL_TEXTURE_2D, 0);
         }
     }
     if(mesh->material->diffuseMap) {
+        context->ActiveTexture(GL_TEXTURE1);
         if(mesh->material->diffuseMap->TBO) {
-            context->ActiveTexture(GL_TEXTURE1);
             context->BindTexture(GL_TEXTURE_2D, mesh->material->diffuseMap->TBO);
         } else {
-            context->ActiveTexture(GL_TEXTURE1);
             context->BindTexture(GL_TEXTURE_2D, 0);
         }
     }
     if(mesh->material->specularMap) {
+        context->ActiveTexture(GL_TEXTURE2);
         if(mesh->material->specularMap->TBO) {
-            context->ActiveTexture(GL_TEXTURE2);
             context->BindTexture(GL_TEXTURE_2D, mesh->material->specularMap->TBO);
         } else {
-            context->ActiveTexture(GL_TEXTURE2);
             context->BindTexture(GL_TEXTURE_2D, 0);
         }
     }
-    if(material->specularMap) {
-        if(mesh->material->specularMap->context != context) {
-            prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "Material specular map context does not match mesh context. Aborting operation, nothing was modified");
-            return;
-        }
-    }
     if(mesh->material->normalMap) {
+        context->ActiveTexture(GL_TEXTURE3);
         if(mesh->material->normalMap->TBO) {
-            context->ActiveTexture(GL_TEXTURE3);
             context->BindTexture(GL_TEXTURE_2D, mesh->material->normalMap->TBO);
         } else {
-            context->ActiveTexture(GL_TEXTURE3);
             context->BindTexture(GL_TEXTURE_2D, 0);
         }
     }

@@ -10,7 +10,7 @@
 int main(int argc, char** argv) {
     prLogSetLevel(PR_LOG_TRACE);
     FILE* logFile = fopen("prLog.txt", "w");
-    prLogSetStream(2, (FILE*[]){stdout, logFile});
+    prLogSetStream(1, (FILE*[]){stdout, logFile});
 
     glfwInit();
 
@@ -32,6 +32,8 @@ int main(int argc, char** argv) {
 
     prTextureData* steelTexture = loadTexture(test->openglContext, "res/steel.jpg");
 
+    prTextureData* steelNormal = loadTexture(test->openglContext, "res/steelNormal.png");
+
     prTextureData* brickWallDiffuseTexture = loadTexture(test->openglContext, "res/brickWallDiffuse.tga");
 
     prTextureData* brickWallNormalTexture = loadTexture(test->openglContext, "res/brickWallNormal.tga");
@@ -52,7 +54,7 @@ int main(int argc, char** argv) {
     prMaterialLinkAmbientMap(materialMetal, steelTexture);
     prMaterialLinkDiffuseMap(materialMetal, steelTexture);
     prMaterialLinkSpecularMap(materialMetal, whiteTexture);
-    prMaterialLinkNormalMap(materialMetal, whiteTexture);
+    prMaterialLinkNormalMap(materialMetal, steelNormal);
     materialMetal->shininess = 256.0f;
 
     prMaterialData* materialWood = prMaterialCreate();
@@ -75,15 +77,6 @@ int main(int argc, char** argv) {
     prMaterialLinkSpecularMap(materialBrick, brickWallSpecularTexture);
     prMaterialLinkNormalMap(materialBrick, brickWallNormalTexture);
     prMaterialSetShininess(materialBrick, 32.0f);
-
-    prMeshData* meshSun = prMeshCreate();
-    prMeshLinkContext(meshSun, test->openglContext);
-    prMeshUpdate(meshSun,
-        vertices, sizeof(vertices) / sizeof(float),
-        normals, sizeof(normals) / sizeof(float),
-        textureCoordinates, sizeof(textureCoordinates) / sizeof(float),
-        indices, sizeof(indices) / sizeof(unsigned int));
-    prMeshLinkMaterial(meshSun, materialWhite);
 
     prMeshData* meshMetal = prMeshCreate();
     prMeshLinkContext(meshMetal, test->openglContext);
@@ -121,16 +114,15 @@ int main(int argc, char** argv) {
         indices, sizeof(indices) / sizeof(unsigned int));
     prMeshLinkMaterial(meshBrick, materialBrick);
 
-    prMeshData* meshTetrahedron = prMeshCreate();
-    prMeshLinkContext(meshTetrahedron, test->openglContext);
-    prMeshUpdate(meshTetrahedron,
-        vertices2, sizeof(vertices2) / sizeof(float),
-        normals2, sizeof(normals2) / sizeof(float),
-        textureCoordinates2, sizeof(textureCoordinates2) / sizeof(float),
-        indices2, sizeof(indices2) / sizeof(unsigned int));
-    prMeshLinkMaterial(meshTetrahedron, defaultMaterial);
+    prMeshData* meshItem = prMeshCreate();
+    prMeshLinkContext(meshItem, test->openglContext);
+    prMeshUpdate(meshItem,
+        vertices, sizeof(vertices) / sizeof(float),
+        normals, sizeof(normals) / sizeof(float),
+        textureCoordinates, sizeof(textureCoordinates) / sizeof(float),
+        indices, sizeof(indices) / sizeof(unsigned int));
+    prMeshLinkMaterial(meshItem, defaultMaterial);
 
-    test->openglContext->UseProgram(shaderProgram->shaderProgramObject);
     prDirectionalLightData* sun = prDirectionalLightCreate();
     prDirectionalLightSetDirection(sun, (vec3){-1.0f, -1.0f, -1.0f});
     prDirectionalLightSetAmbient(sun, (vec3){0.2, 0.2, 0.15});
@@ -168,6 +160,7 @@ int main(int argc, char** argv) {
 
     test->openglContext->Enable(GL_DEPTH_TEST);
     test->openglContext->Enable(GL_BLEND);
+    test->openglContext->Enable(GL_CULL_FACE);
     test->openglContext->BlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     while(!glfwWindowShouldClose(test->window)) {
@@ -182,23 +175,20 @@ int main(int argc, char** argv) {
         vec3 rotation = {radians(yaw), radians(pitch), radians(0.0f)};
         prCameraUpdate(camera, cameraPosition, rotation, 45.0f, 0.001f, 10000.0f);
 
-        translationsToMatrix(translation, (vec3){50.0f, 50.0f, 50.0f}, GLM_VEC3_ZERO, (vec3){5.0f, 5.0f, 5.0f});
-        prMeshDraw(meshSun, translation, camera, shaderProgram);
-
-        translationsToMatrix(translation, (vec3){0.0f, 0.0f, -20.0f}, GLM_VEC3_ZERO, (vec3){30.0f, 30.0f, 5.0f});
+        translationsToMatrix(translation, (vec3){0.0f, 0.0f, -20.0f}, GLM_VEC3_ZERO, (vec3){30.0f, 30.0f, 10.0f});
         prMeshDraw(meshMetal, translation, camera, shaderProgram);
 
-        translationsToMatrix(translation, (vec3){1.0f, 0.0f, 0.0f}, (vec3){0.0f, smoothOvertime(), 0.0f}, GLM_VEC3_ONE);
+        translationsToMatrix(translation, (vec3){1.0f, 0.0f, 0.0f}, (vec3){0.0f, smoothOvertimeSin(), 0.0f}, GLM_VEC3_ONE);
         prMeshDraw(meshWood, translation, camera, shaderProgram);
 
-        translationsToMatrix(translation, (vec3){-1.0f, 0.0f, 0.0f}, (vec3){0.0f, smoothOvertime(), 0.0f}, GLM_VEC3_ONE);
+        translationsToMatrix(translation, (vec3){-1.0f, 0.0f, 0.0f}, (vec3){0.0f, smoothOvertimeSin(), 0.0f}, GLM_VEC3_ONE);
         prMeshDraw(meshWoodMetal, translation, camera, shaderProgram);
 
-        translationsToMatrix(translation, (vec3){0.0f, 1.5f, 0.0f}, (vec3){0.0f, smoothOvertime(), 0.0f}, GLM_VEC3_ONE);
+        translationsToMatrix(translation, (vec3){0.0f, 1.5f, 0.0f}, (vec3){0.0f, smoothOvertimeSin(), 0.0f}, GLM_VEC3_ONE);
         prMeshDraw(meshBrick, translation, camera, shaderProgram);
 
-        translationsToMatrix(translation, (vec3){0.0f, -1.5f, 0.0f}, (vec3){radians(90.0f), radians(45.0f), 0.0f}, (vec3){smoothOvertime(), smoothOvertime(), smoothOvertime()});
-        prMeshDraw(meshTetrahedron, translation, camera, shaderProgram);
+        translationsToMatrix(translation, (vec3){0.0f, smoothOvertimeSin() / 3.5f - 1.5f, 0.0f}, (vec3){0.0f, radians(smoothOvertime() * 100.0f), 0.0f}, GLM_VEC3_ONE);
+        prMeshDraw(meshItem, translation, camera, shaderProgram);
 
         glfwSwapBuffers(test->window);
         glfwPollEvents();
@@ -214,8 +204,6 @@ int main(int argc, char** argv) {
     meshWood = NULL;
     prMeshDestroy(meshMetal);
     meshMetal = NULL;
-    prMeshDestroy(meshSun);
-    meshSun = NULL;
     
     prMaterialDestroy(materialWoodMetal);
     materialWoodMetal = NULL;

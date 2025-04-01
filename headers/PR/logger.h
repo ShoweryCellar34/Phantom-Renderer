@@ -10,8 +10,8 @@ void prLogSetStream(int streamCount, FILE** stream);
 
 void _prLog(prLogLevel_t level, const char* format, ...);
 
-#define prLog(level, format, ...) _prLog(level, format"\n", ##__VA_ARGS__)
+#define prLog(level, format, ...) _prLog(level, format, ##__VA_ARGS__)
 
 void _prLogEvent(prEvent_t event, prLogLevel_t level, const char* format, ...);
 
-#define prLogEvent(event, level, format, ...) _prLogEvent(event, level, format"\n", ##__VA_ARGS__)
+#define prLogEvent(event, level, format, ...) _prLogEvent(event, level, format, ##__VA_ARGS__)

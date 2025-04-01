@@ -135,9 +135,7 @@ void main() {\n\
     vec3 ambient = texture(material.ambient, textureCoordinates).rgb;\n\
     vec3 diffuse = texture(material.diffuse, textureCoordinates).rgb;\n\
     vec3 specular = texture(material.specular, textureCoordinates).rgb;\n\
-    vec3 normal = texture(material.normal, textureCoordinates).rgb;\n\
-    normal = normal * 2.0 - 1.0;\n\
-    normal = normalize(normals * normal);\n\
+    vec3 normal = normalize(normals);\n\
     \n\
     vec3 viewDirection = normalize(cameraPosition - fragmentPosition);\n\
     \n\
