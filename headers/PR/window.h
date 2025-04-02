@@ -15,5 +15,3 @@ prWindow* prWindowCreate(const char* title, int width, int height);
 void prWindowDestroy(prWindow* window);
 
 void prWindowInitContext(prWindow* window);
-
-void prWindowClear(GladGLContext* context);

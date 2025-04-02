@@ -10,7 +10,7 @@
 int main(int argc, char** argv) {
     prLogSetLevel(PR_LOG_TRACE);
     FILE* logFile = fopen("prLog.txt", "w");
-    prLogSetStream(1, (FILE*[]){stdout, logFile});
+    prLogSetStream(0, (FILE*[]){stdout, logFile});
 
     glfwInit();
 
@@ -21,6 +21,10 @@ int main(int argc, char** argv) {
     prEnableImageFlip();
 
     prShaderProgramData* shaderProgram = loadDefaultShader(test->openglContext);
+
+    prShaderProgramData* shaderProgram2 = prShaderProgramCreate();
+    prShaderProgramLinkContext(shaderProgram2, test->openglContext);
+    prShaderProgramUpdate(shaderProgram2, BASE_VERTEX_SHADER, OUTLINE_FRAGMENT_SHADER);
 
     prTextureData* defaultTexture = makeTextureCheckerboard(test->openglContext, 8, (float[4]){1.0f, 0.0f, 1.0f, 1.0f}, (float[4]){0.0f, 0.0f, 0.0f, 0.0f});
 
@@ -158,13 +162,18 @@ int main(int argc, char** argv) {
     glfwSetCursorPosCallback(test->window, cursorPosCallback);
     glfwSetInputMode(test->window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-    test->openglContext->Enable(GL_DEPTH_TEST);
-    test->openglContext->Enable(GL_BLEND);
+    test->openglContext->StencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
     test->openglContext->Enable(GL_CULL_FACE);
+    test->openglContext->Enable(GL_BLEND);
     test->openglContext->BlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
+    
     while(!glfwWindowShouldClose(test->window)) {
-        prWindowClear(test->openglContext);
+        test->openglContext->Enable(GL_DEPTH_TEST);
+        test->openglContext->Enable(GL_STENCIL_TEST);
+        test->openglContext->StencilFunc(GL_ALWAYS, 1, 0xFF);
+        test->openglContext->StencilMask(0xFF);
+        test->openglContext->ClearColor(0.3f, 0.5f, 0.7f, 1.0f);
+        test->openglContext->Clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
         float currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
@@ -173,22 +182,43 @@ int main(int argc, char** argv) {
         mat4 translation;
 
         vec3 rotation = {radians(yaw), radians(pitch), radians(0.0f)};
-        prCameraUpdate(camera, cameraPosition, rotation, 45.0f, 0.001f, 10000.0f);
+        prCameraUpdate(camera, cameraPosition, rotation, 45.0f, 0.1f, 100.0f);
+
+        float val = smoothOvertimeSin();
 
         translationsToMatrix(translation, (vec3){0.0f, 0.0f, -20.0f}, GLM_VEC3_ZERO, (vec3){30.0f, 30.0f, 10.0f});
         prMeshDraw(meshMetal, translation, camera, shaderProgram);
 
-        translationsToMatrix(translation, (vec3){1.0f, 0.0f, 0.0f}, (vec3){0.0f, smoothOvertimeSin(), 0.0f}, GLM_VEC3_ONE);
+        translationsToMatrix(translation, (vec3){1.0f, 0.0f, 0.0f}, (vec3){0.0f, val, 0.0f}, GLM_VEC3_ONE);
         prMeshDraw(meshWood, translation, camera, shaderProgram);
 
-        translationsToMatrix(translation, (vec3){-1.0f, 0.0f, 0.0f}, (vec3){0.0f, smoothOvertimeSin(), 0.0f}, GLM_VEC3_ONE);
+        translationsToMatrix(translation, (vec3){-1.0f, 0.0f, 0.0f}, (vec3){0.0f, val, 0.0f}, GLM_VEC3_ONE);
         prMeshDraw(meshWoodMetal, translation, camera, shaderProgram);
 
-        translationsToMatrix(translation, (vec3){0.0f, 1.5f, 0.0f}, (vec3){0.0f, smoothOvertimeSin(), 0.0f}, GLM_VEC3_ONE);
+        translationsToMatrix(translation, (vec3){0.0f, 1.5f, 0.0f}, (vec3){0.0f, val, 0.0f}, GLM_VEC3_ONE);
         prMeshDraw(meshBrick, translation, camera, shaderProgram);
 
-        translationsToMatrix(translation, (vec3){0.0f, smoothOvertimeSin() / 3.5f - 1.5f, 0.0f}, (vec3){0.0f, radians(smoothOvertime() * 100.0f), 0.0f}, GLM_VEC3_ONE);
+        translationsToMatrix(translation, (vec3){0.0f, val / 3.5f - 1.5f, 0.0f}, (vec3){0.0f, radians(val * 100.0f), 0.0f}, GLM_VEC3_ONE);
         prMeshDraw(meshItem, translation, camera, shaderProgram);
+
+        test->openglContext->StencilFunc(GL_NOTEQUAL, 1, 0xFF);
+        test->openglContext->StencilMask(0x00);
+        test->openglContext->Disable(GL_DEPTH_TEST);
+
+        translationsToMatrix(translation, (vec3){0.0f, 0.0f, -20.0f}, GLM_VEC3_ZERO, (vec3){33.0f, 33.0f, 11.0f});
+        prMeshDraw(meshMetal, translation, camera, shaderProgram2);
+
+        translationsToMatrix(translation, (vec3){1.0f, 0.0f, 0.0f}, (vec3){0.0f, val, 0.0f}, (vec3){1.1f, 1.1f, 1.1f});
+        prMeshDraw(meshWood, translation, camera, shaderProgram2);
+
+        translationsToMatrix(translation, (vec3){-1.0f, 0.0f, 0.0f}, (vec3){0.0f, val, 0.0f}, (vec3){1.1f, 1.1f, 1.1f});
+        prMeshDraw(meshWoodMetal, translation, camera, shaderProgram2);
+
+        translationsToMatrix(translation, (vec3){0.0f, 1.5f, 0.0f}, (vec3){0.0f, val, 0.0f}, (vec3){1.1f, 1.1f, 1.1f});
+        prMeshDraw(meshBrick, translation, camera, shaderProgram2);
+
+        translationsToMatrix(translation, (vec3){0.0f, val / 3.5f - 1.5f, 0.0f}, (vec3){0.0f, radians(val * 100.0f), 0.0f}, (vec3){1.1f, 1.1f, 1.1f});
+        prMeshDraw(meshItem, translation, camera, shaderProgram2);
 
         glfwSwapBuffers(test->window);
         glfwPollEvents();
@@ -237,6 +267,8 @@ int main(int argc, char** argv) {
     prTextureDestroy(defaultTexture);
     defaultTexture = NULL;
 
+    prShaderProgramDestroy(shaderProgram2);
+    shaderProgram2 = NULL;
     prShaderProgramDestroy(shaderProgram);
     shaderProgram = NULL;
 

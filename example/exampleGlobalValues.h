@@ -157,3 +157,12 @@ float pitch = 0.0f;
 float yaw = 270.0f;
 double lastX = 0.0f;
 double lastY = 0.0f;
+
+#define OUTLINE_FRAGMENT_SHADER "\
+#version 460 core\n\
+out vec4 fragmentColor;\n\
+\n\
+void main() {\n\
+    fragmentColor = vec4(0.04, 0.28, 0.26, 1.0);\n\
+}\n\
+"
