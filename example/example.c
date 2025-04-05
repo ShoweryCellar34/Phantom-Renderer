@@ -10,7 +10,7 @@
 int main(int argc, char** argv) {
     prLogSetLevel(PR_LOG_TRACE);
     FILE* logFile = fopen("prLog.txt", "w");
-    prLogSetStream(0, (FILE*[]){stdout, logFile});
+    prLogSetStream(2, (FILE*[]){stdout, logFile});
 
     glfwInit();
 
