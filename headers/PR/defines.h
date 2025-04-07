@@ -5,7 +5,6 @@
 
 typedef int8_t prLogLevel_t;
 typedef int8_t prEvent_t;
-typedef size_t memorySize_t;
 
 #define PR_MAXSTR_LEN 1024
 

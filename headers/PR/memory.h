@@ -1,11 +1,13 @@
 #pragma once
 
-#include <PR/defines.h>
+#include <stddef.h>
 
-void* prMalloc(memorySize_t size);
+void* prMalloc(size_t size);
 
-void* prMemcpy(void* destinatonMemory, void* sourceMemory, memorySize_t size);
+void* prCalloc(size_t objects, size_t size);
 
-void* prRealloc(void* sourceMemory, memorySize_t size);
+void* prRealloc(void* sourceMemory, size_t size);
+
+void* prMemcpy(void* destinatonMemory, void* sourceMemory, size_t size);
 
 void prFree(void* memory);

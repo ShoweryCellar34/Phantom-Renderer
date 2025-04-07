@@ -14,12 +14,7 @@
 #define UNIFORM_BOILERPLATE int uniformLocation = i_prShaderProgramUniformBoilerPlate(shaderProgram, uniformName); if(uniformLocation < 0) {return;}
 
 prShaderProgramData* prShaderProgramCreate() {
-    prShaderProgramData* shaderProgram = prMalloc(sizeof(prShaderProgramData));
-
-    shaderProgram->context = NULL;
-    shaderProgram->vertexShaderData = NULL;
-    shaderProgram->fragmentShaderData = NULL;
-    shaderProgram->shaderProgramObject = 0;
+    prShaderProgramData* shaderProgram = prCalloc(0, sizeof(prShaderProgramData));
 
     return shaderProgram;
 }

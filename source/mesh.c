@@ -10,23 +10,7 @@
 #include <PR/logger.h>
 
 prMeshData* prMeshCreate() {
-    prMeshData* mesh = prMalloc(sizeof(prMeshData));
-
-    mesh->context = NULL;
-    mesh->material = NULL;
-    mesh->vertices = NULL;
-    mesh->normals = NULL;
-    mesh->textureCoordinates = NULL;
-    mesh->indices = NULL;
-    mesh->verticesCount = 0;
-    mesh->normalsCount = 0;
-    mesh->textureCoordinatesCount = 0;
-    mesh->indicesCount = 0;
-    mesh->VBO = 0;
-    mesh->VAO = 0;
-    mesh->EBO = 0;
-    mesh->GPUReadyBuffer = NULL;
-    mesh->GPUReadyBufferCount = 0;
+    prMeshData* mesh = prCalloc(0, sizeof(prMeshData));
 
     return mesh;
 }

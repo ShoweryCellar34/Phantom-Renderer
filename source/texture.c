@@ -21,15 +21,9 @@ void prDisableImageFlip() {
 }
 
 prTextureData* prTextureCreate() {
-    prTextureData* texture = prMalloc(sizeof(prTextureData));
+    prTextureData* texture = prCalloc(0, sizeof(prTextureData));
 
-    texture->textureData = NULL;
     texture->wrappingMode = PR_WRAPPING_EDGE;
-    texture->pixelated = false;
-    texture->width = 0;
-    texture->height = 0;
-    texture->channels = 0;
-    texture->TBO = 0;
 
     return texture;
 }

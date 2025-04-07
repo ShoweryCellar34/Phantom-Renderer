@@ -7,13 +7,7 @@
 #include <PR/logger.h>
 
 prMaterialData* prMaterialCreate() {
-    prMaterialData* material = prMalloc(sizeof(prMaterialData));
-
-    material->ambientMap = NULL;
-    material->diffuseMap = NULL;
-    material->specularMap = NULL;
-    material->normalMap = NULL;
-    material->shininess = 0.0f;
+    prMaterialData* material = prCalloc(0, sizeof(prMaterialData));
 
     return material;
 }
