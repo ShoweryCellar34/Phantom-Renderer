@@ -7,6 +7,7 @@ typedef int8_t prLogLevel_t;
 typedef int8_t prEvent_t;
 
 #define PR_MAXSTR_LEN 1024
+#define PR_GROWTH_FACTOR 1.5
 
 #define PR_EVENT_MEMORY  0
 #define PR_EVENT_DATA    1

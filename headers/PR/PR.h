@@ -6,6 +6,7 @@ extern "C" {
 
 #include "camera.h"
 #include "defines.h"
+#include "draw.h"
 #include "light.h"
 #include "logger.h"
 #include "material.h"

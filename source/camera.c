@@ -5,7 +5,7 @@
 #include <PR/cameraInternal.h>
 
 prCamera* prCameraCreate() {
-    prCamera* camera = prCalloc(0, sizeof(prCamera));
+    prCamera* camera = prCalloc(1, sizeof(prCamera));
 
     glm_vec3_copy((vec3){0.0f, 1.0f, 0.0f}, camera->up);
 

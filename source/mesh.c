@@ -10,7 +10,7 @@
 #include <PR/logger.h>
 
 prMeshData* prMeshCreate() {
-    prMeshData* mesh = prCalloc(0, sizeof(prMeshData));
+    prMeshData* mesh = prCalloc(1, sizeof(prMeshData));
 
     return mesh;
 }

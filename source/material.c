@@ -7,7 +7,7 @@
 #include <PR/logger.h>
 
 prMaterialData* prMaterialCreate() {
-    prMaterialData* material = prCalloc(0, sizeof(prMaterialData));
+    prMaterialData* material = prCalloc(1, sizeof(prMaterialData));
 
     return material;
 }

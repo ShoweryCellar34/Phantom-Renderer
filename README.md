@@ -14,9 +14,6 @@ Run this command with [git](https://git-scm.com/) installed to clone this reposi
 
 ## How to build \(CMake required\)
 
-### MSVC warning
-The example executables resources may not properly copy to binary directory when using msvc, this will not break the library.
-
 ### [CMake](https://cmake.org/)
 1. Move into the cloned directory `cd Phantom-Renderer`.
 2. Make the build directory `mkdir build` and move into it `cd build`.
