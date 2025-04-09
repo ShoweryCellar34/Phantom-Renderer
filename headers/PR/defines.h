@@ -25,6 +25,11 @@ typedef int8_t prEvent_t;
 #define PR_WRAPPING_EDGE               GL_CLAMP_TO_EDGE
 #define PR_WRAPPING_COLOR              GL_CLAMP_TO_BORDER
 
+#define PR_COLOR                       GL_RGBA
+#define PR_DEPTH                       GL_DEPTH_COMPONENT
+#define PR_STENCIL                     GL_STENCIL_INDEX
+#define PR_DEPTH_STENCIL               GL_DEPTH24_STENCIL8
+
 #ifndef BASE_VERTEX_SHADER
 #define BASE_VERTEX_SHADER "\n\
 #version 460 core\n\

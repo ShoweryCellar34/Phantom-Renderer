@@ -20,7 +20,7 @@ int main(int argc, char** argv) {
 
     prEnableImageFlip();
 
-    prShaderProgramData* shaderProgram = loadDefaultShader(test->openglContext);
+    prShaderData* shaderProgram = loadDefaultShader(test->openglContext);
 
     prTextureData* defaultTexture = makeTextureCheckerboard(test->openglContext, 8, (float[4]){1.0f, 0.0f, 1.0f, 1.0f}, (float[4]){0.0f, 0.0f, 0.0f, 0.0f});
 
@@ -136,19 +136,19 @@ int main(int argc, char** argv) {
     prPointLightSetPosition(point, (vec3){0.0f, 0.0f, 0.0f});
     prPointLightSetDiffuse(point, (vec3){0.6f, 0.6f, 1.0f});
 
-    prShaderProgramUniform3f(shaderProgram, "directionalLights[0].direction", sun->direction[0], sun->direction[1], sun->direction[2]);
-    prShaderProgramUniform3f(shaderProgram, "directionalLights[0].ambient", sun->ambient[0], sun->ambient[1], sun->ambient[2]);
-    prShaderProgramUniform3f(shaderProgram, "directionalLights[0].diffuse", sun->diffuse[0], sun->diffuse[1], sun->diffuse[2]);
-    prShaderProgramUniform3f(shaderProgram, "directionalLights[0].specular", sun->specular[0], sun->specular[1], sun->specular[2]);
+    prShaderUniform3f(shaderProgram, "directionalLights[0].direction", sun->direction[0], sun->direction[1], sun->direction[2]);
+    prShaderUniform3f(shaderProgram, "directionalLights[0].ambient", sun->ambient[0], sun->ambient[1], sun->ambient[2]);
+    prShaderUniform3f(shaderProgram, "directionalLights[0].diffuse", sun->diffuse[0], sun->diffuse[1], sun->diffuse[2]);
+    prShaderUniform3f(shaderProgram, "directionalLights[0].specular", sun->specular[0], sun->specular[1], sun->specular[2]);
 
-    prShaderProgramUniform1f(shaderProgram, "pointLights[0].constant", point->constant);
-    prShaderProgramUniform1f(shaderProgram, "pointLights[0].linear", point->linear);
-    prShaderProgramUniform1f(shaderProgram, "pointLights[0].quadratic", point->quadratic);
+    prShaderUniform1f(shaderProgram, "pointLights[0].constant", point->constant);
+    prShaderUniform1f(shaderProgram, "pointLights[0].linear", point->linear);
+    prShaderUniform1f(shaderProgram, "pointLights[0].quadratic", point->quadratic);
 
-    prShaderProgramUniform3f(shaderProgram, "pointLights[0].position", point->position[0], point->position[1], point->position[2]);
-    prShaderProgramUniform3f(shaderProgram, "pointLights[0].ambient", point->ambient[0], point->ambient[1], point->ambient[2]);
-    prShaderProgramUniform3f(shaderProgram, "pointLights[0].diffuse", point->diffuse[0], point->diffuse[1], point->diffuse[2]);
-    prShaderProgramUniform3f(shaderProgram, "pointLights[0].specular", point->specular[0], point->specular[1], point->specular[2]);
+    prShaderUniform3f(shaderProgram, "pointLights[0].position", point->position[0], point->position[1], point->position[2]);
+    prShaderUniform3f(shaderProgram, "pointLights[0].ambient", point->ambient[0], point->ambient[1], point->ambient[2]);
+    prShaderUniform3f(shaderProgram, "pointLights[0].diffuse", point->diffuse[0], point->diffuse[1], point->diffuse[2]);
+    prShaderUniform3f(shaderProgram, "pointLights[0].specular", point->specular[0], point->specular[1], point->specular[2]);
 
     camera = prCameraCreate();
     prCameraLinkContext(camera, test->openglContext);
@@ -163,7 +163,7 @@ int main(int argc, char** argv) {
     test->openglContext->Enable(GL_CULL_FACE);
     test->openglContext->Enable(GL_BLEND);
     test->openglContext->BlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    
+
     while(!glfwWindowShouldClose(test->window)) {
         test->openglContext->Clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -240,7 +240,7 @@ int main(int argc, char** argv) {
     prTextureDestroy(defaultTexture);
     defaultTexture = NULL;
 
-    prShaderProgramDestroy(shaderProgram);
+    prShaderDestroy(shaderProgram);
     shaderProgram = NULL;
 
     prWindowDestroy(test);

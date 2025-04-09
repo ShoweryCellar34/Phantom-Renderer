@@ -11,39 +11,39 @@
 #include <PR/memory.h>
 #include <PR/logger.h>
 
-#define UNIFORM_BOILERPLATE int uniformLocation = i_prShaderProgramUniformBoilerPlate(shaderProgram, uniformName); if(uniformLocation < 0) {return;}
+#define UNIFORM_BOILERPLATE int uniformLocation = i_prShaderUniformBoilerPlate(shaderProgram, uniformName); if(uniformLocation < 0) {return;}
 
-prShaderProgramData* prShaderProgramCreate() {
-    prShaderProgramData* shaderProgram = prCalloc(1, sizeof(prShaderProgramData));
+prShaderData* prShaderCreate() {
+    prShaderData* shaderProgram = prCalloc(1, sizeof(prShaderData));
 
     return shaderProgram;
 }
 
-void prShaderProgramDestroy(prShaderProgramData* shaderProgram) {
+void prShaderDestroy(prShaderData* shaderProgram) {
     if(shaderProgram->shaderProgramObject) {
-        i_prShaderProgramDestroyOnGPU(shaderProgram);
+        i_prShaderDestroyOnGPU(shaderProgram);
     }
 
     prFree(shaderProgram);
 }
 
-void prShaderProgramLinkContext(prShaderProgramData* shaderProgram, GladGLContext* context) {
+void prShaderLinkContext(prShaderData* shaderProgram, GladGLContext* context) {
     if(shaderProgram->context && shaderProgram->shaderProgramObject) {
-        i_prShaderProgramDestroyOnGPU(shaderProgram);
+        i_prShaderDestroyOnGPU(shaderProgram);
     }
     shaderProgram->context = context;
     if(shaderProgram->context && shaderProgram->vertexShaderData) {
-        i_prShaderProgramCreateOnGPU(shaderProgram);
+        i_prShaderCreateOnGPU(shaderProgram);
     }
 }
 
-void prShaderProgramUpdate(prShaderProgramData* shaderProgram, const char* vertexShader, const char* fragmentShader) {
+void prShaderUpdate(prShaderData* shaderProgram, const char* vertexShader, const char* fragmentShader) {
     if(!vertexShader) {
-        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "Vertex shader data cannot be NULL. Aborting operation, nothing was modified");
+        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prShaderUpdate: Vertex shader data cannot be NULL. Aborting operation, nothing was modified");
         return;
     }
     if(!fragmentShader) {
-        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "Fragment shader data cannot be NULL. Aborting operation, nothing was modified");
+        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prShaderUpdate: Fragment shader data cannot be NULL. Aborting operation, nothing was modified");
         return;
     }
 
@@ -61,32 +61,32 @@ void prShaderProgramUpdate(prShaderProgramData* shaderProgram, const char* verte
     prMemcpy(shaderProgram->fragmentShaderData, (void*)fragmentShader, strlen(fragmentShader) + 1);
 
     if(shaderProgram->context && !shaderProgram->shaderProgramObject) {
-        i_prShaderProgramCreateOnGPU(shaderProgram);
+        i_prShaderCreateOnGPU(shaderProgram);
     } else if(shaderProgram->context) {
-        i_prShaderProgramDestroyOnGPU(shaderProgram);
-        i_prShaderProgramCreateOnGPU(shaderProgram);
+        i_prShaderDestroyOnGPU(shaderProgram);
+        i_prShaderCreateOnGPU(shaderProgram);
     }
 }
 
-void prShaderProgramUniform1f(prShaderProgramData* shaderProgram, const char* uniformName, float number) {
+void prShaderUniform1f(prShaderData* shaderProgram, const char* uniformName, float number) {
     UNIFORM_BOILERPLATE;
 
     shaderProgram->context->Uniform1f(uniformLocation, number);
 }
 
-void prShaderProgramUniform1i(prShaderProgramData* shaderProgram, const char* uniformName, int number) {
+void prShaderUniform1i(prShaderData* shaderProgram, const char* uniformName, int number) {
     UNIFORM_BOILERPLATE;
 
     shaderProgram->context->Uniform1i(uniformLocation, number);
 }
 
-void prShaderProgramUniform3f(prShaderProgramData* shaderProgram, const char* uniformName, float number1, float number2, float number3) {
+void prShaderUniform3f(prShaderData* shaderProgram, const char* uniformName, float number1, float number2, float number3) {
     UNIFORM_BOILERPLATE;
 
     shaderProgram->context->Uniform3f(uniformLocation, number1, number2, number3);
 }
 
-void prShaderProgramUniformMatrix4fv(prShaderProgramData* shaderProgram, const char* uniformName, float* number) {
+void prShaderUniformMatrix4fv(prShaderData* shaderProgram, const char* uniformName, float* number) {
     UNIFORM_BOILERPLATE;
 
     shaderProgram->context->UniformMatrix4fv(uniformLocation, 1, GL_FALSE, number);

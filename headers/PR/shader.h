@@ -2,25 +2,25 @@
 
 typedef struct GladGLContext GladGLContext;
 
-typedef struct prShaderProgramData {
+typedef struct prShaderData {
     GladGLContext* context;
     char* vertexShaderData;
     char* fragmentShaderData;
     unsigned int shaderProgramObject;
-} prShaderProgramData;
+} prShaderData;
 
-prShaderProgramData* prShaderProgramCreate();
+prShaderData* prShaderCreate();
 
-void prShaderProgramDestroy(prShaderProgramData* shaderProgram);
+void prShaderDestroy(prShaderData* shaderProgram);
 
-void prShaderProgramLinkContext(prShaderProgramData* shaderProgram, GladGLContext* context);
+void prShaderLinkContext(prShaderData* shaderProgram, GladGLContext* context);
 
-void prShaderProgramUpdate(prShaderProgramData* shaderProgram, const char* vertexShader, const char* fragmentShader);
+void prShaderUpdate(prShaderData* shaderProgram, const char* vertexShader, const char* fragmentShader);
 
-void prShaderProgramUniform1i(prShaderProgramData* shaderProgram, const char* uniformName, int number);
+void prShaderUniform1i(prShaderData* shaderProgram, const char* uniformName, int number);
 
-void prShaderProgramUniform1f(prShaderProgramData* shaderProgram, const char* uniformName, float number);
+void prShaderUniform1f(prShaderData* shaderProgram, const char* uniformName, float number);
 
-void prShaderProgramUniform3f(prShaderProgramData* shaderProgram, const char* uniformName, float number1, float number2, float number3);
+void prShaderUniform3f(prShaderData* shaderProgram, const char* uniformName, float number1, float number2, float number3);
 
-void prShaderProgramUniformMatrix4fv(prShaderProgramData* shaderProgram, const char* uniformName, float* number);
+void prShaderUniformMatrix4fv(prShaderData* shaderProgram, const char* uniformName, float* number);

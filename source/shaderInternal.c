@@ -10,9 +10,9 @@
 #include <PR/memory.h>
 #include <PR/logger.h>
 
-int i_prShaderProgramUniformBoilerPlate(prShaderProgramData* shaderProgram, const char* uniformName) {
+int i_prShaderUniformBoilerPlate(prShaderData* shaderProgram, const char* uniformName) {
     if(!shaderProgram->shaderProgramObject) {
-        prLogEvent(PR_EVENT_OPENGL, PR_LOG_WARNING, "Shader not initialized. Aborting operation, nothing was modified");
+        prLogEvent(PR_EVENT_OPENGL, PR_LOG_WARNING, "i_prShaderUniformBoilerPlate: Shader not initialized. Aborting operation, nothing was modified");
         return -1;
     }
 
@@ -20,15 +20,15 @@ int i_prShaderProgramUniformBoilerPlate(prShaderProgramData* shaderProgram, cons
     int uniformLocation = shaderProgram->context->GetUniformLocation(shaderProgram->shaderProgramObject, uniformName);
 
     if(uniformLocation == -1) {
-        prLogEvent(PR_EVENT_OPENGL, PR_LOG_WARNING, "No uniform with name \"%s\" found. Aborting operation, nothing was modified", uniformName);
+        prLogEvent(PR_EVENT_OPENGL, PR_LOG_WARNING, "i_prShaderUniformBoilerPlate: No uniform with name \"%s\" found. Aborting operation, nothing was modified", uniformName);
         return -1;
     }
 
     return uniformLocation;
 }
 
-void i_prShaderProgramCreateOnGPU(prShaderProgramData* shaderProgram) {
-    prLogEvent(PR_EVENT_OPENGL, PR_LOG_INFO, "Creating shader program");
+void i_prShaderCreateOnGPU(prShaderData* shaderProgram) {
+    prLogEvent(PR_EVENT_OPENGL, PR_LOG_INFO, "i_prShaderCreateOnGPU: Creating shader program");
 
     GladGLContext* context = shaderProgram->context;
 
@@ -43,7 +43,7 @@ void i_prShaderProgramCreateOnGPU(prShaderProgramData* shaderProgram) {
     if(!success) {
         context->GetShaderInfoLog(vertexShader, PR_MAXSTR_LEN, NULL, infoLog);
         context->DeleteShader(vertexShader);
-        prLogEvent(PR_EVENT_OPENGL, PR_LOG_WARNING, "Vertex shader failed to compile. Aborting operation, nothing was modified:\n%s", infoLog);
+        prLogEvent(PR_EVENT_OPENGL, PR_LOG_WARNING, "i_prShaderCreateOnGPU: Vertex shader failed to compile. Aborting operation, nothing was modified:\n%s", infoLog);
         return;
     }
 
@@ -56,7 +56,7 @@ void i_prShaderProgramCreateOnGPU(prShaderProgramData* shaderProgram) {
         context->GetShaderInfoLog(fragmentShader, PR_MAXSTR_LEN, NULL, infoLog);
         context->DeleteShader(vertexShader);
         context->DeleteShader(fragmentShader);
-        prLogEvent(PR_EVENT_OPENGL, PR_LOG_WARNING, "Fragment shader failed to compile. Aborting operation, nothing was modified: %s", infoLog);
+        prLogEvent(PR_EVENT_OPENGL, PR_LOG_WARNING, "i_prShaderCreateOnGPU: Fragment shader failed to compile. Aborting operation, nothing was modified: %s", infoLog);
         return;
     }
 
@@ -71,7 +71,7 @@ void i_prShaderProgramCreateOnGPU(prShaderProgramData* shaderProgram) {
         context->DeleteShader(vertexShader);
         context->DeleteShader(fragmentShader);
         context->DeleteProgram(shaderProgram->shaderProgramObject);
-        prLogEvent(PR_EVENT_OPENGL, PR_LOG_WARNING, "Shader program failed to link. Aborting operation, nothing was modified: %s", infoLog);
+        prLogEvent(PR_EVENT_OPENGL, PR_LOG_WARNING, "i_prShaderCreateOnGPU: Shader program failed to link. Aborting operation, nothing was modified: %s", infoLog);
         return;
     }
 
@@ -79,8 +79,8 @@ void i_prShaderProgramCreateOnGPU(prShaderProgramData* shaderProgram) {
     context->DeleteShader(fragmentShader);
 }
 
-void i_prShaderProgramDestroyOnGPU(prShaderProgramData* shaderProgram) {
-    prLogEvent(PR_EVENT_OPENGL, PR_LOG_TRACE, "Destroying shader program");
+void i_prShaderDestroyOnGPU(prShaderData* shaderProgram) {
+    prLogEvent(PR_EVENT_OPENGL, PR_LOG_TRACE, "i_prShaderDestroyOnGPU: Destroying shader program");
 
     shaderProgram->context->DeleteProgram(shaderProgram->shaderProgramObject);
     shaderProgram->shaderProgramObject = 0;

@@ -50,25 +50,39 @@ void prTextureLinkContext(prTextureData* texture, GladGLContext* context) {
     }
 }
 
-void prTextureUpdate(prTextureData* texture, int wrappingMode, GLubyte rawTextureData[], size_t rawTextureDataCount) {
-    if(!rawTextureDataCount) {
-        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "Texture data count cannot be zero. Aborting operation, nothing was modified");
-    } else if(!rawTextureData) {
-        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "Texture data cannot be NULL. Aborting operation, nothing was modified");
-        return;
+void prTextureUpdate(prTextureData* texture, int type, int wrappingMode, GLubyte rawTextureData[], size_t rawTextureDataCount, GLint width, GLint height) {
+    if(!rawTextureDataCount && rawTextureData) {
+        prLogEvent(PR_EVENT_DATA, PR_LOG_WARNING, "prTextureUpdate: Texture data count not zero while texture data is NULL. Assuming no texture data, texture data will be NULL");
+    }
+    if(((bool)rawTextureData & width) | ((bool)rawTextureData & height)) {
+        prLogEvent(PR_EVENT_DATA, PR_LOG_WARNING, "prTextureUpdate: Width and height must be non-zero if texture data is provided. Assuming texture data, ignoring width and height");
     }
 
     if((wrappingMode != PR_WRAPPING_REPEAT) & (wrappingMode != PR_WRAPPING_REPEAT_MIRRORED) & (wrappingMode != PR_WRAPPING_EDGE) & (wrappingMode != PR_WRAPPING_COLOR)) {
-        prLogEvent(PR_EVENT_DATA, PR_LOG_WARNING, "Invalid wrapping mode for texture (was %i), using repeating wrapping mode", wrappingMode);
+        prLogEvent(PR_EVENT_DATA, PR_LOG_WARNING, "prTextureUpdate: Invalid wrapping mode for texture (was %i), using repeating wrapping mode", wrappingMode);
         texture->wrappingMode = PR_WRAPPING_REPEAT;
     } else {
         texture->wrappingMode = wrappingMode;
     }
 
-    unsigned char* temp = stbi_load_from_memory(rawTextureData, rawTextureDataCount, &texture->width, &texture->height, &texture->channels, 0);
-    if(!temp) {
-        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "Texture data failed to unpack. Aborting operation, nothing was modified");
-        return;
+    if((type != PR_COLOR) & (type != PR_DEPTH) & (type != PR_STENCIL) & (type != PR_DEPTH_STENCIL)) {
+        prLogEvent(PR_EVENT_DATA, PR_LOG_WARNING, "prTextureUpdate: Invalid type for texture (was %i), using RGBA type", type);
+        texture->type = PR_WRAPPING_REPEAT;
+    } else {
+        texture->type = type;
+    }
+
+    unsigned char* temp = NULL;
+    if(rawTextureData) {
+        temp = stbi_load_from_memory(rawTextureData, rawTextureDataCount, &texture->width, &texture->height, &texture->channels, 0);
+        if(!temp) {
+            prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prTextureUpdate: Texture data failed to unpack. Aborting operation, nothing was modified");
+            return;
+        }
+    } else {
+        texture->width = width;
+        texture->height = height;
+        texture->channels = 0;
     }
 
     if(texture->textureData) {

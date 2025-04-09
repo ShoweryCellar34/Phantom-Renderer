@@ -3,11 +3,11 @@
 #include <PR/defines.h>
 
 typedef struct GladGLContext GladGLContext;
-typedef struct prShaderProgramData prShaderProgramData;
+typedef struct prShaderData prShaderData;
 typedef struct prMaterialData prMaterialData;
 typedef struct prTextureData prTextureData;
 
-prShaderProgramData* loadDefaultShader(GladGLContext* context);
+prShaderData* loadDefaultShader(GladGLContext* context);
 
 prMaterialData* makeMaterialOneTexture(prTextureData* texture);
 

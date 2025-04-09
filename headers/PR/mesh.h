@@ -7,7 +7,7 @@
 
 typedef struct prMaterialData prMaterialData;
 typedef struct prCamera prCamera;
-typedef struct prShaderProgramData prShaderProgramData;
+typedef struct prShaderData prShaderData;
 
 typedef struct prMeshData {
     GladGLContext* context;
@@ -35,4 +35,4 @@ void prMeshUpdate(prMeshData* mesh, GLfloat vertices[], size_t verticesCount,
     GLfloat textureCoordinates[], size_t textureCoordinatesCount,
     GLuint indices[], size_t indicesCount);
 
-void prMeshDraw(prMeshData* mesh, mat4 translation, prCamera* camera, prShaderProgramData* shaderProgram);
+void prMeshDraw(prMeshData* mesh, mat4 translation, prCamera* camera, prShaderData* shaderProgram);

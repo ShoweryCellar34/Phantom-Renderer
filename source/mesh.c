@@ -3,10 +3,6 @@
 #include <PR/meshInternal.h>
 
 #include <PR/memory.h>
-#include <PR/material.h>
-#include <PR/texture.h>
-#include <PR/camera.h>
-#include <PR/shader.h>
 #include <PR/logger.h>
 
 prMeshData* prMeshCreate() {
@@ -55,43 +51,43 @@ void prMeshUpdate(prMeshData* mesh, GLfloat vertices[], size_t verticesCount,
     GLfloat textureCoordinates[], size_t textureCoordinatesCount,
     GLuint indices[], size_t indicesCount) {
     if(!verticesCount) {
-        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "Vertices data count cannot be zero. Aborting operation, nothing was modified");
+        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prMeshUpdate: Vertices data count cannot be zero. Aborting operation, nothing was modified");
         return;
     } else if(verticesCount % 3 != 0) {
-        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "Vertices data count must be a multiple of 3 (was %zu). Aborting operation, nothing was modified", verticesCount);
+        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prMeshUpdate: Vertices data count must be a multiple of 3 (was %zu). Aborting operation, nothing was modified", verticesCount);
         return;
     } else if(!vertices) {
-        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "Vertices data cannot be NULL. Aborting operation, nothing was modified");
+        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prMeshUpdate: Vertices data cannot be NULL. Aborting operation, nothing was modified");
         return;
     }
 
     if(normalsCount < verticesCount) {
-        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "Normals data not enough for every vertex (was %zu). Aborting operation, nothing was modified", normalsCount);
+        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prMeshUpdate: Normals data not enough for every vertex (was %zu). Aborting operation, nothing was modified", normalsCount);
         return;
     }
     if(!normals) {
-        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "Normals data cannot be NULL. Aborting operation, nothing was modified");
+        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prMeshUpdate: Normals data cannot be NULL. Aborting operation, nothing was modified");
         return;
     }
 
     if(textureCoordinatesCount / 2 != verticesCount / 3 && textureCoordinatesCount < verticesCount) {
-        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "Texture coordinates data not enough for every vertex (was %zu). Aborting operation, nothing was modified", textureCoordinatesCount);
+        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prMeshUpdate: Texture coordinates data not enough for every vertex (was %zu). Aborting operation, nothing was modified", textureCoordinatesCount);
         return;
     }
     if(!textureCoordinates) {
-        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "Texture coordinates data cannot be NULL. Aborting operation, nothing was modified");
+        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prMeshUpdate: Texture coordinates data cannot be NULL. Aborting operation, nothing was modified");
         return;
     }
 
     if(!indicesCount) {
-        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "Indices data count cannot be zero. Aborting operation, nothing was modified");
+        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prMeshUpdate: Indices data count cannot be zero. Aborting operation, nothing was modified");
         return;
     } else if(indicesCount % 3 != 0) {
-        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "Indices data count must be a multiple of 3 (was %zu). Aborting operation, nothing was modified", indicesCount);
+        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prMeshUpdate: Indices data count must be a multiple of 3 (was %zu). Aborting operation, nothing was modified", indicesCount);
         return;
     }
     if(!indices) {
-        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "Indices data cannot be NULL. Aborting operation, nothing was modified");
+        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prMeshUpdate: Indices data cannot be NULL. Aborting operation, nothing was modified");
         return;
     }
 
@@ -133,77 +129,15 @@ void prMeshUpdate(prMeshData* mesh, GLfloat vertices[], size_t verticesCount,
     }
 }
 
-void prMeshDraw(prMeshData* mesh, mat4 translation, prCamera* camera, prShaderProgramData* shaderProgram) {
-    GladGLContext* context = mesh->context;
-
-    static prMaterialData defaultMaterial = {.shininess = -255.0f};
-    prMaterialData* material = mesh->material;
-
-    if(!mesh->material) {
-        prLogEvent(PR_EVENT_DATA, PR_LOG_WARNING, "Material not set, using default material");
-        if(defaultMaterial.shininess == -255.0f) {
-            defaultMaterial.specularMap = NULL;
-            defaultMaterial.ambientMap = NULL;
-            defaultMaterial.diffuseMap = NULL;
-            defaultMaterial.specularMap = NULL;
-            defaultMaterial.shininess = 32.0f;
-        }
-
-        material = &defaultMaterial;
+void prMeshDraw(prMeshData* mesh, mat4 translation, prCamera* camera, prShaderData* shaderProgram) {
+    if(!mesh->context) {
+        prLogEvent(PR_EVENT_OPENGL, PR_LOG_ERROR, "prMeshDraw: Cannot draw mesh without a valid OpenGL context. Aborting operation, nothing was modified");
+        return;
+    }
+    if(!mesh->VAO) {
+        prLogEvent(PR_EVENT_OPENGL, PR_LOG_ERROR, "prMeshDraw: Cannot draw mesh without a valid OpenGL VAO. Aborting operation, nothing was modified");
+        return;
     }
 
-    context->UseProgram(shaderProgram->shaderProgramObject);
-
-    context->BindVertexArray(mesh->VAO);
-
-    if(mesh->material->ambientMap) {
-        context->ActiveTexture(GL_TEXTURE0);
-        if(mesh->material->ambientMap->TBO) {
-            context->BindTexture(GL_TEXTURE_2D, mesh->material->ambientMap->TBO);
-        } else {
-            context->BindTexture(GL_TEXTURE_2D, 0);
-        }
-    }
-    if(mesh->material->diffuseMap) {
-        context->ActiveTexture(GL_TEXTURE1);
-        if(mesh->material->diffuseMap->TBO) {
-            context->BindTexture(GL_TEXTURE_2D, mesh->material->diffuseMap->TBO);
-        } else {
-            context->BindTexture(GL_TEXTURE_2D, 0);
-        }
-    }
-    if(mesh->material->specularMap) {
-        context->ActiveTexture(GL_TEXTURE2);
-        if(mesh->material->specularMap->TBO) {
-            context->BindTexture(GL_TEXTURE_2D, mesh->material->specularMap->TBO);
-        } else {
-            context->BindTexture(GL_TEXTURE_2D, 0);
-        }
-    }
-    if(mesh->material->normalMap) {
-        context->ActiveTexture(GL_TEXTURE3);
-        if(mesh->material->normalMap->TBO) {
-            context->BindTexture(GL_TEXTURE_2D, mesh->material->normalMap->TBO);
-        } else {
-            context->BindTexture(GL_TEXTURE_2D, 0);
-        }
-    }
-
-    prShaderProgramUniform3f(shaderProgram, "cameraPosition", camera->position[0], camera->position[1], camera->position[2]);
-
-    prShaderProgramUniformMatrix4fv(shaderProgram, "view", camera->view[0]);
-
-    prShaderProgramUniformMatrix4fv(shaderProgram, "projection", camera->projection[0]);
-
-    prShaderProgramUniformMatrix4fv(shaderProgram, "translation", translation[0]);
-
-    prShaderProgramUniform1i(shaderProgram, "material.ambient", 0);
-    prShaderProgramUniform1i(shaderProgram, "material.diffuse", 1);
-    prShaderProgramUniform1i(shaderProgram, "material.specular", 2);
-    prShaderProgramUniform1i(shaderProgram, "material.normal", 3);
-    prShaderProgramUniform1f(shaderProgram, "material.shininess", material->shininess);
-
-    context->DrawElements(GL_TRIANGLES, mesh->indicesCount, GL_UNSIGNED_INT, 0);
-
-    context->BindVertexArray(0);
+    i_prMeshDrawOnGPU(mesh, translation, camera, shaderProgram);
 }

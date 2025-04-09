@@ -9,10 +9,10 @@
 #include <PR/logger.h>
 #include <PR/memory.h>
 
-prShaderProgramData* loadDefaultShader(GladGLContext* context) {
-    prShaderProgramData* shaderProgram = prShaderProgramCreate();
-    prShaderProgramLinkContext(shaderProgram, context);
-    prShaderProgramUpdate(shaderProgram, BASE_VERTEX_SHADER, BASE_FRAGMENT_SHADER);
+prShaderData* loadDefaultShader(GladGLContext* context) {
+    prShaderData* shaderProgram = prShaderCreate();
+    prShaderLinkContext(shaderProgram, context);
+    prShaderUpdate(shaderProgram, BASE_VERTEX_SHADER, BASE_FRAGMENT_SHADER);
 
     return shaderProgram;
 }
@@ -45,7 +45,7 @@ prTextureData* loadTexture(GladGLContext* context, const char* path) {
     fclose(textureFile);
 
     prTextureLinkContext(texture, context);
-    prTextureUpdate(texture, PR_WRAPPING_EDGE, textureData, textureFileSize);
+    prTextureUpdate(texture, PR_COLOR, PR_WRAPPING_EDGE, textureData, textureFileSize, 0, 0);
     prFree(textureData);
 
     return texture;

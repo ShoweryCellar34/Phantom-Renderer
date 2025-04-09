@@ -4,6 +4,10 @@
 #include <PR/memory.h>
 #include <PR/logger.h>
 #include <PR/mesh.h>
+#include <PR/material.h>
+#include <PR/shader.h>
+#include <PR/texture.h>
+#include <PR/camera.h>
 
 void i_prMeshComputeGPUReadyBuffer(prMeshData* mesh) {
     if (mesh->GPUReadyBuffer) {
@@ -33,18 +37,18 @@ void i_prMeshComputeGPUReadyBuffer(prMeshData* mesh) {
 }
 
 void i_prMeshCreateOnGPU(prMeshData* mesh) {
-    prLogEvent(PR_EVENT_OPENGL, PR_LOG_INFO, "Creating mesh on GPU. Verticies: %i Normals: %i Texture coordinates: %i Indices: %i", mesh->verticesCount, mesh->normalsCount, mesh->textureCoordinatesCount, mesh->indicesCount);
+    prLogEvent(PR_EVENT_OPENGL, PR_LOG_INFO, "i_prMeshCreateOnGPU: Creating mesh on GPU. Verticies: %i Normals: %i Texture coordinates: %i Indices: %i", mesh->verticesCount, mesh->normalsCount, mesh->textureCoordinatesCount, mesh->indicesCount);
 
     mesh->context->GenVertexArrays(1, &mesh->VAO);
     if(!mesh->VAO) {
-        prLogEvent(PR_EVENT_OPENGL, PR_LOG_WARNING, "Failed to create vertex array object. Aborting operation, nothing was modified");
+        prLogEvent(PR_EVENT_OPENGL, PR_LOG_WARNING, "i_prMeshCreateOnGPU: Failed to create vertex array object. Aborting operation, nothing was modified");
         return;
     }
 
     mesh->context->GenBuffers(1, &mesh->VBO);
     if(!mesh->VBO) {
         mesh->context->DeleteVertexArrays(1, &mesh->VAO);
-        prLogEvent(PR_EVENT_OPENGL, PR_LOG_WARNING, "Failed to create vertex buffer object. Aborting operation, nothing was modified");
+        prLogEvent(PR_EVENT_OPENGL, PR_LOG_WARNING, "i_prMeshCreateOnGPU: Failed to create vertex buffer object. Aborting operation, nothing was modified");
         return;
     }
 
@@ -52,7 +56,7 @@ void i_prMeshCreateOnGPU(prMeshData* mesh) {
     if(!mesh->EBO) {
         mesh->context->DeleteVertexArrays(1, &mesh->VAO);
         mesh->context->DeleteBuffers(1, &mesh->VBO);
-        prLogEvent(PR_EVENT_OPENGL, PR_LOG_WARNING, "Failed to create index buffer object. Aborting operation, nothing was modified");
+        prLogEvent(PR_EVENT_OPENGL, PR_LOG_WARNING, "i_prMeshCreateOnGPU: Failed to create index buffer object. Aborting operation, nothing was modified");
         return;
     }
 
@@ -83,7 +87,7 @@ void i_prMeshCreateOnGPU(prMeshData* mesh) {
 }
 
 void i_prMeshUpdateOnGPU(prMeshData* mesh) {
-    prLogEvent(PR_EVENT_OPENGL, PR_LOG_INFO, "Updating mesh on GPU. Verticies: %i Normals: %i Texture coordinates: %i Indices: %i", mesh->verticesCount, mesh->normalsCount, mesh->textureCoordinatesCount, mesh->indicesCount);
+    prLogEvent(PR_EVENT_OPENGL, PR_LOG_INFO, "i_prMeshUpdateOnGPU: Updating mesh on GPU. Verticies: %i Normals: %i Texture coordinates: %i Indices: %i", mesh->verticesCount, mesh->normalsCount, mesh->textureCoordinatesCount, mesh->indicesCount);
 
     i_prMeshComputeGPUReadyBuffer(mesh);
 
@@ -108,13 +112,79 @@ void i_prMeshUpdateOnGPU(prMeshData* mesh) {
 
 	mesh->context->BindVertexArray(0);
 
-    prLogEvent(PR_EVENT_OPENGL, PR_LOG_TRACE, "Successfully updated vertex array object and set data");
+    prLogEvent(PR_EVENT_OPENGL, PR_LOG_TRACE, "i_prMeshUpdateOnGPU: Successfully updated vertex array object and set data");
 }
 
 void i_prMeshDestroyOnGPU(prMeshData* mesh) {
-    prLogEvent(PR_EVENT_OPENGL, PR_LOG_TRACE, "Destroying mesh on GPU");
+    prLogEvent(PR_EVENT_OPENGL, PR_LOG_TRACE, "i_prMeshDestroyOnGPU: Destroying mesh on GPU");
 
     mesh->context->DeleteVertexArrays(1, &mesh->VAO);
     mesh->context->DeleteBuffers(1, &mesh->VBO);
     mesh->context->DeleteBuffers(1, &mesh->EBO);
+}
+
+void i_prMeshDrawOnGPU(prMeshData* mesh, mat4 translation, prCamera* camera, prShaderData* shaderProgram) {
+    static prMaterialData defaultMaterial = {NULL, NULL, NULL, NULL, -255.0f};
+    prMaterialData* material = mesh->material;
+
+    if(!mesh->material) {
+        prLogEvent(PR_EVENT_DATA, PR_LOG_WARNING, "i_prMeshDrawOnGPU: Material not set, using default material");
+
+        material = &defaultMaterial;
+    }
+
+    mesh->context->UseProgram(shaderProgram->shaderProgramObject);
+
+    mesh->context->BindVertexArray(mesh->VAO);
+
+    if(mesh->material->ambientMap) {
+        mesh->context->ActiveTexture(GL_TEXTURE0);
+        if(mesh->material->ambientMap->TBO) {
+            mesh->context->BindTexture(GL_TEXTURE_2D, mesh->material->ambientMap->TBO);
+        } else {
+            mesh->context->BindTexture(GL_TEXTURE_2D, 0);
+        }
+    }
+    if(mesh->material->diffuseMap) {
+        mesh->context->ActiveTexture(GL_TEXTURE1);
+        if(mesh->material->diffuseMap->TBO) {
+            mesh->context->BindTexture(GL_TEXTURE_2D, mesh->material->diffuseMap->TBO);
+        } else {
+            mesh->context->BindTexture(GL_TEXTURE_2D, 0);
+        }
+    }
+    if(mesh->material->specularMap) {
+        mesh->context->ActiveTexture(GL_TEXTURE2);
+        if(mesh->material->specularMap->TBO) {
+            mesh->context->BindTexture(GL_TEXTURE_2D, mesh->material->specularMap->TBO);
+        } else {
+            mesh->context->BindTexture(GL_TEXTURE_2D, 0);
+        }
+    }
+    if(mesh->material->normalMap) {
+        mesh->context->ActiveTexture(GL_TEXTURE3);
+        if(mesh->material->normalMap->TBO) {
+            mesh->context->BindTexture(GL_TEXTURE_2D, mesh->material->normalMap->TBO);
+        } else {
+            mesh->context->BindTexture(GL_TEXTURE_2D, 0);
+        }
+    }
+
+    prShaderUniform3f(shaderProgram, "cameraPosition", camera->position[0], camera->position[1], camera->position[2]);
+
+    prShaderUniformMatrix4fv(shaderProgram, "view", camera->view[0]);
+
+    prShaderUniformMatrix4fv(shaderProgram, "projection", camera->projection[0]);
+
+    prShaderUniformMatrix4fv(shaderProgram, "translation", translation[0]);
+
+    prShaderUniform1i(shaderProgram, "material.ambient", 0);
+    prShaderUniform1i(shaderProgram, "material.diffuse", 1);
+    prShaderUniform1i(shaderProgram, "material.specular", 2);
+    prShaderUniform1i(shaderProgram, "material.normal", 3);
+    prShaderUniform1f(shaderProgram, "material.shininess", material->shininess);
+
+    mesh->context->DrawElements(GL_TRIANGLES, mesh->indicesCount, GL_UNSIGNED_INT, 0);
+
+    mesh->context->BindVertexArray(0);
 }
