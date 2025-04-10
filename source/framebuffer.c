@@ -60,3 +60,35 @@ void prFramebufferLinkDepthStencilTexture(prFramebufferData* framebuffer, prText
         i_prFramebufferUpdateBuffers(framebuffer);
     }
 }
+
+void prFramebufferLinkColorTextureRBO(prFramebufferData* framebuffer, prRenderBufferData* colorRBO) {
+    framebuffer->colorRBO = colorRBO;
+
+    if(framebuffer->FBO) {
+        i_prFramebufferUpdateBuffers(framebuffer);
+    }
+}
+
+void prFramebufferLinkDepthTextureRBO(prFramebufferData* framebuffer, prRenderBufferData* depthRBO) {
+    framebuffer->depthRBO = depthRBO;
+
+    if(framebuffer->FBO) {
+        i_prFramebufferUpdateBuffers(framebuffer);
+    }
+}
+
+void prFramebufferLinkStencilTextureRBO(prFramebufferData* framebuffer, prRenderBufferData* stencilRBO) {
+    framebuffer->stencilRBO = stencilRBO;
+
+    if(framebuffer->FBO) {
+        i_prFramebufferUpdateBuffers(framebuffer);
+    }
+}
+
+void prFramebufferLinkDepthStencilTextureRBO(prFramebufferData* framebuffer, prRenderBufferData* depthStencilRBO) {
+    framebuffer->depthStencilRBO = depthStencilRBO;
+
+    if(framebuffer->FBO) {
+        i_prFramebufferUpdateBuffers(framebuffer);
+    }
+}

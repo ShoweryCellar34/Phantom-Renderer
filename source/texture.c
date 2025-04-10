@@ -23,8 +23,6 @@ void prDisableImageFlip() {
 prTextureData* prTextureCreate() {
     prTextureData* texture = prCalloc(1, sizeof(prTextureData));
 
-    texture->wrappingMode = PR_WRAPPING_EDGE;
-
     return texture;
 }
 
@@ -34,14 +32,14 @@ void prTextureDestroy(prTextureData* texture) {
     }
 
     if(texture->textureData) {
-        prFree(texture->textureData);
+        stbi_image_free(texture->textureData);
     }
 
     prFree(texture);
 }
 
 void prTextureLinkContext(prTextureData* texture, GladGLContext* context) {
-    if(texture->context && texture->textureData) {
+    if(texture->context && texture->TBO) {
         i_prTextureDestroyOnGPU(texture);
     }
     texture->context = context;
@@ -66,8 +64,8 @@ void prTextureUpdate(prTextureData* texture, int type, int wrappingMode, GLubyte
     }
 
     if((type != PR_COLOR) & (type != PR_DEPTH) & (type != PR_STENCIL) & (type != PR_DEPTH_STENCIL)) {
-        prLogEvent(PR_EVENT_DATA, PR_LOG_WARNING, "prTextureUpdate: Invalid type for texture (was %i), using RGBA type", type);
-        texture->type = PR_WRAPPING_REPEAT;
+        prLogEvent(PR_EVENT_DATA, PR_LOG_WARNING, "prTextureUpdate: Invalid type for texture (was %i), using PR_COLOR type", type);
+        texture->type = PR_COLOR;
     } else {
         texture->type = type;
     }

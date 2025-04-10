@@ -101,6 +101,7 @@ prTextureData* makeTextureCheckerboard(GladGLContext* context, size_t scale, flo
 
     prFree(template);
 
+    texture->type = PR_COLOR;
     texture->channels = 4;
     texture->height = scale;
     texture->width = scale;

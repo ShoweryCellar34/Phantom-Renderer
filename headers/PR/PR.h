@@ -12,6 +12,7 @@ extern "C" {
 #include "material.h"
 #include "memory.h"
 #include "mesh.h"
+#include "renderbuffer.h"
 #include "shader.h"
 #include "texture.h"
 #include "window.h"
