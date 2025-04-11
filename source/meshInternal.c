@@ -124,50 +124,85 @@ void i_prMeshDestroyOnGPU(prMeshData* mesh) {
 }
 
 void i_prMeshDrawOnGPU(prMeshData* mesh, mat4 translation, prCamera* camera, prShaderData* shaderProgram) {
-    static prMaterialData defaultMaterial = {NULL, NULL, NULL, NULL, -255.0f};
+    if(!shaderProgram->context) {
+        prLogEvent(PR_EVENT_OPENGL, PR_LOG_ERROR, "i_prMeshDrawOnGPU: Cannot use shader without a valid OpenGL context. Aborting operation, nothing was modified");
+        return;
+    }
+    if(mesh->context != shaderProgram->context) {
+        prLogEvent(PR_EVENT_OPENGL, PR_LOG_ERROR, "i_prMeshDrawOnGPU: Mesh and shader contexts do not match. Aborting operation, nothing was modified");
+        return;
+    }
+    if(!shaderProgram->shaderProgramObject) {
+        prLogEvent(PR_EVENT_OPENGL, PR_LOG_ERROR, "i_prMeshDrawOnGPU: Invalid shader program. Aborting operation, nothing was modified");
+        return;
+    }
+
+    prMaterialData defaultMaterial = {NULL, NULL, NULL, NULL, 32.0f};
     prMaterialData* material = mesh->material;
 
     if(!mesh->material) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_WARNING, "i_prMeshDrawOnGPU: Material not set, using default material");
-
         material = &defaultMaterial;
     }
 
     mesh->context->UseProgram(shaderProgram->shaderProgramObject);
-
     mesh->context->BindVertexArray(mesh->VAO);
 
+    mesh->context->ActiveTexture(GL_TEXTURE0);
     if(mesh->material->ambientMap) {
-        mesh->context->ActiveTexture(GL_TEXTURE0);
         if(mesh->material->ambientMap->TBO) {
-            mesh->context->BindTexture(GL_TEXTURE_2D, mesh->material->ambientMap->TBO);
+            if(mesh->material->ambientMap->context != mesh->context) {
+                prLogEvent(PR_EVENT_OPENGL, PR_LOG_ERROR, "i_prMeshDrawOnGPU: Ambient map context does not match mesh context, binding ID 0");
+            } else {
+                mesh->context->BindTexture(GL_TEXTURE_2D, mesh->material->ambientMap->TBO);
+            }
         } else {
             mesh->context->BindTexture(GL_TEXTURE_2D, 0);
         }
+    } else {
+        mesh->context->BindTexture(GL_TEXTURE_2D, 0);
     }
+    mesh->context->ActiveTexture(GL_TEXTURE1);
     if(mesh->material->diffuseMap) {
-        mesh->context->ActiveTexture(GL_TEXTURE1);
         if(mesh->material->diffuseMap->TBO) {
-            mesh->context->BindTexture(GL_TEXTURE_2D, mesh->material->diffuseMap->TBO);
+            if(mesh->material->diffuseMap->context != mesh->context) {
+                prLogEvent(PR_EVENT_OPENGL, PR_LOG_ERROR, "i_prMeshDrawOnGPU: Diffuse map context does not match mesh context, binding ID 0");
+            } else {
+                mesh->context->BindTexture(GL_TEXTURE_2D, mesh->material->diffuseMap->TBO);
+            }
         } else {
             mesh->context->BindTexture(GL_TEXTURE_2D, 0);
         }
+    } else {
+        mesh->context->BindTexture(GL_TEXTURE_2D, 0);
     }
+    mesh->context->ActiveTexture(GL_TEXTURE2);
     if(mesh->material->specularMap) {
-        mesh->context->ActiveTexture(GL_TEXTURE2);
         if(mesh->material->specularMap->TBO) {
-            mesh->context->BindTexture(GL_TEXTURE_2D, mesh->material->specularMap->TBO);
+            if(mesh->material->specularMap->context != mesh->context) {
+                prLogEvent(PR_EVENT_OPENGL, PR_LOG_ERROR, "i_prMeshDrawOnGPU: Specular map context does not match mesh context, binding ID 0");
+            } else {
+                mesh->context->BindTexture(GL_TEXTURE_2D, mesh->material->specularMap->TBO);
+            }
         } else {
             mesh->context->BindTexture(GL_TEXTURE_2D, 0);
         }
+    } else {
+        mesh->context->BindTexture(GL_TEXTURE_2D, 0);
     }
+    mesh->context->ActiveTexture(GL_TEXTURE3);
     if(mesh->material->normalMap) {
-        mesh->context->ActiveTexture(GL_TEXTURE3);
         if(mesh->material->normalMap->TBO) {
-            mesh->context->BindTexture(GL_TEXTURE_2D, mesh->material->normalMap->TBO);
+            if(mesh->material->normalMap->context != mesh->context) {
+                prLogEvent(PR_EVENT_OPENGL, PR_LOG_ERROR, "i_prMeshDrawOnGPU: Normal map context does not match mesh context, binding ID 0");
+            } else {
+                mesh->context->BindTexture(GL_TEXTURE_2D, mesh->material->normalMap->TBO);
+            }
         } else {
             mesh->context->BindTexture(GL_TEXTURE_2D, 0);
         }
+    } else {
+        mesh->context->BindTexture(GL_TEXTURE_2D, 0);
     }
 
     prShaderUniform3f(shaderProgram, "cameraPosition", camera->position[0], camera->position[1], camera->position[2]);

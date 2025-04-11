@@ -78,6 +78,7 @@ int main(int argc, char** argv) {
     prMaterialLinkNormalMap(materialBrick, brickWallNormalTexture);
     prMaterialSetShininess(materialBrick, 32.0f);
 
+
     prMeshData* meshMetal = prMeshCreate();
     prMeshLinkContext(meshMetal, test->openglContext);
     prMeshUpdate(meshMetal,
@@ -163,6 +164,35 @@ int main(int argc, char** argv) {
     test->openglContext->Enable(GL_CULL_FACE);
     test->openglContext->Enable(GL_BLEND);
     test->openglContext->BlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    // prTextureData* colorTexture = prTextureCreate();
+    // prTextureLinkContext(colorTexture, test->openglContext);
+    // prTextureUpdate(colorTexture, PR_COLOR, PR_WRAPPING_EDGE, NULL, 0, 1600, 900);
+
+    // prRenderBufferData* depthStencilRBO = prRenderBufferCreate();
+    // prRenderBufferLinkContext(depthStencilRBO, test->openglContext);
+    // prRenderBufferUpdate(depthStencilRBO, PR_DEPTH_STENCIL, 1600, 800);
+
+    // prFramebufferData* framebuffer = prFramebufferCreate();
+    // prFramebufferLinkContext(framebuffer, test->openglContext);
+    // prFramebufferLinkColorTexture(framebuffer, colorTexture);
+    // prFramebufferLinkDepthStencilTextureRBO(framebuffer, depthStencilRBO);
+
+    // prMeshData* meshQuad = prMeshCreate();
+    // prMeshLinkContext(meshQuad, test->openglContext);
+    // prMeshUpdate(meshQuad,
+    //     verticesQuad, sizeof(verticesQuad) / sizeof(float),
+    //     normalsQuad, sizeof(normalsQuad) / sizeof(float),
+    //     textureCoordinatesQuad, sizeof(textureCoordinatesQuad) / sizeof(float),
+    //     indicesQuad, sizeof(indicesQuad) / sizeof(unsigned int));
+    // prMeshLinkMaterial(meshItem, quadMaterial);
+
+    // prMaterialData* materialQuad = prMeshCreate();
+    // prMaterialLinkAmbientMap(materialQuad, colorTexture);
+    // prMaterialLinkDiffuseMap(materialQuad, blackTexture);
+    // prMaterialLinkSpecularMap(materialQuad, blackTexture);
+    // prMaterialLinkNormalMap(materialQuad, blackTexture);
+    // prMaterialSetShininess(materialBrick, 0.0f);
 
     while(!glfwWindowShouldClose(test->window)) {
         test->openglContext->Clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

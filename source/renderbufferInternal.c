@@ -39,8 +39,8 @@ void i_prRenderBufferCreateOnGPU(prRenderBufferData* renderBuffer) {
         return;
     }
 
-    GLenum format, internalFomrat;
-    i_prRenderbufferComputeFormats(renderBuffer, &format, &internalFomrat);
+    GLenum internalFomrat;
+    i_prRenderbufferComputeFormats(renderBuffer, &internalFomrat);
 
     renderBuffer->context->BindRenderbuffer(GL_RENDERBUFFER, renderBuffer->RBO);
 
