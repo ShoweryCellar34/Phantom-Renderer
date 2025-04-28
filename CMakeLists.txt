@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.20)
 set(POSITION_INDEPENDENT_CODE true)
 set(CMAKE_INTERPROCEDURAL_OPTIMIZATION true)
 
-project(Phantom-Renderer DESCRIPTION "A Basic File Resource Manager" LANGUAGES C HOMEPAGE_URL "https://github.com/ShoweryCellar34/Phantom-Renderer")
+project(Phantom-Renderer DESCRIPTION "A Basic OpenGL renderer" LANGUAGES C HOMEPAGE_URL "https://github.com/ShoweryCellar34/Phantom-Renderer")
 file(GLOB source source/*.c)
 add_library(Phantom-Renderer STATIC ${source})
 set_property(TARGET Phantom-Renderer PROPERTY C_STANDARD 99)
