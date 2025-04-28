@@ -2,7 +2,7 @@
 
 # What is Phantom Renderer?
 
-Phantom Renderer basic file OpenGL based renderer using GLFW written in C, It is designed in a way that you are expected to manage the window (some heelper functions provided) because this being purely a renderer it only needs a glad opengl context so using SDL as a GLFW replacement would be very simple (just make sure to update the opengl viewport size). This is mostly just for use in my other projects.
+Phantom Renderer basic OpenGL based renderer using GLFW written in C, It is designed in a way that you are expected to manage the window (some heelper functions provided) because this being purely a renderer it only needs a glad opengl context so using SDL as a GLFW replacement would be very simple (just make sure to update the opengl viewport size). This is mostly just for use in my other projects.
 
 ## Platform support
 
@@ -19,4 +19,4 @@ Run this command with [git](https://git-scm.com/) installed to clone this reposi
 2. Make the build directory `mkdir build` and move into it `cd build`.
 3. Generate the project file `cmake ..`.
 4. Build with `cmake --build .`
-5. Run the produced `Phantom-Renderer` file.
+5. Run the produced `Phantom-Renderer` file \(if example is build\).
