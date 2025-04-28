@@ -6,7 +6,7 @@ Phantom Renderer basic OpenGL based renderer using GLFW written in C, It is desi
 
 ## Platform support
 
-Resource Manager just uses GLFW and [CMake](https://cmake.org/), and is tested on Arch linux with Hyprland and Windows 11/10.
+Phantom-Renderer just uses GLFW and [CMake](https://cmake.org/), and is tested on Arch linux with Hyprland and Windows 11/10.
 
 ## How to clone
 
