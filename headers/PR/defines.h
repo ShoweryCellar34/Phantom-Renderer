@@ -24,6 +24,9 @@ typedef int8_t prEvent_t;
 #define PR_WRAPPING_EDGE                 GL_CLAMP_TO_EDGE
 #define PR_WRAPPING_COLOR                GL_CLAMP_TO_BORDER
 
+#define PR_FILTER_LINEAR                 GL_LINEAR
+#define PR_FILTER_NEAREST                GL_NEAREST
+
 #define PR_ACCESS_READ_ONLY              GL_READ_ONLY
 #define PR_ACCESS_WRITE_ONLY             GL_WRITE_ONLY
 #define PR_ACCESS_READ_WRITE             GL_READ_WRITE
@@ -37,6 +40,11 @@ typedef int8_t prEvent_t;
 #define PR_FORMAT_STENCIL                GL_STENCIL_INDEX
 #define PR_FORMAT_DEPTH                  GL_DEPTH_COMPONENT
 #define PR_FORMAT_DEPTH_STENCIL          GL_DEPTH24_STENCIL8
+#define PR_FORMAT_AUTO                   GL_RGB10_A2UI // Just a random format that can be used as a value for PR_FORMAT_AUTO
+
+#define PR_BUFFER_BIT_COLOR              GL_COLOR_BUFFER_BIT
+#define PR_BUFFER_BIT_DEPTH              GL_DEPTH_BUFFER_BIT  
+#define PR_BUFFER_BIT_STENCIL            GL_STENCIL_BUFFER_BIT
 
 #ifndef BASE_VERTEX_SHADER
 #define BASE_VERTEX_SHADER "\n\

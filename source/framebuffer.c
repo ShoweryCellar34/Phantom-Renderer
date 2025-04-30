@@ -69,7 +69,7 @@ void prFramebufferLinkStencilTexture(prFramebufferData* framebuffer, prTextureDa
 }
 
 void prFramebufferLinkDepthStencilTexture(prFramebufferData* framebuffer, prTextureData* depthStencilTexture) {
-    if (depthStencilTexture && framebuffer->context != depthStencilTexture->context) {
+    if(depthStencilTexture && framebuffer->context != depthStencilTexture->context) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferLinkDepthStencilTexture: Texture context does not match framebuffer context. Aborting operation, nothing was modified");
         return;
     }
@@ -105,7 +105,7 @@ void prFramebufferLinkDepthTextureRBO(prFramebufferData* framebuffer, prRenderBu
 }
 
 void prFramebufferLinkStencilTextureRBO(prFramebufferData* framebuffer, prRenderBufferData* stencilRBO) {
-    if (stencilRBO && framebuffer->context != stencilRBO->context) {
+    if(stencilRBO && framebuffer->context != stencilRBO->context) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferLinkStencilTextureRBO: RenderBuffer context does not match framebuffer context. Aborting operation, nothing was modified");
         return;
     }
@@ -126,4 +126,39 @@ void prFramebufferLinkDepthStencilTextureRBO(prFramebufferData* framebuffer, prR
     if(framebuffer->FBO) {
         i_prFramebufferUpdateBuffers(framebuffer);
     }
+}
+
+void prFramebufferBlit(prFramebufferData* source, prFramebufferData* destination, int srcX0, int srcY0, int srcX1, int srcY1, int dstX0, int dstY0, int dstX1, int dstY1, GLbitfield mask, GLenum filter) {
+    if(source) {
+        if(!source->context) {
+            prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferBlit: Source framebuffer context cannot be NULL. Aborting operation, nothing was modified");
+            return;
+        }
+        if(!source->FBO) {
+            prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferBlit: Source framebuffer is not initialized on GPU. Aborting operation, nothing was modified");
+            return;
+        }
+    } else {
+        prLogEvent(PR_EVENT_DATA, PR_LOG_TRACE, "prFramebufferBlit: Source framebuffer NULL, assuming default framebuffer (0)");
+    }
+    if(destination) {
+        if(!destination->context) {
+            prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferBlit: Destination framebuffer context cannot be NULL. Aborting operation, nothing was modified");
+            return;
+        }
+        if(!destination->FBO) {
+            prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferBlit: Destination framebuffer is not initialized on GPU. Aborting operation, nothing was modified");
+            return;
+        }
+    } else {
+        prLogEvent(PR_EVENT_DATA, PR_LOG_TRACE, "prFramebufferBlit: Destination framebuffer NULL, assuming default framebuffer (0)");
+    }
+    if(source && destination) {
+        if(source->context != destination->context) {
+            prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferBlit: Source and destination framebuffer contexts do not match. Aborting operation, nothing was modified");
+            return;
+        }
+    }
+
+    i_prFramebufferBlitOnGPU(source, destination, srcX0, srcY0, srcX1, srcY1, dstX0, dstY0, dstX1, dstY1, mask, filter);
 }

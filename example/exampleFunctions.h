@@ -40,6 +40,10 @@ void proccessInput(GLFWwindow* window) {
         glm_vec3_add(cameraPosition, temp[3], cameraPosition);
         // cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
     }
+    if(glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
+        glm_vec3_scale(camera->up, cameraSpeed, temp[1]);
+        glm_vec3_add(cameraPosition, temp[1], cameraPosition);
+    }
 
     if(glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) {
         glm_vec3_scale(camera->up, cameraSpeed, temp2[0]);

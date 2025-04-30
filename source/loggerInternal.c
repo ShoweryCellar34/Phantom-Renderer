@@ -1,4 +1,4 @@
-#include <PR/loggerInternal.hpp>
+#include <PR/loggerInternal.h>
 
 #include <time.h>
 

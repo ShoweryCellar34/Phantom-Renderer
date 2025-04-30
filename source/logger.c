@@ -2,7 +2,7 @@
 
 #include <PR/defines.h>
 
-#include <PR/loggerInternal.hpp>
+#include <PR/loggerInternal.h>
 
 #include <stdarg.h>
 #include <string.h>

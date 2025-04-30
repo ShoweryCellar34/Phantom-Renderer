@@ -12,7 +12,7 @@ typedef struct prTextureData {
     GladGLContext* context;
     int format;
     int wrappingMode;
-    bool pixelated;
+    int filter;
     GLubyte* textureData;
     GLint width, height, channels;
     GLuint TBO;
@@ -24,8 +24,6 @@ void prTextureDestroy(prTextureData* texture);
 
 void prTextureLinkContext(prTextureData* texture, GladGLContext* context);
 
-void prTextureUpdate(prTextureData* texture, int format, int wrappingMode, GLubyte rawTextureData[], size_t rawTextureDataCount, GLint width, GLint height);
-
-void prTextureSetPixelated(prTextureData* texture, bool pixelated);
+void prTextureUpdate(prTextureData* texture, int format, int filter, int wrappingMode, GLubyte rawTextureData[], size_t rawTextureDataCount, GLint width, GLint height);
 
 void prTextureBindImage(prTextureData* texture, unsigned int index, unsigned int mipmapLevel, unsigned int access, unsigned int format);

@@ -10,7 +10,7 @@
 #include <PR/camera.h>
 
 void i_prMeshComputeGPUReadyBuffer(prMeshData* mesh) {
-    if (mesh->GPUReadyBuffer) {
+    if(mesh->GPUReadyBuffer) {
         prFree(mesh->GPUReadyBuffer);
         mesh->GPUReadyBuffer = NULL;
     }

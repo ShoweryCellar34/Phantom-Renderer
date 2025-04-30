@@ -52,6 +52,11 @@ void i_prTextureComputeFormats(prTextureData* texture, GLenum* format, GLenum* i
             *format = GL_DEPTH24_STENCIL8;
             *internalFormat = GL_UNSIGNED_INT_24_8;
             break;
+
+        default:
+            *format = GL_RGB;
+            *internalFormat = GL_RGB16F;
+            break;
     }
 }
 
@@ -63,8 +68,8 @@ void i_prTextureSetDataOnGPU(prTextureData* texture) {
 
     texture->context->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, texture->wrappingMode);	
     texture->context->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, texture->wrappingMode);
-    texture->context->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, (texture->pixelated ? GL_NEAREST : GL_LINEAR));
-    texture->context->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, (texture->pixelated ? GL_NEAREST : GL_LINEAR));
+    texture->context->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, texture->filter);
+    texture->context->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, texture->filter);
 
     texture->context->PixelStorei(GL_UNPACK_ALIGNMENT, 1);
     texture->context->TexImage2D(GL_TEXTURE_2D, 0, internalFomrat, texture->width, texture->height, 0, format, GL_UNSIGNED_BYTE, texture->textureData);

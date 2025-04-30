@@ -48,22 +48,35 @@ void prTextureLinkContext(prTextureData* texture, GladGLContext* context) {
     }
 }
 
-void prTextureUpdate(prTextureData* texture, int format, int wrappingMode, GLubyte rawTextureData[], size_t rawTextureDataCount, GLint width, GLint height) {
+void prTextureUpdate(prTextureData* texture, int format, int filter, int wrappingMode, GLubyte rawTextureData[], size_t rawTextureDataCount, GLint width, GLint height) {
     if(!rawTextureDataCount && rawTextureData) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_WARNING, "prTextureUpdate: Texture data count not zero while texture data is NULL. Assuming no texture data, texture data will be NULL");
     }
-    if(((bool)rawTextureData & width) | ((bool)rawTextureData & height)) {
-        prLogEvent(PR_EVENT_DATA, PR_LOG_WARNING, "prTextureUpdate: Width and height must be non-zero if texture data is provided. Assuming texture data, ignoring width and height");
+    if(rawTextureData && (width == 0 || height == 0)) {
+        prLogEvent(PR_EVENT_DATA, PR_LOG_WARNING, "prTextureUpdate: Width and/or height provided in conjunction with texture data provided. Assuming raw, unconpressed texture data to be passed directly to GPU");
     }
 
-    if((wrappingMode != PR_WRAPPING_REPEAT) & (wrappingMode != PR_WRAPPING_REPEAT_MIRRORED) & (wrappingMode != PR_WRAPPING_EDGE) & (wrappingMode != PR_WRAPPING_COLOR)) {
+    if((wrappingMode != PR_WRAPPING_REPEAT) && (wrappingMode != PR_WRAPPING_REPEAT_MIRRORED) && 
+       (wrappingMode != PR_WRAPPING_EDGE) && (wrappingMode != PR_WRAPPING_COLOR)
+    ) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_WARNING, "prTextureUpdate: Invalid wrapping mode for texture (was %i), using repeating wrapping mode", wrappingMode);
         texture->wrappingMode = PR_WRAPPING_REPEAT;
     } else {
         texture->wrappingMode = wrappingMode;
     }
 
-    if((format != PR_FORMAT_A) & (format != PR_FORMAT_G) & (format != PR_FORMAT_B) & (format != PR_FORMAT_A) & (format != PR_FORMAT_RGB) & (format != PR_FORMAT_RGBA) & (format != PR_FORMAT_STENCIL) & (format != PR_FORMAT_DEPTH) & (format != PR_FORMAT_DEPTH_STENCIL)) {
+    if(filter != PR_FILTER_LINEAR && filter != PR_FILTER_NEAREST) {
+        prLogEvent(PR_EVENT_DATA, PR_LOG_WARNING, "prTextureSetFilter: Invalid filter mode (was %i), using linear filtering", filter);
+        texture->filter = PR_FILTER_LINEAR;
+    } else {
+        texture->filter = filter;
+    }
+
+    if((format != PR_FORMAT_A) && (format != PR_FORMAT_G) && (format != PR_FORMAT_B) &&
+        (format != PR_FORMAT_RGB) && (format != PR_FORMAT_RGBA) &&
+        (format != PR_FORMAT_STENCIL) && (format != PR_FORMAT_DEPTH) && (format != PR_FORMAT_DEPTH_STENCIL) &&
+        (format != PR_FORMAT_AUTO)
+    ) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_WARNING, "prTextureUpdate: Invalid format for texture (was %i), using PR_FORMAT_RGB type", format);
         texture->format = PR_FORMAT_RGB;
     } else {
@@ -71,16 +84,39 @@ void prTextureUpdate(prTextureData* texture, int format, int wrappingMode, GLuby
     }
 
     unsigned char* temp = NULL;
-    if(rawTextureData) {
+    if(rawTextureData && (!width || !height)) {
         temp = stbi_load_from_memory(rawTextureData, rawTextureDataCount, &texture->width, &texture->height, &texture->channels, 0);
         if(!temp) {
             prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prTextureUpdate: Texture data failed to unpack. Aborting operation, nothing was modified");
             return;
         }
+    } else if(width || height) {
+        temp = prMalloc(rawTextureDataCount);
+        prMemcpy(temp, (void*)rawTextureData, rawTextureDataCount);
+        texture->width = width;
+        texture->height = height;
+        texture->channels = 0;
     } else {
         texture->width = width;
         texture->height = height;
         texture->channels = 0;
+    }
+
+    if(format == PR_FORMAT_AUTO) {
+        prLogEvent(PR_EVENT_DATA, PR_LOG_TRACE, "prTextureUpdate: Automatically determining texture format based on channel count (%d channels)", texture->channels);
+        switch(texture->channels) {
+            case 3:
+                texture->format = PR_FORMAT_RGB;
+                break;
+
+            case 4:
+                texture->format = PR_FORMAT_RGBA;
+                break;
+
+            default:
+                texture->format = PR_FORMAT_RGB;
+                break;
+        }
     }
 
     if(texture->textureData) {
@@ -95,10 +131,6 @@ void prTextureUpdate(prTextureData* texture, int format, int wrappingMode, GLuby
     } else if(texture->context) {
         i_prTextureUpdateOnGPU(texture);
     }
-}
-
-void prTextureSetPixelated(prTextureData* texture, bool pixelated) {
-    texture->pixelated = pixelated;
 }
 
 void prTextureBindImage(prTextureData* texture, unsigned int index, unsigned int mipmapLevel, unsigned int access, unsigned int format) {

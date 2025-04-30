@@ -45,7 +45,7 @@ prTextureData* loadTexture(GladGLContext* context, const char* path) {
     fclose(textureFile);
 
     prTextureLinkContext(texture, context);
-    prTextureUpdate(texture, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, textureData, textureFileSize, 0, 0);
+    prTextureUpdate(texture, PR_FORMAT_AUTO, PR_FILTER_LINEAR, PR_WRAPPING_EDGE, textureData, textureFileSize, 0, 0);
     prFree(textureData);
 
     return texture;
@@ -55,16 +55,15 @@ prTextureData* makeTextureSingleColor(GladGLContext* context, float* color) {
     prTextureData* texture = prTextureCreate();
     prTextureLinkContext(texture, context);
 
-    texture->textureData = prMalloc(4 * sizeof(GLubyte));
-    texture->textureData[0] = color[0] * 255.0f;
-    texture->textureData[1] = color[1] * 255.0f;
-    texture->textureData[2] = color[2] * 255.0f;
-    texture->textureData[3] = color[3] * 255.0f;
-    texture->channels = 4;
-    texture->height = 1;
-    texture->width = 1;
+    GLubyte* textureData = prMalloc(4 * sizeof(GLubyte));
+    textureData[0] = color[0] * 255.0f;
+    textureData[1] = color[1] * 255.0f;
+    textureData[2] = color[2] * 255.0f;
+    textureData[3] = color[3] * 255.0f;
 
-    i_prTextureCreateOnGPU(texture);
+    prTextureUpdate(texture, PR_FORMAT_RGBA, PR_FILTER_LINEAR, PR_WRAPPING_REPEAT, textureData, 4, 1, 1);
+
+    prFree(textureData);
 
     return texture;
 }
@@ -87,26 +86,20 @@ prTextureData* makeTextureCheckerboard(GladGLContext* context, size_t scale, flo
         }
     }
 
-    texture->textureData = prMalloc(scale * scale * 4 * sizeof(GLubyte));
-    texture->wrappingMode = PR_WRAPPING_REPEAT;
-    texture->pixelated = true;
-
+    GLubyte* textureData = prMalloc(scale * scale * 4 * sizeof(GLubyte));
     for(size_t i = 0; i < scale * scale; i++) {
         size_t index = i * 4;
-        texture->textureData[index++] = (template[i] ? color1[0] * 255 : color2[0] * 255);
-        texture->textureData[index++] = (template[i] ? color1[1] * 255 : color2[1] * 255);
-        texture->textureData[index++] = (template[i] ? color1[2] * 255 : color2[2] * 255);
-        texture->textureData[index] = (template[i] ? color1[3] * 255 : color2[3] * 255);
+        textureData[index++] = (template[i] ? color1[0] * 255 : color2[0] * 255);
+        textureData[index++] = (template[i] ? color1[1] * 255 : color2[1] * 255);
+        textureData[index++] = (template[i] ? color1[2] * 255 : color2[2] * 255);
+        textureData[index] = (template[i] ? color1[3] * 255 : color2[3] * 255);
     }
 
     prFree(template);
 
-    texture->format = PR_FORMAT_RGBA;
-    texture->channels = 4;
-    texture->height = scale;
-    texture->width = scale;
-
-    i_prTextureCreateOnGPU(texture);
+    prTextureUpdate(texture, PR_FORMAT_RGBA, PR_FILTER_NEAREST, PR_WRAPPING_REPEAT, textureData, scale * scale * 4, scale, scale);
+    
+    prFree(textureData);
 
     return texture;
 }

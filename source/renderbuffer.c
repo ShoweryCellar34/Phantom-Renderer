@@ -36,7 +36,10 @@ void prRenderBufferUpdate(prRenderBufferData* renderBuffer, int format, GLint wi
         prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prRenderBufferUpdate: Invalid dimensions (width: %i, height: %i). Aborting operation, nothing was modified", width, height);
         return;
     }
-    if((format != PR_FORMAT_A) & (format != PR_FORMAT_G) & (format != PR_FORMAT_B) & (format != PR_FORMAT_A) & (format != PR_FORMAT_RGB) & (format != PR_FORMAT_RGBA) & (format != PR_FORMAT_STENCIL) & (format != PR_FORMAT_DEPTH) & (format != PR_FORMAT_DEPTH_STENCIL)) {
+    if((format != PR_FORMAT_A) && (format != PR_FORMAT_G) && (format != PR_FORMAT_B) &&
+        (format != PR_FORMAT_RGB) && (format != PR_FORMAT_RGBA) &&
+        (format != PR_FORMAT_STENCIL) && (format != PR_FORMAT_DEPTH) && (format != PR_FORMAT_DEPTH_STENCIL)
+    ) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_WARNING, "prRenderBufferUpdate: Invalid format for renderbuffer (was %i), using PR_FORMAT_RGB type", format);
         renderBuffer->format = PR_FORMAT_RGB;
     } else {
