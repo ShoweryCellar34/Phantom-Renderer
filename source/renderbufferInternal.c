@@ -6,26 +6,42 @@
 #include <PR/logger.h>
 #include <PR/renderbuffer.h>
 
-void i_prRenderbufferComputeFormats(prRenderBufferData* texture, GLenum* internalFormat) {
-    switch(texture->type) {
-        case PR_COLOR:
-            *internalFormat = GL_RGBA;
+void i_prRenderbufferComputeFormats(prRenderBufferData* renderBuffer, GLenum* internalFormat) {
+    switch(renderBuffer->format) {
+        case PR_FORMAT_R:
+            *internalFormat = GL_RED;
             break;
 
-        case PR_DEPTH:
-            *internalFormat = GL_DEPTH_COMPONENT;
+        case PR_FORMAT_G:
+            *internalFormat = GL_GREEN;
             break;
 
-        case PR_STENCIL:
-            *internalFormat = GL_STENCIL_INDEX;
+        case PR_FORMAT_B:
+            *internalFormat = GL_BLUE;
             break;
 
-        case PR_DEPTH_STENCIL:
+        case PR_FORMAT_A:
+            *internalFormat = GL_ALPHA;
+            break;
+
+        case PR_FORMAT_RGB:
+            *internalFormat = GL_RGB16F;
+            break;
+
+        case PR_FORMAT_RGBA:
+            *internalFormat = GL_RGBA32F;
+            break;
+
+        case PR_FORMAT_STENCIL:
+            *internalFormat = GL_STENCIL_INDEX8;
+            break;
+
+        case PR_FORMAT_DEPTH:
+            *internalFormat = GL_DEPTH_COMPONENT24;
+            break;
+
+        case PR_FORMAT_DEPTH_STENCIL:
             *internalFormat = GL_DEPTH24_STENCIL8;
-            break;
-
-        default:
-            *internalFormat = 0;
             break;
     }
 }

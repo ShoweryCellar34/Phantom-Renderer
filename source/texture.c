@@ -48,7 +48,7 @@ void prTextureLinkContext(prTextureData* texture, GladGLContext* context) {
     }
 }
 
-void prTextureUpdate(prTextureData* texture, int type, int wrappingMode, GLubyte rawTextureData[], size_t rawTextureDataCount, GLint width, GLint height) {
+void prTextureUpdate(prTextureData* texture, int format, int wrappingMode, GLubyte rawTextureData[], size_t rawTextureDataCount, GLint width, GLint height) {
     if(!rawTextureDataCount && rawTextureData) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_WARNING, "prTextureUpdate: Texture data count not zero while texture data is NULL. Assuming no texture data, texture data will be NULL");
     }
@@ -63,11 +63,11 @@ void prTextureUpdate(prTextureData* texture, int type, int wrappingMode, GLubyte
         texture->wrappingMode = wrappingMode;
     }
 
-    if((type != PR_COLOR) & (type != PR_DEPTH) & (type != PR_STENCIL) & (type != PR_DEPTH_STENCIL)) {
-        prLogEvent(PR_EVENT_DATA, PR_LOG_WARNING, "prTextureUpdate: Invalid type for texture (was %i), using PR_COLOR type", type);
-        texture->type = PR_COLOR;
+    if((format != PR_FORMAT_A) & (format != PR_FORMAT_G) & (format != PR_FORMAT_B) & (format != PR_FORMAT_A) & (format != PR_FORMAT_RGB) & (format != PR_FORMAT_RGBA) & (format != PR_FORMAT_STENCIL) & (format != PR_FORMAT_DEPTH) & (format != PR_FORMAT_DEPTH_STENCIL)) {
+        prLogEvent(PR_EVENT_DATA, PR_LOG_WARNING, "prTextureUpdate: Invalid format for texture (was %i), using PR_FORMAT_RGB type", format);
+        texture->format = PR_FORMAT_RGB;
     } else {
-        texture->type = type;
+        texture->format = format;
     }
 
     unsigned char* temp = NULL;
@@ -99,4 +99,8 @@ void prTextureUpdate(prTextureData* texture, int type, int wrappingMode, GLubyte
 
 void prTextureSetPixelated(prTextureData* texture, bool pixelated) {
     texture->pixelated = pixelated;
+}
+
+void prTextureBindImage(prTextureData* texture, unsigned int index, unsigned int mipmapLevel, unsigned int access, unsigned int format) {
+    texture->context->BindImageTexture(index, texture->TBO, mipmapLevel, GL_FALSE, 0, access, format);
 }

@@ -6,8 +6,7 @@
 typedef int8_t prLogLevel_t;
 typedef int8_t prEvent_t;
 
-#define PR_MAXSTR_LEN 1024
-#define PR_GROWTH_FACTOR 1.5
+#define PR_MAXSTR_LEN    1024
 
 #define PR_EVENT_MEMORY  0
 #define PR_EVENT_DATA    1
@@ -20,15 +19,24 @@ typedef int8_t prEvent_t;
 #define PR_LOG_INFO      7
 #define PR_LOG_TRACE     8
 
-#define PR_WRAPPING_REPEAT             GL_REPEAT
-#define PR_WRAPPING_REPEAT_MIRRORED    GL_MIRRORED_REPEAT
-#define PR_WRAPPING_EDGE               GL_CLAMP_TO_EDGE
-#define PR_WRAPPING_COLOR              GL_CLAMP_TO_BORDER
+#define PR_WRAPPING_REPEAT               GL_REPEAT
+#define PR_WRAPPING_REPEAT_MIRRORED      GL_MIRRORED_REPEAT
+#define PR_WRAPPING_EDGE                 GL_CLAMP_TO_EDGE
+#define PR_WRAPPING_COLOR                GL_CLAMP_TO_BORDER
 
-#define PR_COLOR                       GL_RGBA
-#define PR_DEPTH                       GL_DEPTH_COMPONENT
-#define PR_STENCIL                     GL_STENCIL_INDEX
-#define PR_DEPTH_STENCIL               GL_DEPTH24_STENCIL8
+#define PR_ACCESS_READ_ONLY              GL_READ_ONLY
+#define PR_ACCESS_WRITE_ONLY             GL_WRITE_ONLY
+#define PR_ACCESS_READ_WRITE             GL_READ_WRITE
+
+#define PR_FORMAT_R                      GL_RED
+#define PR_FORMAT_G                      GL_GREEN
+#define PR_FORMAT_B                      GL_BLUE
+#define PR_FORMAT_A                      GL_ALPHA
+#define PR_FORMAT_RGB                    GL_RGB
+#define PR_FORMAT_RGBA                   GL_RGBA
+#define PR_FORMAT_STENCIL                GL_STENCIL_INDEX
+#define PR_FORMAT_DEPTH                  GL_DEPTH_COMPONENT
+#define PR_FORMAT_DEPTH_STENCIL          GL_DEPTH24_STENCIL8
 
 #ifndef BASE_VERTEX_SHADER
 #define BASE_VERTEX_SHADER "\n\

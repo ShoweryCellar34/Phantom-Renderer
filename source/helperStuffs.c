@@ -45,7 +45,7 @@ prTextureData* loadTexture(GladGLContext* context, const char* path) {
     fclose(textureFile);
 
     prTextureLinkContext(texture, context);
-    prTextureUpdate(texture, PR_COLOR, PR_WRAPPING_EDGE, textureData, textureFileSize, 0, 0);
+    prTextureUpdate(texture, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, textureData, textureFileSize, 0, 0);
     prFree(textureData);
 
     return texture;
@@ -101,7 +101,7 @@ prTextureData* makeTextureCheckerboard(GladGLContext* context, size_t scale, flo
 
     prFree(template);
 
-    texture->type = PR_COLOR;
+    texture->format = PR_FORMAT_RGBA;
     texture->channels = 4;
     texture->height = scale;
     texture->width = scale;

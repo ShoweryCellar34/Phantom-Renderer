@@ -7,42 +7,50 @@
 #include <PR/texture.h>
 
 void i_prTextureComputeFormats(prTextureData* texture, GLenum* format, GLenum* internalFormat) {
-    switch(texture->type) {
-        case PR_COLOR:
-            switch(texture->channels) {
-                case 3:
-                    *format = GL_RGB;
-                    break;
-        
-                case 4:
-                    *format = GL_RGBA;
-                    break;
-
-                default:
-                    *format = 0;
-                    break;
-            }
-            *internalFormat = GL_RGBA;
+    switch(texture->format) {
+        case PR_FORMAT_R:
+            *format = GL_RED;
+            *internalFormat = GL_RED;
             break;
 
-        case PR_DEPTH:
-            *format = GL_DEPTH_COMPONENT;
-            *internalFormat = GL_DEPTH_COMPONENT;
+        case PR_FORMAT_G:
+            *format = GL_GREEN;
+            *internalFormat = GL_GREEN;
             break;
 
-        case PR_STENCIL:
+        case PR_FORMAT_B:
+            *format = GL_BLUE;
+            *internalFormat = GL_BLUE;
+            break;
+
+        case PR_FORMAT_A:
+            *format = GL_ALPHA;
+            *internalFormat = GL_ALPHA;
+            break;
+
+        case PR_FORMAT_RGB:
+            *format = GL_RGB;
+            *internalFormat = GL_RGB16F;
+            break;
+
+        case PR_FORMAT_RGBA:
+            *format = GL_RGBA;
+            *internalFormat = GL_RGBA32F;
+            break;
+
+        case PR_FORMAT_STENCIL:
             *format = GL_STENCIL_INDEX;
-            *internalFormat = GL_STENCIL_INDEX;
+            *internalFormat = GL_STENCIL_INDEX8;
             break;
 
-        case PR_DEPTH_STENCIL:
+        case PR_FORMAT_DEPTH:
+            *format = GL_DEPTH_COMPONENT;
+            *internalFormat = GL_DEPTH_COMPONENT24;
+            break;
+
+        case PR_FORMAT_DEPTH_STENCIL:
             *format = GL_DEPTH24_STENCIL8;
             *internalFormat = GL_UNSIGNED_INT_24_8;
-            break;
-
-        default:
-            *format = 0;
-            *internalFormat = 0;
             break;
     }
 }
