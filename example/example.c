@@ -125,10 +125,10 @@ int main(int argc, char** argv) {
     prMeshLinkMaterial(meshItem, defaultMaterial);
 
     prDirectionalLightData* sun = prDirectionalLightCreate();
-    prDirectionalLightSetDirection(sun, (vec3){-1.0f, -1.0f, -1.0f});
+    prDirectionalLightSetDirection(sun, (vec3){-0.25f, -1.0f, -0.25f});
     prDirectionalLightSetAmbient(sun, (vec3){0.2, 0.2, 0.15});
-    prDirectionalLightSetDiffuse(sun, (vec3){0.5f, 0.5f, 0.4f});
-    prDirectionalLightSetSpecular(sun, (vec3){0.7, 0.7, 0.7});
+    prDirectionalLightSetDiffuse(sun, (vec3){0.6f, 0.6f, 0.6f});
+    prDirectionalLightSetSpecular(sun, (vec3){0.8f, 0.8f, 0.8f});
 
     prPointLightData* point = prPointLightCreate();
     point->constant = 1.0;
@@ -209,6 +209,9 @@ int main(int argc, char** argv) {
         float val = smoothOvertimeSin();
 
         translationsToMatrix(translation, (vec3){0.0f, 0.0f, -20.0f}, GLM_VEC3_ZERO, (vec3){30.0f, 30.0f, 10.0f});
+        prMeshDraw(meshMetal, translation, camera, shaderProgram);
+
+        translationsToMatrix(translation, (vec3){0.0f, -20.0f, 0.0f}, GLM_VEC3_ZERO, (vec3){30.0f, 10.0f, 30.0f});
         prMeshDraw(meshMetal, translation, camera, shaderProgram);
 
         translationsToMatrix(translation, (vec3){1.0f, 0.0f, 0.0f}, (vec3){0.0f, val, 0.0f}, GLM_VEC3_ONE);
