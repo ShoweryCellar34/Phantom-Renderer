@@ -24,13 +24,12 @@ void i_prFramebufferDestroyOnGPU(prFramebufferData* framebuffer) {
 
 void i_prFramebufferUpdateBuffers(prFramebufferData* framebuffer) {
     prLogEvent(PR_EVENT_OPENGL, PR_LOG_INFO, "i_prFramebufferUpdateBuffers: Updating framebuffer object");
-    framebuffer->context->BindFramebuffer(GL_FRAMEBUFFER, framebuffer->FBO);
 
     i_prFramebufferSetDataOnGPU(framebuffer);
 }
 
 void i_prFramebufferSetDataOnGPU(prFramebufferData* framebuffer) {
-    framebuffer->context->BindFramebuffer(GL_FRAMEBUFFER, 0);
+    framebuffer->context->BindFramebuffer(GL_FRAMEBUFFER, framebuffer->FBO);
 
     i_prFramebufferSetAttachment(framebuffer, framebuffer->colorTexture, framebuffer->colorRBO, GL_COLOR_ATTACHMENT0);
     i_prFramebufferSetAttachment(framebuffer, framebuffer->depthTexture, framebuffer->depthRBO, GL_DEPTH_ATTACHMENT);
@@ -66,8 +65,8 @@ void i_prFramebufferSetAttachment(prFramebufferData* framebuffer, prTextureData*
 }
 
 void i_prFramebufferBlitOnGPU(prFramebufferData* source, prFramebufferData* destination, int srcX0, int srcY0, int srcX1, int srcY1, int dstX0, int dstY0, int dstX1, int dstY1, GLbitfield mask, GLenum filter) {
-    source->context->BindFramebuffer(GL_READ_FRAMEBUFFER, source ? source->FBO : 0);
-    source->context->BindFramebuffer(GL_DRAW_FRAMEBUFFER, destination ? destination->FBO : 0);
+    source->context->BindFramebuffer(GL_READ_FRAMEBUFFER, (source ? source->FBO : 0));
+    source->context->BindFramebuffer(GL_DRAW_FRAMEBUFFER, (destination ? destination->FBO : 0));
 
     source->context->BlitFramebuffer(
         srcX0, srcY0, srcX1, srcY1,

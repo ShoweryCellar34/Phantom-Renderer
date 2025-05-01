@@ -14,13 +14,21 @@ int main(int argc, char** argv) {
 
     glfwInit();
 
-    prWindow* test = prWindowCreate("Test", 1280, 720);
+    prWindow* test = prWindowCreate(TITLE, windowWidth, windowHeight);
     prWindowInitContext(test);
     glfwSetWindowUserPointer(test->window, test->openglContext);
 
     prEnableImageFlip();
 
     prShaderData* shaderProgram = loadDefaultShader(test->openglContext);
+
+    prShaderData* hudShaderProgram = prShaderCreate();
+    prShaderLinkContext(hudShaderProgram, test->openglContext);
+    prShaderUpdate(hudShaderProgram, HUD_VERTEX_SHADER, HUD_FRAGMENT_SHADER);
+
+    prComputeShaderData* computeShaderProgram = prComputeShaderCreate();
+    prComputeShaderLinkContext(computeShaderProgram, test->openglContext);
+    prComputeShaderUpdate(computeShaderProgram, HUD_COMPUTE_SHADER);
 
     prTextureData* defaultTexture = makeTextureCheckerboard(test->openglContext, 8, (float[4]){1.0f, 0.0f, 1.0f, 1.0f}, (float[4]){0.0f, 0.0f, 0.0f, 0.0f});
 
@@ -43,6 +51,10 @@ int main(int argc, char** argv) {
     prTextureData* blackTexture = makeTextureSingleColor(test->openglContext, (float[4]){0.0f, 0.0f, 0.0f, 1.0f});
 
     prTextureData* whiteTexture = makeTextureSingleColor(test->openglContext, (float[4]){1.0f, 1.0f, 1.0f, 1.0f});
+
+    colorTexture = prTextureCreate();
+    prTextureLinkContext(colorTexture, test->openglContext);
+    prTextureUpdate(colorTexture, PR_FORMAT_RGBA, PR_FILTER_LINEAR, PR_WRAPPING_EDGE, NULL, 0, windowWidth, windowHeight);
 
     prMaterialData* defaultMaterial = makeMaterialOneTexture(defaultTexture);
     defaultMaterial->shininess = 48.0f;
@@ -78,6 +90,12 @@ int main(int argc, char** argv) {
     prMaterialLinkNormalMap(materialBrick, brickWallNormalTexture);
     prMaterialSetShininess(materialBrick, 32.0f);
 
+    prMaterialData* materialQuad = prMaterialCreate();
+    prMaterialLinkAmbientMap(materialQuad, colorTexture);
+    prMaterialLinkDiffuseMap(materialQuad, blackTexture);
+    prMaterialLinkSpecularMap(materialQuad, blackTexture);
+    prMaterialLinkNormalMap(materialQuad, blackTexture);
+    prMaterialSetShininess(materialQuad, 0.0f);
 
     prMeshData* meshMetal = prMeshCreate();
     prMeshLinkContext(meshMetal, test->openglContext);
@@ -124,6 +142,15 @@ int main(int argc, char** argv) {
         indices, sizeof(indices) / sizeof(unsigned int));
     prMeshLinkMaterial(meshItem, defaultMaterial);
 
+    prMeshData* meshQuad = prMeshCreate();
+    prMeshLinkContext(meshQuad, test->openglContext);
+    prMeshUpdate(meshQuad,
+        verticesQuad, sizeof(verticesQuad) / sizeof(float),
+        normalsQuad, sizeof(normalsQuad) / sizeof(float),
+        textureCoordinatesQuad, sizeof(textureCoordinatesQuad) / sizeof(float),
+        indicesQuad, sizeof(indicesQuad) / sizeof(unsigned int));
+    prMeshLinkMaterial(meshQuad, materialQuad);
+
     prDirectionalLightData* sun = prDirectionalLightCreate();
     prDirectionalLightSetDirection(sun, (vec3){-0.25f, -1.0f, -0.25f});
     prDirectionalLightSetAmbient(sun, (vec3){0.2, 0.2, 0.15});
@@ -165,36 +192,12 @@ int main(int argc, char** argv) {
     test->openglContext->Enable(GL_BLEND);
     test->openglContext->BlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    // prTextureData* colorTexture = prTextureCreate();
-    // prTextureLinkContext(colorTexture, test->openglContext);
-    // prTextureUpdate(colorTexture, PR_COLOR, PR_WRAPPING_EDGE, NULL, 0, 1600, 900);
-
-    // prRenderBufferData* depthStencilRBO = prRenderBufferCreate();
-    // prRenderBufferLinkContext(depthStencilRBO, test->openglContext);
-    // prRenderBufferUpdate(depthStencilRBO, PR_DEPTH_STENCIL, 1600, 800);
-
-    // prFramebufferData* framebuffer = prFramebufferCreate();
-    // prFramebufferLinkContext(framebuffer, test->openglContext);
-    // prFramebufferLinkColorTexture(framebuffer, colorTexture);
-    // prFramebufferLinkDepthStencilTextureRBO(framebuffer, depthStencilRBO);
-
-    // prMeshData* meshQuad = prMeshCreate();
-    // prMeshLinkContext(meshQuad, test->openglContext);
-    // prMeshUpdate(meshQuad,
-    //     verticesQuad, sizeof(verticesQuad) / sizeof(float),
-    //     normalsQuad, sizeof(normalsQuad) / sizeof(float),
-    //     textureCoordinatesQuad, sizeof(textureCoordinatesQuad) / sizeof(float),
-    //     indicesQuad, sizeof(indicesQuad) / sizeof(unsigned int));
-    // prMeshLinkMaterial(meshItem, quadMaterial);
-
-    // prMaterialData* materialQuad = prMeshCreate();
-    // prMaterialLinkAmbientMap(materialQuad, colorTexture);
-    // prMaterialLinkDiffuseMap(materialQuad, blackTexture);
-    // prMaterialLinkSpecularMap(materialQuad, blackTexture);
-    // prMaterialLinkNormalMap(materialQuad, blackTexture);
-    // prMaterialSetShininess(materialBrick, 0.0f);
-
     while(!glfwWindowShouldClose(test->window)) {
+        test->openglContext->UseProgram(computeShaderProgram->computeShaderProgramObject);
+        prTextureBindImage(colorTexture, 0, 0, PR_ACCESS_WRITE_ONLY, GL_RGBA32F);
+        prComputeShaderDispatch(computeShaderProgram, windowWidth, windowHeight, 1);
+        test->openglContext->MemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
+
         test->openglContext->Clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         float currentFrame = glfwGetTime();
@@ -226,6 +229,9 @@ int main(int argc, char** argv) {
         translationsToMatrix(translation, (vec3){0.0f, val / 3.5f - 1.5f, 0.0f}, (vec3){0.0f, radians(val * 100.0f), 0.0f}, GLM_VEC3_ONE);
         prMeshDraw(meshItem, translation, camera, shaderProgram);
 
+        translationsToMatrix(translation, (vec3){0.0f, 0.0f, 0.0f}, GLM_VEC3_ZERO, GLM_VEC3_ONE);
+        prMeshDraw(meshQuad, translation, camera, hudShaderProgram);
+
         glfwSwapBuffers(test->window);
         glfwPollEvents();
         proccessInput(test->window);
@@ -234,13 +240,17 @@ int main(int argc, char** argv) {
     prCameraDestroy(camera);
     camera = NULL;
 
+    prMeshDestroy(meshQuad);
+    meshQuad = NULL;
     prMeshDestroy(meshWoodMetal);
     meshWoodMetal = NULL;
     prMeshDestroy(meshWood);
     meshWood = NULL;
     prMeshDestroy(meshMetal);
     meshMetal = NULL;
-    
+
+    prMaterialDestroy(materialQuad);
+    materialQuad = NULL;
     prMaterialDestroy(materialWoodMetal);
     materialWoodMetal = NULL;
     prMaterialDestroy(materialWood);
@@ -252,6 +262,8 @@ int main(int argc, char** argv) {
     prMaterialDestroy(defaultMaterial);
     defaultMaterial = NULL;
 
+    prTextureDestroy(colorTexture);
+    colorTexture = NULL;
     prTextureDestroy(whiteTexture);
     whiteTexture = NULL;
     prTextureDestroy(blackTexture);
@@ -273,6 +285,10 @@ int main(int argc, char** argv) {
     prTextureDestroy(defaultTexture);
     defaultTexture = NULL;
 
+    prComputeShaderDestroy(computeShaderProgram);
+    computeShaderProgram = NULL;
+    prShaderDestroy(hudShaderProgram);
+    hudShaderProgram = NULL;
     prShaderDestroy(shaderProgram);
     shaderProgram = NULL;
 

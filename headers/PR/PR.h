@@ -5,6 +5,7 @@ extern "C" {
 #endif
 
 #include "camera.h"
+#include "computeShader.h"
 #include "defines.h"
 #include "framebuffer.h"
 #include "light.h"

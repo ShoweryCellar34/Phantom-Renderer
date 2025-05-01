@@ -46,12 +46,18 @@ void proccessInput(GLFWwindow* window) {
     }
 
     if(glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) {
-        glm_vec3_scale(camera->up, cameraSpeed, temp2[0]);
+        glm_cross(camera->up, camera->front, temp2[0]);
+        glm_normalize(temp2[0]);
+        glm_cross(camera->front, temp2[0], temp2[0]);
+        glm_vec3_scale(temp2[0], cameraSpeed, temp2[0]);
         glm_vec3_add(cameraPosition, temp2[0], cameraPosition);
     }
     if(glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) {
-        glm_vec3_scale(camera->up, cameraSpeed, temp2[1]);
-        glm_vec3_sub(cameraPosition, temp2[1], cameraPosition);
+        glm_cross(camera->up, camera->front, temp2[0]);
+        glm_normalize(temp2[0]);
+        glm_cross(camera->front, temp2[0], temp2[0]);
+        glm_vec3_scale(temp2[0], cameraSpeed, temp2[0]);
+        glm_vec3_sub(cameraPosition, temp2[0], cameraPosition);
     }
 
     if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
@@ -60,9 +66,13 @@ void proccessInput(GLFWwindow* window) {
 }
 
 void framebufferSizeCallback(GLFWwindow* window, int width, int height) {
+    windowWidth = width;
+    windowHeight = height;
     GladGLContext* context = glfwGetWindowUserPointer(window);
     context->Viewport(0, 0, width, height);
     prCameraUpdateDimentions(camera);
+
+    prTextureUpdate(colorTexture, PR_FORMAT_RGBA, PR_FILTER_LINEAR, PR_WRAPPING_EDGE, NULL, 0, windowWidth, windowHeight);
 }
 
 void cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {

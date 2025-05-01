@@ -90,6 +90,11 @@ void prTextureUpdate(prTextureData* texture, int format, int filter, int wrappin
             prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prTextureUpdate: Texture data failed to unpack. Aborting operation, nothing was modified");
             return;
         }
+    } else if(!rawTextureData && (width || height)) {
+        temp = NULL;
+        texture->width = width;
+        texture->height = height;
+        texture->channels = 0;
     } else if(width || height) {
         temp = prMalloc(rawTextureDataCount);
         prMemcpy(temp, (void*)rawTextureData, rawTextureDataCount);

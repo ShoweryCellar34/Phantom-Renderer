@@ -147,6 +147,32 @@ unsigned int indices[] = {
     33, 35, 34
 };
 
+float verticesQuad[] = {
+    0.05f, 0.95f, 0.0f,
+    0.05f, 0.65f, 0.0f,
+    0.35f, 0.65f, 0.0f,
+    0.35f, 0.95f, 0.0f
+};
+
+float normalsQuad[] = {
+    0.0f, 1.0f, 0.0f,
+    0.0f, 1.0f, 0.0f,
+    0.0f, 1.0f, 0.0f,
+    0.0f, 1.0f, 0.0f,
+};
+
+float textureCoordinatesQuad[] = {
+    0.0f, 1.0f,
+    0.0f, 0.0f,
+    1.0f, 0.0f,
+    1.0f, 1.0f,
+};
+
+unsigned int indicesQuad[] = {
+    0, 1, 2,
+    2, 3, 0
+};
+
 prCamera* camera = NULL;
 vec3 cameraPosition = {0.0f, 0.0f, 5.0f};
 float deltaTime = 0.0f;
@@ -158,11 +184,53 @@ float yaw = 270.0f;
 double lastX = 0.0f;
 double lastY = 0.0f;
 
-#define OUTLINE_FRAGMENT_SHADER "\
+#define HUD_VERTEX_SHADER "\n\
+#version 460 core\n\
+layout (location = 0) in vec3 inputPosition;\n\
+layout (location = 2) in vec2 inputTextureCoordinates;\n\
+\n\
+out vec2 textureCoordinates;\n\
+\n\
+void main() {\n\
+    vec4 pos = vec4(inputPosition, 1.0);\n\
+    pos.xy = pos.xy * 2.0 - 1.0;\n\
+    gl_Position = pos;\n\
+    textureCoordinates = inputTextureCoordinates;\n\
+}\n\
+"
+
+#define HUD_FRAGMENT_SHADER "\n\
 #version 460 core\n\
 out vec4 fragmentColor;\n\
 \n\
+in vec2 textureCoordinates;\n\
+\n\
+struct Material {\n\
+    sampler2D ambient;\n\
+};\n\
+uniform Material material;\n\
+\n\
 void main() {\n\
-    fragmentColor = vec4(0.04, 0.28, 0.26, 1.0);\n\
+    fragmentColor = vec4(texture(material.ambient, textureCoordinates).rgb, 1.0);\n\
 }\n\
 "
+
+#define HUD_COMPUTE_SHADER "\n\
+#version 460 core\n\
+layout (local_size_x = 1, local_size_y = 1, local_size_z = 1) in;\n\
+layout (rgba32f, binding = 0) uniform image2D outputImage;\n\
+void main() {\n\
+    ivec2 pixelCoord = ivec2(gl_GlobalInvocationID.xy);\n\
+    vec2 uv = vec2(pixelCoord) / vec2(imageSize(outputImage));\n\
+    vec3 color = vec3(uv, 0.5);\n\
+    imageStore(outputImage, pixelCoord, vec4(color, 1.0));\n\
+}\n\
+"
+
+prTextureData* colorTexture = NULL;
+
+#define DEF_WIDTH 1280
+#define DEF_HEIGHT 720
+int windowWidth = DEF_WIDTH;
+int windowHeight = DEF_HEIGHT;
+#define TITLE "Phantom-Renderer Demo"

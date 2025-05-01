@@ -138,8 +138,6 @@ void prFramebufferBlit(prFramebufferData* source, prFramebufferData* destination
             prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferBlit: Source framebuffer is not initialized on GPU. Aborting operation, nothing was modified");
             return;
         }
-    } else {
-        prLogEvent(PR_EVENT_DATA, PR_LOG_TRACE, "prFramebufferBlit: Source framebuffer NULL, assuming default framebuffer (0)");
     }
     if(destination) {
         if(!destination->context) {
@@ -150,8 +148,6 @@ void prFramebufferBlit(prFramebufferData* source, prFramebufferData* destination
             prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferBlit: Destination framebuffer is not initialized on GPU. Aborting operation, nothing was modified");
             return;
         }
-    } else {
-        prLogEvent(PR_EVENT_DATA, PR_LOG_TRACE, "prFramebufferBlit: Destination framebuffer NULL, assuming default framebuffer (0)");
     }
     if(source && destination) {
         if(source->context != destination->context) {

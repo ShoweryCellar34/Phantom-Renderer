@@ -149,12 +149,12 @@ void i_prMeshDrawOnGPU(prMeshData* mesh, mat4 translation, prCamera* camera, prS
     mesh->context->BindVertexArray(mesh->VAO);
 
     mesh->context->ActiveTexture(GL_TEXTURE0);
-    if(mesh->material->ambientMap) {
-        if(mesh->material->ambientMap->TBO) {
-            if(mesh->material->ambientMap->context != mesh->context) {
+    if(material->ambientMap) {
+        if(material->ambientMap->TBO) {
+            if(material->ambientMap->context != mesh->context) {
                 prLogEvent(PR_EVENT_OPENGL, PR_LOG_ERROR, "i_prMeshDrawOnGPU: Ambient map context does not match mesh context, binding ID 0");
             } else {
-                mesh->context->BindTexture(GL_TEXTURE_2D, mesh->material->ambientMap->TBO);
+                mesh->context->BindTexture(GL_TEXTURE_2D, material->ambientMap->TBO);
             }
         } else {
             mesh->context->BindTexture(GL_TEXTURE_2D, 0);
@@ -163,12 +163,12 @@ void i_prMeshDrawOnGPU(prMeshData* mesh, mat4 translation, prCamera* camera, prS
         mesh->context->BindTexture(GL_TEXTURE_2D, 0);
     }
     mesh->context->ActiveTexture(GL_TEXTURE1);
-    if(mesh->material->diffuseMap) {
-        if(mesh->material->diffuseMap->TBO) {
-            if(mesh->material->diffuseMap->context != mesh->context) {
+    if(material->diffuseMap) {
+        if(material->diffuseMap->TBO) {
+            if(material->diffuseMap->context != mesh->context) {
                 prLogEvent(PR_EVENT_OPENGL, PR_LOG_ERROR, "i_prMeshDrawOnGPU: Diffuse map context does not match mesh context, binding ID 0");
             } else {
-                mesh->context->BindTexture(GL_TEXTURE_2D, mesh->material->diffuseMap->TBO);
+                mesh->context->BindTexture(GL_TEXTURE_2D, material->diffuseMap->TBO);
             }
         } else {
             mesh->context->BindTexture(GL_TEXTURE_2D, 0);
@@ -177,12 +177,12 @@ void i_prMeshDrawOnGPU(prMeshData* mesh, mat4 translation, prCamera* camera, prS
         mesh->context->BindTexture(GL_TEXTURE_2D, 0);
     }
     mesh->context->ActiveTexture(GL_TEXTURE2);
-    if(mesh->material->specularMap) {
-        if(mesh->material->specularMap->TBO) {
-            if(mesh->material->specularMap->context != mesh->context) {
+    if(material->specularMap) {
+        if(material->specularMap->TBO) {
+            if(material->specularMap->context != mesh->context) {
                 prLogEvent(PR_EVENT_OPENGL, PR_LOG_ERROR, "i_prMeshDrawOnGPU: Specular map context does not match mesh context, binding ID 0");
             } else {
-                mesh->context->BindTexture(GL_TEXTURE_2D, mesh->material->specularMap->TBO);
+                mesh->context->BindTexture(GL_TEXTURE_2D, material->specularMap->TBO);
             }
         } else {
             mesh->context->BindTexture(GL_TEXTURE_2D, 0);
@@ -191,12 +191,12 @@ void i_prMeshDrawOnGPU(prMeshData* mesh, mat4 translation, prCamera* camera, prS
         mesh->context->BindTexture(GL_TEXTURE_2D, 0);
     }
     mesh->context->ActiveTexture(GL_TEXTURE3);
-    if(mesh->material->normalMap) {
-        if(mesh->material->normalMap->TBO) {
-            if(mesh->material->normalMap->context != mesh->context) {
+    if(material->normalMap) {
+        if(material->normalMap->TBO) {
+            if(material->normalMap->context != mesh->context) {
                 prLogEvent(PR_EVENT_OPENGL, PR_LOG_ERROR, "i_prMeshDrawOnGPU: Normal map context does not match mesh context, binding ID 0");
             } else {
-                mesh->context->BindTexture(GL_TEXTURE_2D, mesh->material->normalMap->TBO);
+                mesh->context->BindTexture(GL_TEXTURE_2D, material->normalMap->TBO);
             }
         } else {
             mesh->context->BindTexture(GL_TEXTURE_2D, 0);
