@@ -12,7 +12,7 @@
 prShaderData* loadDefaultShader(GladGLContext* context) {
     prShaderData* shaderProgram = prShaderCreate();
     prShaderLinkContext(shaderProgram, context);
-    prShaderUpdate(shaderProgram, BASE_VERTEX_SHADER, BASE_FRAGMENT_SHADER);
+    prShaderUpdate(shaderProgram, 1, 1, BASE_VERTEX_SHADER, BASE_FRAGMENT_SHADER);
 
     return shaderProgram;
 }

@@ -24,7 +24,7 @@ int main(int argc, char** argv) {
 
     prShaderData* hudShaderProgram = prShaderCreate();
     prShaderLinkContext(hudShaderProgram, test->openglContext);
-    prShaderUpdate(hudShaderProgram, HUD_VERTEX_SHADER, HUD_FRAGMENT_SHADER);
+    prShaderUpdate(hudShaderProgram, 0, 0, HUD_VERTEX_SHADER, HUD_FRAGMENT_SHADER);
 
     prComputeShaderData* computeShaderProgram = prComputeShaderCreate();
     prComputeShaderLinkContext(computeShaderProgram, test->openglContext);

@@ -18,14 +18,9 @@ void prMeshDestroy(prMeshData* mesh) {
 
     if(mesh->vertices) {
         prFree(mesh->vertices);
-    }
-    if(mesh->textureCoordinates) {
+        prFree(mesh->normals);
         prFree(mesh->textureCoordinates);
-    }
-    if(mesh->indices) {
         prFree(mesh->indices);
-    }
-    if(mesh->GPUReadyBuffer) {
         prFree(mesh->GPUReadyBuffer);
     }
 
@@ -93,17 +88,15 @@ void prMeshUpdate(prMeshData* mesh, GLfloat vertices[], size_t verticesCount,
 
     if(mesh->vertices) {
         prFree(mesh->vertices);
-        prFree(mesh->indices);
-        mesh->vertices = NULL;
-        mesh->indices = NULL;
-    }
-    if(mesh->normals) {
         prFree(mesh->normals);
-        mesh->normals = NULL;
-    }
-    if(mesh->textureCoordinates) {
         prFree(mesh->textureCoordinates);
+        prFree(mesh->indices);
+        prFree(mesh->GPUReadyBuffer);
+        mesh->vertices = NULL;
+        mesh->normals = NULL;
         mesh->textureCoordinates = NULL;
+        mesh->indices = NULL;
+        mesh->GPUReadyBuffer = NULL;
     }
 
     mesh->vertices = prMalloc(sizeof(GLfloat) * verticesCount);

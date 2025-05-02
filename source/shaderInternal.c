@@ -10,7 +10,7 @@
 #include <PR/memory.h>
 #include <PR/logger.h>
 
-int i_prShaderUniformBoilerPlate(prShaderData* shaderProgram, const char* uniformName) {
+int i_prShaderUniformBoilerPlate(prShaderData* shaderProgram, int logMissing, const char* uniformName) {
     if(!shaderProgram->shaderProgramObject) {
         prLogEvent(PR_EVENT_OPENGL, PR_LOG_WARNING, "i_prShaderUniformBoilerPlate: Shader not initialized. Aborting operation, nothing was modified");
         return -1;
@@ -20,7 +20,10 @@ int i_prShaderUniformBoilerPlate(prShaderData* shaderProgram, const char* unifor
     int uniformLocation = shaderProgram->context->GetUniformLocation(shaderProgram->shaderProgramObject, uniformName);
 
     if(uniformLocation == -1) {
-        prLogEvent(PR_EVENT_OPENGL, PR_LOG_WARNING, "i_prShaderUniformBoilerPlate: No uniform with name \"%s\" found. Aborting operation, nothing was modified", uniformName);
+        // To verbose because this will happen whenever the uniform is set, and can be an issue when a uniform set by prMeshDraw() is not found in the shader.
+        if(logMissing != 0) {
+            prLogEvent(PR_EVENT_OPENGL, PR_LOG_WARNING, "i_prShaderUniformBoilerPlate: No uniform with name \"%s\" found. Aborting operation, nothing was modified", uniformName);
+        }
         return -1;
     }
 

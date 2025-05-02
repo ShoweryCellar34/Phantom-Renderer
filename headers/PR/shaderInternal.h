@@ -2,7 +2,7 @@
 
 typedef struct prShaderData prShaderData;
 
-int i_prShaderUniformBoilerPlate(prShaderData* shaderProgram, const char* uniformName);
+int i_prShaderUniformBoilerPlate(prShaderData* shaderProgram, int logMissing, const char* uniformName);
 
 void i_prShaderCreateOnGPU(prShaderData* shaderProgram);
 

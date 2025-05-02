@@ -44,6 +44,10 @@ void proccessInput(GLFWwindow* window) {
         glm_vec3_scale(camera->up, cameraSpeed, temp[1]);
         glm_vec3_add(cameraPosition, temp[1], cameraPosition);
     }
+    if(glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
+        glm_vec3_scale(camera->up, cameraSpeed, temp[1]);
+        glm_vec3_sub(cameraPosition, temp[1], cameraPosition);
+    }
 
     if(glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) {
         glm_cross(camera->up, camera->front, temp2[0]);

@@ -15,7 +15,7 @@ void i_prMeshComputeGPUReadyBuffer(prMeshData* mesh) {
         mesh->GPUReadyBuffer = NULL;
     }
 
-    mesh->GPUReadyBufferCount = mesh->verticesCount + mesh->normalsCount + mesh->textureCoordinatesCount;
+    mesh->GPUReadyBufferCount = (mesh->verticesCount / 3) * 8;
     mesh->GPUReadyBuffer = prMalloc(mesh->GPUReadyBufferCount * sizeof(GLfloat));
 
     size_t index = 0;
@@ -205,19 +205,29 @@ void i_prMeshDrawOnGPU(prMeshData* mesh, mat4 translation, prCamera* camera, prS
         mesh->context->BindTexture(GL_TEXTURE_2D, 0);
     }
 
-    prShaderUniform3f(shaderProgram, "cameraPosition", camera->position[0], camera->position[1], camera->position[2]);
+    int success = 0;
 
-    prShaderUniformMatrix4fv(shaderProgram, "view", camera->view[0]);
+    if(shaderProgram->useCameraUniforms) {
+        success += prShaderUniform3fQuiet(shaderProgram, "cameraPosition", camera->position[0], camera->position[1], camera->position[2]);
+        success += prShaderUniformMatrix4fvQuiet(shaderProgram, "view", camera->view[0]);
+        success += prShaderUniformMatrix4fvQuiet(shaderProgram, "projection", camera->projection[0]);
+        success += prShaderUniformMatrix4fvQuiet(shaderProgram, "translation", translation[0]);
+        if(success < 4) {
+            prLogEvent(PR_EVENT_OPENGL, PR_LOG_WARNING, "i_prMeshDrawOnGPU: One or more camera uniform variables could not be set");
+        }
+    }
 
-    prShaderUniformMatrix4fv(shaderProgram, "projection", camera->projection[0]);
-
-    prShaderUniformMatrix4fv(shaderProgram, "translation", translation[0]);
-
-    prShaderUniform1i(shaderProgram, "material.ambient", 0);
-    prShaderUniform1i(shaderProgram, "material.diffuse", 1);
-    prShaderUniform1i(shaderProgram, "material.specular", 2);
-    prShaderUniform1i(shaderProgram, "material.normal", 3);
-    prShaderUniform1f(shaderProgram, "material.shininess", material->shininess);
+    if(shaderProgram->useMaterialUniforms) {
+        success = 0;
+        success += prShaderUniform1iQuiet(shaderProgram, "material.ambient", 0);
+        success += prShaderUniform1iQuiet(shaderProgram, "material.diffuse", 1);
+        success += prShaderUniform1iQuiet(shaderProgram, "material.specular", 2);
+        success += prShaderUniform1iQuiet(shaderProgram, "material.normal", 3);
+        success += prShaderUniform1fQuiet(shaderProgram, "material.shininess", material->shininess);
+        if(success < 4) {
+            prLogEvent(PR_EVENT_OPENGL, PR_LOG_WARNING, "i_prMeshDrawOnGPU: One or more material uniform variables could not be set");
+        }
+    }
 
     mesh->context->DrawElements(GL_TRIANGLES, mesh->indicesCount, GL_UNSIGNED_INT, 0);
 
