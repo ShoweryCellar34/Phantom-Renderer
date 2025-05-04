@@ -56,7 +56,6 @@ layout (location = 2) in vec2 inputTextureCoordinates;\n\
 out vec3 fragmentPosition;\n\
 out vec3 normals;\n\
 out vec2 textureCoordinates;\n\
-out mat3 TBN;\n\
 \n\
 uniform mat4 translation;\n\
 uniform mat4 view;\n\
@@ -65,19 +64,7 @@ uniform mat4 projection;\n\
 void main() {\n\
     gl_Position = projection * view * translation * vec4(inputPosition, 1.0);\n\
     fragmentPosition = vec3(translation * vec4(inputPosition, 1.0));\n\
-    \n\
-    // Transform normal to world space\n\
-    mat3 normalMatrix = mat3(transpose(inverse(translation)));\n\
-    vec3 N = normalize(normalMatrix * inputNormals);\n\
-    \n\
-    // Calculate tangent basis\n\
-    vec3 T = normalize(cross(N, N.y > 0.999 ? vec3(1,0,0) : vec3(0,1,0)));\n\
-    vec3 B = normalize(cross(N, T));\n\
-    \n\
-    // Output normal and TBN matrix\n\
-    normals = N;\n\
-    TBN = mat3(T, B, N);\n\
-    \n\
+    normals = mat3(transpose(inverse(translation))) * inputNormals;\n\
     textureCoordinates = inputTextureCoordinates;\n\
 }\n\
 "
@@ -94,7 +81,6 @@ uniform mat4 translation;\n\
 in vec3 fragmentPosition;\n\
 in vec3 normals;\n\
 in vec2 textureCoordinates;\n\
-in mat3 TBN;\n\
 \n\
 struct Material {\n\
     sampler2D ambient;\n\
@@ -170,11 +156,8 @@ void main() {\n\
     vec3 ambient = texture(material.ambient, textureCoordinates).rgb;\n\
     vec3 diffuse = texture(material.diffuse, textureCoordinates).rgb;\n\
     vec3 specular = texture(material.specular, textureCoordinates).rgb;\n\
-    \n\
-    // Sample and transform normal using pre-calculated TBN matrix\n\
-    vec3 normal = texture(material.normal, textureCoordinates).rgb;\n\
-    normal = normalize(normal * 2.0 - 1.0);\n\
-    normal = normalize(TBN * normal);\n\
+    vec3 normal = normalize(texture(material.normal, textureCoordinates).rgb);\n\
+    normal = normalize(normals);\n\
     \n\
     vec3 viewDirection = normalize(cameraPosition - fragmentPosition);\n\
     \n\

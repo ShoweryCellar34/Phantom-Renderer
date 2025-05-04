@@ -52,6 +52,8 @@ int main(int argc, char** argv) {
 
     prTextureData* whiteTexture = makeTextureSingleColor(test->openglContext, (float[4]){1.0f, 1.0f, 1.0f, 1.0f});
 
+    prTextureData* defaultNormal = makeTextureSingleColor(test->openglContext, (float[4]){0.0f, -1.0f, 0.0f, 1.0f});
+
     colorTexture = prTextureCreate();
     prTextureLinkContext(colorTexture, test->openglContext);
     prTextureUpdate(colorTexture, PR_FORMAT_RGBA, PR_FILTER_LINEAR, PR_WRAPPING_EDGE, NULL, 0, windowWidth, windowHeight);
@@ -152,9 +154,9 @@ int main(int argc, char** argv) {
     prMeshLinkMaterial(meshQuad, materialQuad);
 
     prDirectionalLightData* sun = prDirectionalLightCreate();
-    prDirectionalLightSetDirection(sun, (vec3){-0.25f, -1.0f, -0.25f});
-    prDirectionalLightSetAmbient(sun, (vec3){0.2, 0.2, 0.15});
-    prDirectionalLightSetDiffuse(sun, (vec3){0.6f, 0.6f, 0.6f});
+    prDirectionalLightSetDirection(sun, (vec3){-1.0f, -1.0f, -1.0f});
+    prDirectionalLightSetAmbient(sun, (vec3){0.095f, 0.095f, 0.1f});
+    prDirectionalLightSetDiffuse(sun, (vec3){0.6f, 0.6f, 0.55f});
     prDirectionalLightSetSpecular(sun, (vec3){0.8f, 0.8f, 0.8f});
 
     prPointLightData* point = prPointLightCreate();
@@ -264,6 +266,8 @@ int main(int argc, char** argv) {
 
     prTextureDestroy(colorTexture);
     colorTexture = NULL;
+    prTextureDestroy(defaultNormal);
+    defaultNormal = NULL;
     prTextureDestroy(whiteTexture);
     whiteTexture = NULL;
     prTextureDestroy(blackTexture);
