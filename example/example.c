@@ -58,6 +58,15 @@ int main(int argc, char** argv) {
     prTextureLinkContext(colorTexture, test->openglContext);
     prTextureUpdate(colorTexture, PR_FORMAT_RGBA, PR_FILTER_LINEAR, PR_WRAPPING_EDGE, NULL, 0, windowWidth, windowHeight);
 
+    depthStencilRBO = prRenderBufferCreate();
+    prRenderBufferLinkContext(depthStencilRBO, test->openglContext);
+    prRenderBufferUpdate(depthStencilRBO, PR_FORMAT_DEPTH_STENCIL, windowWidth, windowHeight);
+
+    framebuffer = prFramebufferCreate();
+    prFramebufferLinkContext(framebuffer, test->openglContext);
+    prFramebufferLinkColorTexture(framebuffer, colorTexture);
+    prFramebufferLinkDepthStencilTextureRBO(framebuffer, depthStencilRBO);
+
     prMaterialData* defaultMaterial = makeMaterialOneTexture(defaultTexture);
     defaultMaterial->shininess = 48.0f;
 
@@ -156,8 +165,8 @@ int main(int argc, char** argv) {
     prDirectionalLightData* sun = prDirectionalLightCreate();
     prDirectionalLightSetDirection(sun, (vec3){-1.0f, -1.0f, -1.0f});
     prDirectionalLightSetAmbient(sun, (vec3){0.095f, 0.095f, 0.1f});
-    prDirectionalLightSetDiffuse(sun, (vec3){0.6f, 0.6f, 0.55f});
-    prDirectionalLightSetSpecular(sun, (vec3){0.8f, 0.8f, 0.8f});
+    prDirectionalLightSetDiffuse(sun, (vec3){0.8f, 0.8f, 0.75f});
+    prDirectionalLightSetSpecular(sun, (vec3){0.9f, 0.9f, 0.85f});
 
     prPointLightData* point = prPointLightCreate();
     point->constant = 1.0;
@@ -200,6 +209,7 @@ int main(int argc, char** argv) {
         prComputeShaderDispatch(computeShaderProgram, windowWidth, windowHeight, 1);
         test->openglContext->MemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
 
+        test->openglContext->Enable(GL_DEPTH_TEST);
         test->openglContext->Clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         float currentFrame = glfwGetTime();
@@ -231,8 +241,11 @@ int main(int argc, char** argv) {
         translationsToMatrix(translation, (vec3){0.0f, val / 3.5f - 1.5f, 0.0f}, (vec3){0.0f, radians(val * 100.0f), 0.0f}, GLM_VEC3_ONE);
         prMeshDraw(meshItem, translation, camera, shaderProgram);
 
+        test->openglContext->Disable(GL_DEPTH_TEST);
         translationsToMatrix(translation, (vec3){0.0f, 0.0f, 0.0f}, GLM_VEC3_ZERO, GLM_VEC3_ONE);
         prMeshDraw(meshQuad, translation, camera, hudShaderProgram);
+
+        // prFramebufferBlit(test->openglContext, framebuffer, NULL, 0, 0, windowWidth, windowHeight, 0, 0, windowWidth, windowHeight, PR_BUFFER_BIT_COLOR, GL_NEAREST);
 
         glfwSwapBuffers(test->window);
         glfwPollEvents();
@@ -264,8 +277,13 @@ int main(int argc, char** argv) {
     prMaterialDestroy(defaultMaterial);
     defaultMaterial = NULL;
 
+    prFramebufferDestroy(framebuffer);
+    framebuffer = NULL;
+    prRenderBufferDestroy(depthStencilRBO);
+    depthStencilRBO = NULL;
     prTextureDestroy(colorTexture);
     colorTexture = NULL;
+
     prTextureDestroy(defaultNormal);
     defaultNormal = NULL;
     prTextureDestroy(whiteTexture);

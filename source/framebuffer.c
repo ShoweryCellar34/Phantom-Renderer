@@ -128,10 +128,14 @@ void prFramebufferLinkDepthStencilTextureRBO(prFramebufferData* framebuffer, prR
     }
 }
 
-void prFramebufferBlit(prFramebufferData* source, prFramebufferData* destination, int srcX0, int srcY0, int srcX1, int srcY1, int dstX0, int dstY0, int dstX1, int dstY1, GLbitfield mask, GLenum filter) {
+void prFramebufferBlit(GladGLContext* context, prFramebufferData* source, prFramebufferData* destination, int srcX0, int srcY0, int srcX1, int srcY1, int dstX0, int dstY0, int dstX1, int dstY1, GLbitfield mask, GLenum filter) {
     if(source) {
         if(!source->context) {
             prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferBlit: Source framebuffer context cannot be NULL. Aborting operation, nothing was modified");
+            return;
+        }
+        if(source->context != context) {
+            prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferBlit: Source framebuffer context must match context passed to function. Aborting operation, nothing was modified");
             return;
         }
         if(!source->FBO) {
@@ -144,17 +148,15 @@ void prFramebufferBlit(prFramebufferData* source, prFramebufferData* destination
             prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferBlit: Destination framebuffer context cannot be NULL. Aborting operation, nothing was modified");
             return;
         }
+        if(destination->context != context) {
+            prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferBlit: Destination framebuffer context must match context passed to function. Aborting operation, nothing was modified");
+            return;
+        }
         if(!destination->FBO) {
             prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferBlit: Destination framebuffer is not initialized on GPU. Aborting operation, nothing was modified");
             return;
         }
     }
-    if(source && destination) {
-        if(source->context != destination->context) {
-            prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferBlit: Source and destination framebuffer contexts do not match. Aborting operation, nothing was modified");
-            return;
-        }
-    }
 
-    i_prFramebufferBlitOnGPU(source, destination, srcX0, srcY0, srcX1, srcY1, dstX0, dstY0, dstX1, dstY1, mask, filter);
+    i_prFramebufferBlitOnGPU(context, source, destination, srcX0, srcY0, srcX1, srcY1, dstX0, dstY0, dstX1, dstY1, mask, filter);
 }

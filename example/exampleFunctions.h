@@ -77,6 +77,7 @@ void framebufferSizeCallback(GLFWwindow* window, int width, int height) {
     prCameraUpdateDimentions(camera);
 
     prTextureUpdate(colorTexture, PR_FORMAT_RGBA, PR_FILTER_LINEAR, PR_WRAPPING_EDGE, NULL, 0, windowWidth, windowHeight);
+    prRenderBufferUpdate(depthStencilRBO, PR_FORMAT_DEPTH_STENCIL, windowWidth, windowHeight);
 }
 
 void cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {

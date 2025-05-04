@@ -29,6 +29,11 @@ void i_prFramebufferUpdateBuffers(prFramebufferData* framebuffer) {
 }
 
 void i_prFramebufferSetDataOnGPU(prFramebufferData* framebuffer) {
+    GLint previousReadFramebuffer, previousDrawFramebuffer;
+    
+    framebuffer->context->GetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &previousReadFramebuffer);
+    framebuffer->context->GetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &previousDrawFramebuffer);
+
     framebuffer->context->BindFramebuffer(GL_FRAMEBUFFER, framebuffer->FBO);
 
     i_prFramebufferSetAttachment(framebuffer, framebuffer->colorTexture, framebuffer->colorRBO, GL_COLOR_ATTACHMENT0);
@@ -36,7 +41,8 @@ void i_prFramebufferSetDataOnGPU(prFramebufferData* framebuffer) {
     i_prFramebufferSetAttachment(framebuffer, framebuffer->stencilTexture, framebuffer->stencilRBO, GL_STENCIL_ATTACHMENT);
     i_prFramebufferSetAttachment(framebuffer, framebuffer->depthStencilTexture, framebuffer->depthStencilRBO, GL_DEPTH_STENCIL_ATTACHMENT);
 
-    framebuffer->context->BindFramebuffer(GL_FRAMEBUFFER, 0);
+    framebuffer->context->BindFramebuffer(GL_READ_FRAMEBUFFER, previousReadFramebuffer);
+    framebuffer->context->BindFramebuffer(GL_DRAW_FRAMEBUFFER, previousDrawFramebuffer);
 }
 
 void i_prFramebufferSetAttachment(prFramebufferData* framebuffer, prTextureData* texture, prRenderBufferData* renderbuffer, GLenum attachment) {
@@ -64,15 +70,21 @@ void i_prFramebufferSetAttachment(prFramebufferData* framebuffer, prTextureData*
     framebuffer->context->FramebufferRenderbuffer(GL_FRAMEBUFFER, attachment, GL_RENDERBUFFER, RBO);
 }
 
-void i_prFramebufferBlitOnGPU(prFramebufferData* source, prFramebufferData* destination, int srcX0, int srcY0, int srcX1, int srcY1, int dstX0, int dstY0, int dstX1, int dstY1, GLbitfield mask, GLenum filter) {
-    source->context->BindFramebuffer(GL_READ_FRAMEBUFFER, (source ? source->FBO : 0));
-    source->context->BindFramebuffer(GL_DRAW_FRAMEBUFFER, (destination ? destination->FBO : 0));
+void i_prFramebufferBlitOnGPU(GladGLContext* context, prFramebufferData* source, prFramebufferData* destination, int srcX0, int srcY0, int srcX1, int srcY1, int dstX0, int dstY0, int dstX1, int dstY1, GLbitfield mask, GLenum filter) {
+    GLint previousReadFramebuffer, previousDrawFramebuffer;
+    
+    context->GetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &previousReadFramebuffer);
+    context->GetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &previousDrawFramebuffer);
 
-    source->context->BlitFramebuffer(
+    context->BindFramebuffer(GL_READ_FRAMEBUFFER, (source ? source->FBO : 0));
+    context->BindFramebuffer(GL_DRAW_FRAMEBUFFER, (destination ? destination->FBO : 0));
+
+    context->BlitFramebuffer(
         srcX0, srcY0, srcX1, srcY1,
         dstX0, dstY0, dstX1, dstY1,
         mask, filter
     );
 
-    source->context->BindFramebuffer(GL_FRAMEBUFFER, 0);
+    context->BindFramebuffer(GL_READ_FRAMEBUFFER, previousReadFramebuffer);
+    context->BindFramebuffer(GL_DRAW_FRAMEBUFFER, previousDrawFramebuffer);
 }
