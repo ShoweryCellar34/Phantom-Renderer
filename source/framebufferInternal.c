@@ -88,3 +88,17 @@ void i_prFramebufferBlitOnGPU(GladGLContext* context, prFramebufferData* source,
     context->BindFramebuffer(GL_READ_FRAMEBUFFER, previousReadFramebuffer);
     context->BindFramebuffer(GL_DRAW_FRAMEBUFFER, previousDrawFramebuffer);
 }
+
+void i_prFramebufferClear(GladGLContext* context, prFramebufferData* framebuffer, unsigned int bits) {
+    GLint previousReadFramebuffer, previousDrawFramebuffer;
+    
+    context->GetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &previousReadFramebuffer);
+    context->GetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &previousDrawFramebuffer);
+
+    context->BindFramebuffer(GL_FRAMEBUFFER, (framebuffer ? framebuffer->FBO : 0));
+
+    context->Clear(bits);
+
+    context->BindFramebuffer(GL_READ_FRAMEBUFFER, previousReadFramebuffer);
+    context->BindFramebuffer(GL_DRAW_FRAMEBUFFER, previousDrawFramebuffer);
+}

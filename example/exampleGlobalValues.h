@@ -148,10 +148,10 @@ unsigned int indices[] = {
 };
 
 float verticesQuad[] = {
-    0.05f, 0.95f, 0.0f,
-    0.05f, 0.65f, 0.0f,
-    0.35f, 0.65f, 0.0f,
-    0.35f, 0.95f, 0.0f
+    0.0f, 1.0f, 0.0f,
+    0.0f, 0.0f, 0.0f,
+    1.0f, 0.0f, 0.0f,
+    1.0f, 1.0f, 0.0f
 };
 
 float normalsQuad[] = {
@@ -211,7 +211,7 @@ struct Material {\n\
 uniform Material material;\n\
 \n\
 void main() {\n\
-    fragmentColor = vec4(texture(material.ambient, textureCoordinates).rgb, 1.0);\n\
+    fragmentColor = texture(material.ambient, textureCoordinates);\n\
 }\n\
 "
 
@@ -223,10 +223,13 @@ void main() {\n\
     ivec2 pixelCoord = ivec2(gl_GlobalInvocationID.xy);\n\
     vec2 uv = vec2(pixelCoord) / vec2(imageSize(outputImage));\n\
     vec3 color = vec3(uv, 0.5);\n\
-    imageStore(outputImage, pixelCoord, vec4(color, 1.0));\n\
+    imageStore(outputImage, pixelCoord, vec4(color, 0.5));\n\
 }\n\
 "
 
+int showHUD = 0;
+
+prTextureData* HUDTexture = NULL;
 prTextureData* colorTexture = NULL;
 prRenderBufferData* depthStencilRBO = NULL;
 prFramebufferData* framebuffer = NULL;

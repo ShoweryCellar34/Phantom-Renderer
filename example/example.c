@@ -16,6 +16,13 @@ int main(int argc, char** argv) {
 
     prWindow* test = prWindowCreate(TITLE, windowWidth, windowHeight);
     prWindowInitContext(test);
+
+    glfwMakeContextCurrent(test->window);
+    glfwSetFramebufferSizeCallback(test->window, framebufferSizeCallback);
+    glfwSetCursorPosCallback(test->window, cursorPosCallback);
+    glfwSetKeyCallback(test->window, keyCallback);
+    glfwSetInputMode(test->window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
     glfwSetWindowUserPointer(test->window, test->openglContext);
 
     prEnableImageFlip();
@@ -30,7 +37,7 @@ int main(int argc, char** argv) {
     prComputeShaderLinkContext(computeShaderProgram, test->openglContext);
     prComputeShaderUpdate(computeShaderProgram, HUD_COMPUTE_SHADER);
 
-    prTextureData* defaultTexture = makeTextureCheckerboard(test->openglContext, 8, (float[4]){1.0f, 0.0f, 1.0f, 1.0f}, (float[4]){0.0f, 0.0f, 0.0f, 0.0f});
+    prTextureData* defaultTexture = makeTextureCheckerboard(test->openglContext, 8, (float[4]){1.0f, 0.0f, 1.0f, 1.0f}, (float[4]){0.0f, 0.0f, 0.0f, 1.0f});
 
     prTextureData* containerTexture = loadTexture(test->openglContext, "res/container.jpg");
 
@@ -53,6 +60,10 @@ int main(int argc, char** argv) {
     prTextureData* whiteTexture = makeTextureSingleColor(test->openglContext, (float[4]){1.0f, 1.0f, 1.0f, 1.0f});
 
     prTextureData* defaultNormal = makeTextureSingleColor(test->openglContext, (float[4]){0.0f, -1.0f, 0.0f, 1.0f});
+
+    HUDTexture = prTextureCreate();
+    prTextureLinkContext(HUDTexture, test->openglContext);
+    prTextureUpdate(HUDTexture, PR_FORMAT_RGBA, PR_FILTER_LINEAR, PR_WRAPPING_EDGE, NULL, 0, windowWidth, windowHeight);
 
     colorTexture = prTextureCreate();
     prTextureLinkContext(colorTexture, test->openglContext);
@@ -102,7 +113,7 @@ int main(int argc, char** argv) {
     prMaterialSetShininess(materialBrick, 32.0f);
 
     prMaterialData* materialQuad = prMaterialCreate();
-    prMaterialLinkAmbientMap(materialQuad, colorTexture);
+    prMaterialLinkAmbientMap(materialQuad, HUDTexture);
     prMaterialLinkDiffuseMap(materialQuad, blackTexture);
     prMaterialLinkSpecularMap(materialQuad, blackTexture);
     prMaterialLinkNormalMap(materialQuad, blackTexture);
@@ -192,11 +203,6 @@ int main(int argc, char** argv) {
     camera = prCameraCreate();
     prCameraLinkContext(camera, test->openglContext);
 
-    glfwMakeContextCurrent(test->window);
-    glfwSetFramebufferSizeCallback(test->window, framebufferSizeCallback);
-    glfwSetCursorPosCallback(test->window, cursorPosCallback);
-    glfwSetInputMode(test->window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-
     test->openglContext->Enable(GL_DEPTH_TEST);
     test->openglContext->ClearColor(0.3f, 0.5f, 0.7f, 1.0f);
     test->openglContext->Enable(GL_CULL_FACE);
@@ -205,12 +211,13 @@ int main(int argc, char** argv) {
 
     while(!glfwWindowShouldClose(test->window)) {
         test->openglContext->UseProgram(computeShaderProgram->computeShaderProgramObject);
-        prTextureBindImage(colorTexture, 0, 0, PR_ACCESS_WRITE_ONLY, GL_RGBA32F);
+        prTextureBindImage(HUDTexture, 0, 0, PR_ACCESS_WRITE_ONLY, GL_RGBA32F);
         prComputeShaderDispatch(computeShaderProgram, windowWidth, windowHeight, 1);
         test->openglContext->MemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
 
         test->openglContext->Enable(GL_DEPTH_TEST);
-        test->openglContext->Clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        prFramebufferClear(test->openglContext, NULL, PR_BUFFER_BIT_COLOR | PR_BUFFER_BIT_DEPTH);
+        prFramebufferClear(test->openglContext, framebuffer, PR_BUFFER_BIT_COLOR | PR_BUFFER_BIT_DEPTH);
 
         float currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
@@ -229,6 +236,9 @@ int main(int argc, char** argv) {
         translationsToMatrix(translation, (vec3){0.0f, -20.0f, 0.0f}, GLM_VEC3_ZERO, (vec3){30.0f, 10.0f, 30.0f});
         prMeshDraw(meshMetal, translation, camera, shaderProgram);
 
+        translationsToMatrix(translation, (vec3){-20.0f, 0.0f, 0.0f}, GLM_VEC3_ZERO, (vec3){10.0f, 30.0f, 30.0f});
+        prMeshDraw(meshMetal, translation, camera, shaderProgram);
+
         translationsToMatrix(translation, (vec3){1.0f, 0.0f, 0.0f}, (vec3){0.0f, val, 0.0f}, GLM_VEC3_ONE);
         prMeshDraw(meshWood, translation, camera, shaderProgram);
 
@@ -241,11 +251,11 @@ int main(int argc, char** argv) {
         translationsToMatrix(translation, (vec3){0.0f, val / 3.5f - 1.5f, 0.0f}, (vec3){0.0f, radians(val * 100.0f), 0.0f}, GLM_VEC3_ONE);
         prMeshDraw(meshItem, translation, camera, shaderProgram);
 
-        test->openglContext->Disable(GL_DEPTH_TEST);
-        translationsToMatrix(translation, (vec3){0.0f, 0.0f, 0.0f}, GLM_VEC3_ZERO, GLM_VEC3_ONE);
-        prMeshDraw(meshQuad, translation, camera, hudShaderProgram);
-
-        // prFramebufferBlit(test->openglContext, framebuffer, NULL, 0, 0, windowWidth, windowHeight, 0, 0, windowWidth, windowHeight, PR_BUFFER_BIT_COLOR, GL_NEAREST);
+        if(showHUD == 1) {
+            test->openglContext->Disable(GL_DEPTH_TEST);
+            translationsToMatrix(translation, (vec3){0.0f, 0.0f, 0.0f}, GLM_VEC3_ZERO, GLM_VEC3_ONE);
+            prMeshDraw(meshQuad, translation, camera, hudShaderProgram);
+        }
 
         glfwSwapBuffers(test->window);
         glfwPollEvents();
@@ -284,6 +294,8 @@ int main(int argc, char** argv) {
     prTextureDestroy(colorTexture);
     colorTexture = NULL;
 
+    prTextureDestroy(HUDTexture);
+    HUDTexture = NULL;
     prTextureDestroy(defaultNormal);
     defaultNormal = NULL;
     prTextureDestroy(whiteTexture);

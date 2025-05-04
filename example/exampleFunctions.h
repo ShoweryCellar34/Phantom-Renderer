@@ -107,6 +107,12 @@ void cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
     }
 }
 
+void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+    if(key == GLFW_KEY_X && action == GLFW_PRESS) {
+        showHUD = !showHUD;
+    }
+}
+
 void translationsToMatrix(mat4 matrix, vec3 position, vec3 rotation, vec3 scale) {
     glm_mat4_identity(matrix);
     glm_translate(matrix, position);

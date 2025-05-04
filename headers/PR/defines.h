@@ -153,7 +153,8 @@ vec3 calculatePointLight(pointLight light, vec3 viewDirection, vec3 fragmentPosi
 }\n\
 \n\
 void main() {\n\
-    vec3 ambient = texture(material.ambient, textureCoordinates).rgb;\n\
+    vec4 sampledTexture = texture(material.ambient, textureCoordinates);\n\
+    vec3 ambient = sampledTexture.rgb;\n\
     vec3 diffuse = texture(material.diffuse, textureCoordinates).rgb;\n\
     vec3 specular = texture(material.specular, textureCoordinates).rgb;\n\
     vec3 normal = normalize(texture(material.normal, textureCoordinates).rgb);\n\
@@ -171,7 +172,7 @@ void main() {\n\
         result += calculatePointLight(pointLights[i], viewDirection, fragmentPosition, ambient, diffuse, specular, normal);\n\
     }\n\
     \n\
-    fragmentColor = vec4(result, 1.0);\n\
+    fragmentColor = vec4(result, sampledTexture.a);\n\
 }\n\
 "
 #endif

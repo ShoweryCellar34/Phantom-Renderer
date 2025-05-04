@@ -160,3 +160,22 @@ void prFramebufferBlit(GladGLContext* context, prFramebufferData* source, prFram
 
     i_prFramebufferBlitOnGPU(context, source, destination, srcX0, srcY0, srcX1, srcY1, dstX0, dstY0, dstX1, dstY1, mask, filter);
 }
+
+void prFramebufferClear(GladGLContext* context, prFramebufferData* framebuffer, GLenum bits) {
+    if(framebuffer) {
+        if(!framebuffer->context) {
+            prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferClear: Framebuffer context cannot be NULL. Aborting operation, nothing was modified");
+            return;
+        }
+        if(framebuffer->context != context) {
+            prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferClear: Framebuffer context must match context passed to function. Aborting operation, nothing was modified");
+            return;
+        }
+        if(!framebuffer->FBO) {
+            prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferClear: Framebuffer is not initialized on GPU. Aborting operation, nothing was modified");
+            return;
+        }
+    }
+
+    i_prFramebufferClear(context, framebuffer, bits);
+}
