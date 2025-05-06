@@ -39,7 +39,7 @@ void prShaderLinkContext(prShaderData* shaderProgram, GladGLContext* context) {
     }
 }
 
-void prShaderUpdate(prShaderData* shaderProgram, int useCameraUniforms, int useMaterialUniforms, const char* vertexShader, const char* fragmentShader) {
+void prShaderUpdate(prShaderData* shaderProgram, int useCameraUniforms, int useMaterialUniforms, const GLchar* vertexShader, const GLchar* fragmentShader) {
     if(!vertexShader) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prShaderUpdate: Vertex shader data cannot be NULL. Aborting operation, nothing was modified");
         return;
@@ -73,31 +73,31 @@ void prShaderUpdate(prShaderData* shaderProgram, int useCameraUniforms, int useM
     }
 }
 
-void prShaderUniform1f(prShaderData* shaderProgram, const char* uniformName, float number) {
-    UNIFORM_BOILERPLATE;
-
-    shaderProgram->context->Uniform1f(uniformLocation, number);
-}
-
-void prShaderUniform1i(prShaderData* shaderProgram, const char* uniformName, int number) {
+void prShaderUniform1i(prShaderData* shaderProgram, const GLchar* uniformName, GLint number) {
     UNIFORM_BOILERPLATE;
 
     shaderProgram->context->Uniform1i(uniformLocation, number);
 }
 
-void prShaderUniform3f(prShaderData* shaderProgram, const char* uniformName, float number1, float number2, float number3) {
+void prShaderUniform1f(prShaderData* shaderProgram, const GLchar* uniformName, GLfloat number) {
+    UNIFORM_BOILERPLATE;
+
+    shaderProgram->context->Uniform1f(uniformLocation, number);
+}
+
+void prShaderUniform3f(prShaderData* shaderProgram, const GLchar* uniformName, GLfloat number1, GLfloat number2, GLfloat number3) {
     UNIFORM_BOILERPLATE;
 
     shaderProgram->context->Uniform3f(uniformLocation, number1, number2, number3);
 }
 
-void prShaderUniformMatrix4fv(prShaderData* shaderProgram, const char* uniformName, float* number) {
+void prShaderUniformMatrix4fv(prShaderData* shaderProgram, const GLchar* uniformName, GLfloat* number) {
     UNIFORM_BOILERPLATE;
 
     shaderProgram->context->UniformMatrix4fv(uniformLocation, 1, GL_FALSE, number);
 }
 
-int prShaderUniform1fQuiet(prShaderData* shaderProgram, const char* uniformName, float number) {
+int prShaderUniform1fQuiet(prShaderData* shaderProgram, const GLchar* uniformName, GLfloat number) {
     UNIFORM_BOILERPLATE_QUIET;
 
     shaderProgram->context->Uniform1f(uniformLocation, number);
@@ -105,7 +105,7 @@ int prShaderUniform1fQuiet(prShaderData* shaderProgram, const char* uniformName,
     return 1;
 }
 
-int prShaderUniform1iQuiet(prShaderData* shaderProgram, const char* uniformName, int number) {
+int prShaderUniform1iQuiet(prShaderData* shaderProgram, const GLchar* uniformName, GLint number) {
     UNIFORM_BOILERPLATE_QUIET;
 
     shaderProgram->context->Uniform1i(uniformLocation, number);
@@ -113,7 +113,7 @@ int prShaderUniform1iQuiet(prShaderData* shaderProgram, const char* uniformName,
     return 1;
 }
 
-int prShaderUniform3fQuiet(prShaderData* shaderProgram, const char* uniformName, float number1, float number2, float number3) {
+int prShaderUniform3fQuiet(prShaderData* shaderProgram, const GLchar* uniformName, GLfloat number1, GLfloat number2, GLfloat number3) {
     UNIFORM_BOILERPLATE_QUIET;
 
     shaderProgram->context->Uniform3f(uniformLocation, number1, number2, number3);
@@ -121,11 +121,10 @@ int prShaderUniform3fQuiet(prShaderData* shaderProgram, const char* uniformName,
     return 1;
 }
 
-int prShaderUniformMatrix4fvQuiet(prShaderData* shaderProgram, const char* uniformName, float* number) {
+int prShaderUniformMatrix4fvQuiet(prShaderData* shaderProgram, const GLchar* uniformName, GLfloat* number) {
     UNIFORM_BOILERPLATE_QUIET;
 
     shaderProgram->context->UniformMatrix4fv(uniformLocation, 1, GL_FALSE, number);
 
     return 1;
 }
-

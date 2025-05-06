@@ -1,6 +1,6 @@
 #pragma once
 
-#include <cglm/cglm.h>
+#include <glad/gl.h>
 
 typedef struct prTextureData prTextureData;
 
@@ -9,7 +9,7 @@ typedef struct prMaterialData {
     prTextureData* diffuseMap;
     prTextureData* specularMap;
     prTextureData* normalMap;
-    float shininess;
+    GLfloat shininess;
 } prMaterialData;
 
 prMaterialData* prMaterialCreate();
@@ -26,4 +26,4 @@ void prMaterialLinkSpecularMap(prMaterialData* material, prTextureData* specular
 
 void prMaterialLinkNormalMap(prMaterialData* material, prTextureData* normalMap);
 
-void prMaterialSetShininess(prMaterialData* material, float shininess);
+void prMaterialSetShininess(prMaterialData* material, GLfloat shininess);

@@ -32,6 +32,6 @@ void prMaterialLinkNormalMap(prMaterialData* material, prTextureData* normalMap)
     material->normalMap = normalMap;
 }
 
-void prMaterialSetShininess(prMaterialData* material, float shininess) {
+void prMaterialSetShininess(prMaterialData* material, GLfloat shininess) {
     material->shininess = shininess;
 }

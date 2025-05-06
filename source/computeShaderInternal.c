@@ -15,10 +15,10 @@ void i_prComputeShaderCreateOnGPU(prComputeShaderData* computeShaderProgram) {
 
     GladGLContext* context = computeShaderProgram->context;
 
-    int success;
-    char infoLog[PR_MAXSTR_LEN];
+    GLint success;
+    GLchar infoLog[PR_MAXSTR_LEN];
 
-    unsigned int computeShader = context->CreateShader(GL_COMPUTE_SHADER);
+    GLuint computeShader = context->CreateShader(GL_COMPUTE_SHADER);
     context->ShaderSource(computeShader, 1, (const GLchar* const*)&computeShaderProgram->computeShaderData, NULL);
     context->CompileShader(computeShader);
 

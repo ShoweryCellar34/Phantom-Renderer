@@ -10,14 +10,14 @@
 #include <PR/memory.h>
 #include <PR/logger.h>
 
-int i_prShaderUniformBoilerPlate(prShaderData* shaderProgram, int logMissing, const char* uniformName) {
+int i_prShaderUniformBoilerPlate(prShaderData* shaderProgram, int logMissing, const GLchar* uniformName) {
     if(!shaderProgram->shaderProgramObject) {
         prLogEvent(PR_EVENT_OPENGL, PR_LOG_WARNING, "i_prShaderUniformBoilerPlate: Shader not initialized. Aborting operation, nothing was modified");
         return -1;
     }
 
     shaderProgram->context->UseProgram(shaderProgram->shaderProgramObject);
-    int uniformLocation = shaderProgram->context->GetUniformLocation(shaderProgram->shaderProgramObject, uniformName);
+    GLint uniformLocation = shaderProgram->context->GetUniformLocation(shaderProgram->shaderProgramObject, uniformName);
 
     if(uniformLocation == -1) {
         // To verbose because this will happen whenever the uniform is set, and can be an issue when a uniform set by prMeshDraw() is not found in the shader.
@@ -35,8 +35,8 @@ void i_prShaderCreateOnGPU(prShaderData* shaderProgram) {
 
     GladGLContext* context = shaderProgram->context;
 
-    int success;
-    char infoLog[PR_MAXSTR_LEN];
+    GLint success;
+    GLchar infoLog[PR_MAXSTR_LEN];
 
     unsigned int vertexShader = context->CreateShader(GL_VERTEX_SHADER);
     context->ShaderSource(vertexShader, 1, (const GLchar* const*)&shaderProgram->vertexShaderData, NULL);

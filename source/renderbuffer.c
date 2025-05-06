@@ -31,7 +31,7 @@ void prRenderBufferLinkContext(prRenderBufferData* renderBuffer, GladGLContext* 
     }
 }
 
-void prRenderBufferUpdate(prRenderBufferData* renderBuffer, int format, GLint width, GLint height) {
+void prRenderBufferUpdate(prRenderBufferData* renderBuffer, GLenum format, GLsizei width, GLsizei height) {
     if(width <= 0 || height <= 0) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prRenderBufferUpdate: Invalid dimensions (width: %i, height: %i). Aborting operation, nothing was modified", width, height);
         return;

@@ -5,8 +5,8 @@
 
 typedef struct prRenderBufferData {
     GladGLContext* context;
-    int format;
-    GLint width, height;
+    GLenum format;
+    GLsizei width, height;
     GLuint RBO;
 } prRenderBufferData;
 
@@ -16,4 +16,4 @@ void prRenderBufferDestroy(prRenderBufferData* renderBuffer);
 
 void prRenderBufferLinkContext(prRenderBufferData* renderBuffer, GladGLContext* context);
 
-void prRenderBufferUpdate(prRenderBufferData* renderBuffer, int format, GLint width, GLint height);
+void prRenderBufferUpdate(prRenderBufferData* renderBuffer, GLenum format, GLsizei width, GLsizei height);

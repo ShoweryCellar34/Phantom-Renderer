@@ -7,7 +7,6 @@
 #include <stddef.h>
 #include <string.h>
 #include <stdio.h>
-#include <glad/gl.h>
 #include <PR/memory.h>
 #include <PR/logger.h>
 
@@ -35,7 +34,7 @@ void prComputeShaderLinkContext(prComputeShaderData* computeShaderProgram, GladG
     }
 }
 
-void prComputeShaderUpdate(prComputeShaderData* computeShaderProgram, const char* computeShader) {
+void prComputeShaderUpdate(prComputeShaderData* computeShaderProgram, const GLchar* computeShader) {
     if(!computeShader) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prComputeShaderUpdate: Compute shader data cannot be NULL. Aborting operation, nothing was modified");
         return;

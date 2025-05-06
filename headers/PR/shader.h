@@ -4,9 +4,9 @@ typedef struct GladGLContext GladGLContext;
 
 typedef struct prShaderData {
     GladGLContext* context;
-    char* vertexShaderData;
-    char* fragmentShaderData;
-    unsigned int shaderProgramObject;
+    GLchar* vertexShaderData;
+    GLchar* fragmentShaderData;
+    GLuint shaderProgramObject;
     int useCameraUniforms;
     int useMaterialUniforms;
 } prShaderData;
@@ -17,21 +17,21 @@ void prShaderDestroy(prShaderData* shaderProgram);
 
 void prShaderLinkContext(prShaderData* shaderProgram, GladGLContext* context);
 
-void prShaderUpdate(prShaderData* shaderProgram, int useCameraUniforms, int useMaterialUniforms, const char* vertexShader, const char* fragmentShader);
+void prShaderUpdate(prShaderData* shaderProgram, int useCameraUniforms, int useMaterialUniforms, const GLchar* vertexShader, const GLchar* fragmentShader);
 
-void prShaderUniform1i(prShaderData* shaderProgram, const char* uniformName, int number);
+void prShaderUniform1i(prShaderData* shaderProgram, const GLchar* uniformName, GLint number);
 
-void prShaderUniform1f(prShaderData* shaderProgram, const char* uniformName, float number);
+void prShaderUniform1f(prShaderData* shaderProgram, const GLchar* uniformName, GLfloat number);
 
-void prShaderUniform3f(prShaderData* shaderProgram, const char* uniformName, float number1, float number2, float number3);
+void prShaderUniform3f(prShaderData* shaderProgram, const GLchar* uniformName, GLfloat number1, GLfloat number2, GLfloat number3);
 
-void prShaderUniformMatrix4fv(prShaderData* shaderProgram, const char* uniformName, float* number);
+void prShaderUniformMatrix4fv(prShaderData* shaderProgram, const GLchar* uniformName, GLfloat* number);
 
-int prShaderUniform1iQuiet(prShaderData* shaderProgram, const char* uniformName, int number);
+int prShaderUniform1iQuiet(prShaderData* shaderProgram, const GLchar* uniformName, GLint number);
 
-int prShaderUniform1fQuiet(prShaderData* shaderProgram, const char* uniformName, float number);
+int prShaderUniform1fQuiet(prShaderData* shaderProgram, const GLchar* uniformName, GLfloat number);
 
-int prShaderUniform3fQuiet(prShaderData* shaderProgram, const char* uniformName, float number1, float number2, float number3);
+int prShaderUniform3fQuiet(prShaderData* shaderProgram, const GLchar* uniformName, GLfloat number1, GLfloat number2, GLfloat number3);
 
-int prShaderUniformMatrix4fvQuiet(prShaderData* shaderProgram, const char* uniformName, float* number);
+int prShaderUniformMatrix4fvQuiet(prShaderData* shaderProgram, const GLchar* uniformName, GLfloat* number);
 

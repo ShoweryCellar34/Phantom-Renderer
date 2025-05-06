@@ -16,10 +16,10 @@ typedef struct prMeshData {
     GLfloat* normals;
     GLfloat* textureCoordinates;
     GLuint* indices;
-    GLuint verticesCount, normalsCount, textureCoordinatesCount, indicesCount;
+    GLsizei verticesCount, normalsCount, textureCoordinatesCount, indicesCount;
     GLuint VBO, VAO, EBO;
     GLfloat* GPUReadyBuffer;
-    GLuint GPUReadyBufferCount;
+    GLsizeiptr GPUReadyBufferCount;
 } prMeshData;
 
 prMeshData* prMeshCreate();

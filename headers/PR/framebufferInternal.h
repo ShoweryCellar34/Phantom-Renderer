@@ -15,8 +15,9 @@ void i_prFramebufferSetDataOnGPU(prFramebufferData* framebuffer);
 void i_prFramebufferSetAttachment(prFramebufferData* framebuffer, prTextureData* texture, prRenderBufferData* renderbuffer, GLenum attachment);
 
 void i_prFramebufferBlitOnGPU(GladGLContext* context, prFramebufferData* source, prFramebufferData* destination, 
-    int srcX0, int srcY0, int srcX1, int srcY1,
-    int dstX0, int dstY0, int dstX1, int dstY1,
-    GLbitfield mask, GLenum filter);
+    GLint srcX0, GLint srcY0, GLint srcX1, GLint srcY1,
+    GLint dstX0, GLint dstY0, GLint dstX1, GLint dstY1,
+    GLbitfield mask, GLenum filter
+);
 
 void i_prFramebufferClear(GladGLContext* context, prFramebufferData* framebuffer, unsigned int bits);

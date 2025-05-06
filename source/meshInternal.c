@@ -62,7 +62,7 @@ void i_prMeshCreateOnGPU(prMeshData* mesh) {
 
     i_prMeshComputeGPUReadyBuffer(mesh);
 
-    int stride = 8;
+    GLint stride = 8;
 
     mesh->context->BindVertexArray(mesh->VAO);
 
@@ -91,7 +91,7 @@ void i_prMeshUpdateOnGPU(prMeshData* mesh) {
 
     i_prMeshComputeGPUReadyBuffer(mesh);
 
-    int stride = 8;
+    GLint stride = 8;
 
 	mesh->context->BindVertexArray(mesh->VAO);
 
