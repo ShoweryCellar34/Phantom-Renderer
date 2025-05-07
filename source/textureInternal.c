@@ -6,7 +6,7 @@
 #include <PR/logger.h>
 #include <PR/texture.h>
 
-void i_prTextureComputeFormats(prTextureData* texture, GLenum* format, GLenum* internalFormat) {
+void i_prTextureComputeFormats(prTextureData* texture, GLenum* format, GLint* internalFormat) {
     switch(texture->format) {
         case PR_FORMAT_R:
             *format = GL_RED;
@@ -61,7 +61,8 @@ void i_prTextureComputeFormats(prTextureData* texture, GLenum* format, GLenum* i
 }
 
 void i_prTextureSetDataOnGPU(prTextureData* texture) {
-    GLenum format, internalFomrat;
+    GLenum format;
+    GLint internalFomrat;
     i_prTextureComputeFormats(texture, &format, &internalFomrat);
 
     texture->context->BindTexture(GL_TEXTURE_2D, texture->TBO);

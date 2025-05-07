@@ -2,8 +2,6 @@
 
 #include <PR/framebuffer.h>
 
-typedef struct GladGLContext GladGLContext;
-
 void i_prFramebufferCreateOnGPU(prFramebufferData* framebuffer);
 
 void i_prFramebufferDestroyOnGPU(prFramebufferData* framebuffer);

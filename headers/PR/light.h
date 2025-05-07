@@ -40,6 +40,8 @@ void prPointLightDestroy(prPointLightData* light);
 
 void prPointLightSetPosition(prPointLightData* light, vec3 position);
 
+void prPointLightCalculateAttenuation(prPointLightData* light, float distance);
+
 void prPointLightSetAmbient(prPointLightData* light, vec3 abmient);
 
 void prPointLightSetDiffuse(prPointLightData* light, vec3 diffuse);

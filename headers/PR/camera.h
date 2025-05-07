@@ -1,15 +1,14 @@
 #pragma once
 
+#include <glad/gl.h>
 #include <cglm/cglm.h>
-
-typedef struct GladGLContext GladGLContext;
 
 typedef struct prCamera {
     GladGLContext* context;
     vec3 position;
     mat4 view;
     mat4 projection;
-    int viewportWidth, viewportHeight;
+    GLint viewportWidth, viewportHeight;
     vec3 front;
     vec3 up;
 } prCamera;

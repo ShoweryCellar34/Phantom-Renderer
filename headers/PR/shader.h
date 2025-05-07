@@ -1,6 +1,6 @@
 #pragma once
 
-typedef struct GladGLContext GladGLContext;
+#include <glad/gl.h>
 
 typedef struct prShaderData {
     GladGLContext* context;

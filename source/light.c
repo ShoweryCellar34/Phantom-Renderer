@@ -68,3 +68,9 @@ void prPointLightSetDiffuse(prPointLightData* light, vec3 diffuse) {
 void prPointLightSetSpecular(prPointLightData* light, vec3 specular) {
     glm_vec3_copy(specular, light->specular);
 }
+
+void prPointLightCalculateAttenuation(prPointLightData* light, float distance) {
+    light->constant = 1.0f;
+    light->linear = 4.5f / distance;
+    light->quadratic = 75.0f / (distance * distance);
+}

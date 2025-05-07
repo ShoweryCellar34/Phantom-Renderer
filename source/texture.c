@@ -48,7 +48,7 @@ void prTextureLinkContext(prTextureData* texture, GladGLContext* context) {
     }
 }
 
-void prTextureUpdate(prTextureData* texture, int format, int filter, int wrappingMode, GLubyte rawTextureData[], size_t rawTextureDataCount, GLint width, GLint height) {
+void prTextureUpdate(prTextureData* texture, GLenum format, GLint wrappingMode, GLint filter, GLubyte rawTextureData[], size_t rawTextureDataCount, GLsizei width, GLsizei height) {
     if(!rawTextureDataCount && rawTextureData) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_WARNING, "prTextureUpdate: Texture data count not zero while texture data is NULL. Assuming no texture data, texture data will be NULL");
     }
@@ -139,5 +139,35 @@ void prTextureUpdate(prTextureData* texture, int format, int filter, int wrappin
 }
 
 void prTextureBindImage(prTextureData* texture, unsigned int index, unsigned int mipmapLevel, unsigned int access, unsigned int format) {
+    if((access != PR_ACCESS_READ_ONLY) && (access != PR_ACCESS_WRITE_ONLY) && (access != PR_ACCESS_READ_WRITE)) {
+        prLogEvent(PR_EVENT_DATA, PR_LOG_WARNING, "prTextureBindImage: Invalid access mode (was %u), using PR_ACCESS_READ_WRITE", access);
+        access = PR_ACCESS_READ_WRITE;
+    }
+
+    if(!texture->TBO) {
+        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prTextureBindImage: Attempt to bind texture that has not been created on GPU. Aborting operation");
+        return;
+    }
+
+    if(!texture->context) {
+        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prTextureBindImage: Attempt to bind texture without OpenGL context. Aborting operation");
+        return;
+    }
+
     texture->context->BindImageTexture(index, texture->TBO, mipmapLevel, GL_FALSE, 0, access, format);
+}
+
+void prTextureBindTexture(prTextureData* texture, unsigned int unit) {
+    if(!texture->TBO) {
+        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prTextureBindTexture: Attempt to bind texture that has not been created on GPU. Aborting operation");
+        return;
+    }
+
+    if(!texture->context) {
+        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prTextureBindTexture: Attempt to bind texture without OpenGL context. Aborting operation");
+        return;
+    }
+
+    texture->context->ActiveTexture(GL_TEXTURE0 + unit);
+    texture->context->BindTexture(GL_TEXTURE_2D, texture->TBO);
 }

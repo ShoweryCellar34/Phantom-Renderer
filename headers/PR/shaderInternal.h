@@ -1,5 +1,7 @@
 #pragma once
 
+#include <glad/gl.h>
+
 typedef struct prShaderData prShaderData;
 
 int i_prShaderUniformBoilerPlate(prShaderData* shaderProgram, int logMissing, const GLchar* uniformName);

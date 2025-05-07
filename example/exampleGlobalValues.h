@@ -227,9 +227,10 @@ void main() {\n\
 }\n\
 "
 
-int showHUD = 0;
+int showHUD = 1;
+int showPostProcessing = 1;
 
-prTextureData* HUDTexture = NULL;
+prTextureData* postProcessingTexture = NULL;
 prTextureData* colorTexture = NULL;
 prRenderBufferData* depthStencilRBO = NULL;
 prFramebufferData* framebuffer = NULL;

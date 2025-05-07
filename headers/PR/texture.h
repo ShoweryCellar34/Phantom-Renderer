@@ -10,11 +10,12 @@ void prDisableImageFlip();
 
 typedef struct prTextureData {
     GladGLContext* context;
-    int format;
-    int wrappingMode;
-    int filter;
+    GLenum format;
+    GLint wrappingMode;
+    GLint filter;
     GLubyte* textureData;
-    GLint width, height, channels;
+    GLsizei width, height;
+    int channels;
     GLuint TBO;
 } prTextureData;
 
@@ -24,6 +25,8 @@ void prTextureDestroy(prTextureData* texture);
 
 void prTextureLinkContext(prTextureData* texture, GladGLContext* context);
 
-void prTextureUpdate(prTextureData* texture, int format, int filter, int wrappingMode, GLubyte rawTextureData[], size_t rawTextureDataCount, GLint width, GLint height);
+void prTextureUpdate(prTextureData* texture, GLenum format, GLint wrappingMode, GLint filter, GLubyte rawTextureData[], size_t rawTextureDataCount, GLsizei width, GLsizei height);
 
 void prTextureBindImage(prTextureData* texture, unsigned int index, unsigned int mipmapLevel, unsigned int access, unsigned int format);
+
+void prTextureBindTexture(prTextureData* texture, unsigned int unit);

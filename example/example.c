@@ -61,13 +61,15 @@ int main(int argc, char** argv) {
 
     prTextureData* defaultNormal = makeTextureSingleColor(test->openglContext, (float[4]){0.0f, -1.0f, 0.0f, 1.0f});
 
-    HUDTexture = prTextureCreate();
-    prTextureLinkContext(HUDTexture, test->openglContext);
-    prTextureUpdate(HUDTexture, PR_FORMAT_RGBA, PR_FILTER_LINEAR, PR_WRAPPING_EDGE, NULL, 0, windowWidth, windowHeight);
+    prTextureData* HUDTexture = loadTexture(test->openglContext, "res/HUD.png");
+
+    postProcessingTexture = prTextureCreate();
+    prTextureLinkContext(postProcessingTexture, test->openglContext);
+    prTextureUpdate(postProcessingTexture, PR_FORMAT_RGBA, PR_FILTER_LINEAR, PR_WRAPPING_EDGE, NULL, 0, windowWidth, windowHeight);
 
     colorTexture = prTextureCreate();
     prTextureLinkContext(colorTexture, test->openglContext);
-    prTextureUpdate(colorTexture, PR_FORMAT_RGBA, PR_FILTER_LINEAR, PR_WRAPPING_EDGE, NULL, 0, windowWidth, windowHeight);
+    prTextureUpdate(colorTexture, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR, NULL, 0, windowWidth, windowHeight);
 
     depthStencilRBO = prRenderBufferCreate();
     prRenderBufferLinkContext(depthStencilRBO, test->openglContext);
@@ -112,12 +114,19 @@ int main(int argc, char** argv) {
     prMaterialLinkNormalMap(materialBrick, brickWallNormalTexture);
     prMaterialSetShininess(materialBrick, 32.0f);
 
-    prMaterialData* materialQuad = prMaterialCreate();
-    prMaterialLinkAmbientMap(materialQuad, HUDTexture);
-    prMaterialLinkDiffuseMap(materialQuad, blackTexture);
-    prMaterialLinkSpecularMap(materialQuad, blackTexture);
-    prMaterialLinkNormalMap(materialQuad, blackTexture);
-    prMaterialSetShininess(materialQuad, 0.0f);
+    prMaterialData* materialHUD = prMaterialCreate();
+    prMaterialLinkAmbientMap(materialHUD, HUDTexture);
+    prMaterialLinkDiffuseMap(materialHUD, blackTexture);
+    prMaterialLinkSpecularMap(materialHUD, blackTexture);
+    prMaterialLinkNormalMap(materialHUD, blackTexture);
+    prMaterialSetShininess(materialHUD, 0.0f);
+
+    prMaterialData* materialPostProcessing = prMaterialCreate();
+    prMaterialLinkAmbientMap(materialPostProcessing, postProcessingTexture);
+    prMaterialLinkDiffuseMap(materialPostProcessing, blackTexture);
+    prMaterialLinkSpecularMap(materialPostProcessing, blackTexture);
+    prMaterialLinkNormalMap(materialPostProcessing, blackTexture);
+    prMaterialSetShininess(materialPostProcessing, 0.0f);
 
     prMeshData* meshMetal = prMeshCreate();
     prMeshLinkContext(meshMetal, test->openglContext);
@@ -171,20 +180,19 @@ int main(int argc, char** argv) {
         normalsQuad, sizeof(normalsQuad) / sizeof(float),
         textureCoordinatesQuad, sizeof(textureCoordinatesQuad) / sizeof(float),
         indicesQuad, sizeof(indicesQuad) / sizeof(unsigned int));
-    prMeshLinkMaterial(meshQuad, materialQuad);
+    prMeshLinkMaterial(meshQuad, materialHUD);
 
     prDirectionalLightData* sun = prDirectionalLightCreate();
-    prDirectionalLightSetDirection(sun, (vec3){-1.0f, -1.0f, -1.0f});
+    prDirectionalLightSetDirection(sun, (vec3){-0.25f, -0.5f, -0.75f});
     prDirectionalLightSetAmbient(sun, (vec3){0.095f, 0.095f, 0.1f});
     prDirectionalLightSetDiffuse(sun, (vec3){0.8f, 0.8f, 0.75f});
     prDirectionalLightSetSpecular(sun, (vec3){0.9f, 0.9f, 0.85f});
 
     prPointLightData* point = prPointLightCreate();
-    point->constant = 1.0;
-    point->linear = 0.7f;
-    point->quadratic = 1.8f;
     prPointLightSetPosition(point, (vec3){0.0f, 0.0f, 0.0f});
-    prPointLightSetDiffuse(point, (vec3){0.6f, 0.6f, 1.0f});
+    prPointLightCalculateAttenuation(point, 50.0f);
+    prPointLightSetDiffuse(point, (vec3){0.0f, 0.0f, 1.0f});
+    prPointLightSetSpecular(point, (vec3){1.0f, 0.0f, 0.0f});
 
     prShaderUniform3f(shaderProgram, "directionalLights[0].direction", sun->direction[0], sun->direction[1], sun->direction[2]);
     prShaderUniform3f(shaderProgram, "directionalLights[0].ambient", sun->ambient[0], sun->ambient[1], sun->ambient[2]);
@@ -210,11 +218,6 @@ int main(int argc, char** argv) {
     test->openglContext->BlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     while(!glfwWindowShouldClose(test->window)) {
-        test->openglContext->UseProgram(computeShaderProgram->computeShaderProgramObject);
-        prTextureBindImage(HUDTexture, 0, 0, PR_ACCESS_WRITE_ONLY, GL_RGBA32F);
-        prComputeShaderDispatch(computeShaderProgram, windowWidth, windowHeight, 1);
-        test->openglContext->MemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
-
         test->openglContext->Enable(GL_DEPTH_TEST);
         prFramebufferClear(test->openglContext, NULL, PR_BUFFER_BIT_COLOR | PR_BUFFER_BIT_DEPTH);
         prFramebufferClear(test->openglContext, framebuffer, PR_BUFFER_BIT_COLOR | PR_BUFFER_BIT_DEPTH);
@@ -254,6 +257,16 @@ int main(int argc, char** argv) {
         if(showHUD == 1) {
             test->openglContext->Disable(GL_DEPTH_TEST);
             translationsToMatrix(translation, (vec3){0.0f, 0.0f, 0.0f}, GLM_VEC3_ZERO, GLM_VEC3_ONE);
+            prMeshLinkMaterial(meshQuad, materialHUD);
+            prMeshDraw(meshQuad, translation, camera, hudShaderProgram);
+        }
+
+        if(showPostProcessing) {
+            prTextureBindImage(postProcessingTexture, 0, 0, PR_ACCESS_WRITE_ONLY, GL_RGBA32F);
+            prComputeShaderDispatch(computeShaderProgram, windowWidth, windowHeight, 1);
+            test->openglContext->MemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
+
+            prMeshLinkMaterial(meshQuad, materialPostProcessing);
             prMeshDraw(meshQuad, translation, camera, hudShaderProgram);
         }
 
@@ -274,8 +287,8 @@ int main(int argc, char** argv) {
     prMeshDestroy(meshMetal);
     meshMetal = NULL;
 
-    prMaterialDestroy(materialQuad);
-    materialQuad = NULL;
+    prMaterialDestroy(materialHUD);
+    materialHUD = NULL;
     prMaterialDestroy(materialWoodMetal);
     materialWoodMetal = NULL;
     prMaterialDestroy(materialWood);
@@ -294,6 +307,8 @@ int main(int argc, char** argv) {
     prTextureDestroy(colorTexture);
     colorTexture = NULL;
 
+    prTextureDestroy(postProcessingTexture);
+    postProcessingTexture = NULL;
     prTextureDestroy(HUDTexture);
     HUDTexture = NULL;
     prTextureDestroy(defaultNormal);

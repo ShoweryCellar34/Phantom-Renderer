@@ -45,7 +45,7 @@ prTextureData* loadTexture(GladGLContext* context, const char* path) {
     fclose(textureFile);
 
     prTextureLinkContext(texture, context);
-    prTextureUpdate(texture, PR_FORMAT_AUTO, PR_FILTER_LINEAR, PR_WRAPPING_EDGE, textureData, textureFileSize, 0, 0);
+    prTextureUpdate(texture, PR_FORMAT_AUTO, PR_WRAPPING_EDGE, PR_FILTER_LINEAR, textureData, textureFileSize, 0, 0);
     prFree(textureData);
 
     return texture;
@@ -61,7 +61,7 @@ prTextureData* makeTextureSingleColor(GladGLContext* context, float* color) {
     textureData[2] = color[2] * 255.0f;
     textureData[3] = color[3] * 255.0f;
 
-    prTextureUpdate(texture, PR_FORMAT_RGBA, PR_FILTER_LINEAR, PR_WRAPPING_REPEAT, textureData, 4, 1, 1);
+    prTextureUpdate(texture, PR_FORMAT_RGBA, PR_WRAPPING_REPEAT, PR_FILTER_LINEAR, textureData, 4, 1, 1);
 
     prFree(textureData);
 
@@ -97,7 +97,7 @@ prTextureData* makeTextureCheckerboard(GladGLContext* context, size_t scale, flo
 
     prFree(template);
 
-    prTextureUpdate(texture, PR_FORMAT_RGBA, PR_FILTER_NEAREST, PR_WRAPPING_REPEAT, textureData, scale * scale * 4, scale, scale);
+    prTextureUpdate(texture, PR_FORMAT_RGBA, PR_WRAPPING_REPEAT, PR_FILTER_NEAREST, textureData, scale * scale * 4, scale, scale);
     
     prFree(textureData);
 
