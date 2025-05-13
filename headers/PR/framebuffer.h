@@ -20,10 +20,15 @@ typedef struct prFramebufferData {
 } prFramebufferData;
 
 prFramebufferData* prFramebufferCreate();
-
 void prFramebufferDestroy(prFramebufferData* framebuffer);
-
 void prFramebufferLinkContext(prFramebufferData* framebuffer, GladGLContext* context);
+
+void prFramebufferBind(prFramebufferData* framebuffer);
+void prFramebufferUnbind(prFramebufferData* framebuffer);
+void prFramebufferBindRead(prFramebufferData* framebuffer);
+void prFramebufferBindDraw(prFramebufferData* framebuffer);
+GLuint prFramebufferGetHandle(prFramebufferData* framebuffer);
+GLenum prFramebufferCheckStatus(prFramebufferData* framebuffer);
 
 void prFramebufferLinkColorTexture(prFramebufferData* framebuffer, prTextureData* colorTexture);
 void prFramebufferLinkDepthTexture(prFramebufferData* framebuffer, prTextureData* depthTexture);
@@ -35,10 +40,12 @@ void prFramebufferLinkDepthTextureRBO(prFramebufferData* framebuffer, prRenderBu
 void prFramebufferLinkStencilTextureRBO(prFramebufferData* framebuffer, prRenderBufferData* stencilRBO);
 void prFramebufferLinkDepthStencilTextureRBO(prFramebufferData* framebuffer, prRenderBufferData* depthStencilRBO);
 
+void prFramebufferTextureAttachment(prFramebufferData* framebuffer, GLenum attachment, GLuint textureHandle, GLint level);
+void prFramebufferRenderBufferAttachment(prFramebufferData* framebuffer, GLenum attachment, GLuint rboHandle);
+
 void prFramebufferBlit(GladGLContext* context, prFramebufferData* source, prFramebufferData* destination,
     GLint srcX0, GLint srcY0, GLint srcX1, GLint srcY1,
     GLint dstX0, GLint dstY0, GLint dstX1, GLint dstY1,
     GLbitfield mask, GLenum filter
 );
-
 void prFramebufferClear(GladGLContext* context, prFramebufferData* framebuffer, GLenum bits);

@@ -32,6 +32,48 @@ void prFramebufferLinkContext(prFramebufferData* framebuffer, GladGLContext* con
     }
 }
 
+void prFramebufferBind(prFramebufferData* framebuffer) {
+    if(!framebuffer || !framebuffer->context) {
+        return;
+    }
+    framebuffer->context->BindFramebuffer(GL_FRAMEBUFFER, framebuffer->FBO);
+}
+
+void prFramebufferUnbind(prFramebufferData* framebuffer) {
+    if(!framebuffer || !framebuffer->context) {
+        return;
+    }
+    framebuffer->context->BindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void prFramebufferBindRead(prFramebufferData* framebuffer) {
+    if(!framebuffer || !framebuffer->context) {
+        return;
+    }
+    framebuffer->context->BindFramebuffer(GL_READ_FRAMEBUFFER, framebuffer->FBO);
+}
+
+void prFramebufferBindDraw(prFramebufferData* framebuffer) {
+    if(!framebuffer || !framebuffer->context) {
+        return;
+    }
+    framebuffer->context->BindFramebuffer(GL_DRAW_FRAMEBUFFER, framebuffer->FBO);
+}
+
+GLuint prFramebufferGetHandle(prFramebufferData* framebuffer) {
+    if(!framebuffer) {
+        return 0;
+    }
+    return framebuffer->FBO;
+}
+
+GLenum prFramebufferCheckStatus(prFramebufferData* framebuffer) {
+    if(!framebuffer || !framebuffer->context) {
+        return GL_FRAMEBUFFER_UNDEFINED;
+    }
+    return framebuffer->context->CheckFramebufferStatus(GL_FRAMEBUFFER);
+}
+
 void prFramebufferLinkColorTexture(prFramebufferData* framebuffer, prTextureData* colorTexture) {
     if(colorTexture && framebuffer->context != colorTexture->context) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferLinkColorTexture: Texture context does not match framebuffer context. Aborting operation, nothing was modified");
@@ -126,6 +168,20 @@ void prFramebufferLinkDepthStencilTextureRBO(prFramebufferData* framebuffer, prR
     if(framebuffer->FBO) {
         i_prFramebufferUpdateBuffers(framebuffer);
     }
+}
+
+void prFramebufferTextureAttachment(prFramebufferData* framebuffer, GLenum attachment, GLuint textureHandle, GLint level) {
+    if (!framebuffer || !framebuffer->context) {
+        return;
+    }
+    framebuffer->context->FramebufferTexture2D(GL_FRAMEBUFFER, attachment, GL_TEXTURE_2D, textureHandle, level);
+}
+
+void prFramebufferRenderBufferAttachment(prFramebufferData* framebuffer, GLenum attachment, GLuint rboHandle) {
+    if (!framebuffer || !framebuffer->context) {
+        return;
+    }
+    framebuffer->context->FramebufferRenderbuffer(GL_FRAMEBUFFER, attachment, GL_RENDERBUFFER, rboHandle);
 }
 
 void prFramebufferBlit(GladGLContext* context, prFramebufferData* source, prFramebufferData* destination, GLint srcX0, GLint srcY0, GLint srcX1, GLint srcY1, GLint dstX0, GLint dstY0, GLint dstX1, GLint dstY1, GLbitfield mask, GLenum filter) {

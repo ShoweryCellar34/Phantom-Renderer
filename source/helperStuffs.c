@@ -3,30 +3,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <PR/shader.h>
-#include <PR/material.h>
 #include <PR/texture.h>
 #include <PR/textureInternal.h>
 #include <PR/logger.h>
 #include <PR/memory.h>
-
-prShaderData* loadDefaultShader(GladGLContext* context) {
-    prShaderData* shaderProgram = prShaderCreate();
-    prShaderLinkContext(shaderProgram, context);
-    prShaderUpdate(shaderProgram, 1, 1, BASE_VERTEX_SHADER, BASE_FRAGMENT_SHADER);
-
-    return shaderProgram;
-}
-
-prMaterialData* makeMaterialOneTexture(prTextureData* texture) {
-    prMaterialData* material = prMaterialCreate();
-
-    prMaterialLinkAmbientMap(material, texture);
-    prMaterialLinkDiffuseMap(material, texture);
-    prMaterialLinkSpecularMap(material, texture);
-    prMaterialLinkNormalMap(material, texture);
-
-    return material;
-}
 
 prTextureData* loadTexture(GladGLContext* context, const char* path) {
     prTextureData* texture = prTextureCreate();

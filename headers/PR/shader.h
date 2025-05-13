@@ -7,31 +7,24 @@ typedef struct prShaderData {
     GLchar* vertexShaderData;
     GLchar* fragmentShaderData;
     GLuint shaderProgramObject;
-    int useCameraUniforms;
-    int useMaterialUniforms;
 } prShaderData;
 
 prShaderData* prShaderCreate();
-
 void prShaderDestroy(prShaderData* shaderProgram);
-
 void prShaderLinkContext(prShaderData* shaderProgram, GladGLContext* context);
+void prShaderUpdate(prShaderData* shaderProgram, const GLchar* vertexShader, const GLchar* fragmentShader);
 
-void prShaderUpdate(prShaderData* shaderProgram, int useCameraUniforms, int useMaterialUniforms, const GLchar* vertexShader, const GLchar* fragmentShader);
+void prShaderBind(prShaderData* shaderProgram);
+void prShaderUnbind(prShaderData* shaderProgram);
+GLint prShaderGetUniformLocation(prShaderData* shaderProgram, const GLchar* uniformName);
+void prShaderSetAttributeLocation(prShaderData* shaderProgram, GLuint index, const GLchar* name);
 
-void prShaderUniform1i(prShaderData* shaderProgram, const GLchar* uniformName, GLint number);
+void prShaderLocationSetUniform1i(prShaderData* shaderProgram, GLint location, GLint value);
+void prShaderLocationSetUniform1f(prShaderData* shaderProgram, GLint location, GLfloat value);
+void prShaderLocationSetUniform3f(prShaderData* shaderProgram, GLint location, GLfloat v1, GLfloat v2, GLfloat v3);
+void prShaderLocationSetUniformMatrix4fv(prShaderData* shaderProgram, GLint location, const GLfloat* matrix);
 
-void prShaderUniform1f(prShaderData* shaderProgram, const GLchar* uniformName, GLfloat number);
-
-void prShaderUniform3f(prShaderData* shaderProgram, const GLchar* uniformName, GLfloat number1, GLfloat number2, GLfloat number3);
-
-void prShaderUniformMatrix4fv(prShaderData* shaderProgram, const GLchar* uniformName, GLfloat* number);
-
-int prShaderUniform1iQuiet(prShaderData* shaderProgram, const GLchar* uniformName, GLint number);
-
-int prShaderUniform1fQuiet(prShaderData* shaderProgram, const GLchar* uniformName, GLfloat number);
-
-int prShaderUniform3fQuiet(prShaderData* shaderProgram, const GLchar* uniformName, GLfloat number1, GLfloat number2, GLfloat number3);
-
-int prShaderUniformMatrix4fvQuiet(prShaderData* shaderProgram, const GLchar* uniformName, GLfloat* number);
-
+void prShaderSetUniform1i(prShaderData* shaderProgram, const GLchar* uniformName, GLint value);
+void prShaderSetUniform1f(prShaderData* shaderProgram, const GLchar* uniformName, GLfloat value);
+void prShaderSetUniform3f(prShaderData* shaderProgram, const GLchar* uniformName, GLfloat v1, GLfloat v2, GLfloat v3);
+void prShaderSetUniformMatrix4fv(prShaderData* shaderProgram, const GLchar* uniformName, GLfloat* matrix);

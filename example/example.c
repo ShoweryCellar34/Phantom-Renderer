@@ -27,13 +27,13 @@ int main(int argc, char** argv) {
 
     prEnableImageFlip();
 
-    prShaderData* shaderProgram = loadDefaultShader(test->openglContext);
+    prShaderData* shaderProgram = createDefaultShader(test->openglContext);
 
     prShaderData* hudShaderProgram = prShaderCreate();
     prShaderLinkContext(hudShaderProgram, test->openglContext);
-    prShaderUpdate(hudShaderProgram, 0, 0, HUD_VERTEX_SHADER, HUD_FRAGMENT_SHADER);
+    prShaderUpdate(hudShaderProgram, HUD_VERTEX_SHADER, HUD_FRAGMENT_SHADER);
 
-    prComputeShaderData* computeShaderProgram = prComputeShaderCreate();
+    computeShaderProgram = prComputeShaderCreate();
     prComputeShaderLinkContext(computeShaderProgram, test->openglContext);
     prComputeShaderUpdate(computeShaderProgram, HUD_COMPUTE_SHADER);
 
@@ -215,7 +215,11 @@ int main(int argc, char** argv) {
     test->openglContext->ClearColor(0.3f, 0.5f, 0.7f, 1.0f);
     test->openglContext->Enable(GL_CULL_FACE);
     test->openglContext->Enable(GL_BLEND);
+
     test->openglContext->BlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    prTextureBindImage(postProcessingTexture, 0, 0, PR_ACCESS_WRITE_ONLY, GL_RGBA32F);
+    prComputeShaderDispatch(computeShaderProgram, windowWidth, windowHeight, 1);
+    test->openglContext->MemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
 
     while(!glfwWindowShouldClose(test->window)) {
         test->openglContext->Enable(GL_DEPTH_TEST);
@@ -262,10 +266,6 @@ int main(int argc, char** argv) {
         }
 
         if(showPostProcessing) {
-            prTextureBindImage(postProcessingTexture, 0, 0, PR_ACCESS_WRITE_ONLY, GL_RGBA32F);
-            prComputeShaderDispatch(computeShaderProgram, windowWidth, windowHeight, 1);
-            test->openglContext->MemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
-
             prMeshLinkMaterial(meshQuad, materialPostProcessing);
             prMeshDraw(meshQuad, translation, camera, hudShaderProgram);
         }

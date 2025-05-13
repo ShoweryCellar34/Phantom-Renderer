@@ -75,22 +75,12 @@ void i_prFramebufferBlitOnGPU(GladGLContext* context, prFramebufferData* source,
     GLint dstX0, GLint dstY0, GLint dstX1, GLint dstY1,
     GLbitfield mask, GLenum filter
 ) {
-    GLint previousReadFramebuffer, previousDrawFramebuffer;
-    
-    context->GetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &previousReadFramebuffer);
-    context->GetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &previousDrawFramebuffer);
-
-    context->BindFramebuffer(GL_READ_FRAMEBUFFER, (source ? source->FBO : 0));
-    context->BindFramebuffer(GL_DRAW_FRAMEBUFFER, (destination ? destination->FBO : 0));
-
-    context->BlitFramebuffer(
+    context->BlitNamedFramebuffer(
+        (source ? source->FBO : 0), (destination ? destination->FBO : 0),
         srcX0, srcY0, srcX1, srcY1,
         dstX0, dstY0, dstX1, dstY1,
         mask, filter
     );
-
-    context->BindFramebuffer(GL_READ_FRAMEBUFFER, previousReadFramebuffer);
-    context->BindFramebuffer(GL_DRAW_FRAMEBUFFER, previousDrawFramebuffer);
 }
 
 void i_prFramebufferClear(GladGLContext* context, prFramebufferData* framebuffer, unsigned int bits) {

@@ -37,10 +37,6 @@ void prMeshLinkContext(prMeshData* mesh, GladGLContext* context) {
     }
 }
 
-void prMeshLinkMaterial(prMeshData* mesh, prMaterialData* material) {
-    mesh->material = material;
-}
-
 void prMeshUpdate(prMeshData* mesh, GLfloat vertices[], size_t verticesCount,
     GLfloat normals[], size_t normalsCount,
     GLfloat textureCoordinates[], size_t textureCoordinatesCount,
@@ -122,7 +118,7 @@ void prMeshUpdate(prMeshData* mesh, GLfloat vertices[], size_t verticesCount,
     }
 }
 
-void prMeshDraw(prMeshData* mesh, mat4 translation, prCamera* camera, prShaderData* shaderProgram) {
+void prMeshDraw(prMeshData* mesh) {
     if(!mesh->context) {
         prLogEvent(PR_EVENT_OPENGL, PR_LOG_ERROR, "prMeshDraw: Cannot draw mesh without a valid OpenGL context. Aborting operation, nothing was modified");
         return;
@@ -132,5 +128,5 @@ void prMeshDraw(prMeshData* mesh, mat4 translation, prCamera* camera, prShaderDa
         return;
     }
 
-    i_prMeshDrawOnGPU(mesh, translation, camera, shaderProgram);
+    i_prMeshDrawOnGPU(mesh);
 }

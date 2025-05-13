@@ -80,6 +80,11 @@ void framebufferSizeCallback(GLFWwindow* window, int width, int height) {
 
     prTextureUpdate(colorTexture, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR, NULL, 0, windowWidth, windowHeight);
     prRenderBufferUpdate(depthStencilRBO, PR_FORMAT_DEPTH_STENCIL, windowWidth, windowHeight);
+
+    context->BlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    prTextureBindImage(postProcessingTexture, 0, 0, PR_ACCESS_WRITE_ONLY, GL_RGBA32F);
+    prComputeShaderDispatch(computeShaderProgram, windowWidth, windowHeight, 1);
+    context->MemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
 }
 
 void cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
@@ -138,4 +143,79 @@ float smoothOvertime() {
 
 float smoothOvertimeSin() {
     return sin((glfwGetTimerValue() * 2.5f) / 5.0f / glfwGetTimerFrequency());
+}
+
+static const char* DEFAULT_VERTEX_SHADER = 
+    "#version 450 core\n"
+    "layout (location = 0) in vec3 aPos;\n"
+    "layout (location = 1) in vec3 aNormal;\n"
+    "layout (location = 2) in vec2 aTexCoord;\n"
+    "out vec3 FragPos;\n"
+    "out vec3 Normal;\n"
+    "out vec2 TexCoord;\n"
+    "uniform mat4 model;\n"
+    "uniform mat4 view;\n"
+    "uniform mat4 projection;\n"
+    "void main() {\n"
+    "    FragPos = vec3(model * vec4(aPos, 1.0));\n"
+    "    Normal = mat3(transpose(inverse(model))) * aNormal;\n"
+    "    TexCoord = aTexCoord;\n"
+    "    gl_Position = projection * view * vec4(FragPos, 1.0);\n"
+    "}\n";
+
+static const char* DEFAULT_FRAGMENT_SHADER = 
+    "#version 450 core\n"
+    "in vec3 FragPos;\n"
+    "in vec3 Normal;\n"
+    "in vec2 TexCoord;\n"
+    "out vec4 FragColor;\n"
+    "struct DirectionalLight {\n"
+    "    vec3 direction;\n"
+    "    vec3 ambient;\n"
+    "    vec3 diffuse;\n"
+    "    vec3 specular;\n"
+    "};\n"
+    "struct PointLight {\n"
+    "    vec3 position;\n"
+    "    float constant;\n"
+    "    float linear;\n"
+    "    float quadratic;\n"
+    "    vec3 ambient;\n"
+    "    vec3 diffuse;\n"
+    "    vec3 specular;\n"
+    "};\n"
+    "uniform DirectionalLight directionalLights[4];\n"
+    "uniform PointLight pointLights[4];\n"
+    "uniform sampler2D texture0;\n"  // Simplified texture handling
+    "uniform vec3 viewPos;\n"
+    "void main() {\n"
+    "    vec3 norm = normalize(Normal);\n"
+    "    vec3 viewDir = normalize(viewPos - FragPos);\n"
+    "    vec3 result = vec3(0.0);\n"
+    "    // Directional light\n"
+    "    vec3 lightDir = normalize(-directionalLights[0].direction);\n"
+    "    float diff = max(dot(norm, lightDir), 0.0);\n"
+    "    vec3 reflectDir = reflect(-lightDir, norm);\n"
+    "    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32.0);\n"
+    "    result += directionalLights[0].ambient * vec3(texture(texture0, TexCoord));\n"
+    "    result += diff * directionalLights[0].diffuse * vec3(texture(texture0, TexCoord));\n"
+    "    result += spec * directionalLights[0].specular * vec3(texture(texture0, TexCoord));\n"
+    "    // Point light\n"
+    "    vec3 pointLightDir = normalize(pointLights[0].position - FragPos);\n"
+    "    float pointDiff = max(dot(norm, pointLightDir), 0.0);\n"
+    "    vec3 pointReflectDir = reflect(-pointLightDir, norm);\n"
+    "    float pointSpec = pow(max(dot(viewDir, pointReflectDir), 0.0), 32.0);\n"
+    "    float distance = length(pointLights[0].position - FragPos);\n"
+    "    float attenuation = 1.0 / (pointLights[0].constant + pointLights[0].linear * distance + pointLights[0].quadratic * distance * distance);\n"
+    "    result += attenuation * (pointLights[0].ambient * vec3(texture(texture0, TexCoord)) +\n"
+    "                            pointDiff * pointLights[0].diffuse * vec3(texture(texture0, TexCoord)) +\n"
+    "                            pointSpec * pointLights[0].specular * vec3(texture(texture0, TexCoord)));\n"
+    "    FragColor = vec4(result, 1.0);\n"
+    "}\n";
+
+prShaderData* createDefaultShader(GladGLContext* context) {
+    prShaderData* shader = prShaderCreate();
+    prShaderLinkContext(shader, context);
+    prShaderUpdate(shader, DEFAULT_VERTEX_SHADER, DEFAULT_FRAGMENT_SHADER);
+    return shader;
 }

@@ -230,6 +230,7 @@ void main() {\n\
 int showHUD = 1;
 int showPostProcessing = 1;
 
+prComputeShaderData* computeShaderProgram = NULL;
 prTextureData* postProcessingTexture = NULL;
 prTextureData* colorTexture = NULL;
 prRenderBufferData* depthStencilRBO = NULL;

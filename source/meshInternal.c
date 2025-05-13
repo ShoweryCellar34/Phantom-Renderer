@@ -4,7 +4,6 @@
 #include <PR/memory.h>
 #include <PR/logger.h>
 #include <PR/mesh.h>
-#include <PR/material.h>
 #include <PR/shader.h>
 #include <PR/texture.h>
 #include <PR/camera.h>
@@ -123,111 +122,8 @@ void i_prMeshDestroyOnGPU(prMeshData* mesh) {
     mesh->context->DeleteBuffers(1, &mesh->EBO);
 }
 
-void i_prMeshDrawOnGPU(prMeshData* mesh, mat4 translation, prCamera* camera, prShaderData* shaderProgram) {
-    if(!shaderProgram->context) {
-        prLogEvent(PR_EVENT_OPENGL, PR_LOG_ERROR, "i_prMeshDrawOnGPU: Cannot use shader without a valid OpenGL context. Aborting operation, nothing was modified");
-        return;
-    }
-    if(mesh->context != shaderProgram->context) {
-        prLogEvent(PR_EVENT_OPENGL, PR_LOG_ERROR, "i_prMeshDrawOnGPU: Mesh and shader contexts do not match. Aborting operation, nothing was modified");
-        return;
-    }
-    if(!shaderProgram->shaderProgramObject) {
-        prLogEvent(PR_EVENT_OPENGL, PR_LOG_ERROR, "i_prMeshDrawOnGPU: Invalid shader program. Aborting operation, nothing was modified");
-        return;
-    }
-
-    prMaterialData defaultMaterial = {NULL, NULL, NULL, NULL, 32.0f};
-    prMaterialData* material = mesh->material;
-
-    if(!mesh->material) {
-        prLogEvent(PR_EVENT_DATA, PR_LOG_WARNING, "i_prMeshDrawOnGPU: Material not set, using default material");
-        material = &defaultMaterial;
-    }
-
-    mesh->context->UseProgram(shaderProgram->shaderProgramObject);
+void i_prMeshDrawOnGPU(prMeshData* mesh) {
     mesh->context->BindVertexArray(mesh->VAO);
-
-    mesh->context->ActiveTexture(GL_TEXTURE0);
-    if(material->ambientMap) {
-        if(material->ambientMap->TBO) {
-            if(material->ambientMap->context != mesh->context) {
-                prLogEvent(PR_EVENT_OPENGL, PR_LOG_ERROR, "i_prMeshDrawOnGPU: Ambient map context does not match mesh context, binding ID 0");
-            } else {
-                mesh->context->BindTexture(GL_TEXTURE_2D, material->ambientMap->TBO);
-            }
-        } else {
-            mesh->context->BindTexture(GL_TEXTURE_2D, 0);
-        }
-    } else {
-        mesh->context->BindTexture(GL_TEXTURE_2D, 0);
-    }
-    mesh->context->ActiveTexture(GL_TEXTURE1);
-    if(material->diffuseMap) {
-        if(material->diffuseMap->TBO) {
-            if(material->diffuseMap->context != mesh->context) {
-                prLogEvent(PR_EVENT_OPENGL, PR_LOG_ERROR, "i_prMeshDrawOnGPU: Diffuse map context does not match mesh context, binding ID 0");
-            } else {
-                mesh->context->BindTexture(GL_TEXTURE_2D, material->diffuseMap->TBO);
-            }
-        } else {
-            mesh->context->BindTexture(GL_TEXTURE_2D, 0);
-        }
-    } else {
-        mesh->context->BindTexture(GL_TEXTURE_2D, 0);
-    }
-    mesh->context->ActiveTexture(GL_TEXTURE2);
-    if(material->specularMap) {
-        if(material->specularMap->TBO) {
-            if(material->specularMap->context != mesh->context) {
-                prLogEvent(PR_EVENT_OPENGL, PR_LOG_ERROR, "i_prMeshDrawOnGPU: Specular map context does not match mesh context, binding ID 0");
-            } else {
-                mesh->context->BindTexture(GL_TEXTURE_2D, material->specularMap->TBO);
-            }
-        } else {
-            mesh->context->BindTexture(GL_TEXTURE_2D, 0);
-        }
-    } else {
-        mesh->context->BindTexture(GL_TEXTURE_2D, 0);
-    }
-    mesh->context->ActiveTexture(GL_TEXTURE3);
-    if(material->normalMap) {
-        if(material->normalMap->TBO) {
-            if(material->normalMap->context != mesh->context) {
-                prLogEvent(PR_EVENT_OPENGL, PR_LOG_ERROR, "i_prMeshDrawOnGPU: Normal map context does not match mesh context, binding ID 0");
-            } else {
-                mesh->context->BindTexture(GL_TEXTURE_2D, material->normalMap->TBO);
-            }
-        } else {
-            mesh->context->BindTexture(GL_TEXTURE_2D, 0);
-        }
-    } else {
-        mesh->context->BindTexture(GL_TEXTURE_2D, 0);
-    }
-
-    int success = 0;
-
-    if(shaderProgram->useCameraUniforms) {
-        success += prShaderUniform3fQuiet(shaderProgram, "cameraPosition", camera->position[0], camera->position[1], camera->position[2]);
-        success += prShaderUniformMatrix4fvQuiet(shaderProgram, "view", camera->view[0]);
-        success += prShaderUniformMatrix4fvQuiet(shaderProgram, "projection", camera->projection[0]);
-        success += prShaderUniformMatrix4fvQuiet(shaderProgram, "translation", translation[0]);
-        if(success < 4) {
-            prLogEvent(PR_EVENT_OPENGL, PR_LOG_WARNING, "i_prMeshDrawOnGPU: One or more camera uniform variables could not be set");
-        }
-    }
-
-    if(shaderProgram->useMaterialUniforms) {
-        success = 0;
-        success += prShaderUniform1iQuiet(shaderProgram, "material.ambient", 0);
-        success += prShaderUniform1iQuiet(shaderProgram, "material.diffuse", 1);
-        success += prShaderUniform1iQuiet(shaderProgram, "material.specular", 2);
-        success += prShaderUniform1iQuiet(shaderProgram, "material.normal", 3);
-        success += prShaderUniform1fQuiet(shaderProgram, "material.shininess", material->shininess);
-        if(success < 4) {
-            prLogEvent(PR_EVENT_OPENGL, PR_LOG_WARNING, "i_prMeshDrawOnGPU: One or more material uniform variables could not be set");
-        }
-    }
 
     mesh->context->DrawElements(GL_TRIANGLES, mesh->indicesCount, GL_UNSIGNED_INT, 0);
 

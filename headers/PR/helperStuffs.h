@@ -4,12 +4,7 @@
 
 typedef struct GladGLContext GladGLContext;
 typedef struct prShaderData prShaderData;
-typedef struct prMaterialData prMaterialData;
 typedef struct prTextureData prTextureData;
-
-prShaderData* loadDefaultShader(GladGLContext* context);
-
-prMaterialData* makeMaterialOneTexture(prTextureData* texture);
 
 prTextureData* loadTexture(GladGLContext* context, const char* path);
 
