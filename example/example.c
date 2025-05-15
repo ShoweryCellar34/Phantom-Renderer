@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <cglm/cglm.h>
+#include <stb_image.h>
 #include <PR/memory.h>
 #include "exampleGlobalValues.h"
 #include "exampleFunctions.h"
@@ -28,6 +29,10 @@ int main(int argc, char** argv) {
     prEnableImageFlip();
 
     prShaderData* shaderProgram = createDefaultShader(test->openglContext);
+
+    prShaderData* skyboxShaderProgram = prShaderCreate();
+    prShaderLinkContext(skyboxShaderProgram, test->openglContext);
+    prShaderUpdate(skyboxShaderProgram, SKYBOX_VERTEX_SHADER, SKYBOX_FRAGMENT_SHADER);
 
     prShaderData* hudShaderProgram = prShaderCreate();
     prShaderLinkContext(hudShaderProgram, test->openglContext);
@@ -88,6 +93,15 @@ int main(int argc, char** argv) {
         48.0f
     };
 
+    skyboxMaterialData materialSkybox = {
+        defaultTexture,
+        defaultTexture,
+        defaultTexture,
+        defaultTexture,
+        defaultTexture,
+        defaultTexture
+    };
+
     materialData materialWhite = {
         whiteTexture,
         whiteTexture,
@@ -144,41 +158,9 @@ int main(int argc, char** argv) {
         0.0f
     };
 
-    prMeshData* meshMetal = prMeshCreate();
-    prMeshLinkContext(meshMetal, test->openglContext);
-    prMeshUpdate(meshMetal,
-        vertices, sizeof(vertices) / sizeof(float),
-        normals, sizeof(normals) / sizeof(float),
-        textureCoordinates, sizeof(textureCoordinates) / sizeof(float),
-        indices, sizeof(indices) / sizeof(unsigned int));
-
-    prMeshData* meshWood = prMeshCreate();
-    prMeshLinkContext(meshWood, test->openglContext);
-    prMeshUpdate(meshWood,
-        vertices, sizeof(vertices) / sizeof(float),
-        normals, sizeof(normals) / sizeof(float),
-        textureCoordinates, sizeof(textureCoordinates) / sizeof(float),
-        indices, sizeof(indices) / sizeof(unsigned int));
-
-    prMeshData* meshWoodMetal = prMeshCreate();
-    prMeshLinkContext(meshWoodMetal, test->openglContext);
-    prMeshUpdate(meshWoodMetal,
-        vertices, sizeof(vertices) / sizeof(float),
-        normals, sizeof(normals) / sizeof(float),
-        textureCoordinates, sizeof(textureCoordinates) / sizeof(float),
-        indices, sizeof(indices) / sizeof(unsigned int));
-
-    prMeshData* meshBrick = prMeshCreate();
-    prMeshLinkContext(meshBrick, test->openglContext);
-    prMeshUpdate(meshBrick,
-        vertices, sizeof(vertices) / sizeof(float),
-        normals, sizeof(normals) / sizeof(float),
-        textureCoordinates, sizeof(textureCoordinates) / sizeof(float),
-        indices, sizeof(indices) / sizeof(unsigned int));
-
-    prMeshData* meshItem = prMeshCreate();
-    prMeshLinkContext(meshItem, test->openglContext);
-    prMeshUpdate(meshItem,
+    prMeshData* meshCube = prMeshCreate();
+    prMeshLinkContext(meshCube, test->openglContext);
+    prMeshUpdate(meshCube,
         vertices, sizeof(vertices) / sizeof(float),
         normals, sizeof(normals) / sizeof(float),
         textureCoordinates, sizeof(textureCoordinates) / sizeof(float),
@@ -250,6 +232,35 @@ int main(int argc, char** argv) {
     test->openglContext->Enable(GL_CULL_FACE);
     test->openglContext->Enable(GL_BLEND);
 
+    const char* skyboxTextures[6] = {
+        "res/skybox/right.jpg",
+        "res/skybox/left.jpg",
+        "res/skybox/top.jpg",
+        "res/skybox/bottom.jpg",
+        "res/skybox/front.jpg",
+        "res/skybox/back.jpg",
+    };
+
+    unsigned int skyboxTexture;
+    test->openglContext->GenTextures(1, &skyboxTexture);
+    test->openglContext->BindTexture(GL_TEXTURE_CUBE_MAP, skyboxTexture);
+
+    int width, height, channels;
+    for(unsigned int i = 0; i < 6; i++) {
+        unsigned char* data = stbi_load(skyboxTextures[i], &width, &height, &channels, 0);
+        test->openglContext->TexImage2D(
+            GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+            0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data
+        );
+        stbi_image_free(data);
+    }
+
+    test->openglContext->TexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    test->openglContext->TexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    test->openglContext->TexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    test->openglContext->TexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    test->openglContext->TexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
     while(!glfwWindowShouldClose(test->window)) {
         test->openglContext->Enable(GL_DEPTH_TEST);
         prFramebufferClear(test->openglContext, NULL, PR_BUFFER_BIT_COLOR | PR_BUFFER_BIT_DEPTH);
@@ -262,7 +273,7 @@ int main(int argc, char** argv) {
         mat4 translation;
 
         vec3 rotation = {radians(yaw), radians(pitch), radians(0.0f)};
-        prCameraUpdate(camera, cameraPosition, rotation, 45.0f, 0.1f, 100.0f);
+        prCameraUpdate(camera, cameraPosition, rotation, 45.0f, 0.1f, 1500.0f);
 
         prShaderSetUniform3f(shaderProgram, "cameraPosition", camera->position[0], camera->position[1], camera->position[2]);
         prShaderSetUniformMatrix4fv(shaderProgram, "view", camera->view[0]);
@@ -272,40 +283,56 @@ int main(int argc, char** argv) {
 
         prFramebufferBind(framebuffer);
 
+        test->openglContext->ActiveTexture(GL_TEXTURE0);
+        test->openglContext->BindTexture(GL_TEXTURE_CUBE_MAP, skyboxTexture);
+
+        translationsToMatrix(translation, camera->position, GLM_VEC3_ZERO, (vec3){1.0f, 1.0f, 1.0f});
+        prShaderSetUniformMatrix4fv(skyboxShaderProgram, "translation", translation[0]);
+        prShaderSetUniformMatrix4fv(skyboxShaderProgram, "view", camera->view[0]);
+        prShaderSetUniformMatrix4fv(skyboxShaderProgram, "projection", camera->projection[0]);
+
+        test->openglContext->Disable(GL_CULL_FACE);
+        test->openglContext->DepthMask(GL_FALSE);
+        test->openglContext->DepthFunc(GL_LEQUAL);
+        prShaderBind(skyboxShaderProgram);
+        prMeshDraw(meshCube);
         translationsToMatrix(translation, (vec3){0.0f, 0.0f, -20.0f}, GLM_VEC3_ZERO, (vec3){30.0f, 30.0f, 10.0f});
         bindMaterial(&materialMetal, shaderProgram);
+        test->openglContext->DepthMask(GL_TRUE);
+        test->openglContext->Enable(GL_CULL_FACE);
+
         prShaderSetUniformMatrix4fv(shaderProgram, "translation", translation[0]);
-        prMeshDraw(meshMetal);
+        prMeshDraw(meshCube);
 
         translationsToMatrix(translation, (vec3){0.0f, -20.0f, 0.0f}, GLM_VEC3_ZERO, (vec3){30.0f, 10.0f, 30.0f});
         bindMaterial(&materialMetal, shaderProgram);
         prShaderSetUniformMatrix4fv(shaderProgram, "translation", translation[0]);
-        prMeshDraw(meshMetal);
+        prMeshDraw(meshCube);
 
         translationsToMatrix(translation, (vec3){-20.0f, 0.0f, 0.0f}, GLM_VEC3_ZERO, (vec3){10.0f, 30.0f, 30.0f});
         bindMaterial(&materialMetal, shaderProgram);
         prShaderSetUniformMatrix4fv(shaderProgram, "translation", translation[0]);
-        prMeshDraw(meshMetal);
+        prMeshDraw(meshCube);
 
         translationsToMatrix(translation, (vec3){1.0f, 0.0f, 0.0f}, (vec3){0.0f, val, 0.0f}, GLM_VEC3_ONE);
         bindMaterial(&materialWood, shaderProgram);
         prShaderSetUniformMatrix4fv(shaderProgram, "translation", translation[0]);
-        prMeshDraw(meshWood);
+        prMeshDraw(meshCube);
 
         translationsToMatrix(translation, (vec3){-1.0f, 0.0f, 0.0f}, (vec3){0.0f, val, 0.0f}, GLM_VEC3_ONE);
         bindMaterial(&materialWoodMetal, shaderProgram);
         prShaderSetUniformMatrix4fv(shaderProgram, "translation", translation[0]);
-        prMeshDraw(meshWoodMetal);
+        prMeshDraw(meshCube);
 
         translationsToMatrix(translation, (vec3){0.0f, 1.5f, 0.0f}, (vec3){0.0f, val, 0.0f}, GLM_VEC3_ONE);
         bindMaterial(&materialBrick, shaderProgram);
         prShaderSetUniformMatrix4fv(shaderProgram, "translation", translation[0]);
-        prMeshDraw(meshBrick);
+        prMeshDraw(meshCube);
 
         translationsToMatrix(translation, (vec3){0.0f, val / 3.5f - 1.5f, 0.0f}, (vec3){0.0f, radians(val * 100.0f), 0.0f}, GLM_VEC3_ONE);
         bindMaterial(&defaultMaterial, shaderProgram);
         prShaderSetUniformMatrix4fv(shaderProgram, "translation", translation[0]);
-        prMeshDraw(meshItem);
+        prMeshDraw(meshCube);
 
         if(showHUD == 1) {
             test->openglContext->Disable(GL_DEPTH_TEST);
@@ -342,12 +369,8 @@ int main(int argc, char** argv) {
 
     prMeshDestroy(meshQuad);
     meshQuad = NULL;
-    prMeshDestroy(meshWoodMetal);
-    meshWoodMetal = NULL;
-    prMeshDestroy(meshWood);
-    meshWood = NULL;
-    prMeshDestroy(meshMetal);
-    meshMetal = NULL;
+    prMeshDestroy(meshCube);
+    meshCube = NULL;
 
     prFramebufferDestroy(framebuffer);
     framebuffer = NULL;
@@ -387,6 +410,8 @@ int main(int argc, char** argv) {
     computeShaderProgram = NULL;
     prShaderDestroy(hudShaderProgram);
     hudShaderProgram = NULL;
+    prShaderDestroy(skyboxShaderProgram);
+    skyboxShaderProgram = NULL;
     prShaderDestroy(shaderProgram);
     shaderProgram = NULL;
 

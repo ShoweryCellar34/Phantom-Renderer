@@ -89,36 +89,47 @@ float normals[] = {
 };
 
 float textureCoordinates[] = {
+    // Back face
     0.0f, 0.0f,
     1.0f, 0.0f,
     1.0f, 1.0f,
     1.0f, 1.0f,
     0.0f, 1.0f,
     0.0f, 0.0f,
+
+    // Front face
     0.0f, 0.0f,
     1.0f, 0.0f,
     1.0f, 1.0f,
     1.0f, 1.0f,
     0.0f, 1.0f,
     0.0f, 0.0f,
+
+    // Left face (rotated 90° clockwise)
     1.0f, 0.0f,
     1.0f, 1.0f,
     0.0f, 1.0f,
     0.0f, 1.0f,
     0.0f, 0.0f,
     1.0f, 0.0f,
+
+    // Right face (rotated 90° clockwise)
     1.0f, 0.0f,
     1.0f, 1.0f,
     0.0f, 1.0f,
     0.0f, 1.0f,
     0.0f, 0.0f,
     1.0f, 0.0f,
+
+    // Bottom face
     0.0f, 1.0f,
     1.0f, 1.0f,
     1.0f, 0.0f,
     1.0f, 0.0f,
     0.0f, 0.0f,
     0.0f, 1.0f,
+
+    // Top face
     0.0f, 1.0f,
     1.0f, 1.0f,
     1.0f, 0.0f,
@@ -180,6 +191,15 @@ typedef struct materialData {
     prTextureData* normalMap;
     GLfloat shininess;
 } materialData;
+
+typedef struct skyboxMaterialData {
+    prTextureData* rightTexture;
+    prTextureData* leftTexture;
+    prTextureData* topTexture;
+    prTextureData* bottomTexture;
+    prTextureData* backTexture;
+    prTextureData* frontTexture;
+} skyboxMaterialData;
 
 prCamera* camera = NULL;
 vec3 cameraPosition = {0.0f, 0.0f, 5.0f};
@@ -323,6 +343,39 @@ void main() {\n\
 "
 #endif
 
+#ifndef SKYBOX_VERTEX_SHADER
+#define SKYBOX_VERTEX_SHADER "\n\
+#version 460 core\n\
+layout (location = 0) in vec3 inputPosition;\n\
+\n\
+out vec3 textureCoordinates;\n\
+\n\
+uniform mat4 translation;\n\
+uniform mat4 view;\n\
+uniform mat4 projection;\n\
+\n\
+void main() {\n\
+    gl_Position = (projection * view * translation * vec4(inputPosition, 1.0)).xyww;\n\
+    textureCoordinates = inputPosition;\n\
+}\n\
+"
+#endif
+
+#ifndef SKYBOX_FRAGMENT_SHADER
+#define SKYBOX_FRAGMENT_SHADER "\n\
+#version 460 core\n\
+out vec4 fragmentColor;\n\
+\n\
+in vec3 textureCoordinates;\n\
+\n\
+layout (location = 0) uniform samplerCube skybox;\n\
+\n\
+void main() {\n\
+    fragmentColor = texture(skybox, textureCoordinates);\n\
+}\n\
+"
+#endif
+
 #define HUD_VERTEX_SHADER "\n\
 #version 460 core\n\
 layout (location = 0) in vec3 inputPosition;\n\
@@ -359,11 +412,42 @@ void main() {\n\
 layout (local_size_x = 1, local_size_y = 1, local_size_z = 1) in;\n\
 layout (binding = 0) uniform sampler2D inputImage;\n\
 layout (rgba32f, binding = 1) uniform image2D outputImage;\n\
+\n\
+const float offset = 1.0 / 300.0;\n\
+\n\
 void main() {\n\
     ivec2 pixelCoord = ivec2(gl_GlobalInvocationID.xy);\n\
     vec2 uv = vec2(pixelCoord) / vec2(imageSize(outputImage));\n\
-    vec3 color = vec3(uv, 0.5);\n\
-    imageStore(outputImage, pixelCoord, texture(inputImage, uv).brga);\n\
+    \n\
+    vec2 offsets[9] = vec2[](\n\
+        vec2(-offset,  offset), // top-left\n\
+        vec2( 0.0f,    offset), // top-center\n\
+        vec2( offset,  offset), // top-right\n\
+        vec2(-offset,  0.0f),   // center-left\n\
+        vec2( 0.0f,    0.0f),   // center-center\n\
+        vec2( offset,  0.0f),   // center-right\n\
+        vec2(-offset, -offset), // bottom-left\n\
+        vec2( 0.0f,   -offset), // bottom-center\n\
+        vec2( offset, -offset)  // bottom-right\n\
+    );\n\
+    \n\
+    float kernel[9] = float[](\n\
+        1.0 / 9.0, 1.0 / 9.0, 1.0 / 9.0,\n\
+        1.0 / 9.0, 1.0 / 9.0, 1.0 / 9.0,\n\
+        1.0 / 9.0, 1.0 / 9.0, 1.0 / 9.0\n\
+    );\n\
+    \n\
+    vec4 samples[9];\n\
+    for(int i = 0; i < 9; i++) {\n\
+        samples[i] = texture(inputImage, uv + offsets[i]);\n\
+    }\n\
+    \n\
+    vec4 finalSample = vec4(0.0);\n\
+    for(int i = 0; i < 9; i++) {\n\
+        finalSample += samples[i] * kernel[i];\n\
+    }\n\
+    \n\
+    imageStore(outputImage, pixelCoord, finalSample);\n\
 }\n\
 "
 

@@ -63,10 +63,6 @@ void proccessInput(GLFWwindow* window) {
         glm_vec3_scale(temp2[0], cameraSpeed, temp2[0]);
         glm_vec3_sub(cameraPosition, temp2[0], cameraPosition);
     }
-
-    if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
-        glfwSetWindowShouldClose(window, 1);
-    }
 }
 
 void framebufferSizeCallback(GLFWwindow* window, int width, int height) {
@@ -132,6 +128,10 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 
     if(key == GLFW_KEY_Z && action == GLFW_PRESS) {
         showPostProcessing = !showPostProcessing;
+    }
+
+    if(key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+        glfwSetWindowShouldClose(window, 1);
     }
 }
 
