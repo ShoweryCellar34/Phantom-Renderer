@@ -28,22 +28,18 @@ void prFramebufferLinkContext(prFramebufferData* framebuffer, GladGLContext* con
     framebuffer->context = context;
     if(framebuffer->context && !framebuffer->FBO) {
         i_prFramebufferCreateOnGPU(framebuffer);
-        i_prFramebufferUpdateBuffers(framebuffer);
     }
 }
 
 void prFramebufferBind(prFramebufferData* framebuffer) {
-    if(!framebuffer || !framebuffer->context) {
+    if(!framebuffer->context || !framebuffer->FBO) {
         return;
     }
     framebuffer->context->BindFramebuffer(GL_FRAMEBUFFER, framebuffer->FBO);
 }
 
-void prFramebufferUnbind(prFramebufferData* framebuffer) {
-    if(!framebuffer || !framebuffer->context) {
-        return;
-    }
-    framebuffer->context->BindFramebuffer(GL_FRAMEBUFFER, 0);
+void prFramebufferUnbind(GladGLContext* context) {
+    context->BindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void prFramebufferBindRead(prFramebufferData* framebuffer) {

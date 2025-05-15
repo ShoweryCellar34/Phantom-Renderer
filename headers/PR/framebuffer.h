@@ -24,7 +24,7 @@ void prFramebufferDestroy(prFramebufferData* framebuffer);
 void prFramebufferLinkContext(prFramebufferData* framebuffer, GladGLContext* context);
 
 void prFramebufferBind(prFramebufferData* framebuffer);
-void prFramebufferUnbind(prFramebufferData* framebuffer);
+void prFramebufferUnbind(GladGLContext* context);
 void prFramebufferBindRead(prFramebufferData* framebuffer);
 void prFramebufferBindDraw(prFramebufferData* framebuffer);
 GLuint prFramebufferGetHandle(prFramebufferData* framebuffer);

@@ -18,7 +18,7 @@ int main(int argc, char** argv) {
     prWindowInitContext(test);
 
     glfwMakeContextCurrent(test->window);
-    glfwSetFramebufferSizeCallback(test->window, framebufferSizeCallback);
+    glfwSetFramebufferSizeCallback(test->window, framebufferSizeCallbackLite);
     glfwSetCursorPosCallback(test->window, cursorPosCallback);
     glfwSetKeyCallback(test->window, keyCallback);
     glfwSetInputMode(test->window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -58,21 +58,21 @@ int main(int argc, char** argv) {
     vec3 lightDiffuse = {0.8f, 0.8f, 0.75f};
     vec3 lightSpecular = {0.9f, 0.9f, 0.85f};
     
-    vec3 pointLightPos = {0.0f, 0.0f, 0.0f};
-    vec3 pointLightDiffuse = {0.0f, 0.0f, 1.0f};
-    vec3 pointLightSpecular = {1.0f, 0.0f, 0.0f};    // Set directional light uniforms
+    vec3 pointLightPos = {2.0f, 2.0f, 2.0f};
+    vec3 pointLightDiffuse = {0.75f, 0.75f, 0.75f};
+    vec3 pointLightSpecular = {1.0f, 1.0f, 1.0f};
+
     prShaderSetUniform3f(shaderProgram, "directionalLights[0].direction", lightDir[0], lightDir[1], lightDir[2]);
     prShaderSetUniform3f(shaderProgram, "directionalLights[0].ambient", lightAmbient[0], lightAmbient[1], lightAmbient[2]);
     prShaderSetUniform3f(shaderProgram, "directionalLights[0].diffuse", lightDiffuse[0], lightDiffuse[1], lightDiffuse[2]);
     prShaderSetUniform3f(shaderProgram, "directionalLights[0].specular", lightSpecular[0], lightSpecular[1], lightSpecular[2]);
 
-    // Set point light uniforms
     prShaderSetUniform1f(shaderProgram, "pointLights[0].constant", 1.0f);
     prShaderSetUniform1f(shaderProgram, "pointLights[0].linear", 0.09f);
     prShaderSetUniform1f(shaderProgram, "pointLights[0].quadratic", 0.032f);
 
     prShaderSetUniform3f(shaderProgram, "pointLights[0].position", pointLightPos[0], pointLightPos[1], pointLightPos[2]);
-    prShaderSetUniform3f(shaderProgram, "pointLights[0].ambient", 0.0f, 0.0f, 0.0f);
+    prShaderSetUniform3f(shaderProgram, "pointLights[0].ambient", 0.095f, 0.095f, 0.1f);
     prShaderSetUniform3f(shaderProgram, "pointLights[0].diffuse", pointLightDiffuse[0], pointLightDiffuse[1], pointLightDiffuse[2]);
     prShaderSetUniform3f(shaderProgram, "pointLights[0].specular", pointLightSpecular[0], pointLightSpecular[1], pointLightSpecular[2]);
 
@@ -103,7 +103,20 @@ int main(int argc, char** argv) {
         prShaderSetUniformMatrix4fv(shaderProgram, "projection", camera->projection[0]);
         prShaderSetUniformMatrix4fv(shaderProgram, "translation", translation[0]);
 
+        prTextureBindTexture(diffuseTexture, 0);
+        prTextureBindTexture(diffuseTexture, 1);
+        prTextureBindTexture(diffuseTexture, 2);
+
+        prShaderSetUniform1i(shaderProgram, "material.ambient", 0);
+        prShaderSetUniform1i(shaderProgram, "material.diffuse", 1);
+        prShaderSetUniform1i(shaderProgram, "material.specular", 2);
+        prShaderSetUniform1f(shaderProgram, "material.shininess", 32.0f);
+
+        prFramebufferBind(framebuffer);
         prMeshDraw(meshItem);
+        prFramebufferUnbind(test->openglContext);
+
+        prFramebufferBlit(test->openglContext, framebuffer, NULL, 0, 0, windowWidth, windowHeight, 0, 0, windowWidth, windowHeight, GL_COLOR_BUFFER_BIT, GL_NEAREST);
 
         glfwSwapBuffers(test->window);
         glfwPollEvents();

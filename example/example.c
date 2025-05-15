@@ -80,53 +80,69 @@ int main(int argc, char** argv) {
     prFramebufferLinkColorTexture(framebuffer, colorTexture);
     prFramebufferLinkDepthStencilTextureRBO(framebuffer, depthStencilRBO);
 
-    prMaterialData* defaultMaterial = makeMaterialOneTexture(defaultTexture);
-    defaultMaterial->shininess = 48.0f;
+    materialData defaultMaterial = {
+        defaultTexture,
+        defaultTexture,
+        defaultTexture,
+        defaultNormal,
+        48.0f
+    };
 
-    prMaterialData* materialWhite = makeMaterialOneTexture(whiteTexture);
-    materialWhite->shininess = 0.0f;
+    materialData materialWhite = {
+        whiteTexture,
+        whiteTexture,
+        whiteTexture,
+        defaultNormal,
+        0.0f,
+    };
 
-    prMaterialData* materialMetal = prMaterialCreate();
-    prMaterialLinkAmbientMap(materialMetal, steelTexture);
-    prMaterialLinkDiffuseMap(materialMetal, steelTexture);
-    prMaterialLinkSpecularMap(materialMetal, whiteTexture);
-    prMaterialLinkNormalMap(materialMetal, steelNormal);
-    materialMetal->shininess = 256.0f;
+    materialData materialMetal = {
+        steelTexture,
+        steelTexture,
+        whiteTexture,
+        steelNormal,
+        256.0f
+    };
 
-    prMaterialData* materialWood = prMaterialCreate();
-    prMaterialLinkAmbientMap(materialWood, containerTexture);
-    prMaterialLinkDiffuseMap(materialWood, containerTexture);
-    prMaterialLinkSpecularMap(materialWood, blackTexture);
-    prMaterialLinkNormalMap(materialWood, whiteTexture);
-    prMaterialSetShininess(materialWood, 32.0f);
+    materialData materialWood = {
+        containerTexture,
+        containerTexture,
+        blackTexture,
+        whiteTexture,
+        32.0f
+    };
 
-    prMaterialData* materialWoodMetal = prMaterialCreate();
-    prMaterialLinkAmbientMap(materialWoodMetal, containerMetalTexture);
-    prMaterialLinkDiffuseMap(materialWoodMetal, containerMetalTexture);
-    prMaterialLinkSpecularMap(materialWoodMetal, containerMetalSpecularTexture);
-    prMaterialLinkNormalMap(materialWoodMetal, whiteTexture);
-    prMaterialSetShininess(materialWoodMetal, 256.0f);
+    materialData materialWoodMetal = {
+        containerMetalTexture,
+        containerMetalTexture,
+        containerMetalSpecularTexture,
+        whiteTexture,
+        256.0f
+    };
 
-    prMaterialData* materialBrick = prMaterialCreate();
-    prMaterialLinkAmbientMap(materialBrick, brickWallDiffuseTexture);
-    prMaterialLinkDiffuseMap(materialBrick, brickWallDiffuseTexture);
-    prMaterialLinkSpecularMap(materialBrick, brickWallSpecularTexture);
-    prMaterialLinkNormalMap(materialBrick, brickWallNormalTexture);
-    prMaterialSetShininess(materialBrick, 32.0f);
+    materialData materialBrick = {
+        brickWallDiffuseTexture,
+        brickWallDiffuseTexture,
+        brickWallSpecularTexture,
+        brickWallNormalTexture,
+        32.0f
+    };
 
-    prMaterialData* materialHUD = prMaterialCreate();
-    prMaterialLinkAmbientMap(materialHUD, HUDTexture);
-    prMaterialLinkDiffuseMap(materialHUD, blackTexture);
-    prMaterialLinkSpecularMap(materialHUD, blackTexture);
-    prMaterialLinkNormalMap(materialHUD, blackTexture);
-    prMaterialSetShininess(materialHUD, 0.0f);
+    materialData materialHUD = {
+        HUDTexture,
+        blackTexture,
+        blackTexture,
+        blackTexture,
+        0.0f
+    };
 
-    prMaterialData* materialPostProcessing = prMaterialCreate();
-    prMaterialLinkAmbientMap(materialPostProcessing, postProcessingTexture);
-    prMaterialLinkDiffuseMap(materialPostProcessing, blackTexture);
-    prMaterialLinkSpecularMap(materialPostProcessing, blackTexture);
-    prMaterialLinkNormalMap(materialPostProcessing, blackTexture);
-    prMaterialSetShininess(materialPostProcessing, 0.0f);
+    materialData materialPostProcessing = {
+        postProcessingTexture,
+        blackTexture,
+        blackTexture,
+        blackTexture,
+        0.0f
+    };
 
     prMeshData* meshMetal = prMeshCreate();
     prMeshLinkContext(meshMetal, test->openglContext);
@@ -135,7 +151,6 @@ int main(int argc, char** argv) {
         normals, sizeof(normals) / sizeof(float),
         textureCoordinates, sizeof(textureCoordinates) / sizeof(float),
         indices, sizeof(indices) / sizeof(unsigned int));
-    prMeshLinkMaterial(meshMetal, materialMetal);
 
     prMeshData* meshWood = prMeshCreate();
     prMeshLinkContext(meshWood, test->openglContext);
@@ -144,7 +159,6 @@ int main(int argc, char** argv) {
         normals, sizeof(normals) / sizeof(float),
         textureCoordinates, sizeof(textureCoordinates) / sizeof(float),
         indices, sizeof(indices) / sizeof(unsigned int));
-    prMeshLinkMaterial(meshWood, materialWood);
 
     prMeshData* meshWoodMetal = prMeshCreate();
     prMeshLinkContext(meshWoodMetal, test->openglContext);
@@ -153,7 +167,6 @@ int main(int argc, char** argv) {
         normals, sizeof(normals) / sizeof(float),
         textureCoordinates, sizeof(textureCoordinates) / sizeof(float),
         indices, sizeof(indices) / sizeof(unsigned int));
-    prMeshLinkMaterial(meshWoodMetal, materialWoodMetal);
 
     prMeshData* meshBrick = prMeshCreate();
     prMeshLinkContext(meshBrick, test->openglContext);
@@ -162,7 +175,6 @@ int main(int argc, char** argv) {
         normals, sizeof(normals) / sizeof(float),
         textureCoordinates, sizeof(textureCoordinates) / sizeof(float),
         indices, sizeof(indices) / sizeof(unsigned int));
-    prMeshLinkMaterial(meshBrick, materialBrick);
 
     prMeshData* meshItem = prMeshCreate();
     prMeshLinkContext(meshItem, test->openglContext);
@@ -171,7 +183,6 @@ int main(int argc, char** argv) {
         normals, sizeof(normals) / sizeof(float),
         textureCoordinates, sizeof(textureCoordinates) / sizeof(float),
         indices, sizeof(indices) / sizeof(unsigned int));
-    prMeshLinkMaterial(meshItem, defaultMaterial);
 
     prMeshData* meshQuad = prMeshCreate();
     prMeshLinkContext(meshQuad, test->openglContext);
@@ -180,33 +191,56 @@ int main(int argc, char** argv) {
         normalsQuad, sizeof(normalsQuad) / sizeof(float),
         textureCoordinatesQuad, sizeof(textureCoordinatesQuad) / sizeof(float),
         indicesQuad, sizeof(indicesQuad) / sizeof(unsigned int));
-    prMeshLinkMaterial(meshQuad, materialHUD);
 
-    prDirectionalLightData* sun = prDirectionalLightCreate();
-    prDirectionalLightSetDirection(sun, (vec3){-0.25f, -0.5f, -0.75f});
-    prDirectionalLightSetAmbient(sun, (vec3){0.095f, 0.095f, 0.1f});
-    prDirectionalLightSetDiffuse(sun, (vec3){0.8f, 0.8f, 0.75f});
-    prDirectionalLightSetSpecular(sun, (vec3){0.9f, 0.9f, 0.85f});
+    typedef struct directionalLightData {
+        vec3 direction;
+        vec3 ambient;
+        vec3 diffuse;
+        vec3 specular;
+    } directionalLightData;
 
-    prPointLightData* point = prPointLightCreate();
-    prPointLightSetPosition(point, (vec3){0.0f, 0.0f, 0.0f});
-    prPointLightCalculateAttenuation(point, 50.0f);
-    prPointLightSetDiffuse(point, (vec3){0.0f, 0.0f, 1.0f});
-    prPointLightSetSpecular(point, (vec3){1.0f, 0.0f, 0.0f});
+    directionalLightData sun = {
+        {-0.25f, -0.5f, -0.75f},
+        {0.095f, 0.095f, 0.1f},
+        {0.8f, 0.8f, 0.75f},
+        {0.9f, 0.9f, 0.85f}
+    };
 
-    prShaderUniform3f(shaderProgram, "directionalLights[0].direction", sun->direction[0], sun->direction[1], sun->direction[2]);
-    prShaderUniform3f(shaderProgram, "directionalLights[0].ambient", sun->ambient[0], sun->ambient[1], sun->ambient[2]);
-    prShaderUniform3f(shaderProgram, "directionalLights[0].diffuse", sun->diffuse[0], sun->diffuse[1], sun->diffuse[2]);
-    prShaderUniform3f(shaderProgram, "directionalLights[0].specular", sun->specular[0], sun->specular[1], sun->specular[2]);
+    typedef struct pointLightData {
+        float constant;
+        float linear;
+        float quadratic;
 
-    prShaderUniform1f(shaderProgram, "pointLights[0].constant", point->constant);
-    prShaderUniform1f(shaderProgram, "pointLights[0].linear", point->linear);
-    prShaderUniform1f(shaderProgram, "pointLights[0].quadratic", point->quadratic);
+        vec3 position;
 
-    prShaderUniform3f(shaderProgram, "pointLights[0].position", point->position[0], point->position[1], point->position[2]);
-    prShaderUniform3f(shaderProgram, "pointLights[0].ambient", point->ambient[0], point->ambient[1], point->ambient[2]);
-    prShaderUniform3f(shaderProgram, "pointLights[0].diffuse", point->diffuse[0], point->diffuse[1], point->diffuse[2]);
-    prShaderUniform3f(shaderProgram, "pointLights[0].specular", point->specular[0], point->specular[1], point->specular[2]);
+        vec3 ambient;
+        vec3 diffuse;
+        vec3 specular;
+    } pointLightData;
+
+    pointLightData point = {
+        1.0f,
+        0.09f,
+        0.032f,
+        {0.0f, 0.0f, 0.0f},
+        {0.0f, 0.0f, 0.0f},
+        {0.0f, 0.0f, 1.0f},
+        {1.0f, 0.0f, 0.0f}
+    };
+
+    prShaderSetUniform3f(shaderProgram, "directionalLights[0].direction", sun.direction[0], sun.direction[1], sun.direction[2]);
+    prShaderSetUniform3f(shaderProgram, "directionalLights[0].ambient", sun.ambient[0], sun.ambient[1], sun.ambient[2]);
+    prShaderSetUniform3f(shaderProgram, "directionalLights[0].diffuse", sun.diffuse[0], sun.diffuse[1], sun.diffuse[2]);
+    prShaderSetUniform3f(shaderProgram, "directionalLights[0].specular", sun.specular[0], sun.specular[1], sun.specular[2]);
+
+    prShaderSetUniform1f(shaderProgram, "pointLights[0].constant", point.constant);
+    prShaderSetUniform1f(shaderProgram, "pointLights[0].linear", point.linear);
+    prShaderSetUniform1f(shaderProgram, "pointLights[0].quadratic", point.quadratic);
+
+    prShaderSetUniform3f(shaderProgram, "pointLights[0].position", point.position[0], point.position[1], point.position[2]);
+    prShaderSetUniform3f(shaderProgram, "pointLights[0].ambient", point.ambient[0], point.ambient[1], point.ambient[2]);
+    prShaderSetUniform3f(shaderProgram, "pointLights[0].diffuse", point.diffuse[0], point.diffuse[1], point.diffuse[2]);
+    prShaderSetUniform3f(shaderProgram, "pointLights[0].specular", point.specular[0], point.specular[1], point.specular[2]);
 
     camera = prCameraCreate();
     prCameraLinkContext(camera, test->openglContext);
@@ -215,11 +249,6 @@ int main(int argc, char** argv) {
     test->openglContext->ClearColor(0.3f, 0.5f, 0.7f, 1.0f);
     test->openglContext->Enable(GL_CULL_FACE);
     test->openglContext->Enable(GL_BLEND);
-
-    test->openglContext->BlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    prTextureBindImage(postProcessingTexture, 0, 0, PR_ACCESS_WRITE_ONLY, GL_RGBA32F);
-    prComputeShaderDispatch(computeShaderProgram, windowWidth, windowHeight, 1);
-    test->openglContext->MemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
 
     while(!glfwWindowShouldClose(test->window)) {
         test->openglContext->Enable(GL_DEPTH_TEST);
@@ -235,39 +264,72 @@ int main(int argc, char** argv) {
         vec3 rotation = {radians(yaw), radians(pitch), radians(0.0f)};
         prCameraUpdate(camera, cameraPosition, rotation, 45.0f, 0.1f, 100.0f);
 
+        prShaderSetUniform3f(shaderProgram, "cameraPosition", camera->position[0], camera->position[1], camera->position[2]);
+        prShaderSetUniformMatrix4fv(shaderProgram, "view", camera->view[0]);
+        prShaderSetUniformMatrix4fv(shaderProgram, "projection", camera->projection[0]);
+
         float val = smoothOvertimeSin();
 
+        prFramebufferBind(framebuffer);
+
         translationsToMatrix(translation, (vec3){0.0f, 0.0f, -20.0f}, GLM_VEC3_ZERO, (vec3){30.0f, 30.0f, 10.0f});
-        prMeshDraw(meshMetal, translation, camera, shaderProgram);
+        bindMaterial(&materialMetal, shaderProgram);
+        prShaderSetUniformMatrix4fv(shaderProgram, "translation", translation[0]);
+        prMeshDraw(meshMetal);
 
         translationsToMatrix(translation, (vec3){0.0f, -20.0f, 0.0f}, GLM_VEC3_ZERO, (vec3){30.0f, 10.0f, 30.0f});
-        prMeshDraw(meshMetal, translation, camera, shaderProgram);
+        bindMaterial(&materialMetal, shaderProgram);
+        prShaderSetUniformMatrix4fv(shaderProgram, "translation", translation[0]);
+        prMeshDraw(meshMetal);
 
         translationsToMatrix(translation, (vec3){-20.0f, 0.0f, 0.0f}, GLM_VEC3_ZERO, (vec3){10.0f, 30.0f, 30.0f});
-        prMeshDraw(meshMetal, translation, camera, shaderProgram);
+        bindMaterial(&materialMetal, shaderProgram);
+        prShaderSetUniformMatrix4fv(shaderProgram, "translation", translation[0]);
+        prMeshDraw(meshMetal);
 
         translationsToMatrix(translation, (vec3){1.0f, 0.0f, 0.0f}, (vec3){0.0f, val, 0.0f}, GLM_VEC3_ONE);
-        prMeshDraw(meshWood, translation, camera, shaderProgram);
+        bindMaterial(&materialWood, shaderProgram);
+        prShaderSetUniformMatrix4fv(shaderProgram, "translation", translation[0]);
+        prMeshDraw(meshWood);
 
         translationsToMatrix(translation, (vec3){-1.0f, 0.0f, 0.0f}, (vec3){0.0f, val, 0.0f}, GLM_VEC3_ONE);
-        prMeshDraw(meshWoodMetal, translation, camera, shaderProgram);
+        bindMaterial(&materialWoodMetal, shaderProgram);
+        prShaderSetUniformMatrix4fv(shaderProgram, "translation", translation[0]);
+        prMeshDraw(meshWoodMetal);
 
         translationsToMatrix(translation, (vec3){0.0f, 1.5f, 0.0f}, (vec3){0.0f, val, 0.0f}, GLM_VEC3_ONE);
-        prMeshDraw(meshBrick, translation, camera, shaderProgram);
+        bindMaterial(&materialBrick, shaderProgram);
+        prShaderSetUniformMatrix4fv(shaderProgram, "translation", translation[0]);
+        prMeshDraw(meshBrick);
 
         translationsToMatrix(translation, (vec3){0.0f, val / 3.5f - 1.5f, 0.0f}, (vec3){0.0f, radians(val * 100.0f), 0.0f}, GLM_VEC3_ONE);
-        prMeshDraw(meshItem, translation, camera, shaderProgram);
+        bindMaterial(&defaultMaterial, shaderProgram);
+        prShaderSetUniformMatrix4fv(shaderProgram, "translation", translation[0]);
+        prMeshDraw(meshItem);
 
         if(showHUD == 1) {
             test->openglContext->Disable(GL_DEPTH_TEST);
-            translationsToMatrix(translation, (vec3){0.0f, 0.0f, 0.0f}, GLM_VEC3_ZERO, GLM_VEC3_ONE);
-            prMeshLinkMaterial(meshQuad, materialHUD);
-            prMeshDraw(meshQuad, translation, camera, hudShaderProgram);
+            bindMaterialHUD(&materialHUD, hudShaderProgram);
+            prMeshDraw(meshQuad);
         }
 
+        prFramebufferUnbind(test->openglContext);
+
+        prFramebufferBlit(test->openglContext, framebuffer, NULL,
+            0, 0, windowWidth, windowHeight,
+            0, 0, windowWidth, windowHeight,
+            PR_BUFFER_BIT_COLOR, PR_FILTER_NEAREST
+        );
+
         if(showPostProcessing) {
-            prMeshLinkMaterial(meshQuad, materialPostProcessing);
-            prMeshDraw(meshQuad, translation, camera, hudShaderProgram);
+            test->openglContext->BlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+            prTextureBindTexture(colorTexture, 0);
+            prTextureBindImage(postProcessingTexture, 1, 0, PR_ACCESS_WRITE_ONLY, GL_RGBA32F);
+            prComputeShaderDispatch(computeShaderProgram, windowWidth, windowHeight, 1);
+            test->openglContext->MemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
+
+            bindMaterialHUD(&materialPostProcessing, hudShaderProgram);
+            prMeshDraw(meshQuad);
         }
 
         glfwSwapBuffers(test->window);
@@ -286,19 +348,6 @@ int main(int argc, char** argv) {
     meshWood = NULL;
     prMeshDestroy(meshMetal);
     meshMetal = NULL;
-
-    prMaterialDestroy(materialHUD);
-    materialHUD = NULL;
-    prMaterialDestroy(materialWoodMetal);
-    materialWoodMetal = NULL;
-    prMaterialDestroy(materialWood);
-    materialWood = NULL;
-    prMaterialDestroy(materialMetal);
-    materialMetal = NULL;
-    prMaterialDestroy(materialWhite);
-    materialWhite = NULL;
-    prMaterialDestroy(defaultMaterial);
-    defaultMaterial = NULL;
 
     prFramebufferDestroy(framebuffer);
     framebuffer = NULL;

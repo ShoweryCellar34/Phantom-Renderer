@@ -13,7 +13,6 @@ extern "C" {
 #include "mesh.h"
 #include "renderbuffer.h"
 #include "shader.h"
-#include "state.h"
 #include "texture.h"
 #include "window.h"
 

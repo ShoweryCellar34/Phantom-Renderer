@@ -11,7 +11,7 @@
 #include <PR/memory.h>
 #include <PR/logger.h>
 
-#define UNIFORM_BOILERPLATE int uniformLocation = i_prShaderUniformBoilerPlate(shaderProgram, 1, uniformName); if(uniformLocation < 0) {return;}
+#define UNIFORM_BOILERPLATE int uniformLocation = i_prShaderUniformBoilerPlate(shaderProgram, uniformName); if(uniformLocation < 0) {return;}
 
 #define UNIFORM_BOILERPLATE_QUIET int uniformLocation = i_prShaderUniformBoilerPlate(shaderProgram, 0, uniformName); if(uniformLocation < 0) {return 0;}
 

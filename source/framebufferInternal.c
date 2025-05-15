@@ -46,28 +46,23 @@ void i_prFramebufferSetDataOnGPU(prFramebufferData* framebuffer) {
 }
 
 void i_prFramebufferSetAttachment(prFramebufferData* framebuffer, prTextureData* texture, prRenderBufferData* renderbuffer, GLenum attachment) {
-    GLuint TBO = 0;
-    GLuint RBO = 0;
-
     if(texture) {
         if(texture->TBO) {
             if(texture->context != framebuffer->context) {
                 prLogEvent(PR_EVENT_OPENGL, PR_LOG_ERROR, "i_prFramebufferSetAttachment: Texture context does not match framebuffer context, binding ID 0");
             }
-            TBO = texture->TBO;
+            framebuffer->context->FramebufferTexture2D(GL_FRAMEBUFFER, attachment, GL_TEXTURE_2D, texture->TBO, 0);
         }
     }
-    framebuffer->context->FramebufferTexture2D(GL_FRAMEBUFFER, attachment, GL_TEXTURE_2D, TBO, 0);
 
     if(renderbuffer) {
         if(renderbuffer->RBO) {
             if(renderbuffer->context != framebuffer->context) {
                 prLogEvent(PR_EVENT_OPENGL, PR_LOG_ERROR, "i_prFramebufferSetAttachment: Renderbuffer context does not match framebuffer context, binding ID 0");
             }
-            RBO = renderbuffer->RBO;
+            framebuffer->context->FramebufferRenderbuffer(GL_FRAMEBUFFER, attachment, GL_RENDERBUFFER, renderbuffer->RBO);
         }
     }
-    framebuffer->context->FramebufferRenderbuffer(GL_FRAMEBUFFER, attachment, GL_RENDERBUFFER, RBO);
 }
 
 void i_prFramebufferBlitOnGPU(GladGLContext* context, prFramebufferData* source, prFramebufferData* destination,
