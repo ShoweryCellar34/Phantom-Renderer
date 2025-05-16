@@ -44,21 +44,21 @@ int main(int argc, char** argv) {
 
     prTextureData* defaultTexture = makeTextureCheckerboard(test->openglContext, 8, (float[4]){1.0f, 0.0f, 1.0f, 1.0f}, (float[4]){0.0f, 0.0f, 0.0f, 1.0f});
 
-    prTextureData* containerTexture = loadTexture(test->openglContext, "res/container.jpg");
+    prTextureData* containerTexture = loadTexture(test->openglContext, PR_FILTER_LINEAR, "res/container.jpg");
 
-    prTextureData* containerMetalTexture = loadTexture(test->openglContext, "res/container2.png");
+    prTextureData* containerMetalTexture = loadTexture(test->openglContext, PR_FILTER_LINEAR, "res/container2.png");
 
-    prTextureData* containerMetalSpecularTexture = loadTexture(test->openglContext, "res/container2_specular.png");
+    prTextureData* containerMetalSpecularTexture = loadTexture(test->openglContext, PR_FILTER_LINEAR, "res/container2_specular.png");
 
-    prTextureData* steelTexture = loadTexture(test->openglContext, "res/steel.jpg");
+    prTextureData* steelTexture = loadTexture(test->openglContext, PR_FILTER_LINEAR, "res/steel.jpg");
 
-    prTextureData* steelNormal = loadTexture(test->openglContext, "res/steelNormal.png");
+    prTextureData* steelNormal = loadTexture(test->openglContext, PR_FILTER_LINEAR, "res/steelNormal.png");
 
-    prTextureData* brickWallDiffuseTexture = loadTexture(test->openglContext, "res/brickWallDiffuse.tga");
+    prTextureData* brickWallDiffuseTexture = loadTexture(test->openglContext, PR_FILTER_LINEAR, "res/brickWallDiffuse.tga");
 
-    prTextureData* brickWallNormalTexture = loadTexture(test->openglContext, "res/brickWallNormal.tga");
+    prTextureData* brickWallNormalTexture = loadTexture(test->openglContext, PR_FILTER_LINEAR, "res/brickWallNormal.tga");
 
-    prTextureData* brickWallSpecularTexture = loadTexture(test->openglContext, "res/brickWallSpecular.png");
+    prTextureData* brickWallSpecularTexture = loadTexture(test->openglContext, PR_FILTER_LINEAR, "res/brickWallSpecular.png");
 
     prTextureData* blackTexture = makeTextureSingleColor(test->openglContext, (float[4]){0.0f, 0.0f, 0.0f, 1.0f});
 
@@ -66,7 +66,7 @@ int main(int argc, char** argv) {
 
     prTextureData* defaultNormal = makeTextureSingleColor(test->openglContext, (float[4]){0.0f, -1.0f, 0.0f, 1.0f});
 
-    prTextureData* HUDTexture = loadTexture(test->openglContext, "res/HUD.png");
+    prTextureData* HUDTexture = loadTexture(test->openglContext, PR_FILTER_NEAREST, "res/HUD.png");
 
     postProcessingTexture = prTextureCreate();
     prTextureLinkContext(postProcessingTexture, test->openglContext);
@@ -121,16 +121,16 @@ int main(int argc, char** argv) {
     materialData materialWood = {
         containerTexture,
         containerTexture,
-        blackTexture,
         whiteTexture,
-        32.0f
+        defaultNormal,
+        16.0f
     };
 
     materialData materialWoodMetal = {
         containerMetalTexture,
         containerMetalTexture,
         containerMetalSpecularTexture,
-        whiteTexture,
+        defaultNormal,
         256.0f
     };
 
@@ -263,6 +263,7 @@ int main(int argc, char** argv) {
     test->openglContext->TexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     test->openglContext->TexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
+    glfwMaximizeWindow(test->window);
     while(!glfwWindowShouldClose(test->window)) {
         test->openglContext->Enable(GL_DEPTH_TEST);
         prFramebufferClear(test->openglContext, NULL, PR_BUFFER_BIT_COLOR | PR_BUFFER_BIT_DEPTH);

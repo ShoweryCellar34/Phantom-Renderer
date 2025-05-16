@@ -6,7 +6,7 @@ typedef struct GladGLContext GladGLContext;
 typedef struct prShaderData prShaderData;
 typedef struct prTextureData prTextureData;
 
-prTextureData* loadTexture(GladGLContext* context, const char* path);
+prTextureData* loadTexture(GladGLContext* context, unsigned int filtering, const char* path);
 
 prTextureData* makeTextureSingleColor(GladGLContext* context, float* color);
 

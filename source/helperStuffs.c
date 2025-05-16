@@ -8,7 +8,7 @@
 #include <PR/logger.h>
 #include <PR/memory.h>
 
-prTextureData* loadTexture(GladGLContext* context, const char* path) {
+prTextureData* loadTexture(GladGLContext* context, unsigned int filtering, const char* path) {
     prTextureData* texture = prTextureCreate();
 
     FILE* textureFile = fopen(path, "rb");
@@ -25,7 +25,7 @@ prTextureData* loadTexture(GladGLContext* context, const char* path) {
     fclose(textureFile);
 
     prTextureLinkContext(texture, context);
-    prTextureUpdate(texture, PR_FORMAT_AUTO, PR_WRAPPING_EDGE, PR_FILTER_LINEAR, textureData, textureFileSize, 0, 0);
+    prTextureUpdate(texture, PR_FORMAT_AUTO, PR_WRAPPING_EDGE, filtering, textureData, textureFileSize, 0, 0);
     prFree(textureData);
 
     return texture;
