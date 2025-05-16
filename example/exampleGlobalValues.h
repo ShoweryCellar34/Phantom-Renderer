@@ -105,21 +105,21 @@ float textureCoordinates[] = {
     0.0f, 1.0f,
     0.0f, 0.0f,
 
-    // Left face (rotated 90° clockwise)
-    1.0f, 0.0f,
+    // Left face
     1.0f, 1.0f,
     0.0f, 1.0f,
-    0.0f, 1.0f,
+    0.0f, 0.0f,
     0.0f, 0.0f,
     1.0f, 0.0f,
+    1.0f, 1.0f,
 
-    // Right face (rotated 90° clockwise)
-    1.0f, 0.0f,
+    // Right face
     1.0f, 1.0f,
     0.0f, 1.0f,
-    0.0f, 1.0f,
+    0.0f, 0.0f,
     0.0f, 0.0f,
     1.0f, 0.0f,
+    1.0f, 1.0f,
 
     // Bottom face
     0.0f, 1.0f,

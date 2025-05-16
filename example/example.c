@@ -245,6 +245,7 @@ int main(int argc, char** argv) {
     test->openglContext->GenTextures(1, &skyboxTexture);
     test->openglContext->BindTexture(GL_TEXTURE_CUBE_MAP, skyboxTexture);
 
+    prDisableImageFlip();
     int width, height, channels;
     for(unsigned int i = 0; i < 6; i++) {
         unsigned char* data = stbi_load(skyboxTextures[i], &width, &height, &channels, 0);
@@ -254,6 +255,7 @@ int main(int argc, char** argv) {
         );
         stbi_image_free(data);
     }
+    prEnableImageFlip();
 
     test->openglContext->TexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     test->openglContext->TexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
