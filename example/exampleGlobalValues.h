@@ -432,9 +432,9 @@ void main() {\n\
     );\n\
     \n\
     float kernel[9] = float[](\n\
-        1.0 / 9.0, 1.0 / 9.0, 1.0 / 9.0,\n\
-        1.0 / 9.0, 1.0 / 9.0, 1.0 / 9.0,\n\
-        1.0 / 9.0, 1.0 / 9.0, 1.0 / 9.0\n\
+        -1, -1, -1,\n\
+        -1,  9, -1,\n\
+        -1, -1, -1\n\
     );\n\
     \n\
     vec4 samples[9];\n\
@@ -450,6 +450,15 @@ void main() {\n\
     imageStore(outputImage, pixelCoord, finalSample);\n\
 }\n\
 "
+
+const char* skyboxTextures[6] = {
+    "res/skybox/right.jpg",
+    "res/skybox/left.jpg",
+    "res/skybox/top.jpg",
+    "res/skybox/bottom.jpg",
+    "res/skybox/front.jpg",
+    "res/skybox/back.jpg",
+};
 
 int showHUD = 1;
 int showPostProcessing = 1;

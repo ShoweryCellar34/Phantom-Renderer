@@ -48,7 +48,7 @@ void prTextureLinkContext(prTextureData* texture, GladGLContext* context) {
     }
 }
 
-void prTextureUpdate(prTextureData* texture, GLenum format, GLint wrappingMode, GLint filter, GLubyte rawTextureData[], size_t rawTextureDataCount, GLsizei width, GLsizei height) {
+void prTextureUpdate(prTextureData* texture, GLenum format, GLint wrappingMode, GLint filter, GLubyte* rawTextureData, size_t rawTextureDataCount, GLsizei width, GLsizei height) {
     if(!rawTextureDataCount && rawTextureData) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_WARNING, "prTextureUpdate: Texture data count not zero while texture data is NULL. Assuming no texture data, texture data will be NULL");
     }
@@ -59,14 +59,14 @@ void prTextureUpdate(prTextureData* texture, GLenum format, GLint wrappingMode, 
     if((wrappingMode != PR_WRAPPING_REPEAT) && (wrappingMode != PR_WRAPPING_REPEAT_MIRRORED) && 
        (wrappingMode != PR_WRAPPING_EDGE) && (wrappingMode != PR_WRAPPING_COLOR)
     ) {
-        prLogEvent(PR_EVENT_DATA, PR_LOG_WARNING, "prTextureUpdate: Invalid wrapping mode for texture (was %i), using repeating wrapping mode", wrappingMode);
-        texture->wrappingMode = PR_WRAPPING_REPEAT;
+        prLogEvent(PR_EVENT_DATA, PR_LOG_WARNING, "prTextureUpdate: Invalid wrapping mode for texture (was %i), using PR_WRAPPING_EDGE", wrappingMode);
+        texture->wrappingMode = PR_WRAPPING_EDGE;
     } else {
         texture->wrappingMode = wrappingMode;
     }
 
     if(filter != PR_FILTER_LINEAR && filter != PR_FILTER_NEAREST) {
-        prLogEvent(PR_EVENT_DATA, PR_LOG_WARNING, "prTextureSetFilter: Invalid filter mode (was %i), using linear filtering", filter);
+        prLogEvent(PR_EVENT_DATA, PR_LOG_WARNING, "prTextureSetFilter: Invalid filter mode for cube map (was %i), using PR_FILTER_LINEAR", filter);
         texture->filter = PR_FILTER_LINEAR;
     } else {
         texture->filter = filter;
@@ -138,7 +138,7 @@ void prTextureUpdate(prTextureData* texture, GLenum format, GLint wrappingMode, 
     }
 }
 
-void prTextureBindImage(prTextureData* texture, unsigned int index, unsigned int mipmapLevel, unsigned int access, unsigned int format) {
+void prTextureBindImage(prTextureData* texture, GLuint index, GLint mipmapLevel, GLenum access, GLenum format) {
     if((access != PR_ACCESS_READ_ONLY) && (access != PR_ACCESS_WRITE_ONLY) && (access != PR_ACCESS_READ_WRITE)) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_WARNING, "prTextureBindImage: Invalid access mode (was %u), using PR_ACCESS_READ_WRITE", access);
         access = PR_ACCESS_READ_WRITE;

@@ -57,7 +57,7 @@ void _prLogEvent(prEvent_t event, prLogLevel_t level, const char* format, ...) {
     i_logGetTimeString(timeString, PR_MAXSTR_LEN);
 
     char computedFormat[PR_MAXSTR_LEN];
-    snprintf(computedFormat, PR_MAXSTR_LEN, "\n%s%s%s %s", levelString, i_logGetEventString(event), timeString, format);
+    snprintf(computedFormat, PR_MAXSTR_LEN, "%s%s%s %s\n", levelString, i_logGetEventString(event), timeString, format);
 
     for(int i = 0; i < i_logStreamCount; i++) {
         va_start(arg, format);

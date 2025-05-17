@@ -25,8 +25,8 @@ void prTextureDestroy(prTextureData* texture);
 
 void prTextureLinkContext(prTextureData* texture, GladGLContext* context);
 
-void prTextureUpdate(prTextureData* texture, GLenum format, GLint wrappingMode, GLint filter, GLubyte rawTextureData[], size_t rawTextureDataCount, GLsizei width, GLsizei height);
+void prTextureUpdate(prTextureData* texture, GLenum format, GLint wrappingMode, GLint filter, GLubyte* rawTextureData, size_t rawTextureDataCount, GLsizei width, GLsizei height);
 
-void prTextureBindImage(prTextureData* texture, unsigned int index, unsigned int mipmapLevel, unsigned int access, unsigned int format);
+void prTextureBindImage(prTextureData* texture, GLuint index, GLint mipmapLevel, GLenum access, GLenum format);
 
 void prTextureBindTexture(prTextureData* texture, unsigned int unit);

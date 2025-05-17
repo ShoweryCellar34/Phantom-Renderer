@@ -85,6 +85,8 @@ int main(int argc, char** argv) {
     prFramebufferLinkColorTexture(framebuffer, colorTexture);
     prFramebufferLinkDepthStencilTextureRBO(framebuffer, depthStencilRBO);
 
+    prCubeMapData* skyboxCubeMap = loadCubeMap(test->openglContext, PR_FILTER_LINEAR, skyboxTextures);
+
     materialData defaultMaterial = {
         defaultTexture,
         defaultTexture,
@@ -232,37 +234,6 @@ int main(int argc, char** argv) {
     test->openglContext->Enable(GL_CULL_FACE);
     test->openglContext->Enable(GL_BLEND);
 
-    const char* skyboxTextures[6] = {
-        "res/skybox/right.jpg",
-        "res/skybox/left.jpg",
-        "res/skybox/top.jpg",
-        "res/skybox/bottom.jpg",
-        "res/skybox/front.jpg",
-        "res/skybox/back.jpg",
-    };
-
-    unsigned int skyboxTexture;
-    test->openglContext->GenTextures(1, &skyboxTexture);
-    test->openglContext->BindTexture(GL_TEXTURE_CUBE_MAP, skyboxTexture);
-
-    prDisableImageFlip();
-    int width, height, channels;
-    for(unsigned int i = 0; i < 6; i++) {
-        unsigned char* data = stbi_load(skyboxTextures[i], &width, &height, &channels, 0);
-        test->openglContext->TexImage2D(
-            GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
-            0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data
-        );
-        stbi_image_free(data);
-    }
-    prEnableImageFlip();
-
-    test->openglContext->TexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    test->openglContext->TexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    test->openglContext->TexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    test->openglContext->TexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    test->openglContext->TexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-
     glfwMaximizeWindow(test->window);
     while(!glfwWindowShouldClose(test->window)) {
         test->openglContext->Enable(GL_DEPTH_TEST);
@@ -287,7 +258,7 @@ int main(int argc, char** argv) {
         prFramebufferBind(framebuffer);
 
         test->openglContext->ActiveTexture(GL_TEXTURE0);
-        test->openglContext->BindTexture(GL_TEXTURE_CUBE_MAP, skyboxTexture);
+        test->openglContext->BindTexture(GL_TEXTURE_CUBE_MAP, skyboxCubeMap->TBO);
 
         translationsToMatrix(translation, camera->position, GLM_VEC3_ZERO, (vec3){1.0f, 1.0f, 1.0f});
         prShaderSetUniformMatrix4fv(skyboxShaderProgram, "translation", translation[0]);
@@ -355,7 +326,7 @@ int main(int argc, char** argv) {
             test->openglContext->BlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
             prTextureBindTexture(colorTexture, 0);
             prTextureBindImage(postProcessingTexture, 1, 0, PR_ACCESS_WRITE_ONLY, GL_RGBA32F);
-            prComputeShaderDispatch(computeShaderProgram, windowWidth, windowHeight, 1);
+            prComputeShaderDispatch(computeShaderProgram, windowWidth , windowHeight, 1);
             test->openglContext->MemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
 
             bindMaterialHUD(&materialPostProcessing, hudShaderProgram);
@@ -382,6 +353,8 @@ int main(int argc, char** argv) {
     prTextureDestroy(colorTexture);
     colorTexture = NULL;
 
+    prCubeMapDestroy(skyboxCubeMap);
+    skyboxCubeMap = NULL;
     prTextureDestroy(postProcessingTexture);
     postProcessingTexture = NULL;
     prTextureDestroy(HUDTexture);

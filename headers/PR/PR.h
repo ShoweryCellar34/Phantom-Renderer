@@ -6,6 +6,7 @@ extern "C" {
 
 #include "camera.h"
 #include "computeShader.h"
+#include "cubeMap.h"
 #include "defines.h"
 #include "framebuffer.h"
 #include "logger.h"
