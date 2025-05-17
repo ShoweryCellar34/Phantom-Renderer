@@ -87,7 +87,7 @@ void prTextureUpdate(prTextureData* texture, GLenum format, GLint wrappingMode, 
     if(rawTextureData && (!width || !height)) {
         temp = stbi_load_from_memory(rawTextureData, rawTextureDataCount, &texture->width, &texture->height, &texture->channels, 0);
         if(!temp) {
-            prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prTextureUpdate: Texture data failed to unpack. Aborting operation, nothing was modified");
+            prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prTextureUpdate: Texture data failed to unpack. Aborting operation, nothing was modified: %s", stbi_failure_reason());
             return;
         }
     } else if(!rawTextureData && (width || height)) {
