@@ -23,8 +23,8 @@ void prCubeMapDestroy(prCubeMapData* cubeMap);
 
 void prCubeMapLinkContext(prCubeMapData* cubeMap, GladGLContext* context);
 
-void prCubeMapUpdateAll(prCubeMapData* cubeMap, GLenum format[PR_CUBE_MAP_SIDES], GLint wrappingMode, GLint filter, GLubyte* rawTextureData[PR_CUBE_MAP_SIDES], size_t rawTextureDataCount[PR_CUBE_MAP_SIDES]);
+void prCubeMapUpdateAll(prCubeMapData* cubeMap, GLenum format[PR_CUBE_MAP_SIDES], GLint wrappingMode, GLint filter, GLubyte* rawTextureData[PR_CUBE_MAP_SIDES], size_t rawTextureDataCount[PR_CUBE_MAP_SIDES], GLsizei width[PR_CUBE_MAP_SIDES], GLsizei height[PR_CUBE_MAP_SIDES]);
 
-void prCubeMapUpdate(prCubeMapData* cubeMap, int side, GLenum format, GLint wrappingMode, GLint filter, GLubyte* rawTextureData, size_t rawTextureDataCount);
+void prCubeMapUpdate(prCubeMapData* cubeMap, int side, GLenum format, GLint wrappingMode, GLint filter, GLubyte* rawTextureData, size_t rawTextureDataCount, GLsizei width, GLsizei height);
 
 void prCubeMapBindTexture(prCubeMapData* cubeMap, unsigned int unit);

@@ -25,7 +25,7 @@ int main(int argc, char** argv) {
 
     glfwSetWindowUserPointer(test->window, test->openglContext);
 
-    prEnableImageFlip();
+    stbi_set_flip_vertically_on_load(1);
 
     prShaderData* shaderProgram = createDefaultShader(test->openglContext);
 

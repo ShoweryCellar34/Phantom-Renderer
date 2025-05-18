@@ -12,14 +12,6 @@
 #include <PR/memory.h>
 #include <PR/logger.h>
 
-void prEnableImageFlip() {
-    stbi_set_flip_vertically_on_load(1);
-}
-
-void prDisableImageFlip() {
-    stbi_set_flip_vertically_on_load(0);
-}
-
 prTextureData* prTextureCreate() {
     prTextureData* texture = prCalloc(1, sizeof(prTextureData));
 
@@ -52,8 +44,8 @@ void prTextureUpdate(prTextureData* texture, GLenum format, GLint wrappingMode, 
     if(!rawTextureDataCount && rawTextureData) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_WARNING, "prTextureUpdate: Texture data count not zero while texture data is NULL. Assuming no texture data, texture data will be NULL");
     }
-    if(rawTextureData && (width == 0 || height == 0)) {
-        prLogEvent(PR_EVENT_DATA, PR_LOG_WARNING, "prTextureUpdate: Width and/or height provided in conjunction with texture data provided. Assuming raw, unconpressed texture data to be passed directly to GPU");
+    if(rawTextureData && (width || height)) {
+        prLogEvent(PR_EVENT_DATA, PR_LOG_INFO, "prTextureUpdate: Width and/or height provided in conjunction with texture data was provided. Assuming raw, unconpressed texture data to be passed directly to GPU");
     }
 
     if((wrappingMode != PR_WRAPPING_REPEAT) && (wrappingMode != PR_WRAPPING_REPEAT_MIRRORED) && 
@@ -95,13 +87,9 @@ void prTextureUpdate(prTextureData* texture, GLenum format, GLint wrappingMode, 
         texture->width = width;
         texture->height = height;
         texture->channels = 0;
-    } else if(width || height) {
+    } else if(rawTextureData && (width || height)) {
         temp = prMalloc(rawTextureDataCount);
         prMemcpy(temp, (void*)rawTextureData, rawTextureDataCount);
-        texture->width = width;
-        texture->height = height;
-        texture->channels = 0;
-    } else {
         texture->width = width;
         texture->height = height;
         texture->channels = 0;

@@ -67,7 +67,7 @@ void i_prTextureSetDataOnGPU(prTextureData* texture) {
 
     texture->context->BindTexture(GL_TEXTURE_2D, texture->TBO);
 
-    texture->context->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, texture->wrappingMode);	
+    texture->context->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, texture->wrappingMode);
     texture->context->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, texture->wrappingMode);
     texture->context->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, texture->filter);
     texture->context->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, texture->filter);

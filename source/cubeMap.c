@@ -36,8 +36,15 @@ void prCubeMapLinkContext(prCubeMapData* cubeMap, GladGLContext* context) {
     }
 }
 
-void prCubeMapUpdateAll(prCubeMapData* cubeMap, GLenum format[PR_CUBE_MAP_SIDES], GLint wrappingMode, GLint filter, GLubyte* rawTextureData[PR_CUBE_MAP_SIDES], size_t rawTextureDataCount[PR_CUBE_MAP_SIDES]) {
+void prCubeMapUpdateAll(prCubeMapData* cubeMap, GLenum format[PR_CUBE_MAP_SIDES], GLint wrappingMode, GLint filter, GLubyte* rawTextureData[PR_CUBE_MAP_SIDES], size_t rawTextureDataCount[PR_CUBE_MAP_SIDES], GLsizei width[PR_CUBE_MAP_SIDES], GLsizei height[PR_CUBE_MAP_SIDES]) {
     for(int i = 0; i < PR_CUBE_MAP_SIDES; i++) {
+        if(!rawTextureDataCount && rawTextureData) {
+            prLogEvent(PR_EVENT_DATA, PR_LOG_WARNING, "prCubeMapUpdateAll: [Face %i] Cube map face data count not zero while cube map face data is NULL. Assuming no texture data, texture data will be NULL");
+        }
+        if(rawTextureData && (width[i] || height[i])) {
+            prLogEvent(PR_EVENT_DATA, PR_LOG_INFO, "prCubeMapUpdateAll: [Face %i] Width and/or height provided in conjunction with cube map face data was provided. Assuming raw, unconpressed texture data to be passed directly to GPU");
+        }
+
         if(!rawTextureData[i]) {
             prLogEvent(PR_EVENT_DATA, PR_LOG_WARNING, "prCubeMapUpdateAll: [Face %i] Cube map face data NULL, aborting operation, nothing was modified", i);
         }
@@ -54,14 +61,27 @@ void prCubeMapUpdateAll(prCubeMapData* cubeMap, GLenum format[PR_CUBE_MAP_SIDES]
         }
 
         unsigned char* temp = NULL;
-        temp = stbi_load_from_memory(rawTextureData[i], rawTextureDataCount[i], &cubeMap->width[i], &cubeMap->height[i], &cubeMap->channels[i], 0);
-        if(!temp) {
-            prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prCubeMapUpdateAll: [Face %i] Cube map face data failed to unpack. Aborting operation, nothing was modified: %s", i, stbi_failure_reason());
-            return;
+        if(rawTextureData && (!width[i] || !height[i])) {
+            temp = stbi_load_from_memory(rawTextureData[i], rawTextureDataCount[i], &cubeMap->width[i], &cubeMap->height[i], &cubeMap->channels[i], 0);
+            if(!temp) {
+                prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prCubeMapUpdateAll: [Face %i] Cube map face data failed to unpack. Aborting operation, nothing was modified", i);
+                return;
+            }
+        } else if(!rawTextureData && (width[i] || height[i])) {
+            temp = NULL;
+            cubeMap->width[i] = width[i];
+            cubeMap->height[i] = height[i];
+            cubeMap->channels[i] = 0;
+        } else if(rawTextureData && (width || height)) {
+            temp = prMalloc(rawTextureDataCount[i]);
+            prMemcpy(temp, (void*)rawTextureData, rawTextureDataCount[i]);
+            cubeMap->width[i] = width[i];
+            cubeMap->height[i] = height[i];
+            cubeMap->channels[i] = 0;
         }
 
         if(format[i] == PR_FORMAT_AUTO) {
-            prLogEvent(PR_EVENT_DATA, PR_LOG_TRACE, "prCubeMapUpdateAll: [Face %i] Automatically determining cube map face format based on channel count (%d channels)", i, cubeMap->channels);
+            prLogEvent(PR_EVENT_DATA, PR_LOG_TRACE, "prCubeMapUpdateAll: [Face %i] Automatically determining cube map face format based on channel count (%d channels)", i, cubeMap->channels[i]);
             switch(cubeMap->channels[i]) {
                 case 3:
                     cubeMap->format[i] = PR_FORMAT_RGB;
@@ -108,9 +128,12 @@ void prCubeMapUpdateAll(prCubeMapData* cubeMap, GLenum format[PR_CUBE_MAP_SIDES]
     }
 }
 
-void prCubeMapUpdate(prCubeMapData* cubeMap, int side, GLenum format, GLint wrappingMode, GLint filter, GLubyte* rawTextureData, size_t rawTextureDataCount) {
-    if(!rawTextureDataCount) {
-        prLogEvent(PR_EVENT_DATA, PR_LOG_WARNING, "prCubeMapUpdate: [Face %i] Cube map face data NULL, aborting operation, nothing was modified", side);
+void prCubeMapUpdate(prCubeMapData* cubeMap, int side, GLenum format, GLint wrappingMode, GLint filter, GLubyte* rawTextureData, size_t rawTextureDataCount, GLsizei width, GLsizei height) {
+    if(!rawTextureDataCount && rawTextureData) {
+        prLogEvent(PR_EVENT_DATA, PR_LOG_WARNING, "prCubeMapUpdate: [Face %i] Cube map face data count not zero while cube map face data is NULL. Assuming no texture data, texture data will be NULL", side);
+    }
+    if(rawTextureData && (width == 0 || height == 0)) {
+        prLogEvent(PR_EVENT_DATA, PR_LOG_INFO, "prCubeMapUpdate: [Face %i] Width and/or height provided in conjunction with cube map face data was provided. Assuming raw, unconpressed texture data to be passed directly to GPU", side);
     }
 
     if((format != PR_FORMAT_A) && (format != PR_FORMAT_G) && (format != PR_FORMAT_B) &&
@@ -141,14 +164,27 @@ void prCubeMapUpdate(prCubeMapData* cubeMap, int side, GLenum format, GLint wrap
     }
 
     unsigned char* temp = NULL;
-    temp = stbi_load_from_memory(rawTextureData, rawTextureDataCount, &cubeMap->width[side], &cubeMap->height[side], &cubeMap->channels[side], 0);
-    if(!temp) {
-        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prCubeMapUpdate: [Face %i] Cube map face data failed to unpack. Aborting operation, nothing was modified", side);
-        return;
+    if(rawTextureData && (!width || !height)) {
+        temp = stbi_load_from_memory(rawTextureData, rawTextureDataCount, &cubeMap->width[side], &cubeMap->height[side], &cubeMap->channels[side], 0);
+        if(!temp) {
+            prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prCubeMapUpdate: [Face %i] Cube map face data failed to unpack. Aborting operation, nothing was modified", side);
+            return;
+        }
+    } else if(!rawTextureData && (width || height)) {
+        temp = NULL;
+        cubeMap->width[side] = width;
+        cubeMap->height[side] = height;
+        cubeMap->channels[side] = 0;
+    } else if(rawTextureData && (width || height)) {
+        temp = prMalloc(rawTextureDataCount);
+        prMemcpy(temp, (void*)rawTextureData, rawTextureDataCount);
+        cubeMap->width[side] = width;
+        cubeMap->height[side] = height;
+        cubeMap->channels[side] = 0;
     }
 
     if(format == PR_FORMAT_AUTO) {
-        prLogEvent(PR_EVENT_DATA, PR_LOG_TRACE, "prCubeMapUpdate: [Face %i] Automatically determining cube map face format based on channel count (%d channels)", side, cubeMap->channels);
+        prLogEvent(PR_EVENT_DATA, PR_LOG_TRACE, "prCubeMapUpdate: [Face %i] Automatically determining cube map face format based on channel count (%d channels)", side, cubeMap->channels[side]);
         switch(cubeMap->channels[side]) {
             case 3:
                 cubeMap->format[side] = PR_FORMAT_RGB;

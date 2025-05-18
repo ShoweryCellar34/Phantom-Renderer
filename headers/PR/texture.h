@@ -4,10 +4,6 @@
 #include <stddef.h>
 #include <glad/gl.h>
 
-void prEnableImageFlip();
-
-void prDisableImageFlip();
-
 typedef struct prTextureData {
     GladGLContext* context;
     GLenum format;

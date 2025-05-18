@@ -15,6 +15,7 @@ int main(int argc, char** argv) {
 
     glfwInit();
 
+    glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
     prWindow* test = prWindowCreate(TITLE, windowWidth, windowHeight);
     prWindowInitContext(test);
 
@@ -23,10 +24,14 @@ int main(int argc, char** argv) {
     glfwSetCursorPosCallback(test->window, cursorPosCallback);
     glfwSetKeyCallback(test->window, keyCallback);
     glfwSetInputMode(test->window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    test->openglContext->Enable(GL_DEBUG_OUTPUT);
+    test->openglContext->Enable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+    test->openglContext->DebugMessageCallback(glDebugOutput, NULL);
+    test->openglContext->DebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
 
     glfwSetWindowUserPointer(test->window, test->openglContext);
 
-    prEnableImageFlip();
+    stbi_set_flip_vertically_on_load(1);
 
     prShaderData* shaderProgram = createDefaultShader(test->openglContext);
 
@@ -85,7 +90,9 @@ int main(int argc, char** argv) {
     prFramebufferLinkColorTexture(framebuffer, colorTexture);
     prFramebufferLinkDepthStencilTextureRBO(framebuffer, depthStencilRBO);
 
+    stbi_set_flip_vertically_on_load(0);
     prCubeMapData* skyboxCubeMap = loadCubeMap(test->openglContext, PR_FILTER_LINEAR, skyboxTextures);
+    stbi_set_flip_vertically_on_load(1);
 
     materialData defaultMaterial = {
         defaultTexture,
@@ -257,24 +264,14 @@ int main(int argc, char** argv) {
 
         prFramebufferBind(framebuffer);
 
-        test->openglContext->ActiveTexture(GL_TEXTURE0);
-        test->openglContext->BindTexture(GL_TEXTURE_CUBE_MAP, skyboxCubeMap->TBO);
-
+        prCubeMapBindTexture(skyboxCubeMap, 0);
         translationsToMatrix(translation, camera->position, GLM_VEC3_ZERO, (vec3){1.0f, 1.0f, 1.0f});
         prShaderSetUniformMatrix4fv(skyboxShaderProgram, "translation", translation[0]);
         prShaderSetUniformMatrix4fv(skyboxShaderProgram, "view", camera->view[0]);
         prShaderSetUniformMatrix4fv(skyboxShaderProgram, "projection", camera->projection[0]);
 
-        test->openglContext->Disable(GL_CULL_FACE);
-        test->openglContext->DepthMask(GL_FALSE);
-        test->openglContext->DepthFunc(GL_LEQUAL);
-        prShaderBind(skyboxShaderProgram);
-        prMeshDraw(meshCube);
         translationsToMatrix(translation, (vec3){0.0f, 0.0f, -20.0f}, GLM_VEC3_ZERO, (vec3){30.0f, 30.0f, 10.0f});
         bindMaterial(&materialMetal, shaderProgram);
-        test->openglContext->DepthMask(GL_TRUE);
-        test->openglContext->Enable(GL_CULL_FACE);
-
         prShaderSetUniformMatrix4fv(shaderProgram, "translation", translation[0]);
         prMeshDraw(meshCube);
 
@@ -307,6 +304,14 @@ int main(int argc, char** argv) {
         bindMaterial(&defaultMaterial, shaderProgram);
         prShaderSetUniformMatrix4fv(shaderProgram, "translation", translation[0]);
         prMeshDraw(meshCube);
+
+        test->openglContext->Disable(GL_CULL_FACE);
+        test->openglContext->DepthMask(GL_FALSE);
+        test->openglContext->DepthFunc(GL_LEQUAL);
+        prShaderBind(skyboxShaderProgram);
+        prMeshDraw(meshCube);
+        test->openglContext->DepthMask(GL_TRUE);
+        test->openglContext->Enable(GL_CULL_FACE);
 
         if(showHUD == 1) {
             test->openglContext->Disable(GL_DEPTH_TEST);

@@ -64,8 +64,9 @@ void i_prCubeMapSetDataAllOnGPU(prCubeMapData* cubeMap) {
 
     cubeMap->context->BindTexture(GL_TEXTURE_CUBE_MAP, cubeMap->TBO);
 
-    cubeMap->context->TexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, cubeMap->wrappingMode);	
+    cubeMap->context->TexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, cubeMap->wrappingMode);
     cubeMap->context->TexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, cubeMap->wrappingMode);
+    cubeMap->context->TexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, cubeMap->wrappingMode);
     cubeMap->context->TexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, cubeMap->filter);
     cubeMap->context->TexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, cubeMap->filter);
 
@@ -88,7 +89,7 @@ void i_prCubeMapSetDataOnGPU(prCubeMapData* cubeMap, int side) {
 
     cubeMap->context->BindTexture(GL_TEXTURE_CUBE_MAP, cubeMap->TBO);
 
-    cubeMap->context->TexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, cubeMap->wrappingMode);	
+    cubeMap->context->TexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, cubeMap->wrappingMode);
     cubeMap->context->TexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, cubeMap->wrappingMode);
     cubeMap->context->TexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, cubeMap->wrappingMode);
     cubeMap->context->TexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, cubeMap->filter);
