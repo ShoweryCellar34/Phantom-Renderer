@@ -31,7 +31,7 @@ void prCubeMapLinkContext(prCubeMapData* cubeMap, GladGLContext* context) {
         i_prCubeMapDestroyOnGPU(cubeMap);
     }
     cubeMap->context = context;
-    if(cubeMap->context) {
+    if(cubeMap->context && (cubeMap->textureData[0] || cubeMap->textureData[1] || cubeMap->textureData[2] || cubeMap->textureData[3] || cubeMap->textureData[4] || cubeMap->textureData[5])) {
         i_prCubeMapCreateOnGPU(cubeMap);
     }
 }
@@ -72,7 +72,7 @@ void prCubeMapUpdateAll(prCubeMapData* cubeMap, GLenum format[PR_CUBE_MAP_SIDES]
             cubeMap->width[i] = width[i];
             cubeMap->height[i] = height[i];
             cubeMap->channels[i] = 0;
-        } else if(rawTextureData && (width || height)) {
+        } else if(rawTextureData && (width[i] || height[i])) {
             temp = prMalloc(rawTextureDataCount[i]);
             prMemcpy(temp, (void*)rawTextureData, rawTextureDataCount[i]);
             cubeMap->width[i] = width[i];
@@ -119,6 +119,19 @@ void prCubeMapUpdateAll(prCubeMapData* cubeMap, GLenum format[PR_CUBE_MAP_SIDES]
         cubeMap->filter = PR_FILTER_LINEAR;
     } else {
         cubeMap->filter = filter;
+    }
+
+    int unifiedAttributes = 1;
+    for(int i = 0; i < PR_CUBE_MAP_SIDES; i++) {
+        if((cubeMap->width[i] != cubeMap->height[i]) || (cubeMap->width[i] != cubeMap->width[0]) || (cubeMap->channels[i] != cubeMap->channels[0])) {
+            unifiedAttributes = 0;
+        }
+    }
+    if(!unifiedAttributes) {
+        prLogEvent(PR_EVENT_DATA, PR_LOG_WARNING, "prCubeMapUpdateAll: Cube map face dimentions/channles are inconsistent across faces, this may prevent cube map from working:");
+        for(int i = 0; i < PR_CUBE_MAP_SIDES; i++) {
+            prLogRaw("                                  [Face %i] Width: %i Height: %i Channels: %i\n", i, cubeMap->width[i], cubeMap->height[i], cubeMap->channels[i]);
+        }
     }
 
     if(cubeMap->context && !cubeMap->TBO) {
@@ -206,6 +219,17 @@ void prCubeMapUpdate(prCubeMapData* cubeMap, int side, GLenum format, GLint wrap
     }
 
     cubeMap->textureData[side] = temp;
+
+    int unifiedAttributes = 1;
+    if((cubeMap->width[side] != cubeMap->height[side]) || (cubeMap->width[side] != cubeMap->width[(side ? 0 : 1)]) || (cubeMap->channels[side] != cubeMap->channels[(side ? 0 : 1)])) {
+        unifiedAttributes = 0;
+    }
+    if(!unifiedAttributes) {
+        prLogEvent(PR_EVENT_DATA, PR_LOG_WARNING, "prCubeMapUpdateAll: Cube map face dimentions/channles are inconsistent across faces, this may prevent cube map from working:");
+        for(int i = 0; i < PR_CUBE_MAP_SIDES; i++) {
+            prLogRaw("                                  [Face %i] Width: %i Height: %i Channels: %i\n", i, cubeMap->width[i], cubeMap->height[i], cubeMap->channels[i]);
+        }
+    }
 
     if(cubeMap->context && !cubeMap->TBO) {
         i_prCubeMapCreateOnGPU(cubeMap);

@@ -58,7 +58,6 @@ prCubeMapData* loadCubeMap(GladGLContext* context, unsigned int filtering, const
         (GLubyte*[PR_CUBE_MAP_SIDES]){textureData[0], textureData[1], textureData[2], textureData[3], textureData[4], textureData[5]},
         (size_t[PR_CUBE_MAP_SIDES]){textureFileSize[0], textureFileSize[1], textureFileSize[2], textureFileSize[3], textureFileSize[4], textureFileSize[5]},
         (GLsizei[PR_CUBE_MAP_SIDES]){0, 0, 0, 0, 0 ,0}, (GLsizei[PR_CUBE_MAP_SIDES]){0, 0, 0, 0, 0 ,0});
-    prCubeMapUpdate(cubeMap, 5, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR, (GLubyte[]){255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255}, 16, 2, 2);
 
     for(int i = 0; i < PR_CUBE_MAP_SIDES; i++) {
         prFree(textureData[i]);

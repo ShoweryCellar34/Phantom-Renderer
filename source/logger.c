@@ -20,6 +20,16 @@ void prLogSetStream(int streamCount, FILE** stream) {
     i_logStream = stream;
 }
 
+void _prLogRaw(const char* format, ...) {
+    va_list arg;
+
+    for(int i = 0; i < i_logStreamCount; i++) {
+        va_start(arg, format);
+        vfprintf(i_logStream[i], format, arg);
+        va_end(arg);
+    }
+}
+
 void _prLog(prLogLevel_t level, const char* format, ...) {
     va_list arg;
 

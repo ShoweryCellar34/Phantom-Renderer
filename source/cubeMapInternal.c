@@ -127,10 +127,10 @@ void i_prCubeMapDestroyOnGPU(prCubeMapData* cubeMap) {
 }
 
 void i_prCubeMapUpdateAllOnGPU(prCubeMapData* cubeMap) {
-    prLogEvent(PR_EVENT_OPENGL, PR_LOG_INFO, "i_prCubeMapUpdateAllOnGPU: Updating all faces on cube map buffer object");
+    prLogEvent(PR_EVENT_OPENGL, PR_LOG_INFO, "i_prCubeMapUpdateAllOnGPU: Updating all faces of cube map buffer object. Width: %i Height: %i Channels: %i", cubeMap->width[0], cubeMap->height[0], cubeMap->channels[0]);
 
     if(!cubeMap->TBO) {
-        prLogEvent(PR_EVENT_OPENGL, PR_LOG_WARNING, "i_prCubeMapUpdateAllOnGPU: Failed to update all faces on cube map buffer object, invalid ID. Aborting operation, nothing was modified");
+        prLogEvent(PR_EVENT_OPENGL, PR_LOG_WARNING, "i_prCubeMapUpdateAllOnGPU: Failed to update all faces of cube map buffer object, invalid ID. Aborting operation, nothing was modified");
         return;
     }
 
@@ -138,7 +138,7 @@ void i_prCubeMapUpdateAllOnGPU(prCubeMapData* cubeMap) {
 }
 
 void i_prCubeMapUpdateOnGPU(prCubeMapData* cubeMap, int side) {
-    prLogEvent(PR_EVENT_OPENGL, PR_LOG_INFO, "i_prCubeMapUpdateOnGPU: Updating face %i of cube map buffer object", side);
+    prLogEvent(PR_EVENT_OPENGL, PR_LOG_INFO, "i_prCubeMapUpdateOnGPU: Updating face %i of cube map buffer object. Width: %i Height: %i Channels: %i", side, cubeMap->width[side], cubeMap->height[side], cubeMap->channels[side]);
 
     if(!cubeMap->TBO) {
         prLogEvent(PR_EVENT_OPENGL, PR_LOG_WARNING, "i_prCubeMapUpdateOnGPU: Failed to update face %i of cube map buffer object, invalid ID. Aborting operation, nothing was modified", side);

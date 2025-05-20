@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <cglm/cglm.h>
 #include <PR/memory.h>
+#include <stb_image.h>
 #include "exampleGlobalValues.h"
 #include "exampleFunctions.h"
 
