@@ -10,14 +10,11 @@ typedef struct prShaderData prShaderData;
 
 typedef struct prMeshData {
     GladGLContext* context;
-    GLfloat* vertices;
-    GLfloat* normals;
-    GLfloat* textureCoordinates;
-    GLuint* indices;
-    GLsizei verticesCount, normalsCount, textureCoordinatesCount, indicesCount;
+    void* GPUReadyBuffer;
+    GLsizeiptr GPUReadyBufferSize;
+    void* indices;
+    GLsizei indicesSize;
     GLuint VBO, VAO, EBO;
-    GLfloat* GPUReadyBuffer;
-    GLsizeiptr GPUReadyBufferCount;
 } prMeshData;
 
 prMeshData* prMeshCreate();
@@ -26,9 +23,8 @@ void prMeshDestroy(prMeshData* mesh);
 
 void prMeshLinkContext(prMeshData* mesh, GladGLContext* context);
 
-void prMeshUpdate(prMeshData* mesh, GLfloat vertices[], size_t verticesCount,
-    GLfloat normals[], size_t normalsCount,
-    GLfloat textureCoordinates[], size_t textureCoordinatesCount,
-    GLuint indices[], size_t indicesCount);
+void prMeshUpdate(prMeshData* mesh, void* GPUReadyBuffer, GLsizeiptr GPUReadyBufferSize, void* indices, GLsizeiptr indicesSize);
+
+void prMeshSetVertexAttribute(prMeshData* mesh, GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const void* pointer);
 
 void prMeshDraw(prMeshData* mesh);

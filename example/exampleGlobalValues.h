@@ -158,6 +158,7 @@ unsigned int indices[] = {
     33, 35, 34
 };
 
+
 float verticesQuad[] = {
     0.0f, 1.0f, 0.0f,
     0.0f, 0.0f, 0.0f,
@@ -451,15 +452,25 @@ void main() {\n\
 }\n\
 "
 
-const char* skyboxTextures[6] = {
-    "res/skybox/right.jpg",
-    "res/skybox/left.jpg",
-    "res/skybox/top.jpg",
-    "res/skybox/bottom.jpg",
-    "res/skybox/front.jpg",
-    "res/skybox/back.jpg",
+const char* skybox1Textures[6] = {
+    "res/skyboxes/1/right.jpg",
+    "res/skyboxes/1/left.jpg",
+    "res/skyboxes/1/top.jpg",
+    "res/skyboxes/1/bottom.jpg",
+    "res/skyboxes/1/front.jpg",
+    "res/skyboxes/1/back.jpg",
 };
 
+const char* skybox2Textures[6] = {
+    "res/skyboxes/2/px.png",
+    "res/skyboxes/2/nx.png",
+    "res/skyboxes/2/py.png",
+    "res/skyboxes/2/ny.png",
+    "res/skyboxes/2/pz.png",
+    "res/skyboxes/2/nz.png",
+};
+
+int currentSkybox = 1;
 int showHUD = 1;
 int showPostProcessing = 1;
 

@@ -16,12 +16,9 @@ void prMeshDestroy(prMeshData* mesh) {
         i_prMeshDestroyOnGPU(mesh);
     }
 
-    if(mesh->vertices) {
-        prFree(mesh->vertices);
-        prFree(mesh->normals);
-        prFree(mesh->textureCoordinates);
-        prFree(mesh->indices);
+    if(mesh->GPUReadyBuffer) {
         prFree(mesh->GPUReadyBuffer);
+        prFree(mesh->indices);
     }
 
     prFree(mesh);
@@ -37,44 +34,18 @@ void prMeshLinkContext(prMeshData* mesh, GladGLContext* context) {
     }
 }
 
-void prMeshUpdate(prMeshData* mesh, GLfloat vertices[], size_t verticesCount,
-    GLfloat normals[], size_t normalsCount,
-    GLfloat textureCoordinates[], size_t textureCoordinatesCount,
-    GLuint indices[], size_t indicesCount) {
-    if(!verticesCount) {
-        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prMeshUpdate: Vertices data count cannot be zero. Aborting operation, nothing was modified");
+void prMeshUpdate(prMeshData* mesh, void* GPUReadyBuffer, GLsizeiptr GPUReadyBufferSize, void* indices, GLsizeiptr indicesSize) {
+    if(!GPUReadyBufferSize) {
+        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prMeshUpdate: Mesh data size cannot be zero. Aborting operation, nothing was modified");
         return;
-    } else if(verticesCount % 3 != 0) {
-        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prMeshUpdate: Vertices data count must be a multiple of 3 (was %zu). Aborting operation, nothing was modified", verticesCount);
-        return;
-    } else if(!vertices) {
-        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prMeshUpdate: Vertices data cannot be NULL. Aborting operation, nothing was modified");
+    }
+    if(!GPUReadyBuffer) {
+        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prMeshUpdate: Mesh data cannot be NULL. Aborting operation, nothing was modified");
         return;
     }
 
-    if(normalsCount < verticesCount) {
-        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prMeshUpdate: Normals data not enough for every vertex (was %zu). Aborting operation, nothing was modified", normalsCount);
-        return;
-    }
-    if(!normals) {
-        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prMeshUpdate: Normals data cannot be NULL. Aborting operation, nothing was modified");
-        return;
-    }
-
-    if(textureCoordinatesCount / 2 != verticesCount / 3 && textureCoordinatesCount < verticesCount) {
-        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prMeshUpdate: Texture coordinates data not enough for every vertex (was %zu). Aborting operation, nothing was modified", textureCoordinatesCount);
-        return;
-    }
-    if(!textureCoordinates) {
-        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prMeshUpdate: Texture coordinates data cannot be NULL. Aborting operation, nothing was modified");
-        return;
-    }
-
-    if(!indicesCount) {
-        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prMeshUpdate: Indices data count cannot be zero. Aborting operation, nothing was modified");
-        return;
-    } else if(indicesCount % 3 != 0) {
-        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prMeshUpdate: Indices data count must be a multiple of 3 (was %zu). Aborting operation, nothing was modified", indicesCount);
+    if(!indicesSize) {
+        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prMeshUpdate: Indices data size cannot be zero. Aborting operation, nothing was modified");
         return;
     }
     if(!indices) {
@@ -82,34 +53,20 @@ void prMeshUpdate(prMeshData* mesh, GLfloat vertices[], size_t verticesCount,
         return;
     }
 
-    if(mesh->vertices) {
-        prFree(mesh->vertices);
-        prFree(mesh->normals);
-        prFree(mesh->textureCoordinates);
-        prFree(mesh->indices);
+    if(mesh->GPUReadyBuffer) {
         prFree(mesh->GPUReadyBuffer);
-        mesh->vertices = NULL;
-        mesh->normals = NULL;
-        mesh->textureCoordinates = NULL;
-        mesh->indices = NULL;
+        prFree(mesh->indices);
         mesh->GPUReadyBuffer = NULL;
+        mesh->indices = NULL;
     }
 
-    mesh->vertices = prMalloc(sizeof(GLfloat) * verticesCount);
-    prMemcpy(mesh->vertices, vertices, sizeof(GLfloat) * verticesCount);
-    mesh->verticesCount = verticesCount;
+    mesh->GPUReadyBuffer = prMalloc(GPUReadyBufferSize);
+    prMemcpy(mesh->GPUReadyBuffer, GPUReadyBuffer, GPUReadyBufferSize);
+    mesh->GPUReadyBufferSize = GPUReadyBufferSize;
 
-    mesh->normals = prMalloc(sizeof(GLfloat) * normalsCount);
-    prMemcpy(mesh->normals, normals, sizeof(GLfloat) * normalsCount);
-    mesh->normalsCount = normalsCount;
-
-    mesh->textureCoordinates = prMalloc(sizeof(GLfloat) * textureCoordinatesCount);
-    prMemcpy(mesh->textureCoordinates, textureCoordinates, sizeof(GLfloat) * textureCoordinatesCount);
-    mesh->textureCoordinatesCount = textureCoordinatesCount;
-
-    mesh->indices = prMalloc(sizeof(GLuint) * indicesCount);
-    prMemcpy(mesh->indices, indices, sizeof(GLuint) * indicesCount);
-    mesh->indicesCount = indicesCount;
+    mesh->indices = prMalloc(indicesSize);
+    prMemcpy(mesh->indices, indices, indicesSize);
+    mesh->indicesSize = indicesSize;
 
     if(mesh->context && !mesh->VAO) {
         i_prMeshCreateOnGPU(mesh);

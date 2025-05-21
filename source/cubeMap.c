@@ -39,10 +39,10 @@ void prCubeMapLinkContext(prCubeMapData* cubeMap, GladGLContext* context) {
 void prCubeMapUpdateAll(prCubeMapData* cubeMap, GLenum format[PR_CUBE_MAP_SIDES], GLint wrappingMode, GLint filter, GLubyte* rawTextureData[PR_CUBE_MAP_SIDES], size_t rawTextureDataCount[PR_CUBE_MAP_SIDES], GLsizei width[PR_CUBE_MAP_SIDES], GLsizei height[PR_CUBE_MAP_SIDES]) {
     for(int i = 0; i < PR_CUBE_MAP_SIDES; i++) {
         if(!rawTextureDataCount && rawTextureData) {
-            prLogEvent(PR_EVENT_DATA, PR_LOG_WARNING, "prCubeMapUpdateAll: [Face %i] Cube map face data count not zero while cube map face data is NULL. Assuming no texture data, texture data will be NULL");
+            prLogEvent(PR_EVENT_DATA, PR_LOG_WARNING, "prCubeMapUpdateAll: [Face %i] Cube map face data count not zero while cube map face data is NULL. Assuming no texture data, texture data will be NULL", i);
         }
         if(rawTextureData && (width[i] || height[i])) {
-            prLogEvent(PR_EVENT_DATA, PR_LOG_INFO, "prCubeMapUpdateAll: [Face %i] Width and/or height provided in conjunction with cube map face data was provided. Assuming raw, unconpressed texture data to be passed directly to GPU");
+            prLogEvent(PR_EVENT_DATA, PR_LOG_INFO, "prCubeMapUpdateAll: [Face %i] Width and/or height provided in conjunction with cube map face data was provided. Assuming raw, unconpressed texture data to be passed directly to GPU", i);
         }
 
         if(!rawTextureData[i]) {
@@ -74,7 +74,7 @@ void prCubeMapUpdateAll(prCubeMapData* cubeMap, GLenum format[PR_CUBE_MAP_SIDES]
             cubeMap->channels[i] = 0;
         } else if(rawTextureData && (width[i] || height[i])) {
             temp = prMalloc(rawTextureDataCount[i]);
-            prMemcpy(temp, (void*)rawTextureData, rawTextureDataCount[i]);
+            prMemcpy(temp, (void*)rawTextureData[i], rawTextureDataCount[i]);
             cubeMap->width[i] = width[i];
             cubeMap->height[i] = height[i];
             cubeMap->channels[i] = 0;

@@ -90,9 +90,44 @@ int main(int argc, char** argv) {
     prFramebufferLinkColorTexture(framebuffer, colorTexture);
     prFramebufferLinkDepthStencilTextureRBO(framebuffer, depthStencilRBO);
 
+    prCubeMapData* skyboxDefaultCubeMap = makeCubeMapSingleColors(test->openglContext, (float[PR_CUBE_MAP_SIDES][4]){
+        {0.0f, 0.0f, 0.0f, 1.0f},
+        {0.0f, 0.0f, 0.0f, 1.0f},
+        {0.0f, 0.0f, 0.0f, 1.0f},
+        {0.0f, 0.0f, 0.0f, 1.0f},
+        {0.0f, 0.0f, 0.0f, 1.0f},
+        {0.0f, 0.0f, 0.0f, 1.0f}
+    });
+
     stbi_set_flip_vertically_on_load(0);
-    prCubeMapData* skyboxCubeMap = loadCubeMap(test->openglContext, PR_FILTER_LINEAR, skyboxTextures);
+    prCubeMapData* skyboxCubeMap1 = loadCubeMap(test->openglContext, PR_FILTER_LINEAR, skybox1Textures);
+    prCubeMapData* skyboxCubeMap2 = loadCubeMap(test->openglContext, PR_FILTER_LINEAR, skybox2Textures);
     stbi_set_flip_vertically_on_load(1);
+
+    prCubeMapData* skyboxCubeMap3 = makeCubeMapSingleColors(test->openglContext, (float[PR_CUBE_MAP_SIDES][4]){
+        {1.0f, 0.0f, 0.0f, 1.0f},
+        {1.0f, 0.0f, 1.0f, 1.0f},
+        {0.0f, 1.0f, 0.0f, 1.0f},
+        {1.0f, 1.0f, 0.0f, 1.0f},
+        {0.0f, 0.0f, 1.0f, 1.0f},
+        {0.0f, 1.0f, 1.0f, 1.0f}
+    });
+
+    prCubeMapData* skybox4CubeMap = makeCubeMapCheckerboards(test->openglContext, 32, (float[PR_CUBE_MAP_SIDES][4]){
+        {1.0f, 0.0f, 0.0f, 1.0f},
+        {1.0f, 0.0f, 1.0f, 1.0f},
+        {0.0f, 1.0f, 0.0f, 1.0f},
+        {1.0f, 1.0f, 0.0f, 1.0f},
+        {0.0f, 0.0f, 1.0f, 1.0f},
+        {0.0f, 1.0f, 1.0f, 1.0f}
+    }, (float[PR_CUBE_MAP_SIDES][4]){
+        {0.0f, 0.0f, 0.0f, 1.0f},
+        {0.0f, 0.0f, 0.0f, 1.0f},
+        {0.0f, 0.0f, 0.0f, 1.0f},
+        {0.0f, 0.0f, 0.0f, 1.0f},
+        {0.0f, 0.0f, 0.0f, 1.0f},
+        {0.0f, 0.0f, 0.0f, 1.0f}
+    });
 
     materialData defaultMaterial = {
         defaultTexture,
@@ -170,10 +205,8 @@ int main(int argc, char** argv) {
     prMeshData* meshCube = prMeshCreate();
     prMeshLinkContext(meshCube, test->openglContext);
     prMeshUpdate(meshCube,
-        vertices, sizeof(vertices) / sizeof(float),
-        normals, sizeof(normals) / sizeof(float),
-        textureCoordinates, sizeof(textureCoordinates) / sizeof(float),
-        indices, sizeof(indices) / sizeof(unsigned int));
+        GPUReadyData, GPUReadyDataCount,
+        indices, indicesCount);
 
     prMeshData* meshQuad = prMeshCreate();
     prMeshLinkContext(meshQuad, test->openglContext);
@@ -264,12 +297,6 @@ int main(int argc, char** argv) {
 
         prFramebufferBind(framebuffer);
 
-        prCubeMapBindTexture(skyboxCubeMap, 0);
-        translationsToMatrix(translation, camera->position, GLM_VEC3_ZERO, (vec3){1.0f, 1.0f, 1.0f});
-        prShaderSetUniformMatrix4fv(skyboxShaderProgram, "translation", translation[0]);
-        prShaderSetUniformMatrix4fv(skyboxShaderProgram, "view", camera->view[0]);
-        prShaderSetUniformMatrix4fv(skyboxShaderProgram, "projection", camera->projection[0]);
-
         translationsToMatrix(translation, (vec3){0.0f, 0.0f, -20.0f}, GLM_VEC3_ZERO, (vec3){30.0f, 30.0f, 10.0f});
         bindMaterial(&materialMetal, shaderProgram);
         prShaderSetUniformMatrix4fv(shaderProgram, "translation", translation[0]);
@@ -305,12 +332,36 @@ int main(int argc, char** argv) {
         prShaderSetUniformMatrix4fv(shaderProgram, "translation", translation[0]);
         prMeshDraw(meshCube);
 
+        switch(currentSkybox) {
+            case 1:
+                prCubeMapBindTexture(skyboxCubeMap1, 0);
+                break;
+
+            case 2:
+                prCubeMapBindTexture(skyboxCubeMap2, 0);
+                break;
+
+            case 3:
+                prCubeMapBindTexture(skyboxCubeMap3, 0);
+                break;
+
+            case 4:
+                prCubeMapBindTexture(skybox4CubeMap, 0);
+                break;
+
+            default:
+                prCubeMapBindTexture(skyboxDefaultCubeMap, 0);
+                break;
+        }
+
+        translationsToMatrix(translation, camera->position, GLM_VEC3_ZERO, (vec3){1.0f, 1.0f, 1.0f});
+        prShaderSetUniformMatrix4fv(skyboxShaderProgram, "translation", translation[0]);
+        prShaderSetUniformMatrix4fv(skyboxShaderProgram, "view", camera->view[0]);
+        prShaderSetUniformMatrix4fv(skyboxShaderProgram, "projection", camera->projection[0]);
         test->openglContext->Disable(GL_CULL_FACE);
-        test->openglContext->DepthMask(GL_FALSE);
         test->openglContext->DepthFunc(GL_LEQUAL);
         prShaderBind(skyboxShaderProgram);
         prMeshDraw(meshCube);
-        test->openglContext->DepthMask(GL_TRUE);
         test->openglContext->Enable(GL_CULL_FACE);
 
         if(showHUD == 1) {
@@ -358,8 +409,16 @@ int main(int argc, char** argv) {
     prTextureDestroy(colorTexture);
     colorTexture = NULL;
 
-    prCubeMapDestroy(skyboxCubeMap);
-    skyboxCubeMap = NULL;
+    prCubeMapDestroy(skybox4CubeMap);
+    skybox4CubeMap = NULL;
+    prCubeMapDestroy(skyboxCubeMap3);
+    skyboxCubeMap3 = NULL;
+    prCubeMapDestroy(skyboxCubeMap2);
+    skyboxCubeMap2 = NULL;
+    prCubeMapDestroy(skyboxCubeMap1);
+    skyboxCubeMap1 = NULL;
+    prCubeMapDestroy(skyboxDefaultCubeMap);
+    skyboxDefaultCubeMap = NULL;
     prTextureDestroy(postProcessingTexture);
     postProcessingTexture = NULL;
     prTextureDestroy(HUDTexture);
