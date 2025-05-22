@@ -202,19 +202,31 @@ int main(int argc, char** argv) {
         0.0f
     };
 
+    cubeData = computeGPUReadyBuffer(&cubeDataSize,
+        vertices, sizeof(vertices) / sizeof(float),
+        normals, sizeof(normals) / sizeof(float),
+        textureCoordinates, sizeof(textureCoordinates) / sizeof(float)
+    );
+    indicesSize = sizeof(indices);
+
+    quadData = computeGPUReadyBuffer(&quadDataSize,
+        verticesQuad, sizeof(verticesQuad) / sizeof(float),
+        normalsQuad, sizeof(normalsQuad) / sizeof(float),
+        textureCoordinatesQuad, sizeof(textureCoordinatesQuad) / sizeof(float)
+    );
+    indicesQuadSize = sizeof(indicesQuad);
+
     prMeshData* meshCube = prMeshCreate();
     prMeshLinkContext(meshCube, test->openglContext);
     prMeshUpdate(meshCube,
-        GPUReadyData, GPUReadyDataCount,
-        indices, indicesCount);
+        cubeData, cubeDataSize,
+        indices, indicesSize);
 
     prMeshData* meshQuad = prMeshCreate();
     prMeshLinkContext(meshQuad, test->openglContext);
     prMeshUpdate(meshQuad,
-        verticesQuad, sizeof(verticesQuad) / sizeof(float),
-        normalsQuad, sizeof(normalsQuad) / sizeof(float),
-        textureCoordinatesQuad, sizeof(textureCoordinatesQuad) / sizeof(float),
-        indicesQuad, sizeof(indicesQuad) / sizeof(unsigned int));
+        quadData, quadDataSize,
+        indicesQuad, indicesQuadSize);
 
     typedef struct directionalLightData {
         vec3 direction;

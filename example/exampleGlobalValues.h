@@ -137,6 +137,8 @@ float textureCoordinates[] = {
     0.0f, 0.0f,
     0.0f, 1.0f
 };
+void* cubeData = NULL;
+int cubeDataSize = 0;
 
 unsigned int indices[] = {
     0, 2, 1,
@@ -157,7 +159,7 @@ unsigned int indices[] = {
     30, 32, 31,
     33, 35, 34
 };
-
+int indicesSize = 0;
 
 float verticesQuad[] = {
     0.0f, 1.0f, 0.0f,
@@ -179,11 +181,14 @@ float textureCoordinatesQuad[] = {
     1.0f, 0.0f,
     1.0f, 1.0f,
 };
+void* quadData = NULL;
+int quadDataSize = 0;
 
 unsigned int indicesQuad[] = {
     0, 1, 2,
     2, 3, 0
 };
+int indicesQuadSize = 0;
 
 typedef struct materialData {
     prTextureData* ambientMap;

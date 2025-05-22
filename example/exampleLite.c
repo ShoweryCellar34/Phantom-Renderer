@@ -45,13 +45,18 @@ int main(int argc, char** argv) {
     prFramebufferLinkColorTexture(framebuffer, colorTexture);
     prFramebufferLinkDepthStencilTextureRBO(framebuffer, depthStencilRBO);
 
+    cubeData = computeGPUReadyBuffer(&cubeDataSize,
+        vertices, sizeof(vertices) / sizeof(float),
+        normals, sizeof(normals) / sizeof(float),
+        textureCoordinates, sizeof(textureCoordinates) / sizeof(float)
+    );
+    indicesSize = sizeof(indices);
+
     prMeshData* meshItem = prMeshCreate();
     prMeshLinkContext(meshItem, test->openglContext);
     prMeshUpdate(meshItem,
-        vertices, sizeof(vertices) / sizeof(float),
-        normals, sizeof(normals) / sizeof(float),
-        textureCoordinates, sizeof(textureCoordinates) / sizeof(float),
-        indices, sizeof(indices) / sizeof(unsigned int));
+        cubeData, cubeDataSize,
+        indices, indicesSize);
 
     // Set up lighting uniforms directly
     vec3 lightDir = {-0.25f, -0.5f, -0.75f};

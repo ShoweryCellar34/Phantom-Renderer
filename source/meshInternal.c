@@ -37,10 +37,10 @@ void i_prMeshCreateOnGPU(prMeshData* mesh) {
     mesh->context->BindVertexArray(mesh->VAO);
 
     mesh->context->BindBuffer(GL_ARRAY_BUFFER, mesh->VBO);
-    mesh->context->BufferData(GL_ARRAY_BUFFER, mesh->GPUReadyBufferSize * sizeof(GLfloat), mesh->GPUReadyBuffer, GL_STATIC_DRAW);
+    mesh->context->BufferData(GL_ARRAY_BUFFER, mesh->GPUReadyBufferSize, mesh->GPUReadyBuffer, GL_STATIC_DRAW);
 
     mesh->context->BindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->EBO);
-    mesh->context->BufferData(GL_ELEMENT_ARRAY_BUFFER, mesh->indicesSize * sizeof(GLuint), mesh->indices, GL_STATIC_DRAW);
+    mesh->context->BufferData(GL_ELEMENT_ARRAY_BUFFER, mesh->indicesSize, mesh->indices, GL_STATIC_DRAW);
 
     mesh->context->VertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride * sizeof(GLfloat), (void*)(0 * sizeof(GLfloat)));
     mesh->context->EnableVertexAttribArray(0);
