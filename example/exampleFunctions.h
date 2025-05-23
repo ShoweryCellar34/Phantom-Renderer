@@ -2,7 +2,14 @@
 
 #define M_PI 3.14159265358979323846
 #include <math.h>
+#include <time.h>
+#include <string.h>
 #include <GLFW/glfw3.h>
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#define STBIW_MALLOC prMalloc
+#define STBIW_REALLOC prRealloc
+#define STBIW_FREE prFree
+#include <stb_image_write.h>
 #include "exampleGlobalValues.h"
 
 void* computeGPUReadyBuffer(int* size,
@@ -171,6 +178,28 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
     }
     if(key == GLFW_KEY_0 && action == GLFW_PRESS) {
         currentSkybox = 0;
+    }
+
+    if(key == GLFW_KEY_ENTER && action == GLFW_PRESS) {
+        GladGLContext* context = glfwGetWindowUserPointer(window);
+
+        GLint viewportSize[4];
+        context->GetIntegerv(GL_VIEWPORT, viewportSize);
+        int width = viewportSize[2];
+        int height = viewportSize[3];
+
+        unsigned char* pixels = prMalloc(width * height * 4);
+        context->ReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+
+        int timestamp = time(NULL);
+        char name[32];
+        snprintf(name, 32, "%i.png", timestamp);
+
+        stbi_flip_vertically_on_write(1);
+        stbi_write_png(name, width, height, 4, pixels, width * 4);
+        prLogEvent(PR_EVENT_USER, PR_LOG_INFO, "Save screenshot with name: %s", name);
+
+        prFree(pixels);
     }
 
     if(key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {

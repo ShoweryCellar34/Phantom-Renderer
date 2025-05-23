@@ -2,6 +2,10 @@
 
 #include <PR/cubeMapInternal.h>
 
+#define STBI_MALLOC(size) prMalloc(size)
+#define STBI_REALLOC(size) prRealloc(size)
+#define STBI_FREE(size) prFree(size)
+
 #include <stb_image.h>
 #include <PR/logger.h>
 #include <PR/memory.h>

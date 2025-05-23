@@ -159,36 +159,21 @@ unsigned int indices[] = {
     30, 32, 31,
     33, 35, 34
 };
-int indicesSize = 0;
+int indicesSize = sizeof(indices);
 
-float verticesQuad[] = {
-    0.0f, 1.0f, 0.0f,
-    0.0f, 0.0f, 0.0f,
-    1.0f, 0.0f, 0.0f,
-    1.0f, 1.0f, 0.0f
+float quadData[] = {
+    0.0f, 1.0f, 0.0f, 1.0f,
+    0.0f, 0.0f, 0.0f, 0.0f,
+    1.0f, 0.0f, 1.0f, 0.0f,
+    1.0f, 1.0f, 1.0f, 1.0f
 };
-
-float normalsQuad[] = {
-    0.0f, 1.0f, 0.0f,
-    0.0f, 1.0f, 0.0f,
-    0.0f, 1.0f, 0.0f,
-    0.0f, 1.0f, 0.0f,
-};
-
-float textureCoordinatesQuad[] = {
-    0.0f, 1.0f,
-    0.0f, 0.0f,
-    1.0f, 0.0f,
-    1.0f, 1.0f,
-};
-void* quadData = NULL;
-int quadDataSize = 0;
+int quadDataSize = sizeof(quadData);
 
 unsigned int indicesQuad[] = {
     0, 1, 2,
     2, 3, 0
 };
-int indicesQuadSize = 0;
+int indicesQuadSize = sizeof(indicesQuad);
 
 typedef struct materialData {
     prTextureData* ambientMap;
@@ -385,7 +370,7 @@ void main() {\n\
 #define HUD_VERTEX_SHADER "\n\
 #version 460 core\n\
 layout (location = 0) in vec3 inputPosition;\n\
-layout (location = 2) in vec2 inputTextureCoordinates;\n\
+layout (location = 1) in vec2 inputTextureCoordinates;\n\
 \n\
 out vec2 textureCoordinates;\n\
 \n\
