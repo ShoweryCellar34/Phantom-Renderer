@@ -218,12 +218,20 @@ int main(int argc, char** argv) {
 
     prMeshData* meshCube = prMeshCreate();
     prMeshLinkContext(meshCube, test->openglContext);
+    prMeshSetVertexAttribute(meshCube, 0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (void*)(0 * sizeof(GLfloat)));
+    prMeshSetVertexAttribute(meshCube, 1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
+    prMeshSetVertexAttribute(meshCube, 2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (void*)(6 * sizeof(GLfloat)));
     prMeshUpdate(meshCube,
         cubeData, cubeDataSize,
         indices, indicesSize);
 
     prMeshData* meshQuad = prMeshCreate();
     prMeshLinkContext(meshQuad, test->openglContext);
+    // prMeshSetVertexAttribute(meshQuad, 0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (void*)(0 * sizeof(GLfloat)));
+    // prMeshSetVertexAttribute(meshQuad, 1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (void*)(2 * sizeof(GLfloat)));
+    prMeshSetVertexAttribute(meshQuad, 0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (void*)(0 * sizeof(GLfloat)));
+    prMeshSetVertexAttribute(meshQuad, 1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
+    prMeshSetVertexAttribute(meshQuad, 2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (void*)(6 * sizeof(GLfloat)));
     prMeshUpdate(meshQuad,
         quadData, quadDataSize,
         indicesQuad, indicesQuadSize);

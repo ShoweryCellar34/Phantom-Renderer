@@ -32,8 +32,6 @@ void i_prMeshCreateOnGPU(prMeshData* mesh) {
         return;
     }
 
-    GLint stride = 8;
-
     mesh->context->BindVertexArray(mesh->VAO);
 
     mesh->context->BindBuffer(GL_ARRAY_BUFFER, mesh->VBO);
@@ -42,14 +40,12 @@ void i_prMeshCreateOnGPU(prMeshData* mesh) {
     mesh->context->BindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->EBO);
     mesh->context->BufferData(GL_ELEMENT_ARRAY_BUFFER, mesh->indicesSize, mesh->indices, GL_STATIC_DRAW);
 
-    mesh->context->VertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride * sizeof(GLfloat), (void*)(0 * sizeof(GLfloat)));
-    mesh->context->EnableVertexAttribArray(0);
-
-    mesh->context->VertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
-    mesh->context->EnableVertexAttribArray(1);
-
-    mesh->context->VertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, stride * sizeof(GLfloat), (void*)(6 * sizeof(GLfloat)));
-    mesh->context->EnableVertexAttribArray(2);
+    for(int i = 0; i < PR_MAX_VERTEX_ATTRIBUTES; i++) {
+        if(mesh->typeAttribute[i]) {
+            mesh->context->VertexAttribPointer(i, mesh->sizeAttribute[i], mesh->typeAttribute[i], mesh->normalizedAttribute[i], mesh->strideAttribute[i], mesh->offsetAttribute[i]);
+            mesh->context->EnableVertexAttribArray(i);
+        }
+    }
 
     mesh->context->BindBuffer(GL_ARRAY_BUFFER, 0);
 
@@ -59,8 +55,6 @@ void i_prMeshCreateOnGPU(prMeshData* mesh) {
 void i_prMeshUpdateOnGPU(prMeshData* mesh) {
     prLogEvent(PR_EVENT_OPENGL, PR_LOG_INFO, "i_prMeshUpdateOnGPU: Updating mesh on GPU. Vertices data size: %i indices data size: %i", mesh->GPUReadyBufferSize, mesh->indicesSize);
 
-    GLint stride = 8;
-
 	mesh->context->BindVertexArray(mesh->VAO);
 
 	mesh->context->BindBuffer(GL_ARRAY_BUFFER, mesh->VBO);
@@ -69,14 +63,12 @@ void i_prMeshUpdateOnGPU(prMeshData* mesh) {
 	mesh->context->BindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->EBO);
 	mesh->context->BufferData(GL_ELEMENT_ARRAY_BUFFER, mesh->indicesSize, mesh->indices, GL_STATIC_DRAW);
 
-    mesh->context->VertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride * sizeof(GLfloat), (void*)(0 * sizeof(GLfloat)));
-    mesh->context->EnableVertexAttribArray(0);
-
-    mesh->context->VertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
-    mesh->context->EnableVertexAttribArray(1);
-
-    mesh->context->VertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, stride * sizeof(GLfloat), (void*)(6 * sizeof(GLfloat)));
-    mesh->context->EnableVertexAttribArray(2);
+    for(int i = 0; i < PR_MAX_VERTEX_ATTRIBUTES; i++) {
+        if(mesh->typeAttribute[i]) {
+            mesh->context->VertexAttribPointer(i, mesh->sizeAttribute[i], mesh->typeAttribute[i], mesh->normalizedAttribute[i], mesh->strideAttribute[i], mesh->offsetAttribute[i]);
+            mesh->context->EnableVertexAttribArray(i);
+        }
+    }
 
 	mesh->context->BindVertexArray(0);
 

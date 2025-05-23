@@ -75,6 +75,19 @@ void prMeshUpdate(prMeshData* mesh, void* GPUReadyBuffer, GLsizeiptr GPUReadyBuf
     }
 }
 
+void prMeshSetVertexAttribute(prMeshData* mesh, GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const void* offset) {
+    if(index >= PR_MAX_VERTEX_ATTRIBUTES) {
+        prLogEvent(PR_EVENT_OPENGL, PR_LOG_ERROR, "prMeshSetVertexAttribute: Vertex attribute index to high, index: %i max: %i. Aborting operation, nothing was modified", index, PR_MAX_VERTEX_ATTRIBUTES);
+        return;
+    }
+
+    mesh->sizeAttribute[index] = size;
+    mesh->typeAttribute[index] = type;
+    mesh->normalizedAttribute[index] = normalized;
+    mesh->strideAttribute[index] = stride;
+    mesh->offsetAttribute[index] = (void*)offset;
+}
+
 void prMeshDraw(prMeshData* mesh) {
     if(!mesh->context) {
         prLogEvent(PR_EVENT_OPENGL, PR_LOG_ERROR, "prMeshDraw: Cannot draw mesh without a valid OpenGL context. Aborting operation, nothing was modified");

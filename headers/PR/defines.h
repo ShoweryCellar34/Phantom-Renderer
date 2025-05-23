@@ -6,19 +6,20 @@
 typedef int8_t prLogLevel_t;
 typedef int8_t prEvent_t;
 
-#define PR_MAXSTR_LEN        1024
-#define PR_CUBE_MAP_SIDES    6 // This is just for taking the place of a magic number
+#define PR_MAXSTR_LEN               1024
+#define PR_CUBE_MAP_SIDES           6 // This is just for taking the place of a magic number
+#define PR_MAX_VERTEX_ATTRIBUTES    16
 
-#define PR_EVENT_MEMORY      0
-#define PR_EVENT_DATA        1
-#define PR_EVENT_OPENGL      2
-#define PR_EVENT_USER        3
+#define PR_EVENT_MEMORY             0
+#define PR_EVENT_DATA               1
+#define PR_EVENT_OPENGL             2
+#define PR_EVENT_USER               3
 
-#define PR_LOG_FATAL         4
-#define PR_LOG_ERROR         5
-#define PR_LOG_WARNING       6
-#define PR_LOG_INFO          7
-#define PR_LOG_TRACE         8
+#define PR_LOG_FATAL                4
+#define PR_LOG_ERROR                5
+#define PR_LOG_WARNING              6
+#define PR_LOG_INFO                 7
+#define PR_LOG_TRACE                8
 
 #define PR_WRAPPING_REPEAT               GL_REPEAT
 #define PR_WRAPPING_REPEAT_MIRRORED      GL_MIRRORED_REPEAT
