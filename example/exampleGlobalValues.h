@@ -361,7 +361,7 @@ void main() {\n\
     vec3 normal = normalize(texture(material.normal, textureCoordinates)).xyz;\n\
     normal = normalize(normals);\n\
     \n\
-    vec4 result = vec4(0.0, 0.0, 0.0, 1.0);\n\
+    vec4 result = vec4(0.0, 0.0, 0.0, material.shininess);\n\
     if(gl_FragCoord.x > screenSize.x / 2 && gl_FragCoord.y > screenSize.y / 2) {\n\
         result = ambient;\n\
     } else if(gl_FragCoord.x > screenSize.x / 2 && gl_FragCoord.y <= screenSize.y / 2) {\n\
