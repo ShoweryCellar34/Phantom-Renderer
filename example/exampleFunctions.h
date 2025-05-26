@@ -118,19 +118,6 @@ void framebufferSizeCallback(GLFWwindow* window, int width, int height) {
     context->MemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
 }
 
-void framebufferSizeCallbackLite(GLFWwindow* window, int width, int height) {
-    windowWidth = width;
-    windowHeight = height;
-    GladGLContext* context = glfwGetWindowUserPointer(window);
-    context->Viewport(0, 0, width, height);
-    prCameraUpdateDimentions(camera);
-
-    prShaderSetUniform2f(debugShaderProgram, "screenSize", windowWidth, windowHeight);
-
-    prTextureUpdate(colorTexture, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR, NULL, 0, windowWidth, windowHeight);
-    prRenderBufferUpdate(depthStencilRBO, PR_FORMAT_DEPTH_STENCIL, windowWidth, windowHeight);
-}
-
 void cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
     if(firstMouseMovement) {
         lastX = xpos;
@@ -266,49 +253,102 @@ void bindMaterialHUD(materialData* material, prShaderData* shaderProgram) {
     prShaderSetUniform1i(shaderProgram, "material.ambient", 0);
 }
 
-void APIENTRY glDebugOutput(GLenum source, 
+void APIENTRY openglDebugOutput(GLenum source, 
                             GLenum type, 
                             unsigned int id, 
                             GLenum severity, 
                             GLsizei length, 
-                            const char *message, 
-                            const void *userParam)
-{
+                            const char* message, 
+                            const void* userParam
+) {
     // ignore non-significant error/warning codes
-    if(id == 131169 || id == 131185 || id == 131218 || id == 131204) return; 
+    if(id == 131169 || id == 131185 || id == 131218 || id == 131204) {
+        return;
+    } 
 
-    printf("---------------\n");
-    printf("Debug message ( %i ): %s\n", id, message);
+    prLogRaw("---------------\n");
+    prLogRaw("Debug message (%i): %s\n", id, message);
 
-    switch (source)
-    {
-        case GL_DEBUG_SOURCE_API:             printf("Source: API"); break;
-        case GL_DEBUG_SOURCE_WINDOW_SYSTEM:   printf("Source: Window System"); break;
-        case GL_DEBUG_SOURCE_SHADER_COMPILER: printf("Source: Shader Compiler"); break;
-        case GL_DEBUG_SOURCE_THIRD_PARTY:     printf("Source: Third Party"); break;
-        case GL_DEBUG_SOURCE_APPLICATION:     printf("Source: Application"); break;
-        case GL_DEBUG_SOURCE_OTHER:           printf("Source: Other"); break;
-    } printf("\n");
+    switch(source) {
+        case GL_DEBUG_SOURCE_API:
+            prLogRaw("Source: API\n");
+            break;
 
-    switch (type)
-    {
-        case GL_DEBUG_TYPE_ERROR:               printf("Type: Error"); break;
-        case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR: printf("Type: Deprecated Behaviour"); break;
-        case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:  printf("Type: Undefined Behaviour"); break; 
-        case GL_DEBUG_TYPE_PORTABILITY:         printf("Type: Portability"); break;
-        case GL_DEBUG_TYPE_PERFORMANCE:         printf("Type: Performance"); break;
-        case GL_DEBUG_TYPE_MARKER:              printf("Type: Marker"); break;
-        case GL_DEBUG_TYPE_PUSH_GROUP:          printf("Type: Push Group"); break;
-        case GL_DEBUG_TYPE_POP_GROUP:           printf("Type: Pop Group"); break;
-        case GL_DEBUG_TYPE_OTHER:               printf("Type: Other"); break;
-    } printf("\n");
+        case GL_DEBUG_SOURCE_WINDOW_SYSTEM:
+            prLogRaw("Source: Window System\n");
+            break;
+
+        case GL_DEBUG_SOURCE_SHADER_COMPILER:
+            prLogRaw("Source: Shader Compiler\n");
+            break;
+
+        case GL_DEBUG_SOURCE_THIRD_PARTY:
+            prLogRaw("Source: Third Party\n");
+            break;
+
+        case GL_DEBUG_SOURCE_APPLICATION:
+            prLogRaw("Source: Application\n");
+            break;
+
+        case GL_DEBUG_SOURCE_OTHER:
+            prLogRaw("Source: Other\n");
+            break;
+    }
+
+    switch(type) {
+        case GL_DEBUG_TYPE_ERROR:
+            prLogRaw("Type: Error\n");
+            break;
+
+        case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR:
+            prLogRaw("Type: Deprecated Behaviour\n");
+            break;
+
+        case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:
+            prLogRaw("Type: Undefined Behaviour\n");
+            break;
+ 
+        case GL_DEBUG_TYPE_PORTABILITY:
+            prLogRaw("Type: Portability\n");
+            break;
+
+        case GL_DEBUG_TYPE_PERFORMANCE:
+            prLogRaw("Type: Performance\n");
+            break;
+
+        case GL_DEBUG_TYPE_MARKER:
+            prLogRaw("Type: Marker\n");
+            break;
+
+        case GL_DEBUG_TYPE_PUSH_GROUP:
+            prLogRaw("Type: Push Group\n");
+            break;
+
+        case GL_DEBUG_TYPE_POP_GROUP:
+            prLogRaw("Type: Pop Group\n");
+            break;
+
+        case GL_DEBUG_TYPE_OTHER:
+            prLogRaw("Type: Other\n");
+            break;
+    }
     
-    switch (severity)
-    {
-        case GL_DEBUG_SEVERITY_HIGH:         printf("Severity: high"); break;
-        case GL_DEBUG_SEVERITY_MEDIUM:       printf("Severity: medium"); break;
-        case GL_DEBUG_SEVERITY_LOW:          printf("Severity: low"); break;
-        case GL_DEBUG_SEVERITY_NOTIFICATION: printf("Severity: notification"); break;
-    } printf("\n");
-    printf("\n");
+    switch(severity) {
+        case GL_DEBUG_SEVERITY_HIGH:
+            prLogRaw("Severity: high\n");
+            break;
+
+        case GL_DEBUG_SEVERITY_MEDIUM:
+            prLogRaw("Severity: medium\n");
+            break;
+
+        case GL_DEBUG_SEVERITY_LOW:
+            prLogRaw("Severity: low\n");
+            break;
+
+        case GL_DEBUG_SEVERITY_NOTIFICATION:
+            prLogRaw("Severity: notification\n");
+            break;
+    }
+    prLogRaw("\n");
 }

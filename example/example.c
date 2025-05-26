@@ -26,7 +26,7 @@ int main(int argc, char** argv) {
     glfwSetInputMode(test->window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     test->openglContext->Enable(GL_DEBUG_OUTPUT);
     test->openglContext->Enable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-    test->openglContext->DebugMessageCallback(glDebugOutput, NULL);
+    test->openglContext->DebugMessageCallback(openglDebugOutput, NULL);
     test->openglContext->DebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
 
     glfwSetWindowUserPointer(test->window, test->openglContext);

@@ -39,9 +39,7 @@ option(PR_BUILD_EXAMPLE "Build the example program" true)
 
 if(${PR_BUILD_EXAMPLE})
 add_executable(Example example/example.c)
-add_executable(ExampleLite example/exampleLite.c)
 target_link_libraries(Example Phantom-Renderer)
-target_link_libraries(ExampleLite Phantom-Renderer)
 add_custom_target(delete_resources ALL COMMAND ${CMAKE_COMMAND} -E remove_directory ${PROJECT_BINARY_DIR}/res COMMENT "Deleting old resources in binary directory")
 add_custom_target(copy_resources ALL COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}/example/res ${PROJECT_BINARY_DIR}/res COMMENT "Copying resources into binary directory" DEPENDS delete_resources)
 
