@@ -34,6 +34,7 @@ int main(int argc, char** argv) {
     stbi_set_flip_vertically_on_load(1);
 
     prShaderData* shaderProgram = createDefaultShader(test->openglContext);
+    debugShaderProgram = createDebugShader(test->openglContext);
 
     prShaderData* skyboxShaderProgram = prShaderCreate();
     prShaderLinkContext(skyboxShaderProgram, test->openglContext);
@@ -285,6 +286,9 @@ int main(int argc, char** argv) {
     test->openglContext->Enable(GL_BLEND);
 
     glfwMaximizeWindow(test->window);
+
+    prShaderSetUniform2f(debugShaderProgram, "screenSize", windowWidth, windowHeight);
+
     while(!glfwWindowShouldClose(test->window)) {
         test->openglContext->Enable(GL_DEPTH_TEST);
         prFramebufferClear(test->openglContext, NULL, PR_BUFFER_BIT_COLOR | PR_BUFFER_BIT_DEPTH);
@@ -299,47 +303,49 @@ int main(int argc, char** argv) {
         vec3 rotation = {radians(yaw), radians(pitch), radians(0.0f)};
         prCameraUpdate(camera, cameraPosition, rotation, 45.0f, 0.1f, 1500.0f);
 
+        prShaderData* currentShaderProgram = (useDebugShader ? debugShaderProgram : shaderProgram);
+
         prShaderSetUniform3f(shaderProgram, "cameraPosition", camera->position[0], camera->position[1], camera->position[2]);
-        prShaderSetUniformMatrix4fv(shaderProgram, "view", camera->view[0]);
-        prShaderSetUniformMatrix4fv(shaderProgram, "projection", camera->projection[0]);
+        prShaderSetUniformMatrix4fv(currentShaderProgram, "view", camera->view[0]);
+        prShaderSetUniformMatrix4fv(currentShaderProgram, "projection", camera->projection[0]);
 
         float val = smoothOvertimeSin();
 
         prFramebufferBind(framebuffer);
 
         translationsToMatrix(translation, (vec3){0.0f, 0.0f, -20.0f}, GLM_VEC3_ZERO, (vec3){30.0f, 30.0f, 10.0f});
-        bindMaterial(&materialMetal, shaderProgram);
-        prShaderSetUniformMatrix4fv(shaderProgram, "translation", translation[0]);
+        bindMaterial(&materialMetal, currentShaderProgram);
+        prShaderSetUniformMatrix4fv(currentShaderProgram, "translation", translation[0]);
         prMeshDraw(meshCube);
 
         translationsToMatrix(translation, (vec3){0.0f, -20.0f, 0.0f}, GLM_VEC3_ZERO, (vec3){30.0f, 10.0f, 30.0f});
-        bindMaterial(&materialMetal, shaderProgram);
-        prShaderSetUniformMatrix4fv(shaderProgram, "translation", translation[0]);
+        bindMaterial(&materialMetal, currentShaderProgram);
+        prShaderSetUniformMatrix4fv(currentShaderProgram, "translation", translation[0]);
         prMeshDraw(meshCube);
 
         translationsToMatrix(translation, (vec3){-20.0f, 0.0f, 0.0f}, GLM_VEC3_ZERO, (vec3){10.0f, 30.0f, 30.0f});
-        bindMaterial(&materialMetal, shaderProgram);
-        prShaderSetUniformMatrix4fv(shaderProgram, "translation", translation[0]);
+        bindMaterial(&materialMetal, currentShaderProgram);
+        prShaderSetUniformMatrix4fv(currentShaderProgram, "translation", translation[0]);
         prMeshDraw(meshCube);
 
         translationsToMatrix(translation, (vec3){1.0f, 0.0f, 0.0f}, (vec3){0.0f, val, 0.0f}, GLM_VEC3_ONE);
-        bindMaterial(&materialWood, shaderProgram);
-        prShaderSetUniformMatrix4fv(shaderProgram, "translation", translation[0]);
+        bindMaterial(&materialWood, currentShaderProgram);
+        prShaderSetUniformMatrix4fv(currentShaderProgram, "translation", translation[0]);
         prMeshDraw(meshCube);
 
         translationsToMatrix(translation, (vec3){-1.0f, 0.0f, 0.0f}, (vec3){0.0f, val, 0.0f}, GLM_VEC3_ONE);
-        bindMaterial(&materialWoodMetal, shaderProgram);
-        prShaderSetUniformMatrix4fv(shaderProgram, "translation", translation[0]);
+        bindMaterial(&materialWoodMetal, currentShaderProgram);
+        prShaderSetUniformMatrix4fv(currentShaderProgram, "translation", translation[0]);
         prMeshDraw(meshCube);
 
         translationsToMatrix(translation, (vec3){0.0f, 1.5f, 0.0f}, (vec3){0.0f, val, 0.0f}, GLM_VEC3_ONE);
-        bindMaterial(&materialBrick, shaderProgram);
-        prShaderSetUniformMatrix4fv(shaderProgram, "translation", translation[0]);
+        bindMaterial(&materialBrick, currentShaderProgram);
+        prShaderSetUniformMatrix4fv(currentShaderProgram, "translation", translation[0]);
         prMeshDraw(meshCube);
 
         translationsToMatrix(translation, (vec3){0.0f, val / 3.5f - 1.5f, 0.0f}, (vec3){0.0f, radians(val * 100.0f), 0.0f}, GLM_VEC3_ONE);
-        bindMaterial(&defaultMaterial, shaderProgram);
-        prShaderSetUniformMatrix4fv(shaderProgram, "translation", translation[0]);
+        bindMaterial(&defaultMaterial, currentShaderProgram);
+        prShaderSetUniformMatrix4fv(currentShaderProgram, "translation", translation[0]);
         prMeshDraw(meshCube);
 
         switch(currentSkybox) {
@@ -458,6 +464,8 @@ int main(int argc, char** argv) {
 
     prComputeShaderDestroy(computeShaderProgram);
     computeShaderProgram = NULL;
+    prShaderDestroy(debugShaderProgram);
+    debugShaderProgram = NULL;
     prShaderDestroy(hudShaderProgram);
     hudShaderProgram = NULL;
     prShaderDestroy(skyboxShaderProgram);

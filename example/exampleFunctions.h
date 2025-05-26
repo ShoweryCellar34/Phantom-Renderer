@@ -125,6 +125,8 @@ void framebufferSizeCallbackLite(GLFWwindow* window, int width, int height) {
     context->Viewport(0, 0, width, height);
     prCameraUpdateDimentions(camera);
 
+    prShaderSetUniform2f(debugShaderProgram, "screenSize", windowWidth, windowHeight);
+
     prTextureUpdate(colorTexture, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR, NULL, 0, windowWidth, windowHeight);
     prRenderBufferUpdate(depthStencilRBO, PR_FORMAT_DEPTH_STENCIL, windowWidth, windowHeight);
 }
@@ -180,6 +182,10 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
         currentSkybox = 0;
     }
 
+    if(key == GLFW_KEY_BACKSLASH && action == GLFW_PRESS) {
+        useDebugShader = !useDebugShader;
+    }
+
     if(key == GLFW_KEY_ENTER && action == GLFW_PRESS) {
         GladGLContext* context = glfwGetWindowUserPointer(window);
 
@@ -232,6 +238,13 @@ prShaderData* createDefaultShader(GladGLContext* context) {
     prShaderData* shader = prShaderCreate();
     prShaderLinkContext(shader, context);
     prShaderUpdate(shader, DEFAULT_VERTEX_SHADER, DEFAULT_FRAGMENT_SHADER);
+    return shader;
+}
+
+prShaderData* createDebugShader(GladGLContext* context) {
+    prShaderData* shader = prShaderCreate();
+    prShaderLinkContext(shader, context);
+    prShaderUpdate(shader, DEFAULT_VERTEX_SHADER, DEBUG_FRAGMENT_SHADER);
     return shader;
 }
 

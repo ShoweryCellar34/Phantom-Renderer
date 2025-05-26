@@ -112,6 +112,13 @@ void prShaderLocationSetUniform1f(prShaderData* shaderProgram, GLint location, G
     shaderProgram->context->Uniform1f(location, value);
 }
 
+void prShaderLocationSetUniform2f(prShaderData* shaderProgram, GLint location, GLfloat v1, GLfloat v2) {
+    if(!shaderProgram || !shaderProgram->context || !shaderProgram->shaderProgramObject) {
+        return;
+    }
+    shaderProgram->context->Uniform2f(location, v1, v2);
+}
+
 void prShaderLocationSetUniform3f(prShaderData* shaderProgram, GLint location, GLfloat v1, GLfloat v2, GLfloat v3) {
     if(!shaderProgram || !shaderProgram->context || !shaderProgram->shaderProgramObject) {
         return;
@@ -136,6 +143,12 @@ void prShaderSetUniform1f(prShaderData* shaderProgram, const GLchar* uniformName
     UNIFORM_BOILERPLATE;
 
     shaderProgram->context->Uniform1f(uniformLocation, value);
+}
+
+void prShaderSetUniform2f(prShaderData* shaderProgram, const GLchar* uniformName, GLfloat v1, GLfloat v2) {
+    UNIFORM_BOILERPLATE;
+
+    shaderProgram->context->Uniform2f(uniformLocation, v1, v2);
 }
 
 void prShaderSetUniform3f(prShaderData* shaderProgram, const GLchar* uniformName, GLfloat v1, GLfloat v2, GLfloat v3) {

@@ -334,6 +334,49 @@ void main() {\n\
 "
 #endif
 
+#ifndef DEBUG_FRAGMENT_SHADER
+#define DEBUG_FRAGMENT_SHADER "\n\
+#version 460 core\n\
+out vec4 fragmentColor;\n\
+\n\
+uniform vec2 screenSize;\n\
+\n\
+in vec3 fragmentPosition;\n\
+in vec3 normals;\n\
+in vec2 textureCoordinates;\n\
+\n\
+struct Material {\n\
+    sampler2D ambient;\n\
+    sampler2D diffuse;\n\
+    sampler2D specular;\n\
+    sampler2D normal;\n\
+    float shininess;\n\
+};\n\
+uniform Material material;\n\
+\n\
+void main() {\n\
+    vec4 ambient = texture(material.ambient, textureCoordinates);\n\
+    vec4 diffuse = texture(material.diffuse, textureCoordinates);\n\
+    vec3 specular = texture(material.specular, textureCoordinates).rgb;\n\
+    vec3 normal = normalize(texture(material.normal, textureCoordinates)).xyz;\n\
+    normal = normalize(normals);\n\
+    \n\
+    vec4 result = vec4(0.0, 0.0, 0.0, 1.0);\n\
+    if(gl_FragCoord.x > screenSize.x / 2 && gl_FragCoord.y > screenSize.y / 2) {\n\
+        result = ambient;\n\
+    } else if(gl_FragCoord.x > screenSize.x / 2 && gl_FragCoord.y <= screenSize.y / 2) {\n\
+        result = diffuse;\n\
+    } else if(gl_FragCoord.x <= screenSize.x / 2 && gl_FragCoord.y <= screenSize.y / 2) {\n\
+        result = vec4(specular, 1.0);\n\
+    } else if(gl_FragCoord.x <= screenSize.x / 2 && gl_FragCoord.y > screenSize.y / 2) {\n\
+        result = vec4((normal + 1.0) * 0.5, 1.0);\n\
+    }\n\
+    \n\
+    fragmentColor = result;\n\
+}\n\
+"
+#endif
+
 #ifndef SKYBOX_VERTEX_SHADER
 #define SKYBOX_VERTEX_SHADER "\n\
 #version 460 core\n\
@@ -461,9 +504,11 @@ const char* skybox2Textures[6] = {
 };
 
 int currentSkybox = 1;
-int showHUD = 1;
-int showPostProcessing = 1;
+bool showHUD = 1;
+bool showPostProcessing = 1;
 
+bool useDebugShader = false;
+prShaderData* debugShaderProgram = NULL;
 prComputeShaderData* computeShaderProgram = NULL;
 prTextureData* postProcessingTexture = NULL;
 prTextureData* colorTexture = NULL;
