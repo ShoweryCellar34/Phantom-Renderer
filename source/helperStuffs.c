@@ -2,11 +2,12 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <PR/shader.h>
 #include <PR/texture.h>
 #include <PR/cubeMap.h>
 #include <PR/logger.h>
 #include <PR/memory.h>
+#include <PR/shader.h>
+#include <PR/computeShader.h>
 
 prTextureData* loadTexture(GladGLContext* context, unsigned int filtering, const char* path) {
     FILE* textureFile = fopen(path, "rb");
@@ -15,11 +16,11 @@ prTextureData* loadTexture(GladGLContext* context, unsigned int filtering, const
         exit(EXIT_FAILURE);
     }
 
-    fseek(textureFile, 0L, SEEK_END);
+    fseek(textureFile, 0, SEEK_END);
     size_t textureFileSize = ftell(textureFile);
-    fseek(textureFile, 0L, SEEK_SET);
+    rewind(textureFile);
     unsigned char* textureData = prMalloc(textureFileSize + 1);
-    fread(textureData, textureFileSize, 1, textureFile);
+    fread(textureData, 1, textureFileSize, textureFile);
     fclose(textureFile);
 
     prTextureData* texture = prTextureCreate();
@@ -89,11 +90,11 @@ prCubeMapData* loadCubeMap(GladGLContext* context, unsigned int filtering, const
             exit(EXIT_FAILURE);
         }
 
-        fseek(textureFile, 0L, SEEK_END);
+        fseek(textureFile, 0, SEEK_END);
         textureFileSize[i] = ftell(textureFile);
-        fseek(textureFile, 0L, SEEK_SET);
+        rewind(textureFile);
         textureData[i] = prMalloc(textureFileSize[i] + 1);
-        fread(textureData[i], textureFileSize[i], 1, textureFile);
+        fread(textureData[i], 1, textureFileSize[i], textureFile);
         fclose(textureFile);
     }
 
@@ -184,4 +185,88 @@ prCubeMapData* makeCubeMapCheckerboards(GladGLContext* context, size_t scale, fl
     }
 
     return cubeMap;
+}
+
+prShaderData* loadShader(GladGLContext* context, const char* vertexPath, const char* fragmentPath, const char* geometryPath) {
+    prShaderData* shader = prShaderCreate();
+    prShaderLinkContext(shader, context);
+
+    char* vertexData = NULL;
+    char* geometryData = NULL;
+    char* fragmentData = NULL;
+
+    FILE* file = fopen(vertexPath, "rb");
+    if(file == NULL) {
+        prLogEvent(PR_EVENT_USER, PR_LOG_ERROR, "Failed to load vertex shader file \"%s\"", vertexPath);
+        exit(EXIT_FAILURE);
+    }
+    fseek(file, 0, SEEK_END);
+    size_t fileSize = ftell(file);
+    rewind(file);
+    vertexData = prMalloc(fileSize + 1);
+    fread(vertexData, 1, fileSize, file);
+    vertexData[fileSize] = '\0';
+    fclose(file);
+
+    file = fopen(fragmentPath, "rb");
+    if(file == NULL) {
+        prLogEvent(PR_EVENT_USER, PR_LOG_ERROR, "Failed to load fragment shader file \"%s\"", fragmentPath);
+        exit(EXIT_FAILURE);
+    }
+    fseek(file, 0, SEEK_END);
+    fileSize = ftell(file);
+    rewind(file);
+    fragmentData = prMalloc(fileSize + 1);
+    fread(fragmentData, 1, fileSize, file);
+    fragmentData[fileSize] = '\0';
+    fclose(file);
+
+    if(geometryPath) {
+        file = fopen(geometryPath, "rb");
+        if(file == NULL) {
+            prLogEvent(PR_EVENT_USER, PR_LOG_ERROR, "Failed to load geometry shader file \"%s\"", geometryPath);
+            exit(EXIT_FAILURE);
+        }
+        fseek(file, 0, SEEK_END);
+        fileSize = ftell(file);
+        rewind(file);
+        geometryData = prMalloc(fileSize + 1);
+        fread(geometryData, 1, fileSize, file);
+        geometryData[fileSize] = '\0';
+        fclose(file);
+    }
+
+    prShaderUpdate(shader, vertexData, fragmentData, geometryData);
+
+    prFree(vertexData);
+    prFree(fragmentData);
+    if(geometryData) {
+        prFree(geometryData);
+    }
+
+    return shader;
+}
+
+prComputeShaderData* loadComputeShader(GladGLContext* context, const char* path) {
+    prComputeShaderData* computeShader = prComputeShaderCreate();
+    prComputeShaderLinkContext(computeShader, context);
+
+    FILE* file = fopen(path, "rb");
+    if(file == NULL) {
+        prLogEvent(PR_EVENT_USER, PR_LOG_ERROR, "Failed to load compute shader file \"%s\"", path);
+        exit(EXIT_FAILURE);
+    }
+    fseek(file, 0, SEEK_END);
+    size_t fileSize = ftell(file);
+    rewind(file);
+    char* computeData = prMalloc(fileSize + 1);
+    fread(computeData, 1, fileSize, file);
+    computeData[fileSize] = '\0';
+    fclose(file);
+
+    prComputeShaderUpdate(computeShader, computeData);
+
+    prFree(computeData);
+
+    return computeShader;
 }

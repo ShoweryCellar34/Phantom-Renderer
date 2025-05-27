@@ -3,9 +3,10 @@
 #include <PR/defines.h>
 
 typedef struct GladGLContext GladGLContext;
-typedef struct prShaderData prShaderData;
 typedef struct prTextureData prTextureData;
 typedef struct prCubeMapData prCubeMapData;
+typedef struct prShaderData prShaderData;
+typedef struct prComputeShaderData prComputeShaderData;
 
 prTextureData* loadTexture(GladGLContext* context, unsigned int filtering, const char* path);
 
@@ -18,3 +19,7 @@ prCubeMapData* loadCubeMap(GladGLContext* context, unsigned int filtering, const
 prCubeMapData* makeCubeMapSingleColors(GladGLContext* context, float color[PR_CUBE_MAP_SIDES][4]);
 
 prCubeMapData* makeCubeMapCheckerboards(GladGLContext* context, size_t scale, float color1[PR_CUBE_MAP_SIDES][4], float color2[PR_CUBE_MAP_SIDES][4]);
+
+prShaderData* loadShader(GladGLContext* context, const char* vertexPath, const char* fragmentPath, const char* geometryPath);
+
+prComputeShaderData* loadComputeShader(GladGLContext* context, const char* path);

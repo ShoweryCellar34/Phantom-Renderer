@@ -213,28 +213,6 @@ float radians(float degrees) {
     return degrees * (M_PI / 180);
 }
 
-float smoothOvertime() {
-    return (glfwGetTimerValue() * 2.5f) / 5.0f / glfwGetTimerFrequency();
-}
-
-float smoothOvertimeSin() {
-    return sin((glfwGetTimerValue() * 2.5f) / 5.0f / glfwGetTimerFrequency());
-}
-
-prShaderData* createDefaultShader(GladGLContext* context) {
-    prShaderData* shader = prShaderCreate();
-    prShaderLinkContext(shader, context);
-    prShaderUpdate(shader, DEFAULT_VERTEX_SHADER, DEFAULT_FRAGMENT_SHADER, NULL);
-    return shader;
-}
-
-prShaderData* createDebugShader(GladGLContext* context) {
-    prShaderData* shader = prShaderCreate();
-    prShaderLinkContext(shader, context);
-    prShaderUpdate(shader, DEFAULT_VERTEX_SHADER, DEBUG_FRAGMENT_SHADER, DEBUG_GEOMETRY_SHADER);
-    return shader;
-}
-
 void bindMaterial(materialData* material, prShaderData* shaderProgram) {
     prTextureBindTexture(material->ambientMap, 0);
     prTextureBindTexture(material->diffuseMap, 1);
@@ -250,7 +228,7 @@ void bindMaterial(materialData* material, prShaderData* shaderProgram) {
 void bindMaterialHUD(materialData* material, prShaderData* shaderProgram) {
     prTextureBindTexture(material->ambientMap, 0);
 
-    prShaderSetUniform1i(shaderProgram, "material.ambient", 0);
+    prShaderSetUniform1i(shaderProgram, "ambient", 0);
 }
 
 void APIENTRY openglDebugOutput(GLenum source, 
