@@ -341,9 +341,8 @@ out vec4 fragmentColor;\n\
 \n\
 uniform vec2 screenSize;\n\
 \n\
-in vec3 fragmentPosition;\n\
-in vec3 normals;\n\
-in vec2 textureCoordinates;\n\
+in vec3 outNormals;\n\
+in vec2 outTextureCoordinates;\n\
 \n\
 struct Material {\n\
     sampler2D ambient;\n\
@@ -355,11 +354,11 @@ struct Material {\n\
 uniform Material material;\n\
 \n\
 void main() {\n\
-    vec4 ambient = texture(material.ambient, textureCoordinates);\n\
-    vec4 diffuse = texture(material.diffuse, textureCoordinates);\n\
-    vec3 specular = texture(material.specular, textureCoordinates).rgb;\n\
-    vec3 normal = normalize(texture(material.normal, textureCoordinates)).xyz;\n\
-    normal = normalize(normals);\n\
+    vec4 ambient = texture(material.ambient, outTextureCoordinates);\n\
+    vec4 diffuse = texture(material.diffuse, outTextureCoordinates);\n\
+    vec3 specular = texture(material.specular, outTextureCoordinates).rgb;\n\
+    vec3 normal = normalize(texture(material.normal, outTextureCoordinates)).xyz;\n\
+    normal = normalize(outNormals);\n\
     \n\
     vec4 result = vec4(0.0, 0.0, 0.0, material.shininess);\n\
     if(gl_FragCoord.x > screenSize.x / 2 && gl_FragCoord.y > screenSize.y / 2) {\n\
@@ -373,6 +372,29 @@ void main() {\n\
     }\n\
     \n\
     fragmentColor = result;\n\
+}\n\
+"
+#endif
+
+#ifndef DEBUG_GEOMETRY_SHADER
+#define DEBUG_GEOMETRY_SHADER "\n\
+#version 460 core\n\
+layout(triangles) in;\n\
+layout(triangle_strip, max_vertices = 3) out;\n\
+\n\
+in vec3 normals[];\n\
+in vec2 textureCoordinates[];\n\
+out vec3 outNormals;\n\
+out vec2 outTextureCoordinates;\n\
+\n\
+void main() {\n\
+    for(int i = 0; i < 3; i++) {\n\
+        gl_Position = gl_in[i].gl_Position;\n\
+        outNormals = normals[i];\n\
+        outTextureCoordinates = textureCoordinates[i];\n\
+        EmitVertex();\n\
+    }\n\
+    EndPrimitive();\n\
 }\n\
 "
 #endif

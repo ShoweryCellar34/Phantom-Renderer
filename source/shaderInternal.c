@@ -60,9 +60,29 @@ void i_prShaderCreateOnGPU(prShaderData* shaderProgram) {
         return;
     }
 
+    unsigned int geometryShader = 0;
+    if(shaderProgram->geometryShaderData) {
+        geometryShader = context->CreateShader(GL_GEOMETRY_SHADER);
+        context->ShaderSource(geometryShader, 1, (const GLchar* const*)&shaderProgram->geometryShaderData, NULL);
+        context->CompileShader(geometryShader);
+
+        context->GetShaderiv(geometryShader, GL_COMPILE_STATUS, &success);
+        if(!success) {
+            context->GetShaderInfoLog(geometryShader, PR_MAXSTR_LEN, NULL, infoLog);
+            context->DeleteShader(vertexShader);
+            context->DeleteShader(fragmentShader);
+            context->DeleteShader(geometryShader);
+            prLogEvent(PR_EVENT_OPENGL, PR_LOG_WARNING, "i_prShaderCreateOnGPU: Geometry shader failed to compile. Aborting operation, nothing was modified: %s", infoLog);
+            return;
+        }
+    }
+
     shaderProgram->shaderProgramObject = context->CreateProgram();
     context->AttachShader(shaderProgram->shaderProgramObject, vertexShader);
     context->AttachShader(shaderProgram->shaderProgramObject, fragmentShader);
+    if(geometryShader) {
+        context->AttachShader(shaderProgram->shaderProgramObject, geometryShader);
+    }
     context->LinkProgram(shaderProgram->shaderProgramObject);
 
     context->GetProgramiv(shaderProgram->shaderProgramObject, GL_LINK_STATUS, &success);
@@ -77,6 +97,9 @@ void i_prShaderCreateOnGPU(prShaderData* shaderProgram) {
 
     context->DeleteShader(vertexShader);
     context->DeleteShader(fragmentShader);
+    if(geometryShader) {
+        context->DeleteShader(geometryShader);
+    }
 }
 
 void i_prShaderDestroyOnGPU(prShaderData* shaderProgram) {

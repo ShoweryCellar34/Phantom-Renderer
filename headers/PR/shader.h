@@ -6,13 +6,14 @@ typedef struct prShaderData {
     GladGLContext* context;
     GLchar* vertexShaderData;
     GLchar* fragmentShaderData;
+    GLchar* geometryShaderData;
     GLuint shaderProgramObject;
 } prShaderData;
 
 prShaderData* prShaderCreate();
 void prShaderDestroy(prShaderData* shaderProgram);
 void prShaderLinkContext(prShaderData* shaderProgram, GladGLContext* context);
-void prShaderUpdate(prShaderData* shaderProgram, const GLchar* vertexShader, const GLchar* fragmentShader);
+void prShaderUpdate(prShaderData* shaderProgram, const GLchar* vertexShader, const GLchar* fragmentShader, const GLchar* geometryShader);
 
 void prShaderBind(prShaderData* shaderProgram);
 void prShaderUnbind(prShaderData* shaderProgram);

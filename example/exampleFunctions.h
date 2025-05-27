@@ -224,14 +224,14 @@ float smoothOvertimeSin() {
 prShaderData* createDefaultShader(GladGLContext* context) {
     prShaderData* shader = prShaderCreate();
     prShaderLinkContext(shader, context);
-    prShaderUpdate(shader, DEFAULT_VERTEX_SHADER, DEFAULT_FRAGMENT_SHADER);
+    prShaderUpdate(shader, DEFAULT_VERTEX_SHADER, DEFAULT_FRAGMENT_SHADER, NULL);
     return shader;
 }
 
 prShaderData* createDebugShader(GladGLContext* context) {
     prShaderData* shader = prShaderCreate();
     prShaderLinkContext(shader, context);
-    prShaderUpdate(shader, DEFAULT_VERTEX_SHADER, DEBUG_FRAGMENT_SHADER);
+    prShaderUpdate(shader, DEFAULT_VERTEX_SHADER, DEBUG_FRAGMENT_SHADER, DEBUG_GEOMETRY_SHADER);
     return shader;
 }
 

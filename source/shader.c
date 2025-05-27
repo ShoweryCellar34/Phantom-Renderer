@@ -22,6 +22,14 @@ prShaderData* prShaderCreate() {
 }
 
 void prShaderDestroy(prShaderData* shaderProgram) {
+    if(shaderProgram->vertexShaderData) {
+        prFree(shaderProgram->vertexShaderData);
+        prFree(shaderProgram->fragmentShaderData);
+    }
+    if(shaderProgram->geometryShaderData) {
+        prFree(shaderProgram->geometryShaderData);
+    }
+
     if(shaderProgram->shaderProgramObject) {
         i_prShaderDestroyOnGPU(shaderProgram);
     }
@@ -39,7 +47,7 @@ void prShaderLinkContext(prShaderData* shaderProgram, GladGLContext* context) {
     }
 }
 
-void prShaderUpdate(prShaderData* shaderProgram, const GLchar* vertexShader, const GLchar* fragmentShader) {
+void prShaderUpdate(prShaderData* shaderProgram, const GLchar* vertexShader, const GLchar* fragmentShader, const GLchar* geometryShader) {
     if(!vertexShader) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prShaderUpdate: Vertex shader data cannot be NULL. Aborting operation, nothing was modified");
         return;
@@ -55,12 +63,21 @@ void prShaderUpdate(prShaderData* shaderProgram, const GLchar* vertexShader, con
         shaderProgram->vertexShaderData = NULL;
         shaderProgram->fragmentShaderData = NULL;
     }
+    if(shaderProgram->geometryShaderData) {
+        prFree(shaderProgram->geometryShaderData);
+        shaderProgram->geometryShaderData = NULL;
+    }
 
     shaderProgram->vertexShaderData = prMalloc(strlen(vertexShader) + 1);
     prMemcpy(shaderProgram->vertexShaderData, (void*)vertexShader, strlen(vertexShader) + 1);
 
     shaderProgram->fragmentShaderData = prMalloc(strlen(fragmentShader) + 1);
     prMemcpy(shaderProgram->fragmentShaderData, (void*)fragmentShader, strlen(fragmentShader) + 1);
+
+    if(geometryShader) {
+        shaderProgram->geometryShaderData = prMalloc(strlen(geometryShader) + 1);
+        prMemcpy(shaderProgram->geometryShaderData, (void*)geometryShader, strlen(geometryShader) + 1);
+    }
 
     if(shaderProgram->context && !shaderProgram->shaderProgramObject) {
         i_prShaderCreateOnGPU(shaderProgram);

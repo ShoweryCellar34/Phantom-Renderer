@@ -38,11 +38,11 @@ int main(int argc, char** argv) {
 
     prShaderData* skyboxShaderProgram = prShaderCreate();
     prShaderLinkContext(skyboxShaderProgram, test->openglContext);
-    prShaderUpdate(skyboxShaderProgram, SKYBOX_VERTEX_SHADER, SKYBOX_FRAGMENT_SHADER);
+    prShaderUpdate(skyboxShaderProgram, SKYBOX_VERTEX_SHADER, SKYBOX_FRAGMENT_SHADER, NULL);
 
     prShaderData* hudShaderProgram = prShaderCreate();
     prShaderLinkContext(hudShaderProgram, test->openglContext);
-    prShaderUpdate(hudShaderProgram, HUD_VERTEX_SHADER, HUD_FRAGMENT_SHADER);
+    prShaderUpdate(hudShaderProgram, HUD_VERTEX_SHADER, HUD_FRAGMENT_SHADER, NULL);
 
     computeShaderProgram = prComputeShaderCreate();
     prComputeShaderLinkContext(computeShaderProgram, test->openglContext);
