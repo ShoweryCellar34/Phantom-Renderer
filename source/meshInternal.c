@@ -55,13 +55,9 @@ void i_prMeshCreateOnGPU(prMeshData* mesh) {
 void i_prMeshUpdateOnGPU(prMeshData* mesh) {
     prLogEvent(PR_EVENT_OPENGL, PR_LOG_INFO, "i_prMeshUpdateOnGPU: Updating mesh on GPU. Vertices data size: %i indices data size: %i", mesh->GPUReadyBufferSize, mesh->indicesSize);
 
-	mesh->context->BindVertexArray(mesh->VAO);
+	mesh->context->NamedBufferData(mesh->VBO, mesh->GPUReadyBufferSize, mesh->GPUReadyBuffer, GL_STATIC_DRAW);
 
-	mesh->context->BindBuffer(GL_ARRAY_BUFFER, mesh->VBO);
-	mesh->context->BufferData(GL_ARRAY_BUFFER, mesh->GPUReadyBufferSize, mesh->GPUReadyBuffer, GL_STATIC_DRAW);
-
-	mesh->context->BindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->EBO);
-	mesh->context->BufferData(GL_ELEMENT_ARRAY_BUFFER, mesh->indicesSize, mesh->indices, GL_STATIC_DRAW);
+	mesh->context->NamedBufferData(mesh->EBO, mesh->indicesSize, mesh->indices, GL_STATIC_DRAW);
 
     for(int i = 0; i < PR_MAX_VERTEX_ATTRIBUTES; i++) {
         if(mesh->typeAttribute[i]) {
@@ -69,8 +65,6 @@ void i_prMeshUpdateOnGPU(prMeshData* mesh) {
             mesh->context->EnableVertexAttribArray(i);
         }
     }
-
-	mesh->context->BindVertexArray(0);
 
     prLogEvent(PR_EVENT_OPENGL, PR_LOG_TRACE, "i_prMeshUpdateOnGPU: Successfully updated vertex array object and set data");
 }
@@ -87,6 +81,14 @@ void i_prMeshDrawOnGPU(prMeshData* mesh) {
     mesh->context->BindVertexArray(mesh->VAO);
 
     mesh->context->DrawElements(GL_TRIANGLES, mesh->indicesSize, GL_UNSIGNED_INT, 0);
+
+    mesh->context->BindVertexArray(0);
+}
+
+void i_prMeshDrawInstancesOnGPU(prMeshData* mesh, GLsizei count) {
+    mesh->context->BindVertexArray(mesh->VAO);
+
+    mesh->context->DrawElementsInstanced(GL_TRIANGLES, mesh->indicesSize, GL_UNSIGNED_INT, 0, count);
 
     mesh->context->BindVertexArray(0);
 }

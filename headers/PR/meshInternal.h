@@ -1,6 +1,6 @@
 #pragma once
 
-#include <cglm/cglm.h>
+#include <glad/gl.h>
 
 typedef struct prMeshData prMeshData;
 typedef struct prCamera prCamera;
@@ -15,3 +15,5 @@ void i_prMeshUpdateOnGPU(prMeshData* mesh);
 void i_prMeshDestroyOnGPU(prMeshData* mesh);
 
 void i_prMeshDrawOnGPU(prMeshData* mesh);
+
+void i_prMeshDrawInstancesOnGPU(prMeshData* mesh, GLsizei count);

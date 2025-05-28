@@ -100,3 +100,16 @@ void prMeshDraw(prMeshData* mesh) {
 
     i_prMeshDrawOnGPU(mesh);
 }
+
+void prMeshDrawInstances(prMeshData* mesh, GLsizei count) {
+    if(!mesh->context) {
+        prLogEvent(PR_EVENT_OPENGL, PR_LOG_ERROR, "prMeshDraw: Cannot draw mesh without a valid OpenGL context. Aborting operation, nothing was modified");
+        return;
+    }
+    if(!mesh->VAO) {
+        prLogEvent(PR_EVENT_OPENGL, PR_LOG_ERROR, "prMeshDraw: Cannot draw mesh without a valid OpenGL VAO. Aborting operation, nothing was modified");
+        return;
+    }
+
+    i_prMeshDrawInstancesOnGPU(mesh, count);
+}

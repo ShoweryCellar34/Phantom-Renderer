@@ -176,15 +176,20 @@ unsigned int indicesQuad[] = {
 int indicesQuadSize = sizeof(indicesQuad);
 
 float grassData[] = {
-    0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
-   -0.5f, 0.0f, 0.0f, 0.0f, 0.0f,
-    0.0f, 0.5f, 0.0f, 0.0f, 1.0f
+//  Pos                  Normals             Tex Coords   Wave
+    0.045f, 0.0f, 0.0f,  0.0f, 0.0f, -1.0f,  1.0f, 0.0f,  0.0f, 0.0f, 0.0f, // Vertex 1
+   -0.045f, 0.0f, 0.0f,  0.0f, 0.0f, -1.0f,  0.0f, 0.0f,  0.0f, 0.0f, 0.0f, // Vertex 2
+    0.0f, 0.2f, 0.0f,    0.0f, 0.0f, -1.0f,  0.0f, 1.0f,  0.05f, 0.0f, 0.05f, // Vertex 3
+
+    0.045f, 0.0f, 0.0f,  0.0f, 0.0f, 1.0f,   1.0f, 0.0f,  0.0f, 0.0f, 0.0f, // Vertex 4
+   -0.045f, 0.0f, 0.0f,  0.0f, 0.0f, 1.0f,   0.0f, 0.0f,  0.0f, 0.0f, 0.0f, // Vertex 5
+    0.0f, 0.2f, 0.0f,    0.0f, 0.0f, 1.0f,   0.0f, 1.0f,  0.05f, 0.0f, 0.05f  // Vertex 6
 };
 int grassDataSize = sizeof(grassData);
 
 unsigned int indicesGrass[] = {
     0, 1, 2,
-    2, 1, 0
+    5, 4, 3
 };
 int indicesGrassSize = sizeof(indicesGrass);
 

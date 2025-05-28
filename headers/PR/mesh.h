@@ -35,3 +35,5 @@ void prMeshUpdate(prMeshData* mesh, void* GPUReadyBuffer, GLsizeiptr GPUReadyBuf
 void prMeshSetVertexAttribute(prMeshData* mesh, GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const void* offset);
 
 void prMeshDraw(prMeshData* mesh);
+
+void prMeshDrawInstances(prMeshData* mesh, GLsizei count);
