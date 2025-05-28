@@ -65,6 +65,8 @@ int main(int argc, char** argv) {
 
     prTextureData* whiteTexture = makeTextureSingleColor(test->openglContext, (float[4]){1.0f, 1.0f, 1.0f, 1.0f});
 
+    prTextureData* grassTexture = makeTextureSingleColor(test->openglContext, (float[4]){0.0f, 1.0f, 0.0f, 1.0f});
+
     prTextureData* defaultNormal = makeTextureSingleColor(test->openglContext, (float[4]){0.0f, -1.0f, 0.0f, 1.0f});
 
     prTextureData* HUDTexture = loadTexture(test->openglContext, PR_FILTER_NEAREST, "res/textures/HUD.png");
@@ -198,6 +200,14 @@ int main(int argc, char** argv) {
         0.0f
     };
 
+    materialData materialGrass = {
+        grassTexture,
+        grassTexture,
+        blackTexture,
+        blackTexture,
+        0.0f
+    };
+
     cubeData = computeGPUReadyBuffer(&cubeDataSize,
         vertices, sizeof(vertices) / sizeof(float),
         normals, sizeof(normals) / sizeof(float),
@@ -213,6 +223,14 @@ int main(int argc, char** argv) {
     prMeshUpdate(meshCube,
         cubeData, cubeDataSize,
         indices, indicesSize);
+
+    prMeshData* meshGrass = prMeshCreate();
+    prMeshLinkContext(meshGrass, test->openglContext);
+    prMeshSetVertexAttribute(meshGrass, 0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (void*)(0 * sizeof(GLfloat)));
+    prMeshSetVertexAttribute(meshGrass, 2, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
+    prMeshUpdate(meshGrass,
+        grassData, grassDataSize,
+        indicesGrass, indicesGrassSize);
 
     prMeshData* meshQuad = prMeshCreate();
     prMeshLinkContext(meshQuad, test->openglContext);
@@ -361,6 +379,11 @@ int main(int argc, char** argv) {
             bindMaterial(&defaultMaterial, currentShaderProgram);
             prShaderSetUniformMatrix4fv(currentShaderProgram, "translation", translation[0]);
             prMeshDraw(meshCube);
+
+            translationsToMatrix(translation, GLM_VEC3_ZERO, GLM_VEC3_ZERO, GLM_VEC3_ONE);
+            bindMaterial(&materialGrass, currentShaderProgram);
+            prShaderSetUniformMatrix4fv(currentShaderProgram, "translation", translation[0]);
+            prMeshDraw(meshGrass);
         }
 
         switch(currentSkybox) {
@@ -430,6 +453,8 @@ int main(int argc, char** argv) {
 
     prMeshDestroy(meshQuad);
     meshQuad = NULL;
+    prMeshDestroy(meshGrass);
+    meshGrass = NULL;
     prMeshDestroy(meshCube);
     meshCube = NULL;
 
@@ -456,6 +481,8 @@ int main(int argc, char** argv) {
     HUDTexture = NULL;
     prTextureDestroy(defaultNormal);
     defaultNormal = NULL;
+    prTextureDestroy(grassTexture);
+    grassTexture = NULL;
     prTextureDestroy(whiteTexture);
     whiteTexture = NULL;
     prTextureDestroy(blackTexture);
@@ -479,14 +506,14 @@ int main(int argc, char** argv) {
 
     prComputeShaderDestroy(computeShaderProgram);
     computeShaderProgram = NULL;
-    prShaderDestroy(normalShaderProgram);
-    normalShaderProgram = NULL;
-    prShaderDestroy(debugShaderProgram);
-    debugShaderProgram = NULL;
     prShaderDestroy(hudShaderProgram);
     hudShaderProgram = NULL;
     prShaderDestroy(skyboxShaderProgram);
     skyboxShaderProgram = NULL;
+    prShaderDestroy(normalShaderProgram);
+    normalShaderProgram = NULL;
+    prShaderDestroy(debugShaderProgram);
+    debugShaderProgram = NULL;
     prShaderDestroy(shaderProgram);
     shaderProgram = NULL;
 

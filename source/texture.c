@@ -41,7 +41,7 @@ void prTextureLinkContext(prTextureData* texture, GladGLContext* context) {
 }
 
 void prTextureUpdate(prTextureData* texture, GLenum format, GLint wrappingMode, GLint filter, GLubyte* rawTextureData, size_t rawTextureDataCount, GLsizei width, GLsizei height) {
-    if(!rawTextureDataCount && rawTextureData) {
+    if(rawTextureDataCount && !rawTextureData) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_WARNING, "prTextureUpdate: Texture data count not zero while texture data is NULL. Assuming no texture data, texture data will be NULL");
     }
     if(rawTextureData && (width || height)) {

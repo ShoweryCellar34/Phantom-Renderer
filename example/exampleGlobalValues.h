@@ -175,6 +175,19 @@ unsigned int indicesQuad[] = {
 };
 int indicesQuadSize = sizeof(indicesQuad);
 
+float grassData[] = {
+    0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
+   -0.5f, 0.0f, 0.0f, 0.0f, 0.0f,
+    0.0f, 0.5f, 0.0f, 0.0f, 1.0f
+};
+int grassDataSize = sizeof(grassData);
+
+unsigned int indicesGrass[] = {
+    0, 1, 2,
+    2, 1, 0
+};
+int indicesGrassSize = sizeof(indicesGrass);
+
 typedef struct materialData {
     prTextureData* ambientMap;
     prTextureData* diffuseMap;
