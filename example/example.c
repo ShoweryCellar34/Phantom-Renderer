@@ -225,10 +225,9 @@ int main(int argc, char** argv) {
 
     prMeshData* meshGrass = prMeshCreate();
     prMeshLinkContext(meshGrass, test->openglContext);
-    prMeshSetVertexAttribute(meshGrass, 0, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(GLfloat), (void*)(0 * sizeof(GLfloat)));
-    prMeshSetVertexAttribute(meshGrass, 1, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
-    prMeshSetVertexAttribute(meshGrass, 2, 2, GL_FLOAT, GL_FALSE, 11 * sizeof(GLfloat), (void*)(6 * sizeof(GLfloat)));
-    prMeshSetVertexAttribute(meshGrass, 3, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(GLfloat), (void*)(8 * sizeof(GLfloat)));
+    prMeshSetVertexAttribute(meshGrass, 0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (void*)(0 * sizeof(GLfloat)));
+    prMeshSetVertexAttribute(meshGrass, 1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
+    prMeshSetVertexAttribute(meshGrass, 2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (void*)(6 * sizeof(GLfloat)));
     prMeshUpdate(meshGrass,
         grassData, grassDataSize,
         indicesGrass, indicesGrassSize);
@@ -305,8 +304,6 @@ int main(int argc, char** argv) {
         prCameraUpdate(camera, cameraPosition, rotation, 45.0f, 0.1f, 1500.0f);
 
         prShaderData* currentShaderProgram = (useDebugShader ? debugShaderProgram : shaderProgram);
-        prShaderSetUniform1f(currentShaderProgram, "time", glfwGetTime());
-        prShaderBind(currentShaderProgram);
 
         static float seed = 0;
         seed += deltaTime;
@@ -366,17 +363,6 @@ int main(int argc, char** argv) {
         bindMaterial(&defaultMaterial, currentShaderProgram);
         prShaderSetUniformMatrix4fv(currentShaderProgram, "translation", translation[0]);
         prMeshDraw(meshCube);
-
-        translationsToMatrix(translation, (vec3){-15.0f, -14.99f, -15.0f}, GLM_VEC3_ZERO, GLM_VEC3_ONE);
-        bindMaterial(&materialGrass, currentShaderProgram);
-        prShaderSetUniformMatrix4fv(currentShaderProgram, "translation", translation[0]);
-        prShaderSetUniform1i(currentShaderProgram, "grass", 1);
-        int width = 300;
-        int height = 300;
-        prShaderSetUniform1i(currentShaderProgram, "width", width);
-        prShaderSetUniform1i(currentShaderProgram, "height", height);
-        prMeshDrawInstances(meshGrass, width * height);
-        prShaderSetUniform1i(currentShaderProgram, "grass", 0);
 
         switch(currentSkybox) {
             case 1:
