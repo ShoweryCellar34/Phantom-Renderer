@@ -175,24 +175,6 @@ unsigned int indicesQuad[] = {
 };
 int indicesQuadSize = sizeof(indicesQuad);
 
-float grassData[] = {
-//  Pos                  Normals             Tex Coords
-    0.045f, 0.0f, 0.0f,  0.0f, 0.0f, -1.0f,  1.0f, 0.0f, // Vertex 1
-   -0.045f, 0.0f, 0.0f,  0.0f, 0.0f, -1.0f,  0.0f, 0.0f, // Vertex 2
-    0.0f, 0.2f, 0.0f,    0.0f, 0.0f, -1.0f,  0.0f, 1.0f, // Vertex 3
-
-    0.045f, 0.0f, 0.0f,  0.0f, 0.0f, 1.0f,   1.0f, 0.0f, // Vertex 4
-   -0.045f, 0.0f, 0.0f,  0.0f, 0.0f, 1.0f,   0.0f, 0.0f, // Vertex 5
-    0.0f, 0.2f, 0.0f,    0.0f, 0.0f, 1.0f,   0.0f, 1.0f  // Vertex 6
-};
-int grassDataSize = sizeof(grassData);
-
-unsigned int indicesGrass[] = {
-    0, 1, 2,
-    5, 4, 3
-};
-int indicesGrassSize = sizeof(indicesGrass);
-
 typedef struct materialData {
     prTextureData* ambientMap;
     prTextureData* diffuseMap;

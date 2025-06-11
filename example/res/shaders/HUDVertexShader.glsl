@@ -1,6 +1,6 @@
 #version 460 core
 layout(location = 0) in vec3 inputPosition;
-layout(location = 1) in vec2 inputTextureCoordinates;
+layout(location = 2) in vec2 inputTextureCoordinates;
 
 out vec2 textureCoordinates;
 
