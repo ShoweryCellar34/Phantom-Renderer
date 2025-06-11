@@ -280,10 +280,8 @@ int main(int argc, char** argv) {
     prCameraLinkContext(camera, test->openglContext);
 
     test->openglContext->Enable(GL_DEPTH_TEST);
-    test->openglContext->ClearColor(0.3f, 0.5f, 0.7f, 1.0f);
     test->openglContext->Enable(GL_CULL_FACE);
     test->openglContext->Enable(GL_BLEND);
-    test->openglContext->LineWidth(5.0f);
 
     glfwMaximizeWindow(test->window);
 
@@ -291,8 +289,10 @@ int main(int argc, char** argv) {
 
     while(!glfwWindowShouldClose(test->window)) {
         test->openglContext->Enable(GL_DEPTH_TEST);
-        prFramebufferClear(test->openglContext, NULL, PR_BUFFER_BIT_COLOR | PR_BUFFER_BIT_DEPTH);
-        prFramebufferClear(test->openglContext, framebuffer, PR_BUFFER_BIT_COLOR | PR_BUFFER_BIT_DEPTH);
+        prFramebufferClearColor(test->openglContext, NULL, (GLfloat[]){0.3f, 0.5f, 0.7f, 1.0f});
+        prFramebufferClearDepth(test->openglContext, NULL, 1.0f);
+        prFramebufferClearColor(test->openglContext, framebuffer, (GLfloat[]){0.3f, 0.5f, 0.7f, 1.0f});
+        prFramebufferClearDepth(test->openglContext, framebuffer, 1.0f);
 
         float currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
@@ -332,37 +332,37 @@ int main(int argc, char** argv) {
         translationsToMatrix(translation, (vec3){0.0f, 0.0f, -20.0f}, GLM_VEC3_ZERO, (vec3){30.0f, 30.0f, 10.0f});
         bindMaterial(&materialMetal, currentShaderProgram);
         prShaderSetUniformMatrix4fv(currentShaderProgram, "translation", translation[0]);
-        prMeshDraw(meshCube);
+        prMeshDrawIndices(meshCube);
 
         translationsToMatrix(translation, (vec3){0.0f, -20.0f, 0.0f}, GLM_VEC3_ZERO, (vec3){30.0f, 10.0f, 30.0f});
         bindMaterial(&materialMetal, currentShaderProgram);
         prShaderSetUniformMatrix4fv(currentShaderProgram, "translation", translation[0]);
-        prMeshDraw(meshCube);
+        prMeshDrawIndices(meshCube);
 
         translationsToMatrix(translation, (vec3){-20.0f, 0.0f, 0.0f}, GLM_VEC3_ZERO, (vec3){10.0f, 30.0f, 30.0f});
         bindMaterial(&materialMetal, currentShaderProgram);
         prShaderSetUniformMatrix4fv(currentShaderProgram, "translation", translation[0]);
-        prMeshDraw(meshCube);
+        prMeshDrawIndices(meshCube);
 
         translationsToMatrix(translation, (vec3){1.0f, 0.0f, 0.0f}, (vec3){0.0f, smoothSinOverTime, 0.0f}, GLM_VEC3_ONE);
         bindMaterial(&materialWood, currentShaderProgram);
         prShaderSetUniformMatrix4fv(currentShaderProgram, "translation", translation[0]);
-        prMeshDraw(meshCube);
+        prMeshDrawIndices(meshCube);
 
         translationsToMatrix(translation, (vec3){-1.0f, 0.0f, 0.0f}, (vec3){0.0f, smoothSinOverTime, 0.0f}, GLM_VEC3_ONE);
         bindMaterial(&materialWoodMetal, currentShaderProgram);
         prShaderSetUniformMatrix4fv(currentShaderProgram, "translation", translation[0]);
-        prMeshDraw(meshCube);
+        prMeshDrawIndices(meshCube);
 
         translationsToMatrix(translation, (vec3){0.0f, 1.5f, 0.0f}, (vec3){0.0f, smoothSinOverTime, 0.0f}, GLM_VEC3_ONE);
         bindMaterial(&materialBrick, currentShaderProgram);
         prShaderSetUniformMatrix4fv(currentShaderProgram, "translation", translation[0]);
-        prMeshDraw(meshCube);
+        prMeshDrawIndices(meshCube);
 
         translationsToMatrix(translation, (vec3){0.0f, smoothSinOverTime / 3.5f - 1.5f, 0.0f}, (vec3){0.0f, radians(smoothSinOverTime * 100.0f), 0.0f}, GLM_VEC3_ONE);
         bindMaterial(&defaultMaterial, currentShaderProgram);
         prShaderSetUniformMatrix4fv(currentShaderProgram, "translation", translation[0]);
-        prMeshDraw(meshCube);
+        prMeshDrawIndices(meshCube);
 
         switch(currentSkybox) {
             case 1:
@@ -393,13 +393,13 @@ int main(int argc, char** argv) {
         test->openglContext->Disable(GL_CULL_FACE);
         test->openglContext->DepthFunc(GL_LEQUAL);
         prShaderBind(skyboxShaderProgram);
-        prMeshDraw(meshCube);
+        prMeshDrawIndices(meshCube);
         test->openglContext->Enable(GL_CULL_FACE);
 
         if(showHUD == 1) {
             test->openglContext->Disable(GL_DEPTH_TEST);
             bindMaterialHUD(&materialHUD, hudShaderProgram);
-            prMeshDraw(meshQuad);
+            prMeshDrawIndices(meshQuad);
         }
 
         prFramebufferUnbind(test->openglContext);
@@ -418,7 +418,7 @@ int main(int argc, char** argv) {
             test->openglContext->MemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
 
             bindMaterialHUD(&materialPostProcessing, hudShaderProgram);
-            prMeshDraw(meshQuad);
+            prMeshDrawIndices(meshQuad);
         }
 
         glfwSwapBuffers(test->window);

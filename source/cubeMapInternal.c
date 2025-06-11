@@ -61,16 +61,15 @@ void i_prCubeMapComputeFormats(prCubeMapData* cubeMap, int side, GLenum* format,
 }
 
 void i_prCubeMapSetDataAllOnGPU(prCubeMapData* cubeMap) {
-
-    cubeMap->context->BindTexture(GL_TEXTURE_CUBE_MAP, cubeMap->TBO);
-
-    cubeMap->context->TexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, cubeMap->wrappingMode);
-    cubeMap->context->TexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, cubeMap->wrappingMode);
-    cubeMap->context->TexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, cubeMap->wrappingMode);
-    cubeMap->context->TexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, cubeMap->filter);
-    cubeMap->context->TexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, cubeMap->filter);
+    cubeMap->context->TextureParameteri(cubeMap->TBO, GL_TEXTURE_WRAP_S, cubeMap->wrappingMode);
+    cubeMap->context->TextureParameteri(cubeMap->TBO, GL_TEXTURE_WRAP_T, cubeMap->wrappingMode);
+    cubeMap->context->TextureParameteri(cubeMap->TBO, GL_TEXTURE_WRAP_R, cubeMap->wrappingMode);
+    cubeMap->context->TextureParameteri(cubeMap->TBO, GL_TEXTURE_MIN_FILTER, cubeMap->filter);
+    cubeMap->context->TextureParameteri(cubeMap->TBO, GL_TEXTURE_MAG_FILTER, cubeMap->filter);
 
     cubeMap->context->PixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+    cubeMap->context->BindTexture(GL_TEXTURE_CUBE_MAP, cubeMap->TBO);
     for(int i = 0; i < PR_CUBE_MAP_SIDES; i++) {
         GLenum format;
         GLint internalFomrat;
@@ -80,22 +79,21 @@ void i_prCubeMapSetDataAllOnGPU(prCubeMapData* cubeMap) {
             0, internalFomrat, cubeMap->width[i], cubeMap->height[i], 0, format, GL_UNSIGNED_BYTE, cubeMap->textureData[i]
         );
     }
-    cubeMap->context->GenerateMipmap(GL_TEXTURE_CUBE_MAP);
-
     cubeMap->context->BindTexture(GL_TEXTURE_CUBE_MAP, 0);
+
+    cubeMap->context->GenerateMipmap(GL_TEXTURE_CUBE_MAP);
 }
 
 void i_prCubeMapSetDataOnGPU(prCubeMapData* cubeMap, int side) {
-
-    cubeMap->context->BindTexture(GL_TEXTURE_CUBE_MAP, cubeMap->TBO);
-
-    cubeMap->context->TexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, cubeMap->wrappingMode);
-    cubeMap->context->TexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, cubeMap->wrappingMode);
-    cubeMap->context->TexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, cubeMap->wrappingMode);
-    cubeMap->context->TexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, cubeMap->filter);
-    cubeMap->context->TexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, cubeMap->filter);
+    cubeMap->context->TextureParameteri(cubeMap->TBO, GL_TEXTURE_WRAP_S, cubeMap->wrappingMode);
+    cubeMap->context->TextureParameteri(cubeMap->TBO, GL_TEXTURE_WRAP_T, cubeMap->wrappingMode);
+    cubeMap->context->TextureParameteri(cubeMap->TBO, GL_TEXTURE_WRAP_R, cubeMap->wrappingMode);
+    cubeMap->context->TextureParameteri(cubeMap->TBO, GL_TEXTURE_MIN_FILTER, cubeMap->filter);
+    cubeMap->context->TextureParameteri(cubeMap->TBO, GL_TEXTURE_MAG_FILTER, cubeMap->filter);
 
     cubeMap->context->PixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+    cubeMap->context->BindTexture(GL_TEXTURE_CUBE_MAP, cubeMap->TBO);
     GLenum format;
     GLint internalFomrat;
     i_prCubeMapComputeFormats(cubeMap, side, &format, &internalFomrat);
@@ -103,15 +101,15 @@ void i_prCubeMapSetDataOnGPU(prCubeMapData* cubeMap, int side) {
         GL_TEXTURE_CUBE_MAP_POSITIVE_X + side,
         0, internalFomrat, cubeMap->width[side], cubeMap->height[side], 0, format, GL_UNSIGNED_BYTE, cubeMap->textureData[side]
     );
-    cubeMap->context->GenerateMipmap(GL_TEXTURE_CUBE_MAP);
-
     cubeMap->context->BindTexture(GL_TEXTURE_CUBE_MAP, 0);
+
+    cubeMap->context->GenerateMipmap(GL_TEXTURE_CUBE_MAP);
 }
 
 void i_prCubeMapCreateOnGPU(prCubeMapData* cubeMap) {
     prLogEvent(PR_EVENT_OPENGL, PR_LOG_INFO, "i_prCubeMapCreateOnGPU: Creating cube map buffer object");
 
-    cubeMap->context->GenTextures(1, &cubeMap->TBO);
+    cubeMap->context->CreateTextures(GL_TEXTURE_CUBE_MAP, 1, &cubeMap->TBO);
     if(!cubeMap->TBO) {
         prLogEvent(PR_EVENT_OPENGL, PR_LOG_WARNING, "i_prCubeMapCreateOnGPU: Failed to create cube map buffer object. Aborting operation, nothing was modified");
         return;

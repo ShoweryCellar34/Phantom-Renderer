@@ -28,7 +28,7 @@ void i_prMeshCreateOnGPU(prMeshData* mesh) {
     if(!mesh->EBO) {
         mesh->context->DeleteVertexArrays(1, &mesh->VAO);
         mesh->context->DeleteBuffers(1, &mesh->VBO);
-        prLogEvent(PR_EVENT_OPENGL, PR_LOG_WARNING, "i_prMeshCreateOnGPU: Failed to create index buffer object. Aborting operation, nothing was modified");
+        prLogEvent(PR_EVENT_OPENGL, PR_LOG_WARNING, "i_prMeshCreateOnGPU: Failed to create element buffer object. Aborting operation, nothing was modified");
         return;
     }
 
@@ -77,7 +77,7 @@ void i_prMeshDestroyOnGPU(prMeshData* mesh) {
     mesh->context->DeleteBuffers(1, &mesh->EBO);
 }
 
-void i_prMeshDrawOnGPU(prMeshData* mesh) {
+void i_prMeshDrawIndicesOnGPU(prMeshData* mesh) {
     mesh->context->BindVertexArray(mesh->VAO);
 
     mesh->context->DrawElements(GL_TRIANGLES, mesh->indicesSize, GL_UNSIGNED_INT, 0);
@@ -85,10 +85,26 @@ void i_prMeshDrawOnGPU(prMeshData* mesh) {
     mesh->context->BindVertexArray(0);
 }
 
-void i_prMeshDrawInstancesOnGPU(prMeshData* mesh, GLsizei count) {
+void i_prMeshDrawIndicesInstancesOnGPU(prMeshData* mesh, GLsizei count) {
     mesh->context->BindVertexArray(mesh->VAO);
 
     mesh->context->DrawElementsInstanced(GL_TRIANGLES, mesh->indicesSize, GL_UNSIGNED_INT, 0, count);
+
+    mesh->context->BindVertexArray(0);
+}
+
+void i_prMeshDrawOnGPU(prMeshData* mesh, GLsizei verticesCount) {
+    mesh->context->BindVertexArray(mesh->VAO);
+
+    mesh->context->DrawArrays(GL_TRIANGLES, 0, verticesCount);
+
+    mesh->context->BindVertexArray(0);
+}
+
+void i_prMeshDrawInstancesOnGPU(prMeshData* mesh, GLsizei verticesCount, GLsizei count) {
+    mesh->context->BindVertexArray(mesh->VAO);
+
+    mesh->context->DrawArraysInstanced(GL_TRIANGLES, 0, verticesCount, count);
 
     mesh->context->BindVertexArray(0);
 }

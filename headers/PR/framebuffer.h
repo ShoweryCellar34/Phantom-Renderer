@@ -48,4 +48,11 @@ void prFramebufferBlit(GladGLContext* context, prFramebufferData* source, prFram
     GLint dstX0, GLint dstY0, GLint dstX1, GLint dstY1,
     GLbitfield mask, GLenum filter
 );
-void prFramebufferClear(GladGLContext* context, prFramebufferData* framebuffer, GLenum bits);
+
+void prFramebufferClearColor(GladGLContext* context, prFramebufferData* framebuffer, GLfloat color[4]);
+
+void prFramebufferClearDepth(GladGLContext* context, prFramebufferData* framebuffer, GLfloat depth);
+
+void prFramebufferClearStencil(GladGLContext* context, prFramebufferData* framebuffer, GLint stencil);
+
+void prFramebufferClearDepthStencil(GladGLContext* context, prFramebufferData* framebuffer, GLfloat depth, GLint stencil);

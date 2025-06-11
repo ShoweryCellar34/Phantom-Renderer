@@ -17,5 +17,3 @@ void i_prFramebufferBlitOnGPU(GladGLContext* context, prFramebufferData* source,
     GLint dstX0, GLint dstY0, GLint dstX1, GLint dstY1,
     GLbitfield mask, GLenum filter
 );
-
-void i_prFramebufferClear(GladGLContext* context, prFramebufferData* framebuffer, unsigned int bits);

@@ -44,13 +44,8 @@ void prMeshUpdate(prMeshData* mesh, void* GPUReadyBuffer, GLsizeiptr GPUReadyBuf
         return;
     }
 
-    if(!indicesSize) {
-        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prMeshUpdate: Indices data size cannot be zero. Aborting operation, nothing was modified");
-        return;
-    }
     if(!indices) {
-        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prMeshUpdate: Indices data cannot be NULL. Aborting operation, nothing was modified");
-        return;
+        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prMeshUpdate: Indices NULL, assuming not to use indices");
     }
 
     if(mesh->GPUReadyBuffer) {
@@ -64,9 +59,11 @@ void prMeshUpdate(prMeshData* mesh, void* GPUReadyBuffer, GLsizeiptr GPUReadyBuf
     prMemcpy(mesh->GPUReadyBuffer, GPUReadyBuffer, GPUReadyBufferSize);
     mesh->GPUReadyBufferSize = GPUReadyBufferSize;
 
-    mesh->indices = prMalloc(indicesSize);
-    prMemcpy(mesh->indices, indices, indicesSize);
-    mesh->indicesSize = indicesSize;
+    if(indices) {
+        mesh->indices = prMalloc(indicesSize);
+        prMemcpy(mesh->indices, indices, indicesSize);
+        mesh->indicesSize = indicesSize;
+    }
 
     if(mesh->context && !mesh->VAO) {
         i_prMeshCreateOnGPU(mesh);
@@ -88,20 +85,41 @@ void prMeshSetVertexAttribute(prMeshData* mesh, GLuint index, GLint size, GLenum
     mesh->offsetAttribute[index] = (void*)offset;
 }
 
-void prMeshDraw(prMeshData* mesh) {
+void prMeshDrawIndices(prMeshData* mesh) {
     if(!mesh->context) {
-        prLogEvent(PR_EVENT_OPENGL, PR_LOG_ERROR, "prMeshDraw: Cannot draw mesh without a valid OpenGL context. Aborting operation, nothing was modified");
+        prLogEvent(PR_EVENT_OPENGL, PR_LOG_ERROR, "prMeshDrawIndices: Cannot draw mesh without a valid OpenGL context. Aborting operation, nothing was modified");
         return;
     }
     if(!mesh->VAO) {
-        prLogEvent(PR_EVENT_OPENGL, PR_LOG_ERROR, "prMeshDraw: Cannot draw mesh without a valid OpenGL VAO. Aborting operation, nothing was modified");
+        prLogEvent(PR_EVENT_OPENGL, PR_LOG_ERROR, "prMeshDrawIndices: Cannot draw mesh without a valid OpenGL VAO. Aborting operation, nothing was modified");
+        return;
+    }
+    if(!mesh->indices) {
+        prLogEvent(PR_EVENT_OPENGL, PR_LOG_ERROR, "prMeshDrawIndices: Cannot draw mesh using glDrawElements without valid indices. Aborting operation, nothing was modified");
         return;
     }
 
-    i_prMeshDrawOnGPU(mesh);
+    i_prMeshDrawIndicesOnGPU(mesh);
 }
 
-void prMeshDrawInstances(prMeshData* mesh, GLsizei count) {
+void prMeshDrawIndicesInstances(prMeshData* mesh, GLsizei count) {
+    if(!mesh->context) {
+        prLogEvent(PR_EVENT_OPENGL, PR_LOG_ERROR, "prMeshDrawIndicesInstances: Cannot draw mesh without a valid OpenGL context. Aborting operation, nothing was modified");
+        return;
+    }
+    if(!mesh->VAO) {
+        prLogEvent(PR_EVENT_OPENGL, PR_LOG_ERROR, "prMeshDrawIndicesInstances: Cannot draw mesh without a valid OpenGL VAO. Aborting operation, nothing was modified");
+        return;
+    }
+    if(!mesh->indices) {
+        prLogEvent(PR_EVENT_OPENGL, PR_LOG_ERROR, "prMeshDrawIndicesInstances: Cannot draw mesh using glDrawElements without valid indices. Aborting operation, nothing was modified");
+        return;
+    }
+
+    i_prMeshDrawIndicesInstancesOnGPU(mesh, count);
+}
+
+void prMeshDraw(prMeshData* mesh, GLsizei verticesCount) {
     if(!mesh->context) {
         prLogEvent(PR_EVENT_OPENGL, PR_LOG_ERROR, "prMeshDraw: Cannot draw mesh without a valid OpenGL context. Aborting operation, nothing was modified");
         return;
@@ -111,5 +129,18 @@ void prMeshDrawInstances(prMeshData* mesh, GLsizei count) {
         return;
     }
 
-    i_prMeshDrawInstancesOnGPU(mesh, count);
+    i_prMeshDrawOnGPU(mesh, verticesCount);
+}
+
+void prMeshDrawInstances(prMeshData* mesh, GLsizei verticesCount, GLsizei count) {
+    if(!mesh->context) {
+        prLogEvent(PR_EVENT_OPENGL, PR_LOG_ERROR, "prMeshDrawInstances: Cannot draw mesh without a valid OpenGL context. Aborting operation, nothing was modified");
+        return;
+    }
+    if(!mesh->VAO) {
+        prLogEvent(PR_EVENT_OPENGL, PR_LOG_ERROR, "prMeshDrawInstances: Cannot draw mesh without a valid OpenGL VAO. Aborting operation, nothing was modified");
+        return;
+    }
+
+    i_prMeshDrawInstancesOnGPU(mesh, verticesCount, count);
 }

@@ -243,13 +243,12 @@ void prCubeMapUpdate(prCubeMapData* cubeMap, int side, GLenum format, GLint wrap
 }
 
 void prCubeMapBindTexture(prCubeMapData* cubeMap, unsigned int unit) {
-    if(!cubeMap->TBO) {
-        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prCubeMapBindTexture: Attempt to bind cube map that has not been created on GPU. Aborting operation");
-        return;
-    }
-
     if(!cubeMap->context) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prCubeMapBindTexture: Attempt to bind cube map without OpenGL context. Aborting operation");
+        return;
+    }
+    if(!cubeMap->TBO) {
+        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prCubeMapBindTexture: Attempt to bind cube map that has not been created on GPU. Aborting operation");
         return;
     }
 

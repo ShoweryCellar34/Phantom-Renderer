@@ -146,13 +146,12 @@ void prTextureBindImage(prTextureData* texture, GLuint index, GLint mipmapLevel,
 }
 
 void prTextureBindTexture(prTextureData* texture, unsigned int unit) {
-    if(!texture->TBO) {
-        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prTextureBindTexture: Attempt to bind texture that has not been created on GPU. Aborting operation");
-        return;
-    }
-
     if(!texture->context) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prTextureBindTexture: Attempt to bind texture without OpenGL context. Aborting operation");
+        return;
+    }
+    if(!texture->TBO) {
+        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prTextureBindTexture: Attempt to bind texture that has not been created on GPU. Aborting operation");
         return;
     }
 

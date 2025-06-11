@@ -49,7 +49,7 @@ void i_prRenderbufferComputeFormats(prRenderBufferData* renderBuffer, GLenum* in
 void i_prRenderBufferCreateOnGPU(prRenderBufferData* renderBuffer) {
     prLogEvent(PR_EVENT_OPENGL, PR_LOG_INFO, "i_prRenderBufferCreateOnGPU: Creating renderbuffer buffer object. Width: %i Height: %i", renderBuffer->width, renderBuffer->height);
 
-    renderBuffer->context->GenRenderbuffers(1, &renderBuffer->RBO);
+    renderBuffer->context->CreateRenderbuffers(1, &renderBuffer->RBO);
     if(!renderBuffer->RBO) {
         prLogEvent(PR_EVENT_OPENGL, PR_LOG_WARNING, "i_prRenderBufferCreateOnGPU: Failed to create renderbuffer buffer object. Aborting operation, nothing was modified");
         return;
@@ -58,11 +58,7 @@ void i_prRenderBufferCreateOnGPU(prRenderBufferData* renderBuffer) {
     GLenum internalFomrat;
     i_prRenderbufferComputeFormats(renderBuffer, &internalFomrat);
 
-    renderBuffer->context->BindRenderbuffer(GL_RENDERBUFFER, renderBuffer->RBO);
-
-    renderBuffer->context->RenderbufferStorage(GL_RENDERBUFFER, internalFomrat, renderBuffer->width, renderBuffer->height);
-
-    renderBuffer->context->BindRenderbuffer(GL_RENDERBUFFER, 0);
+    renderBuffer->context->NamedRenderbufferStorage(renderBuffer->RBO, internalFomrat, renderBuffer->width, renderBuffer->height);
 }
 
 void i_prRenderBufferDestroyOnGPU(prRenderBufferData* renderBuffer) {
@@ -82,9 +78,5 @@ void i_prRenderBufferUpdateOnGPU(prRenderBufferData* renderBuffer) {
     int internalFomrat;
     i_prRenderbufferComputeFormats(renderBuffer, &internalFomrat);
 
-    renderBuffer->context->BindRenderbuffer(GL_RENDERBUFFER, renderBuffer->RBO);
-
-    renderBuffer->context->RenderbufferStorage(GL_RENDERBUFFER, internalFomrat, renderBuffer->width, renderBuffer->height);
-
-    renderBuffer->context->BindRenderbuffer(GL_RENDERBUFFER, 0);
+    renderBuffer->context->NamedRenderbufferStorage(renderBuffer->RBO, internalFomrat, renderBuffer->width, renderBuffer->height);
 }

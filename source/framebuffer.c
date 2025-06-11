@@ -213,21 +213,106 @@ void prFramebufferBlit(GladGLContext* context, prFramebufferData* source, prFram
     i_prFramebufferBlitOnGPU(context, source, destination, srcX0, srcY0, srcX1, srcY1, dstX0, dstY0, dstX1, dstY1, mask, filter);
 }
 
-void prFramebufferClear(GladGLContext* context, prFramebufferData* framebuffer, GLenum bits) {
+void prFramebufferClearColor(GladGLContext* context, prFramebufferData* framebuffer, GLfloat color[4]) {
     if(framebuffer) {
         if(!framebuffer->context) {
-            prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferClear: Framebuffer context cannot be NULL. Aborting operation, nothing was modified");
+            prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferClearColor: Framebuffer context cannot be NULL. Aborting operation, nothing was modified");
             return;
         }
         if(framebuffer->context != context) {
-            prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferClear: Framebuffer context must match context passed to function. Aborting operation, nothing was modified");
+            prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferClearColor: Framebuffer context must match context passed to function. Aborting operation, nothing was modified");
             return;
         }
         if(!framebuffer->FBO) {
-            prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferClear: Framebuffer is not initialized on GPU. Aborting operation, nothing was modified");
+            prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferClearColor: Framebuffer is not initialized on GPU. Aborting operation, nothing was modified");
             return;
         }
-    }
 
-    i_prFramebufferClear(context, framebuffer, bits);
+        if(framebuffer->colorTexture) {
+            context->ClearNamedFramebufferfv(framebuffer->FBO, GL_COLOR, 0, color);
+        }
+        if(framebuffer->colorRBO) {
+            context->ClearNamedFramebufferfv(framebuffer->FBO, GL_COLOR, 1, color);
+        }
+    } else {
+        context->ClearNamedFramebufferfv(0, GL_COLOR, 0, color);
+    }
+}
+
+void prFramebufferClearDepth(GladGLContext* context, prFramebufferData* framebuffer, GLfloat depth) {
+    if(framebuffer) {
+        if(!framebuffer->context) {
+            prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferClearDepth: Framebuffer context cannot be NULL. Aborting operation, nothing was modified");
+            return;
+        }
+        if(framebuffer->context != context) {
+            prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferClearDepth: Framebuffer context must match context passed to function. Aborting operation, nothing was modified");
+            return;
+        }
+        if(!framebuffer->FBO) {
+            prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferClearDepth: Framebuffer is not initialized on GPU. Aborting operation, nothing was modified");
+            return;
+        }
+
+        if(framebuffer->colorTexture) {
+            context->ClearNamedFramebufferfv(framebuffer->FBO, GL_DEPTH, 0, &depth);
+        }
+        if(framebuffer->colorRBO) {
+            context->ClearNamedFramebufferfv(framebuffer->FBO, GL_DEPTH, 1, &depth);
+        }
+    } else {
+        context->ClearNamedFramebufferfv(0, GL_DEPTH, 0, &depth);
+    }
+}
+
+void prFramebufferClearStencil(GladGLContext* context, prFramebufferData* framebuffer, GLint stencil) {
+    if(framebuffer) {
+        if(!framebuffer->context) {
+            prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferClearStencil: Framebuffer context cannot be NULL. Aborting operation, nothing was modified");
+            return;
+        }
+        if(framebuffer->context != context) {
+            prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferClearStencil: Framebuffer context must match context passed to function. Aborting operation, nothing was modified");
+            return;
+        }
+        if(!framebuffer->FBO) {
+            prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferClearStencil: Framebuffer is not initialized on GPU. Aborting operation, nothing was modified");
+            return;
+        }
+
+        if(framebuffer->colorTexture) {
+            context->ClearNamedFramebufferiv(framebuffer->FBO, GL_STENCIL, 0, &stencil);
+        }
+        if(framebuffer->colorRBO) {
+            context->ClearNamedFramebufferiv(framebuffer->FBO, GL_STENCIL, 1, &stencil);
+        }
+    } else {
+        context->ClearNamedFramebufferiv(0, GL_STENCIL, 0, &stencil);
+    }
+}
+
+void prFramebufferClearDepthStencil(GladGLContext* context, prFramebufferData* framebuffer, GLfloat depth, GLint stencil) {
+    if(framebuffer) {
+        if(!framebuffer->context) {
+            prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferClearDepthStencil: Framebuffer context cannot be NULL. Aborting operation, nothing was modified");
+            return;
+        }
+        if(framebuffer->context != context) {
+            prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferClearDepthStencil: Framebuffer context must match context passed to function. Aborting operation, nothing was modified");
+            return;
+        }
+        if(!framebuffer->FBO) {
+            prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferClearDepthStencil: Framebuffer is not initialized on GPU. Aborting operation, nothing was modified");
+            return;
+        }
+
+        if(framebuffer->colorTexture) {
+            context->ClearNamedFramebufferfi(framebuffer->FBO, GL_DEPTH_STENCIL, 0, depth, stencil);
+        }
+        if(framebuffer->colorRBO) {
+            context->ClearNamedFramebufferfi(framebuffer->FBO, GL_DEPTH_STENCIL, 1, depth, stencil);
+        }
+    } else {
+        context->ClearNamedFramebufferfi(0, GL_DEPTH_STENCIL, 0, depth, stencil);
+    }
 }

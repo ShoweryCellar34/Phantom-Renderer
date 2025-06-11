@@ -65,24 +65,24 @@ void i_prTextureSetDataOnGPU(prTextureData* texture) {
     GLint internalFomrat;
     i_prTextureComputeFormats(texture, &format, &internalFomrat);
 
-    texture->context->BindTexture(GL_TEXTURE_2D, texture->TBO);
-
-    texture->context->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, texture->wrappingMode);
-    texture->context->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, texture->wrappingMode);
-    texture->context->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, texture->filter);
-    texture->context->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, texture->filter);
+    texture->context->TextureParameteri(texture->TBO, GL_TEXTURE_WRAP_S, texture->wrappingMode);
+    texture->context->TextureParameteri(texture->TBO, GL_TEXTURE_WRAP_T, texture->wrappingMode);
+    texture->context->TextureParameteri(texture->TBO, GL_TEXTURE_MIN_FILTER, texture->filter);
+    texture->context->TextureParameteri(texture->TBO, GL_TEXTURE_MAG_FILTER, texture->filter);
 
     texture->context->PixelStorei(GL_UNPACK_ALIGNMENT, 1);
-    texture->context->TexImage2D(GL_TEXTURE_2D, 0, internalFomrat, texture->width, texture->height, 0, format, GL_UNSIGNED_BYTE, texture->textureData);
-    texture->context->GenerateMipmap(GL_TEXTURE_2D);
 
+    texture->context->BindTexture(GL_TEXTURE_2D, texture->TBO);
+    texture->context->TexImage2D(GL_TEXTURE_2D, 0, internalFomrat, texture->width, texture->height, 0, format, GL_UNSIGNED_BYTE, texture->textureData);
     texture->context->BindTexture(GL_TEXTURE_2D, 0);
+
+    texture->context->GenerateTextureMipmap(texture->TBO);
 }
 
 void i_prTextureCreateOnGPU(prTextureData* texture) {
     prLogEvent(PR_EVENT_OPENGL, PR_LOG_INFO, "i_prTextureCreateOnGPU: Creating texture buffer object. Width: %i Height: %i Channels: %i", texture->width, texture->height, texture->channels);
 
-    texture->context->GenTextures(1, &texture->TBO);
+    texture->context->CreateTextures(GL_TEXTURE_2D, 1, &texture->TBO);
     if(!texture->TBO) {
         prLogEvent(PR_EVENT_OPENGL, PR_LOG_WARNING, "i_prTextureCreateOnGPU: Failed to create texture buffer object. Aborting operation, nothing was modified");
         return;

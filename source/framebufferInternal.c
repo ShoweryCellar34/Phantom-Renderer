@@ -7,7 +7,7 @@
 void i_prFramebufferCreateOnGPU(prFramebufferData* framebuffer) {
     prLogEvent(PR_EVENT_OPENGL, PR_LOG_INFO, "i_prFramebufferCreateOnGPU: Creating framebuffer object");
 
-    framebuffer->context->GenFramebuffers(1, &framebuffer->FBO);
+    framebuffer->context->CreateFramebuffers(1, &framebuffer->FBO);
     if(!framebuffer->FBO) {
         prLogEvent(PR_EVENT_OPENGL, PR_LOG_WARNING, "i_prFramebufferCreateOnGPU: Failed to create framebuffer object. Aborting operation, nothing was modified");
         return;
@@ -29,20 +29,10 @@ void i_prFramebufferUpdateBuffers(prFramebufferData* framebuffer) {
 }
 
 void i_prFramebufferSetDataOnGPU(prFramebufferData* framebuffer) {
-    GLint previousReadFramebuffer, previousDrawFramebuffer;
-    
-    framebuffer->context->GetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &previousReadFramebuffer);
-    framebuffer->context->GetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &previousDrawFramebuffer);
-
-    framebuffer->context->BindFramebuffer(GL_FRAMEBUFFER, framebuffer->FBO);
-
     i_prFramebufferSetAttachment(framebuffer, framebuffer->colorTexture, framebuffer->colorRBO, GL_COLOR_ATTACHMENT0);
     i_prFramebufferSetAttachment(framebuffer, framebuffer->depthTexture, framebuffer->depthRBO, GL_DEPTH_ATTACHMENT);
     i_prFramebufferSetAttachment(framebuffer, framebuffer->stencilTexture, framebuffer->stencilRBO, GL_STENCIL_ATTACHMENT);
     i_prFramebufferSetAttachment(framebuffer, framebuffer->depthStencilTexture, framebuffer->depthStencilRBO, GL_DEPTH_STENCIL_ATTACHMENT);
-
-    framebuffer->context->BindFramebuffer(GL_READ_FRAMEBUFFER, previousReadFramebuffer);
-    framebuffer->context->BindFramebuffer(GL_DRAW_FRAMEBUFFER, previousDrawFramebuffer);
 }
 
 void i_prFramebufferSetAttachment(prFramebufferData* framebuffer, prTextureData* texture, prRenderBufferData* renderbuffer, GLenum attachment) {
@@ -51,7 +41,7 @@ void i_prFramebufferSetAttachment(prFramebufferData* framebuffer, prTextureData*
             if(texture->context != framebuffer->context) {
                 prLogEvent(PR_EVENT_OPENGL, PR_LOG_ERROR, "i_prFramebufferSetAttachment: Texture context does not match framebuffer context, binding ID 0");
             }
-            framebuffer->context->FramebufferTexture2D(GL_FRAMEBUFFER, attachment, GL_TEXTURE_2D, texture->TBO, 0);
+            framebuffer->context->NamedFramebufferTexture(framebuffer->FBO, attachment, texture->TBO, 0);
         }
     }
 
@@ -60,7 +50,7 @@ void i_prFramebufferSetAttachment(prFramebufferData* framebuffer, prTextureData*
             if(renderbuffer->context != framebuffer->context) {
                 prLogEvent(PR_EVENT_OPENGL, PR_LOG_ERROR, "i_prFramebufferSetAttachment: Renderbuffer context does not match framebuffer context, binding ID 0");
             }
-            framebuffer->context->FramebufferRenderbuffer(GL_FRAMEBUFFER, attachment, GL_RENDERBUFFER, renderbuffer->RBO);
+            framebuffer->context->NamedFramebufferRenderbuffer(framebuffer->FBO, attachment, GL_RENDERBUFFER, renderbuffer->RBO);
         }
     }
 }
@@ -76,18 +66,4 @@ void i_prFramebufferBlitOnGPU(GladGLContext* context, prFramebufferData* source,
         dstX0, dstY0, dstX1, dstY1,
         mask, filter
     );
-}
-
-void i_prFramebufferClear(GladGLContext* context, prFramebufferData* framebuffer, unsigned int bits) {
-    GLint previousReadFramebuffer, previousDrawFramebuffer;
-    
-    context->GetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &previousReadFramebuffer);
-    context->GetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &previousDrawFramebuffer);
-
-    context->BindFramebuffer(GL_FRAMEBUFFER, (framebuffer ? framebuffer->FBO : 0));
-
-    context->Clear(bits);
-
-    context->BindFramebuffer(GL_READ_FRAMEBUFFER, previousReadFramebuffer);
-    context->BindFramebuffer(GL_DRAW_FRAMEBUFFER, previousDrawFramebuffer);
 }
