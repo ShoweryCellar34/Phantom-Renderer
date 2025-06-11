@@ -80,11 +80,11 @@ int main(int argc, char** argv) {
 
     depthStencilRBO = prRenderBufferCreate();
     prRenderBufferLinkContext(depthStencilRBO, test->openglContext);
-    prRenderBufferUpdate(depthStencilRBO, PR_FORMAT_DEPTH_STENCIL, windowWidth, windowHeight);
+    prRenderBufferUpdate(depthStencilRBO, PR_FORMAT_DEPTH_STENCIL, windowWidth, windowHeight, 0);
 
     framebuffer = prFramebufferCreate();
     prFramebufferLinkContext(framebuffer, test->openglContext);
-    prFramebufferLinkColorTexture(framebuffer, colorTexture);
+    prFramebufferLinkColorTextureRBO(framebuffer, colorTexture);
     prFramebufferLinkDepthStencilTextureRBO(framebuffer, depthStencilRBO);
 
     prCubeMapData* skyboxDefaultCubeMap = makeCubeMapSingleColors(test->openglContext, (float[PR_CUBE_MAP_SIDES][4]){

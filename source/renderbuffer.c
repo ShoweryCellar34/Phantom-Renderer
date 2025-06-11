@@ -31,10 +31,13 @@ void prRenderBufferLinkContext(prRenderBufferData* renderBuffer, GladGLContext* 
     }
 }
 
-void prRenderBufferUpdate(prRenderBufferData* renderBuffer, GLenum format, GLsizei width, GLsizei height) {
+void prRenderBufferUpdate(prRenderBufferData* renderBuffer, GLenum format, GLsizei width, GLsizei height, GLsizei samples) {
     if(width <= 0 || height <= 0) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prRenderBufferUpdate: Invalid dimensions (width: %i, height: %i). Aborting operation, nothing was modified", width, height);
         return;
+    }
+    if(samples >= 4) {
+        prLogEvent(PR_EVENT_DATA, PR_LOG_INFO, "prRenderBufferUpdate: Using multisamples (samples: %i)", samples);
     }
     if((format != PR_FORMAT_A) && (format != PR_FORMAT_G) && (format != PR_FORMAT_B) &&
         (format != PR_FORMAT_RGB) && (format != PR_FORMAT_RGBA) &&
@@ -48,6 +51,7 @@ void prRenderBufferUpdate(prRenderBufferData* renderBuffer, GLenum format, GLsiz
 
     renderBuffer->width = width;
     renderBuffer->height = height;
+    renderBuffer->samples = samples;
 
     if(renderBuffer->context && !renderBuffer->RBO) {
         i_prRenderBufferCreateOnGPU(renderBuffer);

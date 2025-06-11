@@ -47,7 +47,7 @@ void i_prRenderbufferComputeFormats(prRenderBufferData* renderBuffer, GLenum* in
 }
 
 void i_prRenderBufferCreateOnGPU(prRenderBufferData* renderBuffer) {
-    prLogEvent(PR_EVENT_OPENGL, PR_LOG_INFO, "i_prRenderBufferCreateOnGPU: Creating renderbuffer buffer object. Width: %i Height: %i", renderBuffer->width, renderBuffer->height);
+    prLogEvent(PR_EVENT_OPENGL, PR_LOG_INFO, "i_prRenderBufferCreateOnGPU: Creating renderbuffer buffer object. Width: %i Height: %i%s", renderBuffer->width, renderBuffer->height, (renderBuffer->samples >= 4 ? " Samples: %i" : ""), renderBuffer->samples);
 
     renderBuffer->context->CreateRenderbuffers(1, &renderBuffer->RBO);
     if(!renderBuffer->RBO) {
@@ -58,7 +58,11 @@ void i_prRenderBufferCreateOnGPU(prRenderBufferData* renderBuffer) {
     GLenum internalFomrat;
     i_prRenderbufferComputeFormats(renderBuffer, &internalFomrat);
 
-    renderBuffer->context->NamedRenderbufferStorage(renderBuffer->RBO, internalFomrat, renderBuffer->width, renderBuffer->height);
+    if(renderBuffer->samples >= 4) {
+        renderBuffer->context->NamedRenderbufferStorageMultisample(renderBuffer->RBO, renderBuffer->samples, internalFomrat, renderBuffer->width, renderBuffer->height);
+    } else {
+        renderBuffer->context->NamedRenderbufferStorage(renderBuffer->RBO, internalFomrat, renderBuffer->width, renderBuffer->height);
+    }
 }
 
 void i_prRenderBufferDestroyOnGPU(prRenderBufferData* renderBuffer) {
@@ -78,5 +82,9 @@ void i_prRenderBufferUpdateOnGPU(prRenderBufferData* renderBuffer) {
     int internalFomrat;
     i_prRenderbufferComputeFormats(renderBuffer, &internalFomrat);
 
-    renderBuffer->context->NamedRenderbufferStorage(renderBuffer->RBO, internalFomrat, renderBuffer->width, renderBuffer->height);
+    if(renderBuffer->samples >= 4) {
+        renderBuffer->context->NamedRenderbufferStorageMultisample(renderBuffer->RBO, renderBuffer->samples, internalFomrat, renderBuffer->width, renderBuffer->height);
+    } else {
+        renderBuffer->context->NamedRenderbufferStorage(renderBuffer->RBO, internalFomrat, renderBuffer->width, renderBuffer->height);
+    }
 }
