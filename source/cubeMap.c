@@ -216,6 +216,22 @@ void prCubeMapUpdate(prCubeMapData* cubeMap, int side, GLenum format, GLint wrap
                 break;
         }
     }
+    if(format == PR_FORMAT_SRGB_AUTO) {
+        prLogEvent(PR_EVENT_DATA, PR_LOG_TRACE, "prCubeMapUpdate: [Face %i] Automatically determining cube map face sRGB format based on channel count (%d channels)", side, cubeMap->channels[side]);
+        switch(cubeMap->channels[side]) {
+            case 3:
+                cubeMap->format[side] = PR_FORMAT_SRGB;
+                break;
+
+            case 4:
+                cubeMap->format[side] = PR_FORMAT_SRGBA;
+                break;
+
+            default:
+                cubeMap->format[side] = PR_FORMAT_SRGB;
+                break;
+        }
+    }
 
     if(cubeMap->textureData[side]) {
         stbi_image_free(cubeMap->textureData[side]);

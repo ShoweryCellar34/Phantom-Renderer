@@ -38,6 +38,16 @@ void i_prCubeMapComputeFormats(prCubeMapData* cubeMap, int side, GLenum* format,
             *internalFormat = GL_RGBA32F;
             break;
 
+        case PR_FORMAT_SRGB:
+            *format = GL_RGB;
+            *internalFormat = GL_SRGB8;
+            break;
+
+        case PR_FORMAT_SRGBA:
+            *format = GL_RGBA;
+            *internalFormat = GL_SRGB8_ALPHA8;
+            break;
+
         case PR_FORMAT_STENCIL:
             *format = GL_STENCIL_INDEX;
             *internalFormat = GL_STENCIL_INDEX8;
@@ -79,9 +89,9 @@ void i_prCubeMapSetDataAllOnGPU(prCubeMapData* cubeMap) {
             0, internalFomrat, cubeMap->width[i], cubeMap->height[i], 0, format, GL_UNSIGNED_BYTE, cubeMap->textureData[i]
         );
     }
-    cubeMap->context->BindTexture(GL_TEXTURE_CUBE_MAP, 0);
-
     cubeMap->context->GenerateMipmap(GL_TEXTURE_CUBE_MAP);
+
+    cubeMap->context->BindTexture(GL_TEXTURE_CUBE_MAP, 0);
 }
 
 void i_prCubeMapSetDataOnGPU(prCubeMapData* cubeMap, int side) {

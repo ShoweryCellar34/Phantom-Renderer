@@ -32,6 +32,14 @@ void i_prRenderbufferComputeFormats(prRenderBufferData* renderBuffer, GLenum* in
             *internalFormat = GL_RGBA32F;
             break;
 
+        case PR_FORMAT_SRGB:
+            *internalFormat = GL_SRGB8;
+            break;
+
+        case PR_FORMAT_SRGBA:
+            *internalFormat = GL_SRGB8_ALPHA8;
+            break;
+
         case PR_FORMAT_STENCIL:
             *internalFormat = GL_STENCIL_INDEX8;
             break;

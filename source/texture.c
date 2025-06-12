@@ -111,6 +111,22 @@ void prTextureUpdate(prTextureData* texture, GLenum format, GLint wrappingMode, 
                 break;
         }
     }
+    if(format == PR_FORMAT_SRGB_AUTO) {
+        prLogEvent(PR_EVENT_DATA, PR_LOG_TRACE, "prTextureUpdate: Automatically determining texture sRGB format based on channel count (%d channels)", texture->channels);
+        switch(texture->channels) {
+            case 3:
+                texture->format = PR_FORMAT_SRGB;
+                break;
+
+            case 4:
+                texture->format = PR_FORMAT_SRGBA;
+                break;
+
+            default:
+                texture->format = PR_FORMAT_SRGB;
+                break;
+        }
+    }
 
     if(texture->textureData) {
         stbi_image_free(texture->textureData);

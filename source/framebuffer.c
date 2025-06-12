@@ -119,7 +119,7 @@ void prFramebufferLinkDepthStencilTexture(prFramebufferData* framebuffer, prText
 }
 
 void prFramebufferLinkColorTextureRBO(prFramebufferData* framebuffer, prRenderBufferData* colorRBO) {
-    if(colorRBO && framebuffer->context != colorRBO->context) {
+    if(framebuffer->context != colorRBO->context) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferLinkColorTextureRBO: RenderBuffer context does not match framebuffer context. Aborting operation, nothing was modified");
         return;
     }
@@ -131,7 +131,7 @@ void prFramebufferLinkColorTextureRBO(prFramebufferData* framebuffer, prRenderBu
 }
 
 void prFramebufferLinkDepthTextureRBO(prFramebufferData* framebuffer, prRenderBufferData* depthRBO) {
-    if(depthRBO && framebuffer->context != depthRBO->context) {
+    if(framebuffer->context != depthRBO->context) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferLinkDepthTextureRBO: RenderBuffer context does not match framebuffer context. Aborting operation, nothing was modified");
         return;
     }
@@ -143,7 +143,7 @@ void prFramebufferLinkDepthTextureRBO(prFramebufferData* framebuffer, prRenderBu
 }
 
 void prFramebufferLinkStencilTextureRBO(prFramebufferData* framebuffer, prRenderBufferData* stencilRBO) {
-    if(stencilRBO && framebuffer->context != stencilRBO->context) {
+    if(framebuffer->context != stencilRBO->context) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferLinkStencilTextureRBO: RenderBuffer context does not match framebuffer context. Aborting operation, nothing was modified");
         return;
     }
@@ -155,7 +155,7 @@ void prFramebufferLinkStencilTextureRBO(prFramebufferData* framebuffer, prRender
 }
 
 void prFramebufferLinkDepthStencilTextureRBO(prFramebufferData* framebuffer, prRenderBufferData* depthStencilRBO) {
-    if(depthStencilRBO && framebuffer->context != depthStencilRBO->context) {
+    if(framebuffer->context != depthStencilRBO->context) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferLinkDepthStencilTextureRBO: RenderBuffer context does not match framebuffer context. Aborting operation, nothing was modified");
         return;
     }
@@ -167,17 +167,37 @@ void prFramebufferLinkDepthStencilTextureRBO(prFramebufferData* framebuffer, prR
 }
 
 void prFramebufferTextureAttachment(prFramebufferData* framebuffer, GLenum attachment, GLuint textureHandle, GLint level) {
-    if (!framebuffer || !framebuffer->context) {
+    if(!framebuffer->context) {
+        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferTextureAttachment: Framebuffer context cannot be NULL. Aborting operation, nothing was modified");
         return;
     }
     framebuffer->context->FramebufferTexture2D(GL_FRAMEBUFFER, attachment, GL_TEXTURE_2D, textureHandle, level);
 }
 
 void prFramebufferRenderBufferAttachment(prFramebufferData* framebuffer, GLenum attachment, GLuint rboHandle) {
-    if (!framebuffer || !framebuffer->context) {
+    if(!framebuffer->context) {
+        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferRenderBufferAttachment: Framebuffer context cannot be NULL. Aborting operation, nothing was modified");
         return;
     }
     framebuffer->context->FramebufferRenderbuffer(GL_FRAMEBUFFER, attachment, GL_RENDERBUFFER, rboHandle);
+}
+
+void prFramebufferSetDrawBuffer(prFramebufferData* framebuffer, GLenum buffer) {
+    if(!framebuffer->context) {
+        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferSetDrawBuffer: Framebuffer context cannot be NULL. Aborting operation, nothing was modified");
+        return;
+    }
+
+    framebuffer->context->NamedFramebufferDrawBuffer(framebuffer->FBO, buffer);
+}
+
+void prFramebufferSetReadBuffer(prFramebufferData* framebuffer, GLenum buffer) {
+    if(!framebuffer->context) {
+        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferSetReadBuffer: Framebuffer context cannot be NULL. Aborting operation, nothing was modified");
+        return;
+    }
+
+    framebuffer->context->NamedFramebufferReadBuffer(framebuffer->FBO, buffer);
 }
 
 void prFramebufferBlit(GladGLContext* context, prFramebufferData* source, prFramebufferData* destination, GLint srcX0, GLint srcY0, GLint srcX1, GLint srcY1, GLint dstX0, GLint dstY0, GLint dstX1, GLint dstY1, GLbitfield mask, GLenum filter) {

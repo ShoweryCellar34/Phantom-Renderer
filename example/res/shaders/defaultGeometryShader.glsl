@@ -6,12 +6,14 @@ in VERTEX_OUT {
     vec3 fragmentPosition;
     vec3 normals;
     vec2 textureCoordinates;
+    vec4 fragmentPositionLightSpace;
 } vertexOut[];
 
 out GEOMETRY_OUT {
     vec3 fragmentPosition;
     vec3 normals;
     vec2 textureCoordinates;
+    vec4 fragmentPositionLightSpace;
 } geometryOut;
 
 void main() {
@@ -20,6 +22,7 @@ void main() {
         geometryOut.fragmentPosition = vertexOut[i].fragmentPosition;
         geometryOut.normals = vertexOut[i].normals;
         geometryOut.textureCoordinates = vertexOut[i].textureCoordinates;
+        geometryOut.fragmentPositionLightSpace = vertexOut[i].fragmentPositionLightSpace;
         EmitVertex();
     }
     EndPrimitive();

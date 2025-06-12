@@ -39,10 +39,13 @@ typedef int8_t prEvent_t;
 #define PR_FORMAT_A                      GL_ALPHA
 #define PR_FORMAT_RGB                    GL_RGB
 #define PR_FORMAT_RGBA                   GL_RGBA
+#define PR_FORMAT_SRGB                   GL_SRGB
+#define PR_FORMAT_SRGBA                  GL_SRGB_ALPHA
 #define PR_FORMAT_STENCIL                GL_STENCIL_INDEX
 #define PR_FORMAT_DEPTH                  GL_DEPTH_COMPONENT
 #define PR_FORMAT_DEPTH_STENCIL          GL_DEPTH24_STENCIL8
 #define PR_FORMAT_AUTO                   GL_2D // Just a random format that can be used as a value for PR_FORMAT_AUTO
+#define PR_FORMAT_SRGB_AUTO              GL_3D // Just a random format that can be used as a value for PR_FORMAT_SRGB_AUTO
 
 #define PR_BUFFER_BIT_COLOR              GL_COLOR_BUFFER_BIT
 #define PR_BUFFER_BIT_DEPTH              GL_DEPTH_BUFFER_BIT  

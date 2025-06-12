@@ -43,6 +43,9 @@ void prFramebufferLinkDepthStencilTextureRBO(prFramebufferData* framebuffer, prR
 void prFramebufferTextureAttachment(prFramebufferData* framebuffer, GLenum attachment, GLuint textureHandle, GLint level);
 void prFramebufferRenderBufferAttachment(prFramebufferData* framebuffer, GLenum attachment, GLuint rboHandle);
 
+void prFramebufferSetDrawBuffer(prFramebufferData* framebuffer, GLenum buffer);
+void prFramebufferSetReadBuffer(prFramebufferData* framebuffer, GLenum buffer);
+
 void prFramebufferBlit(GladGLContext* context, prFramebufferData* source, prFramebufferData* destination,
     GLint srcX0, GLint srcY0, GLint srcX1, GLint srcY1,
     GLint dstX0, GLint dstY0, GLint dstX1, GLint dstY1,

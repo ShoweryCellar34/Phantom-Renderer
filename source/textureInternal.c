@@ -38,6 +38,16 @@ void i_prTextureComputeFormats(prTextureData* texture, GLenum* format, GLint* in
             *internalFormat = GL_RGBA32F;
             break;
 
+        case PR_FORMAT_SRGB:
+            *format = GL_RGB;
+            *internalFormat = GL_SRGB8;
+            break;
+
+        case PR_FORMAT_SRGBA:
+            *format = GL_RGBA;
+            *internalFormat = GL_SRGB8_ALPHA8;
+            break;
+
         case PR_FORMAT_STENCIL:
             *format = GL_STENCIL_INDEX;
             *internalFormat = GL_STENCIL_INDEX8;

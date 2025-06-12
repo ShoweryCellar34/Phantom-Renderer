@@ -2,13 +2,15 @@
 
 #include <PR/defines.h>
 
+#include <stdbool.h>
+
 typedef struct GladGLContext GladGLContext;
 typedef struct prTextureData prTextureData;
 typedef struct prCubeMapData prCubeMapData;
 typedef struct prShaderData prShaderData;
 typedef struct prComputeShaderData prComputeShaderData;
 
-prTextureData* loadTexture(GladGLContext* context, unsigned int filtering, const char* path);
+prTextureData* loadTexture(GladGLContext* context, unsigned int filtering, bool srgb, const char* path);
 
 prTextureData* makeTextureSingleColor(GladGLContext* context, float color[4]);
 
