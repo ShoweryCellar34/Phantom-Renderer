@@ -70,6 +70,20 @@ int main(int argc, char** argv) {
 
     prTextureData* HUDTexture = loadTexture(test->openglContext, PR_FILTER_NEAREST, "res/textures/HUD.png");
 
+    test->openglContext->Enable(GL_MULTISAMPLE);
+    colorRBOMultisampled = prRenderBufferCreate();
+    prRenderBufferLinkContext(colorRBOMultisampled, test->openglContext);
+    prRenderBufferUpdate(colorRBOMultisampled, PR_FORMAT_RGBA, windowWidth, windowHeight, SAMPLES);
+
+    depthStencilRBOMultisampled = prRenderBufferCreate();
+    prRenderBufferLinkContext(depthStencilRBOMultisampled, test->openglContext);
+    prRenderBufferUpdate(depthStencilRBOMultisampled, PR_FORMAT_DEPTH_STENCIL, windowWidth, windowHeight, SAMPLES);
+
+    framebufferMultisampled = prFramebufferCreate();
+    prFramebufferLinkContext(framebufferMultisampled, test->openglContext);
+    prFramebufferLinkColorTextureRBO(framebufferMultisampled, colorRBOMultisampled);
+    prFramebufferLinkDepthStencilTextureRBO(framebufferMultisampled, depthStencilRBOMultisampled);
+
     postProcessingTexture = prTextureCreate();
     prTextureLinkContext(postProcessingTexture, test->openglContext);
     prTextureUpdate(postProcessingTexture, PR_FORMAT_RGBA, PR_FILTER_LINEAR, PR_WRAPPING_EDGE, NULL, 0, windowWidth, windowHeight);
@@ -84,7 +98,7 @@ int main(int argc, char** argv) {
 
     framebuffer = prFramebufferCreate();
     prFramebufferLinkContext(framebuffer, test->openglContext);
-    prFramebufferLinkColorTextureRBO(framebuffer, colorTexture);
+    prFramebufferLinkColorTexture(framebuffer, colorTexture);
     prFramebufferLinkDepthStencilTextureRBO(framebuffer, depthStencilRBO);
 
     prCubeMapData* skyboxDefaultCubeMap = makeCubeMapSingleColors(test->openglContext, (float[PR_CUBE_MAP_SIDES][4]){
@@ -282,8 +296,10 @@ int main(int argc, char** argv) {
         test->openglContext->Enable(GL_DEPTH_TEST);
         prFramebufferClearColor(test->openglContext, NULL, (GLfloat[]){0.3f, 0.5f, 0.7f, 1.0f});
         prFramebufferClearDepth(test->openglContext, NULL, 1.0f);
+        prFramebufferClearColor(test->openglContext, framebufferMultisampled, (GLfloat[]){0.7f, 0.5f, 0.3f, 1.0f});
+        prFramebufferClearDepthStencil(test->openglContext, framebufferMultisampled, 1.0f, 0);
         prFramebufferClearColor(test->openglContext, framebuffer, (GLfloat[]){0.3f, 0.5f, 0.7f, 1.0f});
-        prFramebufferClearDepth(test->openglContext, framebuffer, 1.0f);
+        prFramebufferClearDepthStencil(test->openglContext, framebuffer, 1.0f, 0);
 
         float currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
@@ -300,7 +316,7 @@ int main(int argc, char** argv) {
         seed += deltaTime;
         float smoothSinOverTime = sin(seed);
 
-        prFramebufferBind(framebuffer);
+        prFramebufferBind(framebufferMultisampled);
 
         prShaderSetUniform3f(currentShaderProgram, "directionalLights[0].direction", sun.direction[0], sun.direction[1], sun.direction[2]);
         prShaderSetUniform3f(currentShaderProgram, "directionalLights[0].ambient", sun.ambient[0], sun.ambient[1], sun.ambient[2]);
@@ -393,13 +409,13 @@ int main(int argc, char** argv) {
             prMeshDrawIndices(meshQuad);
         }
 
-        prFramebufferUnbind(test->openglContext);
-
-        prFramebufferBlit(test->openglContext, framebuffer, NULL,
+        prFramebufferBlit(test->openglContext, framebufferMultisampled, framebuffer,
             0, 0, windowWidth, windowHeight,
             0, 0, windowWidth, windowHeight,
             PR_BUFFER_BIT_COLOR, PR_FILTER_NEAREST
         );
+
+        prFramebufferBind(framebuffer);
 
         if(showPostProcessing) {
             test->openglContext->BlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -411,6 +427,12 @@ int main(int argc, char** argv) {
             bindMaterialHUD(&materialPostProcessing, hudShaderProgram);
             prMeshDrawIndices(meshQuad);
         }
+
+        prFramebufferBlit(test->openglContext, framebuffer, NULL,
+            0, 0, windowWidth, windowHeight,
+            0, 0, windowWidth, windowHeight,
+            PR_BUFFER_BIT_COLOR, PR_FILTER_NEAREST
+        );
 
         glfwSwapBuffers(test->window);
         glfwPollEvents();
@@ -431,6 +453,12 @@ int main(int argc, char** argv) {
     depthStencilRBO = NULL;
     prTextureDestroy(colorTexture);
     colorTexture = NULL;
+    prFramebufferDestroy(framebufferMultisampled);
+    framebufferMultisampled = NULL;
+    prRenderBufferDestroy(depthStencilRBOMultisampled);
+    depthStencilRBO = NULL;
+    prRenderBufferDestroy(colorRBOMultisampled);
+    colorRBOMultisampled = NULL;
 
     prCubeMapDestroy(skybox4CubeMap);
     skybox4CubeMap = NULL;

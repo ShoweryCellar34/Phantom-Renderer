@@ -67,7 +67,7 @@ GLenum prFramebufferCheckStatus(prFramebufferData* framebuffer) {
     if(!framebuffer || !framebuffer->context) {
         return GL_FRAMEBUFFER_UNDEFINED;
     }
-    return framebuffer->context->CheckFramebufferStatus(GL_FRAMEBUFFER);
+    return framebuffer->context->CheckNamedFramebufferStatus(framebuffer->FBO, GL_FRAMEBUFFER);
 }
 
 void prFramebufferLinkColorTexture(prFramebufferData* framebuffer, prTextureData* colorTexture) {
@@ -228,12 +228,7 @@ void prFramebufferClearColor(GladGLContext* context, prFramebufferData* framebuf
             return;
         }
 
-        if(framebuffer->colorTexture) {
-            context->ClearNamedFramebufferfv(framebuffer->FBO, GL_COLOR, 0, color);
-        }
-        if(framebuffer->colorRBO) {
-            context->ClearNamedFramebufferfv(framebuffer->FBO, GL_COLOR, 1, color);
-        }
+        context->ClearNamedFramebufferfv(framebuffer->FBO, GL_COLOR, 0, color);
     } else {
         context->ClearNamedFramebufferfv(0, GL_COLOR, 0, color);
     }
@@ -254,12 +249,7 @@ void prFramebufferClearDepth(GladGLContext* context, prFramebufferData* framebuf
             return;
         }
 
-        if(framebuffer->colorTexture) {
-            context->ClearNamedFramebufferfv(framebuffer->FBO, GL_DEPTH, 0, &depth);
-        }
-        if(framebuffer->colorRBO) {
-            context->ClearNamedFramebufferfv(framebuffer->FBO, GL_DEPTH, 1, &depth);
-        }
+        context->ClearNamedFramebufferfv(framebuffer->FBO, GL_DEPTH, 0, &depth);
     } else {
         context->ClearNamedFramebufferfv(0, GL_DEPTH, 0, &depth);
     }
@@ -280,12 +270,7 @@ void prFramebufferClearStencil(GladGLContext* context, prFramebufferData* frameb
             return;
         }
 
-        if(framebuffer->colorTexture) {
-            context->ClearNamedFramebufferiv(framebuffer->FBO, GL_STENCIL, 0, &stencil);
-        }
-        if(framebuffer->colorRBO) {
-            context->ClearNamedFramebufferiv(framebuffer->FBO, GL_STENCIL, 1, &stencil);
-        }
+        context->ClearNamedFramebufferiv(framebuffer->FBO, GL_STENCIL, 0, &stencil);
     } else {
         context->ClearNamedFramebufferiv(0, GL_STENCIL, 0, &stencil);
     }
@@ -306,12 +291,7 @@ void prFramebufferClearDepthStencil(GladGLContext* context, prFramebufferData* f
             return;
         }
 
-        if(framebuffer->colorTexture) {
-            context->ClearNamedFramebufferfi(framebuffer->FBO, GL_DEPTH_STENCIL, 0, depth, stencil);
-        }
-        if(framebuffer->colorRBO) {
-            context->ClearNamedFramebufferfi(framebuffer->FBO, GL_DEPTH_STENCIL, 1, depth, stencil);
-        }
+        context->ClearNamedFramebufferfi(framebuffer->FBO, GL_DEPTH_STENCIL, 0, depth, stencil);
     } else {
         context->ClearNamedFramebufferfi(0, GL_DEPTH_STENCIL, 0, depth, stencil);
     }
