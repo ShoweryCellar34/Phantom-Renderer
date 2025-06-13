@@ -24,7 +24,7 @@ typedef int8_t prEvent_t;
 #define PR_WRAPPING_REPEAT               GL_REPEAT
 #define PR_WRAPPING_REPEAT_MIRRORED      GL_MIRRORED_REPEAT
 #define PR_WRAPPING_EDGE                 GL_CLAMP_TO_EDGE
-#define PR_WRAPPING_COLOR                GL_CLAMP_TO_BORDER
+#define PR_WRAPPING_BORDER               GL_CLAMP_TO_BORDER
 
 #define PR_FILTER_LINEAR                 GL_LINEAR
 #define PR_FILTER_NEAREST                GL_NEAREST

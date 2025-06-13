@@ -65,18 +65,18 @@ void prCubeMapUpdateAll(prCubeMapData* cubeMap, GLenum format[PR_CUBE_MAP_SIDES]
         }
 
         unsigned char* temp = NULL;
-        if(rawTextureData && (!width[i] || !height[i])) {
+        if(rawTextureData[i] && (!width[i] || !height[i])) {
             temp = stbi_load_from_memory(rawTextureData[i], rawTextureDataCount[i], &cubeMap->width[i], &cubeMap->height[i], &cubeMap->channels[i], 0);
             if(!temp) {
                 prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prCubeMapUpdateAll: [Face %i] Cube map face data failed to unpack. Aborting operation, nothing was modified", i);
                 return;
             }
-        } else if(!rawTextureData && (width[i] || height[i])) {
+        } else if(!rawTextureData[i] && (width[i] || height[i])) {
             temp = NULL;
             cubeMap->width[i] = width[i];
             cubeMap->height[i] = height[i];
             cubeMap->channels[i] = 0;
-        } else if(rawTextureData && (width[i] || height[i])) {
+        } else if(rawTextureData[i] && (width[i] || height[i])) {
             temp = prMalloc(rawTextureDataCount[i]);
             prMemcpy(temp, (void*)rawTextureData[i], rawTextureDataCount[i]);
             cubeMap->width[i] = width[i];
@@ -110,7 +110,7 @@ void prCubeMapUpdateAll(prCubeMapData* cubeMap, GLenum format[PR_CUBE_MAP_SIDES]
     }
 
     if((wrappingMode != PR_WRAPPING_REPEAT) && (wrappingMode != PR_WRAPPING_REPEAT_MIRRORED) && 
-    (wrappingMode != PR_WRAPPING_EDGE) && (wrappingMode != PR_WRAPPING_COLOR)
+    (wrappingMode != PR_WRAPPING_EDGE) && (wrappingMode != PR_WRAPPING_BORDER)
     ) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_WARNING, "prCubeMapUpdateAll: Invalid wrapping mode for cube map (was %i), using PR_WRAPPING_EDGE", wrappingMode);
         cubeMap->wrappingMode = PR_WRAPPING_EDGE;
@@ -165,7 +165,7 @@ void prCubeMapUpdate(prCubeMapData* cubeMap, int side, GLenum format, GLint wrap
     }
 
     if((wrappingMode != PR_WRAPPING_REPEAT) && (wrappingMode != PR_WRAPPING_REPEAT_MIRRORED) && 
-    (wrappingMode != PR_WRAPPING_EDGE) && (wrappingMode != PR_WRAPPING_COLOR)
+    (wrappingMode != PR_WRAPPING_EDGE) && (wrappingMode != PR_WRAPPING_BORDER)
     ) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_WARNING, "prCubeMapUpdate: Invalid wrapping mode for cube map (was %i), using PR_WRAPPING_EDGE", wrappingMode);
         cubeMap->wrappingMode = PR_WRAPPING_EDGE;
@@ -255,6 +255,20 @@ void prCubeMapUpdate(prCubeMapData* cubeMap, int side, GLenum format, GLint wrap
         i_prCubeMapCreateOnGPU(cubeMap);
     } else if(cubeMap->context) {
         i_prCubeMapUpdateOnGPU(cubeMap, side);
+    }
+}
+
+void prCubeMapBorderColor(prCubeMapData* cubeMap, GLfloat borderColor[4]) {
+    prLogEvent(PR_EVENT_DATA, PR_LOG_TRACE, "prCubeMapBorderColor: Updating cube map border color (R: %f G: %f B: %f A: %f)",
+        borderColor[0], borderColor[1], borderColor[2], borderColor[3]);
+
+    cubeMap->borderColor[0] = borderColor[0];
+    cubeMap->borderColor[1] = borderColor[1];
+    cubeMap->borderColor[2] = borderColor[2];
+    cubeMap->borderColor[3] = borderColor[3];
+
+    if(cubeMap->TBO) {
+        i_prCubeMapUpdateBorderColorOnGPU(cubeMap);
     }
 }
 

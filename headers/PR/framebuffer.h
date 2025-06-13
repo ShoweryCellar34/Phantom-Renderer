@@ -3,6 +3,7 @@
 #include <glad/gl.h>
 
 typedef struct prTextureData prTextureData;
+typedef struct prCubeMapData prCubeMapData;
 typedef struct prRenderBufferData prRenderBufferData;
 
 typedef struct prFramebufferData {
@@ -12,6 +13,11 @@ typedef struct prFramebufferData {
     prTextureData* depthTexture;
     prTextureData* stencilTexture;
     prTextureData* depthStencilTexture;
+
+    prCubeMapData* colorCubeMap;
+    prCubeMapData* depthCubeMap;
+    prCubeMapData* stencilCubeMap;
+    prCubeMapData* depthStencilCubeMap;
 
     prRenderBufferData* colorRBO;
     prRenderBufferData* depthRBO;
@@ -34,6 +40,11 @@ void prFramebufferLinkColorTexture(prFramebufferData* framebuffer, prTextureData
 void prFramebufferLinkDepthTexture(prFramebufferData* framebuffer, prTextureData* depthTexture);
 void prFramebufferLinkStencilTexture(prFramebufferData* framebuffer, prTextureData* stencilTexture);
 void prFramebufferLinkDepthStencilTexture(prFramebufferData* framebuffer, prTextureData* depthStencilTexture);
+
+void prFramebufferLinkColorCubeMap(prFramebufferData* framebuffer, prCubeMapData* colorCubeMap);
+void prFramebufferLinkDepthCubeMap(prFramebufferData* framebuffer, prCubeMapData* depthCubeMap);
+void prFramebufferLinkStencilCubeMap(prFramebufferData* framebuffer, prCubeMapData* stencilCubeMap);
+void prFramebufferLinkDepthStencilCubeMap(prFramebufferData* framebuffer, prCubeMapData* depthStencilCubeMap);
 
 void prFramebufferLinkColorTextureRBO(prFramebufferData* framebuffer, prRenderBufferData* colorRBO);
 void prFramebufferLinkDepthTextureRBO(prFramebufferData* framebuffer, prRenderBufferData* depthRBO);

@@ -4,6 +4,7 @@
 
 #include <PR/memory.h>
 #include <PR/texture.h>
+#include <PR/cubeMap.h>
 #include <PR/renderbuffer.h>
 #include <PR/logger.h>
 
@@ -112,6 +113,54 @@ void prFramebufferLinkDepthStencilTexture(prFramebufferData* framebuffer, prText
         return;
     }
     framebuffer->depthStencilTexture = depthStencilTexture;
+
+    if(framebuffer->FBO) {
+        i_prFramebufferUpdateBuffers(framebuffer);
+    }
+}
+
+void prFramebufferLinkColorCubeMap(prFramebufferData* framebuffer, prCubeMapData* colorCubeMap) {
+    if(framebuffer->context != colorCubeMap->context) {
+        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferLinkColorCubeMap: Cube map context does not match framebuffer context. Aborting operation, nothing was modified");
+        return;
+    }
+    framebuffer->colorCubeMap = colorCubeMap;
+
+    if(framebuffer->FBO) {
+        i_prFramebufferUpdateBuffers(framebuffer);
+    }
+}
+
+void prFramebufferLinkDepthCubeMap(prFramebufferData* framebuffer, prCubeMapData* depthCubeMap) {
+    if(framebuffer->context != depthCubeMap->context) {
+        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferLinkDepthCubeMap: Cube map context does not match framebuffer context. Aborting operation, nothing was modified");
+        return;
+    }
+    framebuffer->depthCubeMap = depthCubeMap;
+
+    if(framebuffer->FBO) {
+        i_prFramebufferUpdateBuffers(framebuffer);
+    }
+}
+
+void prFramebufferLinkStencilCubeMap(prFramebufferData* framebuffer, prCubeMapData* stencilCubeMap) {
+    if(framebuffer->context != stencilCubeMap->context) {
+        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferLinkStencilCubeMap: Cube map context does not match framebuffer context. Aborting operation, nothing was modified");
+        return;
+    }
+    framebuffer->stencilCubeMap = stencilCubeMap;
+
+    if(framebuffer->FBO) {
+        i_prFramebufferUpdateBuffers(framebuffer);
+    }
+}
+
+void prFramebufferLinkDepthStencilCubeMap(prFramebufferData* framebuffer, prCubeMapData* depthStencilCubeMap) {
+    if(framebuffer->context != depthStencilCubeMap->context) {
+        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferLinkDepthStencilCubeMap: Cube map context does not match framebuffer context. Aborting operation, nothing was modified");
+        return;
+    }
+    framebuffer->depthStencilCubeMap = depthStencilCubeMap;
 
     if(framebuffer->FBO) {
         i_prFramebufferUpdateBuffers(framebuffer);

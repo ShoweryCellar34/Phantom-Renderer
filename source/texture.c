@@ -49,7 +49,7 @@ void prTextureUpdate(prTextureData* texture, GLenum format, GLint wrappingMode, 
     }
 
     if((wrappingMode != PR_WRAPPING_REPEAT) && (wrappingMode != PR_WRAPPING_REPEAT_MIRRORED) && 
-       (wrappingMode != PR_WRAPPING_EDGE) && (wrappingMode != PR_WRAPPING_COLOR)
+       (wrappingMode != PR_WRAPPING_EDGE) && (wrappingMode != PR_WRAPPING_BORDER)
     ) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_WARNING, "prTextureUpdate: Invalid wrapping mode for texture (was %i), using PR_WRAPPING_EDGE", wrappingMode);
         texture->wrappingMode = PR_WRAPPING_EDGE;
@@ -139,6 +139,20 @@ void prTextureUpdate(prTextureData* texture, GLenum format, GLint wrappingMode, 
         i_prTextureCreateOnGPU(texture);
     } else if(texture->context) {
         i_prTextureUpdateOnGPU(texture);
+    }
+}
+
+void prTextureBorderColor(prTextureData* texture, GLfloat borderColor[4]) {
+    prLogEvent(PR_EVENT_DATA, PR_LOG_TRACE, "prTextureBorderColor: Updating texture border color (R: %f G: %f B: %f A: %f)",
+        borderColor[0], borderColor[1], borderColor[2], borderColor[3]);
+
+    texture->borderColor[0] = borderColor[0];
+    texture->borderColor[1] = borderColor[1];
+    texture->borderColor[2] = borderColor[2];
+    texture->borderColor[3] = borderColor[3];
+
+    if(texture->TBO) {
+        i_prTextureUpdateBorderColorOnGPU(texture);
     }
 }
 

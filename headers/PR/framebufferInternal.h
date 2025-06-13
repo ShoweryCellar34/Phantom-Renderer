@@ -10,7 +10,7 @@ void i_prFramebufferUpdateBuffers(prFramebufferData* framebuffer);
 
 void i_prFramebufferSetDataOnGPU(prFramebufferData* framebuffer);
 
-void i_prFramebufferSetAttachment(prFramebufferData* framebuffer, prTextureData* texture, prRenderBufferData* renderbuffer, GLenum attachment);
+void i_prFramebufferSetAttachment(prFramebufferData* framebuffer, prTextureData* texture, prCubeMapData* cubeMap, prRenderBufferData* renderbuffer, GLenum attachment);
 
 void i_prFramebufferBlitOnGPU(GladGLContext* context, prFramebufferData* source, prFramebufferData* destination, 
     GLint srcX0, GLint srcY0, GLint srcX1, GLint srcY1,

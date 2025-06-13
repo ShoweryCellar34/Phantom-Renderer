@@ -126,6 +126,7 @@ void i_prCubeMapCreateOnGPU(prCubeMapData* cubeMap) {
     }
 
     i_prCubeMapSetDataAllOnGPU(cubeMap);
+    i_prCubeMapUpdateBorderColorOnGPU(cubeMap);
 }
 
 void i_prCubeMapDestroyOnGPU(prCubeMapData* cubeMap) {
@@ -143,6 +144,7 @@ void i_prCubeMapUpdateAllOnGPU(prCubeMapData* cubeMap) {
     }
 
     i_prCubeMapSetDataAllOnGPU(cubeMap);
+    i_prCubeMapUpdateBorderColorOnGPU(cubeMap);
 }
 
 void i_prCubeMapUpdateOnGPU(prCubeMapData* cubeMap, int side) {
@@ -154,4 +156,17 @@ void i_prCubeMapUpdateOnGPU(prCubeMapData* cubeMap, int side) {
     }
 
     i_prCubeMapSetDataOnGPU(cubeMap, side);
+    i_prCubeMapUpdateBorderColorOnGPU(cubeMap);
+}
+
+void i_prCubeMapUpdateBorderColorOnGPU(prCubeMapData* cubeMap) {
+    prLogEvent(PR_EVENT_DATA, PR_LOG_TRACE, "i_prCubeMapUpdateBorderColorOnGPU: Updating cube map border color (R: %f G: %f B: %f A: %f)",
+        cubeMap->borderColor[0], cubeMap->borderColor[1], cubeMap->borderColor[2], cubeMap->borderColor[3]);
+
+    if(!cubeMap->TBO) {
+        prLogEvent(PR_EVENT_OPENGL, PR_LOG_WARNING, "i_prCubeMapUpdateBorderColorOnGPU: Failed to update cube map buffer object, invalid ID. Aborting operation, nothing was modified");
+        return;
+    }
+
+    cubeMap->context->TextureParameterfv(cubeMap->TBO, GL_TEXTURE_BORDER_COLOR, cubeMap->borderColor);
 }

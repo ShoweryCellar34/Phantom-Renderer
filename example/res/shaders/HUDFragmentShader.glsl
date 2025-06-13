@@ -1,9 +1,9 @@
 #version 460 core
 out vec4 fragmentColor;
 
-in vec2 textureCoordinates;
-
 uniform sampler2D ambient;
+
+in vec2 textureCoordinates;
 
 void main() {
     fragmentColor = texture(ambient, textureCoordinates);

@@ -37,6 +37,7 @@ int main(int argc, char** argv) {
     debugShaderProgram = loadShader(test->openglContext, "res/shaders/debugVertexShader.glsl", "res/shaders/debugFragmentShader.glsl", "res/shaders/debugGeometryShader.glsl");
 
     prShaderData* depthShaderProgram = loadShader(test->openglContext, "res/shaders/depthVertexShader.glsl", "res/shaders/depthFragmentShader.glsl", NULL);
+    prShaderData* depth2ShaderProgram = loadShader(test->openglContext, "res/shaders/depthVertexShader.glsl", "res/shaders/depth2FragmentShader.glsl", "res/shaders/depth2FragmentShader.glsl");
 
     prShaderData* skyboxShaderProgram = loadShader(test->openglContext, "res/shaders/skyboxVertexShader.glsl", "res/shaders/skyboxFragmentShader.glsl", NULL);
 
@@ -72,15 +73,33 @@ int main(int argc, char** argv) {
 
     prTextureData* HUDTexture = loadTexture(test->openglContext, PR_FILTER_NEAREST, true, "res/textures/HUD.png");
 
-    depthTextureDepth = prTextureCreate();
+    prTextureData* depthTextureDepth = prTextureCreate();
     prTextureLinkContext(depthTextureDepth, test->openglContext);
-    prTextureUpdate(depthTextureDepth, PR_FORMAT_DEPTH, PR_WRAPPING_EDGE, PR_FILTER_LINEAR, NULL, 0, windowWidth * 4, windowHeight * 4);
+    prTextureUpdate(depthTextureDepth, PR_FORMAT_DEPTH, PR_WRAPPING_EDGE, PR_FILTER_LINEAR, NULL, 0, 8192, 8192);
+    prTextureBorderColor(depthTextureDepth, (GLfloat[]){1.0f, 0.0f, 0.0f, 0.0f});
 
-    framebufferDepth = prFramebufferCreate();
+    prFramebufferData* framebufferDepth = prFramebufferCreate();
     prFramebufferLinkContext(framebufferDepth, test->openglContext);
     prFramebufferLinkDepthTexture(framebufferDepth, depthTextureDepth);
     prFramebufferSetDrawBuffer(framebufferDepth, GL_NONE);
     prFramebufferSetReadBuffer(framebufferDepth, GL_NONE);
+
+    prCubeMapData* depthCubeMapDepth2 = prCubeMapCreate();
+    prCubeMapLinkContext(depthCubeMapDepth2, test->openglContext);
+    prCubeMapUpdateAll(depthCubeMapDepth2,
+        (GLenum[]){PR_FORMAT_DEPTH, PR_FORMAT_DEPTH, PR_FORMAT_DEPTH, PR_FORMAT_DEPTH, PR_FORMAT_DEPTH, PR_FORMAT_DEPTH},
+        PR_WRAPPING_EDGE, PR_FILTER_LINEAR,
+        (GLubyte*[]){NULL, NULL, NULL, NULL, NULL, NULL},
+        (size_t[]){0, 0, 0, 0, 0, 0},
+        (GLsizei[]){1024, 1024, 1024, 1024, 1024, 1024},
+        (GLsizei[]){1024, 1024, 1024, 1024, 1024, 1024});
+    prCubeMapBorderColor(depthCubeMapDepth2, (GLfloat[]){1.0f, 0.0f, 0.0f, 0.0f});
+
+    prFramebufferData* framebufferDepth2 = prFramebufferCreate();
+    prFramebufferLinkContext(framebufferDepth2, test->openglContext);
+    prFramebufferLinkDepthCubeMap(framebufferDepth2, depthCubeMapDepth2);
+    prFramebufferSetDrawBuffer(framebufferDepth2, GL_NONE);
+    prFramebufferSetReadBuffer(framebufferDepth2, GL_NONE);
 
     test->openglContext->Enable(GL_MULTISAMPLE);
     colorRBOMultisampled = prRenderBufferCreate();
@@ -298,12 +317,37 @@ int main(int argc, char** argv) {
 
     mat4 lightProjection;
     glm_ortho(-50.0f, 50.0f, -50.0f, 50.0f, 0.1f, 100.0f, lightProjection);
-
     mat4 lightView;
     glm_lookat((vec3){35.0f, 35.0f, 35.0f}, (vec3){0.0f, 0.0f, 0.0f}, (vec3){0.0f, 1.0f, 0.0f}, lightView);
-
     mat4 lightSpaceMatrix;
     glm_mat4_mul(lightProjection, lightView, lightSpaceMatrix);
+    prShaderSetUniformMatrix4fv(depthShaderProgram, "lightSpaceMatrix", lightSpaceMatrix[0]);
+
+    float aspect = (float)1024 / (float)1024;
+    mat4 light2Projection;
+    glm_perspective(glm_rad(90.0f), aspect, 0.1f, 100.0f, light2Projection);
+    mat4 light2View[6];
+    glm_lookat(point.position, (vec3){point.position[0] + 1.0f, point.position[1], point.position[2]}, (vec3){0.0f, -1.0f, 0.0f}, light2View[0]);
+    glm_lookat(point.position, (vec3){point.position[0] + -1.0f, point.position[1], point.position[2]}, (vec3){0.0f, -1.0f, 0.0f}, light2View[1]);
+    glm_lookat(point.position, (vec3){point.position[0], point.position[1] + 1.0f, point.position[2]}, (vec3){0.0f, 0.0f, 1.0f}, light2View[2]);
+    glm_lookat(point.position, (vec3){point.position[0], point.position[1] + -1.0f, point.position[2]}, (vec3){0.0f, 0.0f, -1.0f}, light2View[3]);
+    glm_lookat(point.position, (vec3){point.position[0], point.position[1], point.position[2] + 1.0f}, (vec3){0.0f, -1.0f, 0.0f}, light2View[4]);
+    glm_lookat(point.position, (vec3){point.position[0], point.position[1], point.position[2] + -1.0f}, (vec3){0.0f, -1.0f, 0.0f}, light2View[5]);
+    mat4 light2SpaceMatrix[6];
+    glm_mat4_mul(light2Projection, light2View[0], light2SpaceMatrix[0]);
+    glm_mat4_mul(light2Projection, light2View[1], light2SpaceMatrix[1]);
+    glm_mat4_mul(light2Projection, light2View[2], light2SpaceMatrix[2]);
+    glm_mat4_mul(light2Projection, light2View[3], light2SpaceMatrix[3]);
+    glm_mat4_mul(light2Projection, light2View[4], light2SpaceMatrix[4]);
+    glm_mat4_mul(light2Projection, light2View[5], light2SpaceMatrix[5]);
+    prShaderSetUniformMatrix4fv(depth2ShaderProgram, "lightSpaceMatrices[0]", light2SpaceMatrix[0][0]);
+    prShaderSetUniformMatrix4fv(depth2ShaderProgram, "lightSpaceMatrices[1]", light2SpaceMatrix[1][0]);
+    prShaderSetUniformMatrix4fv(depth2ShaderProgram, "lightSpaceMatrices[2]", light2SpaceMatrix[2][0]);
+    prShaderSetUniformMatrix4fv(depth2ShaderProgram, "lightSpaceMatrices[3]", light2SpaceMatrix[3][0]);
+    prShaderSetUniformMatrix4fv(depth2ShaderProgram, "lightSpaceMatrices[4]", light2SpaceMatrix[4][0]);
+    prShaderSetUniformMatrix4fv(depth2ShaderProgram, "lightSpaceMatrices[5]", light2SpaceMatrix[5][0]);
+    prShaderSetUniform3f(depth2ShaderProgram, "lightPosition", point.position[0], point.position[1], point.position[2]);
+    prShaderSetUniform1f(depth2ShaderProgram, "farPlane", 100.0f);
 
     test->openglContext->Enable(GL_DEPTH_TEST);
     test->openglContext->Enable(GL_CULL_FACE);
@@ -333,7 +377,7 @@ int main(int argc, char** argv) {
 
         mat4 translation;
 
-        vec3 rotation = {radians(yaw), radians(pitch), radians(0.0f)};
+        vec3 rotation = {glm_rad(yaw), glm_rad(pitch), glm_rad(0.0f)};
         prCameraUpdate(camera, cameraPosition, rotation, 45.0f, 0.1f, 1500.0f);
 
         prShaderData* currentShaderProgram = (useDebugShader ? debugShaderProgram : shaderProgram);
@@ -341,8 +385,6 @@ int main(int argc, char** argv) {
         static float seed = 0;
         seed += deltaTime;
         float smoothSinOverTime = sin(seed);
-
-        prShaderSetUniformMatrix4fv(depthShaderProgram, "lightSpaceMatrix", lightSpaceMatrix[0]);
 
         prShaderSetUniform3f(currentShaderProgram, "directionalLights[0].direction", sun.direction[0], sun.direction[1], sun.direction[2]);
         prShaderSetUniform3f(currentShaderProgram, "directionalLights[0].ambient", sun.ambient[0], sun.ambient[1], sun.ambient[2]);
@@ -363,43 +405,73 @@ int main(int argc, char** argv) {
         prShaderSetUniformMatrix4fv(currentShaderProgram, "projection", camera->projection[0]);
         prShaderSetUniformMatrix4fv(currentShaderProgram, "lightSpaceMatrix", lightSpaceMatrix[0]);
 
-        for(int i = 0; i < 2; i++) {
-            prFramebufferBind((i == 0 ? framebufferDepth : framebufferMultisampled));
-            currentShaderProgram = (i == 0 ? depthShaderProgram : (useDebugShader ? debugShaderProgram : shaderProgram));
-            test->openglContext->Viewport(0, 0, (i == 0 ? windowWidth * 4 : windowWidth), (i == 0 ? windowHeight * 4 : windowHeight));
+        for(int i = 0; i < 3; i++) {
+            switch(i) {
+                case 0:
+                    prFramebufferBind(framebufferDepth);
+                    currentShaderProgram = depthShaderProgram;
+                    test->openglContext->Viewport(0, 0, 8192, 8192);
+                    break;
+
+                case 1:
+                    prFramebufferBind(framebufferDepth2);
+                    currentShaderProgram = depth2ShaderProgram;
+                    test->openglContext->Viewport(0, 0, 1024, 1024);
+                    break;
+
+                case 2:
+                    prFramebufferBind(framebufferMultisampled);
+                    currentShaderProgram = (useDebugShader ? debugShaderProgram : shaderProgram);
+                    test->openglContext->Viewport(0, 0, windowWidth, windowHeight);
+                    break;
+            }
 
             translationsToMatrix(translation, (vec3){0.0f, 0.0f, -20.0f}, GLM_VEC3_ZERO, (vec3){30.0f, 30.0f, 10.0f});
-            bindMaterial(&materialMetal, currentShaderProgram);
+            if(i == 2) {
+                bindMaterial(&materialMetal, currentShaderProgram);
+            }
             prShaderSetUniformMatrix4fv(currentShaderProgram, "translation", translation[0]);
             prMeshDrawIndices(meshCube);
 
             translationsToMatrix(translation, (vec3){0.0f, -20.0f, 0.0f}, GLM_VEC3_ZERO, (vec3){30.0f, 10.0f, 30.0f});
-            bindMaterial(&materialMetal, currentShaderProgram);
+            if(i == 2) {
+                bindMaterial(&materialMetal, currentShaderProgram);
+            }
             prShaderSetUniformMatrix4fv(currentShaderProgram, "translation", translation[0]);
             prMeshDrawIndices(meshCube);
 
             translationsToMatrix(translation, (vec3){-20.0f, 0.0f, 0.0f}, GLM_VEC3_ZERO, (vec3){10.0f, 30.0f, 30.0f});
-            bindMaterial(&materialMetal, currentShaderProgram);
+            if(i == 2) {
+                bindMaterial(&materialMetal, currentShaderProgram);
+            }
             prShaderSetUniformMatrix4fv(currentShaderProgram, "translation", translation[0]);
             prMeshDrawIndices(meshCube);
 
             translationsToMatrix(translation, (vec3){1.0f, 0.0f, 0.0f}, (vec3){0.0f, smoothSinOverTime, 0.0f}, GLM_VEC3_ONE);
-            bindMaterial(&materialWood, currentShaderProgram);
+            if(i == 2) {
+                bindMaterial(&materialWood, currentShaderProgram);
+            }
             prShaderSetUniformMatrix4fv(currentShaderProgram, "translation", translation[0]);
             prMeshDrawIndices(meshCube);
 
             translationsToMatrix(translation, (vec3){-1.0f, 0.0f, 0.0f}, (vec3){0.0f, smoothSinOverTime, 0.0f}, GLM_VEC3_ONE);
-            bindMaterial(&materialWoodMetal, currentShaderProgram);
+            if(i == 2) {
+                bindMaterial(&materialWoodMetal, currentShaderProgram);
+            }
             prShaderSetUniformMatrix4fv(currentShaderProgram, "translation", translation[0]);
             prMeshDrawIndices(meshCube);
 
             translationsToMatrix(translation, (vec3){0.0f, 1.5f, 0.0f}, (vec3){0.0f, smoothSinOverTime, 0.0f}, GLM_VEC3_ONE);
-            bindMaterial(&materialBrick, currentShaderProgram);
+            if(i == 2) {
+                bindMaterial(&materialBrick, currentShaderProgram);
+            }
             prShaderSetUniformMatrix4fv(currentShaderProgram, "translation", translation[0]);
             prMeshDrawIndices(meshCube);
 
-            translationsToMatrix(translation, (vec3){0.0f, smoothSinOverTime / 3.5f - 1.5f, 0.0f}, (vec3){0.0f, radians(smoothSinOverTime * 100.0f), 0.0f}, GLM_VEC3_ONE);
-            bindMaterial(&defaultMaterial, currentShaderProgram);
+            translationsToMatrix(translation, (vec3){0.0f, smoothSinOverTime / 3.5f - 1.5f, 0.0f}, (vec3){0.0f, glm_rad(smoothSinOverTime * 100.0f), 0.0f}, GLM_VEC3_ONE);
+            if(i == 2) {
+                bindMaterial(&defaultMaterial, currentShaderProgram);
+            }
             prShaderSetUniformMatrix4fv(currentShaderProgram, "translation", translation[0]);
             prMeshDrawIndices(meshCube);
         }
@@ -494,6 +566,10 @@ int main(int argc, char** argv) {
     depthStencilRBOMultisampled = NULL;
     prRenderBufferDestroy(colorRBOMultisampled);
     colorRBOMultisampled = NULL;
+    prFramebufferDestroy(framebufferDepth2);
+    framebufferDepth2 = NULL;
+    prCubeMapDestroy(depthCubeMapDepth2);
+    depthCubeMapDepth2 = NULL;
     prFramebufferDestroy(framebufferDepth);
     framebufferDepth = NULL;
     prTextureDestroy(depthTextureDepth);
@@ -544,6 +620,8 @@ int main(int argc, char** argv) {
     hudShaderProgram = NULL;
     prShaderDestroy(skyboxShaderProgram);
     skyboxShaderProgram = NULL;
+    prShaderDestroy(depth2ShaderProgram);
+    depth2ShaderProgram = NULL;
     prShaderDestroy(depthShaderProgram);
     depthShaderProgram = NULL;
     prShaderDestroy(debugShaderProgram);

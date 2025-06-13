@@ -228,8 +228,6 @@ bool showPostProcessing = 1;
 bool useDebugShader = false;
 prShaderData* debugShaderProgram = NULL;
 prComputeShaderData* computeShaderProgram = NULL;
-prTextureData* depthTextureDepth = NULL;
-prFramebufferData* framebufferDepth = NULL;
 prRenderBufferData* colorRBOMultisampled = NULL;
 prRenderBufferData* depthStencilRBOMultisampled = NULL;
 prFramebufferData* framebufferMultisampled = NULL;
@@ -238,7 +236,7 @@ prTextureData* colorTexture = NULL;
 prRenderBufferData* depthStencilRBO = NULL;
 prFramebufferData* framebuffer = NULL;
 
-#define SAMPLES 8
+#define SAMPLES 4
 #define DEF_WIDTH 1280
 #define DEF_HEIGHT 720
 int windowWidth = DEF_WIDTH;

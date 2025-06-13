@@ -99,6 +99,7 @@ void i_prTextureCreateOnGPU(prTextureData* texture) {
     }
 
     i_prTextureSetDataOnGPU(texture);
+    i_prTextureUpdateBorderColorOnGPU(texture);
 }
 
 void i_prTextureDestroyOnGPU(prTextureData* texture) {
@@ -116,4 +117,17 @@ void i_prTextureUpdateOnGPU(prTextureData* texture) {
     }
 
     i_prTextureSetDataOnGPU(texture);
+    i_prTextureUpdateBorderColorOnGPU(texture);
+}
+
+void i_prTextureUpdateBorderColorOnGPU(prTextureData* texture) {
+    prLogEvent(PR_EVENT_DATA, PR_LOG_TRACE, "i_prTextureUpdateBorderColorOnGPU: Updating texture border color (R: %f G: %f B: %f A: %f)",
+        texture->borderColor[0], texture->borderColor[1], texture->borderColor[2], texture->borderColor[3]);
+
+    if(!texture->TBO) {
+        prLogEvent(PR_EVENT_OPENGL, PR_LOG_WARNING, "i_prTextureUpdateBorderColorOnGPU: Failed to update texture buffer object, invalid ID. Aborting operation, nothing was modified");
+        return;
+    }
+
+    texture->context->TextureParameterfv(texture->TBO, GL_TEXTURE_BORDER_COLOR, texture->borderColor);
 }

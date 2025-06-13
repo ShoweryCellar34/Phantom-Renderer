@@ -2,6 +2,7 @@
 
 #include <PR/logger.h>
 #include <PR/texture.h>
+#include <PR/cubeMap.h>
 #include <PR/renderbuffer.h>
 
 void i_prFramebufferCreateOnGPU(prFramebufferData* framebuffer) {
@@ -29,27 +30,27 @@ void i_prFramebufferUpdateBuffers(prFramebufferData* framebuffer) {
 }
 
 void i_prFramebufferSetDataOnGPU(prFramebufferData* framebuffer) {
-    i_prFramebufferSetAttachment(framebuffer, framebuffer->colorTexture, framebuffer->colorRBO, GL_COLOR_ATTACHMENT0);
-    i_prFramebufferSetAttachment(framebuffer, framebuffer->depthTexture, framebuffer->depthRBO, GL_DEPTH_ATTACHMENT);
-    i_prFramebufferSetAttachment(framebuffer, framebuffer->stencilTexture, framebuffer->stencilRBO, GL_STENCIL_ATTACHMENT);
-    i_prFramebufferSetAttachment(framebuffer, framebuffer->depthStencilTexture, framebuffer->depthStencilRBO, GL_DEPTH_STENCIL_ATTACHMENT);
+    i_prFramebufferSetAttachment(framebuffer, framebuffer->colorTexture, framebuffer->colorCubeMap, framebuffer->colorRBO, GL_COLOR_ATTACHMENT0);
+    i_prFramebufferSetAttachment(framebuffer, framebuffer->depthTexture, framebuffer->depthCubeMap, framebuffer->depthRBO, GL_DEPTH_ATTACHMENT);
+    i_prFramebufferSetAttachment(framebuffer, framebuffer->stencilTexture, framebuffer->stencilCubeMap, framebuffer->stencilRBO, GL_STENCIL_ATTACHMENT);
+    i_prFramebufferSetAttachment(framebuffer, framebuffer->depthStencilTexture, framebuffer->depthStencilCubeMap, framebuffer->depthStencilRBO, GL_DEPTH_STENCIL_ATTACHMENT);
 }
 
-void i_prFramebufferSetAttachment(prFramebufferData* framebuffer, prTextureData* texture, prRenderBufferData* renderbuffer, GLenum attachment) {
+void i_prFramebufferSetAttachment(prFramebufferData* framebuffer, prTextureData* texture, prCubeMapData* cubeMap, prRenderBufferData* renderbuffer, GLenum attachment) {
     if(texture) {
         if(texture->TBO) {
-            if(texture->context != framebuffer->context) {
-                prLogEvent(PR_EVENT_OPENGL, PR_LOG_ERROR, "i_prFramebufferSetAttachment: Texture context does not match framebuffer context, binding ID 0");
-            }
             framebuffer->context->NamedFramebufferTexture(framebuffer->FBO, attachment, texture->TBO, 0);
+        }
+    }
+
+    if(cubeMap) {
+        if(cubeMap->TBO) {
+            framebuffer->context->NamedFramebufferTexture(framebuffer->FBO, attachment, cubeMap->TBO, 0);
         }
     }
 
     if(renderbuffer) {
         if(renderbuffer->RBO) {
-            if(renderbuffer->context != framebuffer->context) {
-                prLogEvent(PR_EVENT_OPENGL, PR_LOG_ERROR, "i_prFramebufferSetAttachment: Renderbuffer context does not match framebuffer context, binding ID 0");
-            }
             framebuffer->context->NamedFramebufferRenderbuffer(framebuffer->FBO, attachment, GL_RENDERBUFFER, renderbuffer->RBO);
         }
     }

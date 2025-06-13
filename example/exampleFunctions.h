@@ -1,6 +1,5 @@
 #pragma once
 
-#define M_PI 3.14159265358979323846
 #include <math.h>
 #include <time.h>
 #include <string.h>
@@ -107,8 +106,6 @@ void framebufferSizeCallback(GLFWwindow* window, int width, int height) {
     context->Viewport(0, 0, windowWidth, windowHeight);
     prCameraUpdateDimentions(camera);
 
-    prTextureUpdate(depthTextureDepth, PR_FORMAT_DEPTH, PR_WRAPPING_EDGE, PR_FILTER_LINEAR, NULL, 0, windowWidth * 4, windowHeight * 4);
-
     prRenderBufferUpdate(colorRBOMultisampled, PR_FORMAT_RGBA, windowWidth, windowHeight, SAMPLES);
     prRenderBufferUpdate(depthStencilRBOMultisampled, PR_FORMAT_DEPTH_STENCIL, windowWidth, windowHeight, SAMPLES);
 
@@ -212,10 +209,6 @@ void translationsToMatrix(mat4 matrix, vec3 position, vec3 rotation, vec3 scale)
     glm_rotate(matrix, rotation[1], (vec3){0.0f, 1.0f, 0.0f});
     glm_rotate(matrix, rotation[0], (vec3){1.0f, 0.0f, 0.0f});
     glm_scale(matrix, scale);
-}
-
-float radians(float degrees) {
-    return degrees * (M_PI / 180);
 }
 
 void bindMaterial(materialData* material, prShaderData* shaderProgram) {
