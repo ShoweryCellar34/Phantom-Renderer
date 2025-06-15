@@ -30,4 +30,4 @@ void prCubeMapUpdate(prCubeMapData* cubeMap, int side, GLenum format, GLint wrap
 
 void prCubeMapBorderColor(prCubeMapData* cubeMap, GLfloat borderColor[4]);
 
-void prCubeMapBindTexture(prCubeMapData* cubeMap, unsigned int unit);
+void prCubeMapBindTexture(prCubeMapData* cubeMap, GLuint unit);

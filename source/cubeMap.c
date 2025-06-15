@@ -272,7 +272,7 @@ void prCubeMapBorderColor(prCubeMapData* cubeMap, GLfloat borderColor[4]) {
     }
 }
 
-void prCubeMapBindTexture(prCubeMapData* cubeMap, unsigned int unit) {
+void prCubeMapBindTexture(prCubeMapData* cubeMap, GLuint unit) {
     if(!cubeMap->context) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prCubeMapBindTexture: Attempt to bind cube map without OpenGL context. Aborting operation");
         return;

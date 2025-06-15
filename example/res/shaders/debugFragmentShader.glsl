@@ -22,6 +22,8 @@ struct Material {
 uniform Material material;
 
 uniform sampler2D shadowMap;
+uniform float farPlane;
+uniform samplerCube shadowMap2;
 
 struct directionalLight {
     vec3 direction;
@@ -47,7 +49,7 @@ struct pointLight {
 #define NR_POINT_LIGHTS 1
 uniform pointLight pointLights[NR_POINT_LIGHTS];
 
-float shadowCalculation(vec4 fragmentPositionLightSpace, float bias) {
+float directonalShadowCalculation(vec4 fragmentPositionLightSpace, float bias) {
     vec3 projectedCoordinates = fragmentPositionLightSpace.xyz / fragmentPositionLightSpace.w;
     projectedCoordinates = projectedCoordinates * 0.5 + 0.5;
 
@@ -70,6 +72,19 @@ float shadowCalculation(vec4 fragmentPositionLightSpace, float bias) {
     return shadow;
 }
 
+float pointShadowCalculation(vec3 fragmentPosition) {
+    vec3 fragmentToLight = fragmentPosition - pointLights[0].position;
+    float closestDepth = texture(shadowMap2, fragmentToLight).r;
+    closestDepth *= farPlane;
+
+    float currentDepth = length(fragmentToLight);
+
+    float bias = 0.005;
+    float shadow = currentDepth - bias > closestDepth ? 1.0 : 0.0;
+
+    return shadow;
+}
+
 vec3 calculateDirectionalLight(directionalLight light, vec3 viewDirection, vec3 ambient, vec3 diffuse, vec3 specular, vec3 normal, float shadow) {
     vec3 lightDir = normalize(-light.direction);
 
@@ -85,7 +100,7 @@ vec3 calculateDirectionalLight(directionalLight light, vec3 viewDirection, vec3 
     return ambientOutput + diffuseOutput + specularOutput;
 }
 
-vec3 calculatePointLight(pointLight light, vec3 viewDirection, vec3 fragmentPosition, vec3 ambient, vec3 diffuse, vec3 specular, vec3 normal) {
+vec3 calculatePointLight(pointLight light, vec3 viewDirection, vec3 fragmentPosition, vec3 ambient, vec3 diffuse, vec3 specular, vec3 normal, float shadow) {
     vec3 lightDir = normalize(light.position - fragmentPosition);
 
     float difference = max(dot(normal, lightDir), 0.0);
@@ -98,8 +113,8 @@ vec3 calculatePointLight(pointLight light, vec3 viewDirection, vec3 fragmentPosi
                 light.quadratic * (distance * distance));    
 
     vec3 ambientOutput = light.ambient * ambient;
-    vec3 diffuseOutput = light.diffuse * difference * diffuse;
-    vec3 specularOutput = light.specular * spec * specular;
+    vec3 diffuseOutput = light.diffuse * difference * diffuse * (1.0 - shadow);
+    vec3 specularOutput = light.specular * spec * specular * (1.0 - shadow);
     ambientOutput *= attenuation;
     diffuseOutput *= attenuation;
     specularOutput *= attenuation;
@@ -114,12 +129,13 @@ vec3 calculateShadedResult(vec3 ambient, vec3 diffuse, vec3 specular, vec3 norma
 
     for(int i = 0; i < NR_DIRECTIONAL_LIGHTS; i++) {
         float bias = max(0.05 * (1.0 - dot(normal, normalize(-directionalLights[i].direction))), 0.005);
-        float shadow = shadowCalculation(geometryOut.fragmentPositionLightSpace, bias);
+        float shadow = directonalShadowCalculation(geometryOut.fragmentPositionLightSpace, bias);
         result += calculateDirectionalLight(directionalLights[i], viewDirection, ambient, diffuse, specular, normal, shadow);
     }
 
     for(int i = 0; i < NR_POINT_LIGHTS; i++) {
-        result += calculatePointLight(pointLights[i], viewDirection, geometryOut.fragmentPosition, ambient, diffuse, specular, normal);
+        float shadow = pointShadowCalculation(geometryOut.fragmentPosition);
+        result += calculatePointLight(pointLights[i], viewDirection, geometryOut.fragmentPosition, ambient, diffuse, specular, normal, shadow);
     }
 
     return result;
