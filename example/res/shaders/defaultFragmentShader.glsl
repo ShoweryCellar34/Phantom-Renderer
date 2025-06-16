@@ -21,8 +21,6 @@ struct Material {
 uniform Material material;
 
 uniform sampler2D shadowMap;
-uniform float farPlane;
-uniform samplerCube shadowMap2;
 
 struct directionalLight {
     vec3 direction;
@@ -30,6 +28,8 @@ struct directionalLight {
     vec3 ambient;
     vec3 diffuse;
     vec3 specular;
+
+    sampler2D shadowMap;
 };
 #define NR_DIRECTIONAL_LIGHTS 1
 uniform directionalLight directionalLights[NR_DIRECTIONAL_LIGHTS];
@@ -44,21 +44,24 @@ struct pointLight {
     vec3 ambient;
     vec3 diffuse;
     vec3 specular;
+
+    samplerCube shadowMap;
+    float farPlane;
 };
 #define NR_POINT_LIGHTS 1
 uniform pointLight pointLights[NR_POINT_LIGHTS];
 
-float directonalShadowCalculation(vec4 fragmentPositionLightSpace, float bias) {
+float directonalShadowCalculation(directionalLight light, vec4 fragmentPositionLightSpace, float bias) {
     vec3 projectedCoordinates = fragmentPositionLightSpace.xyz / fragmentPositionLightSpace.w;
     projectedCoordinates = projectedCoordinates * 0.5 + 0.5;
 
     float currentDepth = projectedCoordinates.z;
 
     float shadow = 0.0;
-    vec2 texelSize = 1.0 / textureSize(shadowMap, 0);
+    vec2 texelSize = 1.0 / textureSize(light.shadowMap, 0);
     for(int x = -1; x <= 1; ++x) {
         for(int y = -1; y <= 1; ++y) {
-            float pcfDepth = texture(shadowMap, projectedCoordinates.xy + vec2(x, y) * texelSize).r;
+            float pcfDepth = texture(light.shadowMap, projectedCoordinates.xy + vec2(x, y) * texelSize).r;
             shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;
         }
     }
@@ -71,15 +74,29 @@ float directonalShadowCalculation(vec4 fragmentPositionLightSpace, float bias) {
     return shadow;
 }
 
-float pointShadowCalculation(vec3 fragmentPosition) {
-    vec3 fragmentToLight = fragmentPosition - pointLights[0].position;
-    float closestDepth = texture(shadowMap2, fragmentToLight).r;
-    closestDepth *= farPlane;
+float pointShadowCalculation(pointLight light, vec3 fragmentPosition, float bias) {
+    vec3 fragmentToLight = fragmentPosition - light.position;
 
     float currentDepth = length(fragmentToLight);
 
-    float bias = 0.005;
-    float shadow = currentDepth - bias > closestDepth ? 1.0 : 0.0;
+    vec3 sampleOffsetDirections[20] = vec3[] (
+        vec3(1, 1, 1), vec3(1, -1, 1), vec3(-1, -1, 1), vec3(-1, 1, 1),
+        vec3(1, 1,-1), vec3(1, -1, -1), vec3(-1, -1, -1), vec3(-1, 1, -1),
+        vec3(1, 1, 0), vec3(1, -1, 0), vec3(-1, -1, 0), vec3(-1, 1, 0),
+        vec3(1, 0, 1), vec3(-1, 0, 1), vec3(1, 0, -1), vec3(-1, 0, -1),
+        vec3(0, 1, 1), vec3(0, -1, 1), vec3(0, -1, -1), vec3(0, 1, -1)
+    );
+    int samples = 20;
+    float viewDistance = length(cameraPosition - fragmentPosition);
+    float diskRadius = (1.0 + (viewDistance / light.farPlane)) / 25.0;
+
+    float shadow = 0.0;
+    for(int i = 0; i < samples; ++i) {
+        float closestDepth = texture(light.shadowMap, fragmentToLight + sampleOffsetDirections[i] * diskRadius).r; 
+        closestDepth *= light.farPlane;
+        shadow += currentDepth - bias > closestDepth ? 1.0 : 0.0;
+    }
+    shadow /= float(samples);
 
     return shadow;
 }
@@ -128,12 +145,13 @@ vec3 calculateShadedResult(vec3 ambient, vec3 diffuse, vec3 specular, vec3 norma
 
     for(int i = 0; i < NR_DIRECTIONAL_LIGHTS; i++) {
         float bias = max(0.05 * (1.0 - dot(normal, normalize(-directionalLights[i].direction))), 0.005);
-        float shadow = directonalShadowCalculation(geometryOut.fragmentPositionLightSpace, bias);
+        float shadow = directonalShadowCalculation(directionalLights[i], geometryOut.fragmentPositionLightSpace, bias);
         result += calculateDirectionalLight(directionalLights[i], viewDirection, ambient, diffuse, specular, normal, shadow);
     }
 
     for(int i = 0; i < NR_POINT_LIGHTS; i++) {
-        float shadow = pointShadowCalculation(geometryOut.fragmentPosition);
+        float bias = 0.005;
+        float shadow = pointShadowCalculation(pointLights[i], geometryOut.fragmentPosition, bias);
         result += calculatePointLight(pointLights[i], viewDirection, geometryOut.fragmentPosition, ambient, diffuse, specular, normal, shadow);
     }
 

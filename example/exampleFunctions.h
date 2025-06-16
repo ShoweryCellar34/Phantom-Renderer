@@ -220,6 +220,7 @@ void bindMaterial(materialData* material, prShaderData* shaderProgram) {
     prShaderSetUniform1i(shaderProgram, "material.ambient", 0);
     prShaderSetUniform1i(shaderProgram, "material.diffuse", 1);
     prShaderSetUniform1i(shaderProgram, "material.specular", 2);
+    prShaderSetUniform1i(shaderProgram, "material.normal", 3);
     prShaderSetUniform1f(shaderProgram, "material.shininess", material->shininess);
 }
 

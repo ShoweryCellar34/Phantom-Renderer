@@ -57,11 +57,9 @@ int main(int argc, char** argv) {
 
     prTextureData* steelNormal = loadTexture(test->openglContext, PR_FILTER_LINEAR, false, "res/textures/steelNormal.png");
 
-    prTextureData* brickWallDiffuseTexture = loadTexture(test->openglContext, PR_FILTER_LINEAR, true, "res/textures/brickWallDiffuse.tga");
+    prTextureData* brickWallDiffuseTexture = loadTexture(test->openglContext, PR_FILTER_LINEAR, true, "res/textures/brickwall.jpg");
 
-    prTextureData* brickWallNormalTexture = loadTexture(test->openglContext, PR_FILTER_LINEAR, false, "res/textures/brickWallNormal.tga");
-
-    prTextureData* brickWallSpecularTexture = loadTexture(test->openglContext, PR_FILTER_LINEAR, false, "res/textures/brickWallSpecular.png");
+    prTextureData* brickWallNormalTexture = loadTexture(test->openglContext, PR_FILTER_LINEAR, false, "res/textures/brickwall_normal.jpg");
 
     prTextureData* blackTexture = makeTextureSingleColor(test->openglContext, (float[4]){0.0f, 0.0f, 0.0f, 1.0f});
 
@@ -179,15 +177,6 @@ int main(int argc, char** argv) {
         48.0f
     };
 
-    skyboxMaterialData materialSkybox = {
-        defaultTexture,
-        defaultTexture,
-        defaultTexture,
-        defaultTexture,
-        defaultTexture,
-        defaultTexture
-    };
-
     materialData materialWhite = {
         whiteTexture,
         whiteTexture,
@@ -223,7 +212,7 @@ int main(int argc, char** argv) {
     materialData materialBrick = {
         brickWallDiffuseTexture,
         brickWallDiffuseTexture,
-        brickWallSpecularTexture,
+        blackTexture,
         brickWallNormalTexture,
         32.0f
     };
@@ -281,13 +270,16 @@ int main(int argc, char** argv) {
         vec3 ambient;
         vec3 diffuse;
         vec3 specular;
+
+        GLuint shadowMap;
     } directionalLightData;
 
     directionalLightData sun = {
         {-0.25f, -0.5f, -0.75f},
         {0.02f, 0.015f, 0.015f},
         {0.6f, 0.6f, 0.55f},
-        {0.8f, 0.8f, 0.75f}
+        {0.8f, 0.8f, 0.75f},
+        4
     };
 
     typedef struct pointLightData {
@@ -300,6 +292,9 @@ int main(int argc, char** argv) {
         vec3 ambient;
         vec3 diffuse;
         vec3 specular;
+
+        GLuint shadowMap;
+        float farPlane;
     } pointLightData;
 
     pointLightData point = {
@@ -309,7 +304,9 @@ int main(int argc, char** argv) {
         {0.0f, 0.0f, 0.0f},
         {0.0f, 0.0f, 0.0f},
         {0.0f, 0.0f, 1.0f},
-        {1.0f, 0.0f, 0.0f}
+        {1.0f, 0.0f, 0.0f},
+        5,
+        100.0f
     };
 
     camera = prCameraCreate();
@@ -322,8 +319,6 @@ int main(int argc, char** argv) {
     mat4 lightSpaceMatrix;
     glm_mat4_mul(lightProjection, lightView, lightSpaceMatrix);
     prShaderSetUniformMatrix4fv(depthShaderProgram, "lightSpaceMatrix", lightSpaceMatrix[0]);
-    prShaderSetUniform1f(shaderProgram, "farPlane", 100.0f);
-    prShaderSetUniform1f(debugShaderProgram, "farPlane", 100.0f);
 
     float aspect = (float)1024 / (float)1024;
     mat4 light2Projection;
@@ -357,13 +352,6 @@ int main(int argc, char** argv) {
 
     glfwMaximizeWindow(test->window);
 
-    prTextureBindTexture(depthTextureDepth, 4);
-    prShaderSetUniform1i(shaderProgram, "shadowMap", 4);
-    prShaderSetUniform1i(debugShaderProgram, "shadowMap", 4);
-    prCubeMapBindTexture(depthCubeMapDepth2, 5);
-    prShaderSetUniform1i(shaderProgram, "shadowMap2", 5);
-    prShaderSetUniform1i(debugShaderProgram, "shadowMap2", 5);
-
     prShaderSetUniform2f(debugShaderProgram, "screenSize", windowWidth, windowHeight);
 
     while(!glfwWindowShouldClose(test->window)) {
@@ -396,15 +384,19 @@ int main(int argc, char** argv) {
         prShaderSetUniform3f(currentShaderProgram, "directionalLights[0].ambient", sun.ambient[0], sun.ambient[1], sun.ambient[2]);
         prShaderSetUniform3f(currentShaderProgram, "directionalLights[0].diffuse", sun.diffuse[0], sun.diffuse[1], sun.diffuse[2]);
         prShaderSetUniform3f(currentShaderProgram, "directionalLights[0].specular", sun.specular[0], sun.specular[1], sun.specular[2]);
+        prTextureBindTexture(depthTextureDepth, sun.shadowMap);
+        prShaderSetUniform1i(currentShaderProgram, "directionalLights[0].shadowMap", sun.shadowMap);
 
         prShaderSetUniform1f(currentShaderProgram, "pointLights[0].constant", point.constant);
         prShaderSetUniform1f(currentShaderProgram, "pointLights[0].linear", point.linear);
         prShaderSetUniform1f(currentShaderProgram, "pointLights[0].quadratic", point.quadratic);
-
         prShaderSetUniform3f(currentShaderProgram, "pointLights[0].position", point.position[0], point.position[1], point.position[2]);
         prShaderSetUniform3f(currentShaderProgram, "pointLights[0].ambient", point.ambient[0], point.ambient[1], point.ambient[2]);
         prShaderSetUniform3f(currentShaderProgram, "pointLights[0].diffuse", point.diffuse[0], point.diffuse[1], point.diffuse[2]);
         prShaderSetUniform3f(currentShaderProgram, "pointLights[0].specular", point.specular[0], point.specular[1], point.specular[2]);
+        prCubeMapBindTexture(depthCubeMapDepth2, point.shadowMap);
+        prShaderSetUniform1i(currentShaderProgram, "pointLights[0].shadowMap", point.shadowMap);
+        prShaderSetUniform1f(currentShaderProgram, "pointLights[0].farPlane", point.farPlane);
 
         prShaderSetUniform3f(currentShaderProgram, "cameraPosition", camera->position[0], camera->position[1], camera->position[2]);
         prShaderSetUniformMatrix4fv(currentShaderProgram, "view", camera->view[0]);
@@ -612,8 +604,6 @@ int main(int argc, char** argv) {
     blackTexture = NULL;
     prTextureDestroy(brickWallNormalTexture);
     brickWallNormalTexture = NULL;
-    prTextureDestroy(brickWallSpecularTexture);
-    brickWallSpecularTexture = NULL;
     prTextureDestroy(brickWallDiffuseTexture);
     brickWallDiffuseTexture = NULL;
     prTextureDestroy(steelTexture);
