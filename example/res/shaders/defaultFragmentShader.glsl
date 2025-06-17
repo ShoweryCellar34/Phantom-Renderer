@@ -6,8 +6,8 @@ uniform mat4 translation;
 
 in GEOMETRY_OUT {
     vec3 fragmentPosition;
-    vec3 normals;
     vec2 textureCoordinates;
+    mat4 TBN;
     vec4 fragmentPositionLightSpace;
 } geometryOut;
 
@@ -163,7 +163,8 @@ void main() {
     vec3 diffuse = texture(material.diffuse, geometryOut.textureCoordinates).rgb;
     vec3 specular = texture(material.specular, geometryOut.textureCoordinates).rgb;
     vec3 normal = normalize(texture(material.normal, geometryOut.textureCoordinates).rgb);
-    normal = normalize(geometryOut.normals);
+    normal = normalize(normal * 2.0 - 1.0);
+    normal = normalize(geometryOut.TBN * normal);
 
     fragmentColor = vec4(calculateShadedResult(ambient, diffuse, specular, normal), 1.0);
 }

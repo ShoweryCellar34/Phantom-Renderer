@@ -164,7 +164,7 @@ void main() {
     vec3 diffuse = texture(material.diffuse, geometryOut.textureCoordinates).rgb;
     vec3 specular = texture(material.specular, geometryOut.textureCoordinates).rgb;
     vec3 normal = normalize(texture(material.normal, geometryOut.textureCoordinates).rgb);
-    normal = normalize(geometryOut.normals);
+    normal = normalize(normal * 2.0 - 1.0);
 
     vec4 result = vec4(0.0, 0.0, 0.0, 1.0);
     if(gl_FragCoord.x > screenSize.x / 2 && gl_FragCoord.y > screenSize.y / 2) {
