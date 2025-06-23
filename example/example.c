@@ -43,7 +43,7 @@ int main(int argc, char** argv) {
 
     prShaderData* hudShaderProgram = loadShader(test->openglContext, "res/shaders/HUDVertexShader.glsl", "res/shaders/HUDFragmentShader.glsl", NULL);
 
-    computeShaderProgram = loadComputeShader(test->openglContext, "res/shaders/HUDComputeShader.glsl");
+    computeShaderProgram = loadComputeShader(test->openglContext, "res/shaders/postProcessingComputeShader.glsl");
 
     prTextureData* defaultTexture = makeTextureCheckerboard(test->openglContext, 8, (float[4]){1.0f, 0.0f, 1.0f, 1.0f}, (float[4]){0.0f, 0.0f, 0.0f, 1.0f});
 
@@ -241,18 +241,13 @@ int main(int argc, char** argv) {
         0.0f
     };
 
-    cubeData = computeGPUReadyBuffer(&cubeDataSize,
-        vertices, sizeof(vertices) / sizeof(float),
-        normals, sizeof(normals) / sizeof(float),
-        textureCoordinates, sizeof(textureCoordinates) / sizeof(float)
-    );
-    indicesSize = sizeof(indices);
-
     prMeshData* meshCube = prMeshCreate();
     prMeshLinkContext(meshCube, test->openglContext);
-    prMeshSetVertexAttribute(meshCube, 0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (void*)(0 * sizeof(GLfloat)));
-    prMeshSetVertexAttribute(meshCube, 1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (void*)(6 * sizeof(GLfloat)));
-    prMeshSetVertexAttribute(meshCube, 2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
+    prMeshSetVertexAttribute(meshCube, 0, 3, GL_FLOAT, GL_FALSE, 14 * sizeof(GLfloat), (void*)(0 * sizeof(GLfloat)));
+    prMeshSetVertexAttribute(meshCube, 1, 2, GL_FLOAT, GL_FALSE, 14 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
+    prMeshSetVertexAttribute(meshCube, 2, 3, GL_FLOAT, GL_FALSE, 14 * sizeof(GLfloat), (void*)(5 * sizeof(GLfloat)));
+    prMeshSetVertexAttribute(meshCube, 3, 3, GL_FLOAT, GL_FALSE, 14 * sizeof(GLfloat), (void*)(8 * sizeof(GLfloat)));
+    prMeshSetVertexAttribute(meshCube, 4, 3, GL_FLOAT, GL_FALSE, 14 * sizeof(GLfloat), (void*)(11 * sizeof(GLfloat)));
     prMeshUpdate(meshCube,
         cubeData, cubeDataSize,
         indices, indicesSize);

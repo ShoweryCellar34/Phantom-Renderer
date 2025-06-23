@@ -7,8 +7,8 @@ uniform vec2 screenSize;
 
 in GEOMETRY_OUT {
     vec3 fragmentPosition;
-    vec3 normals;
     vec2 textureCoordinates;
+    mat3 TBN;
     vec4 fragmentPositionLightSpace;
 } geometryOut;
 
@@ -165,6 +165,7 @@ void main() {
     vec3 specular = texture(material.specular, geometryOut.textureCoordinates).rgb;
     vec3 normal = normalize(texture(material.normal, geometryOut.textureCoordinates).rgb);
     normal = normalize(normal * 2.0 - 1.0);
+    normal = normalize(geometryOut.TBN * normal);
 
     vec4 result = vec4(0.0, 0.0, 0.0, 1.0);
     if(gl_FragCoord.x > screenSize.x / 2 && gl_FragCoord.y > screenSize.y / 2) {

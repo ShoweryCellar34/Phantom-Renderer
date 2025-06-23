@@ -7,7 +7,7 @@ uniform mat4 translation;
 in GEOMETRY_OUT {
     vec3 fragmentPosition;
     vec2 textureCoordinates;
-    mat4 TBN;
+    mat3 TBN;
     vec4 fragmentPositionLightSpace;
 } geometryOut;
 

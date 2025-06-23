@@ -11,34 +11,6 @@
 #include <stb_image_write.h>
 #include "exampleGlobalValues.h"
 
-void* computeGPUReadyBuffer(int* size,
-    GLfloat* vertices, size_t verticesCount,
-    GLfloat* normals, size_t normalsCount,
-    GLfloat* textureCoordinates, size_t textureCoordinatesCount
-) {
-    *size = (verticesCount / 3) * 8 * sizeof(GLfloat);
-    GLfloat* GPUReadyBuffer = prMalloc(*size);
-
-    size_t index = 0;
-    for(size_t i = 0; i < verticesCount / 3; i++) {
-        GPUReadyBuffer[index++] = vertices[i * 3];
-        GPUReadyBuffer[index++] = vertices[i * 3 + 1];
-        GPUReadyBuffer[index++] = vertices[i * 3 + 2];
-        // printf("Vertex %i:\n    XYZ:  %.3f, %.3f, %.3f\n", i, mesh->GPUReadyBuffer[index - 3], mesh->GPUReadyBuffer[index - 2], mesh->GPUReadyBuffer[index - 1]);
-
-        GPUReadyBuffer[index++] = normals[i * 3];
-        GPUReadyBuffer[index++] = normals[i * 3 + 1];
-        GPUReadyBuffer[index++] = normals[i * 3 + 2];
-        // printf("NORMAL:  %.3f, %.3f, %.3f\n", i, mesh->GPUReadyBuffer[index - 3], mesh->GPUReadyBuffer[index - 2], mesh->GPUReadyBuffer[index - 1]);
-
-        GPUReadyBuffer[index++] = textureCoordinates[i * 2];
-        GPUReadyBuffer[index++] = textureCoordinates[i * 2 + 1];
-        // printf("    UV:   %.3f, %.3f\n", mesh->GPUReadyBuffer[index - 2], mesh->GPUReadyBuffer[index - 1]);
-    }
-
-    return GPUReadyBuffer;
-}
-
 void proccessInput(GLFWwindow* window) {
     mat4x3 temp;
     mat2x3 temp2;

@@ -1,9 +1,9 @@
 #version 460 core
 layout(location = 0) in vec3 inputPosition;
 layout(location = 1) in vec2 inputTextureCoordinates;
-layout(location = 2) in vec3 inputNormal;
-layout(location = 3) in vec3 inputTangent;
-layout(location = 4) in vec3 inputBitangent;
+layout(location = 2) in vec3 inputTangent;
+layout(location = 3) in vec3 inputBitangent;
+layout(location = 4) in vec3 inputNormal;
 
 uniform mat4 projection;
 uniform mat4 view;
