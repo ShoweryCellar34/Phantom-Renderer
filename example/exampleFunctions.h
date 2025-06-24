@@ -196,7 +196,7 @@ void bindMaterial(materialData* material, prShaderData* shaderProgram) {
     prShaderSetUniform1f(shaderProgram, "material.shininess", material->shininess);
 }
 
-void bindMaterialHUD(materialData* material, prShaderData* shaderProgram) {
+void bindMaterialAmbientOnly(materialData* material, prShaderData* shaderProgram) {
     prTextureBindTexture(material->ambientMap, 0);
 
     prShaderSetUniform1i(shaderProgram, "ambient", 0);

@@ -145,7 +145,7 @@ vec3 calculateShadedResult(vec3 ambient, vec3 diffuse, vec3 specular, vec3 norma
     vec3 result = vec3(0.0, 0.0, 0.0);
 
     for(int i = 0; i < NR_DIRECTIONAL_LIGHTS; i++) {
-        float bias = max(0.05 * (1.0 - dot(normal, normalize(-directionalLights[i].direction))), 0.005);
+        float bias = max(0.01 * (1.0 - dot(normal, normalize(-directionalLights[i].direction))), 0.005);
         float shadow = directonalShadowCalculation(directionalLights[i], geometryOut.fragmentPositionLightSpace, bias);
         result += calculateDirectionalLight(directionalLights[i], viewDirection, ambient, diffuse, specular, normal, shadow);
     }
@@ -163,9 +163,10 @@ void main() {
     vec3 ambient = texture(material.ambient, geometryOut.textureCoordinates).rgb;
     vec3 diffuse = texture(material.diffuse, geometryOut.textureCoordinates).rgb;
     vec3 specular = texture(material.specular, geometryOut.textureCoordinates).rgb;
-    vec3 normal = normalize(texture(material.normal, geometryOut.textureCoordinates).rgb);
-    normal = normalize(normal * 2.0 - 1.0);
+    vec3 normal = texture(material.normal, geometryOut.textureCoordinates).rgb;
+    normal = normal * 2.0 - 1.0;
     normal = normalize(geometryOut.TBN * normal);
+
 
     vec4 result = vec4(0.0, 0.0, 0.0, 1.0);
     if(gl_FragCoord.x > screenSize.x / 2 && gl_FragCoord.y > screenSize.y / 2) {

@@ -24,6 +24,6 @@ void main() {
     vec3 T = normalize(vec3(translation * vec4(inputTangent, 0.0)));
     vec3 B = normalize(vec3(translation * vec4(inputBitangent, 0.0)));
     vec3 N = normalize(vec3(translation * vec4(inputNormal, 0.0)));
-    vertexOut.fragmentPositionLightSpace = lightSpaceMatrix * vec4(vertexOut.fragmentPosition, 1.0);
     vertexOut.TBN = mat3(T, B, N);
+    vertexOut.fragmentPositionLightSpace = lightSpaceMatrix * vec4(vertexOut.fragmentPosition, 1.0);
 }
