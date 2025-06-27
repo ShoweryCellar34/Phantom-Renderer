@@ -1,5 +1,7 @@
 #pragma once
 
+#include <PR/defines.h>
+
 #include <glad/gl.h>
 
 typedef struct prTextureData prTextureData;
@@ -9,17 +11,17 @@ typedef struct prRenderBufferData prRenderBufferData;
 typedef struct prFramebufferData {
     GladGLContext* context;
     GLuint FBO;
-    prTextureData* colorTexture;
+    prTextureData* colorTexture[PR_MAX_FRAMEBUFFER_COLOR_ATTACHMENTS];
     prTextureData* depthTexture;
     prTextureData* stencilTexture;
     prTextureData* depthStencilTexture;
 
-    prCubeMapData* colorCubeMap;
+    prCubeMapData* colorCubeMap[PR_MAX_FRAMEBUFFER_COLOR_ATTACHMENTS];
     prCubeMapData* depthCubeMap;
     prCubeMapData* stencilCubeMap;
     prCubeMapData* depthStencilCubeMap;
 
-    prRenderBufferData* colorRBO;
+    prRenderBufferData* colorRBO[PR_MAX_FRAMEBUFFER_COLOR_ATTACHMENTS];
     prRenderBufferData* depthRBO;
     prRenderBufferData* stencilRBO;
     prRenderBufferData* depthStencilRBO;
@@ -36,26 +38,25 @@ void prFramebufferBindDraw(prFramebufferData* framebuffer);
 GLuint prFramebufferGetHandle(prFramebufferData* framebuffer);
 GLenum prFramebufferCheckStatus(prFramebufferData* framebuffer);
 
-void prFramebufferLinkColorTexture(prFramebufferData* framebuffer, prTextureData* colorTexture);
+void prFramebufferLinkColorTexture(prFramebufferData* framebuffer, prTextureData* colorTexture, unsigned int attachmentPoint);
 void prFramebufferLinkDepthTexture(prFramebufferData* framebuffer, prTextureData* depthTexture);
 void prFramebufferLinkStencilTexture(prFramebufferData* framebuffer, prTextureData* stencilTexture);
 void prFramebufferLinkDepthStencilTexture(prFramebufferData* framebuffer, prTextureData* depthStencilTexture);
 
-void prFramebufferLinkColorCubeMap(prFramebufferData* framebuffer, prCubeMapData* colorCubeMap);
+void prFramebufferLinkColorCubeMap(prFramebufferData* framebuffer, prCubeMapData* colorCubeMap, unsigned int attachmentPoint);
 void prFramebufferLinkDepthCubeMap(prFramebufferData* framebuffer, prCubeMapData* depthCubeMap);
 void prFramebufferLinkStencilCubeMap(prFramebufferData* framebuffer, prCubeMapData* stencilCubeMap);
 void prFramebufferLinkDepthStencilCubeMap(prFramebufferData* framebuffer, prCubeMapData* depthStencilCubeMap);
 
-void prFramebufferLinkColorTextureRBO(prFramebufferData* framebuffer, prRenderBufferData* colorRBO);
+void prFramebufferLinkColorTextureRBO(prFramebufferData* framebuffer, prRenderBufferData* colorRBO, unsigned int attachmentPoint);
 void prFramebufferLinkDepthTextureRBO(prFramebufferData* framebuffer, prRenderBufferData* depthRBO);
 void prFramebufferLinkStencilTextureRBO(prFramebufferData* framebuffer, prRenderBufferData* stencilRBO);
 void prFramebufferLinkDepthStencilTextureRBO(prFramebufferData* framebuffer, prRenderBufferData* depthStencilRBO);
 
-void prFramebufferTextureAttachment(prFramebufferData* framebuffer, GLenum attachment, GLuint textureHandle, GLint level);
-void prFramebufferRenderBufferAttachment(prFramebufferData* framebuffer, GLenum attachment, GLuint rboHandle);
-
 void prFramebufferSetDrawBuffer(prFramebufferData* framebuffer, GLenum buffer);
 void prFramebufferSetReadBuffer(prFramebufferData* framebuffer, GLenum buffer);
+
+void prFramebufferDrawBuffers(prFramebufferData* framebuffer, GLsizei count, const GLenum* buffers);
 
 void prFramebufferBlit(GladGLContext* context, prFramebufferData* source, prFramebufferData* destination,
     GLint srcX0, GLint srcY0, GLint srcX1, GLint srcY1,
@@ -63,7 +64,7 @@ void prFramebufferBlit(GladGLContext* context, prFramebufferData* source, prFram
     GLbitfield mask, GLenum filter
 );
 
-void prFramebufferClearColor(GladGLContext* context, prFramebufferData* framebuffer, GLfloat color[4]);
+void prFramebufferClearColor(GladGLContext* context, prFramebufferData* framebuffer, unsigned int attachmentIndex, GLfloat color[4]);
 
 void prFramebufferClearDepth(GladGLContext* context, prFramebufferData* framebuffer, GLfloat depth);
 

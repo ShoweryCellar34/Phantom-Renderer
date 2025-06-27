@@ -10,7 +10,7 @@ typedef struct prTextureData {
     GLint wrappingMode;
     GLint filter;
     GLubyte* textureData;
-    GLsizei width, height;
+    GLsizei width, height, samples;
     int channels;
     GLfloat borderColor[4];
     GLuint TBO;
@@ -22,7 +22,7 @@ void prTextureDestroy(prTextureData* texture);
 
 void prTextureLinkContext(prTextureData* texture, GladGLContext* context);
 
-void prTextureUpdate(prTextureData* texture, GLenum format, GLint wrappingMode, GLint filter, GLubyte* rawTextureData, size_t rawTextureDataCount, GLsizei width, GLsizei height);
+void prTextureUpdate(prTextureData* texture, GLenum format, GLint wrappingMode, GLint filter, GLubyte* rawTextureData, size_t rawTextureDataCount, GLsizei width, GLsizei height, GLsizei samples);
 
 void prTextureBorderColor(prTextureData* texture, GLfloat borderColor[4]);
 

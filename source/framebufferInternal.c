@@ -30,7 +30,9 @@ void i_prFramebufferUpdateBuffers(prFramebufferData* framebuffer) {
 }
 
 void i_prFramebufferSetDataOnGPU(prFramebufferData* framebuffer) {
-    i_prFramebufferSetAttachment(framebuffer, framebuffer->colorTexture, framebuffer->colorCubeMap, framebuffer->colorRBO, GL_COLOR_ATTACHMENT0);
+    for(int i = 0; i < PR_MAX_FRAMEBUFFER_COLOR_ATTACHMENTS; i++) {
+        i_prFramebufferSetAttachment(framebuffer, framebuffer->colorTexture[i], framebuffer->colorCubeMap[i], framebuffer->colorRBO[i], GL_COLOR_ATTACHMENT0 + i);
+    }
     i_prFramebufferSetAttachment(framebuffer, framebuffer->depthTexture, framebuffer->depthCubeMap, framebuffer->depthRBO, GL_DEPTH_ATTACHMENT);
     i_prFramebufferSetAttachment(framebuffer, framebuffer->stencilTexture, framebuffer->stencilCubeMap, framebuffer->stencilRBO, GL_STENCIL_ATTACHMENT);
     i_prFramebufferSetAttachment(framebuffer, framebuffer->depthStencilTexture, framebuffer->depthStencilCubeMap, framebuffer->depthStencilRBO, GL_DEPTH_STENCIL_ATTACHMENT);

@@ -75,7 +75,7 @@ int main(int argc, char** argv) {
 
     prTextureData* depthTextureDepth = prTextureCreate();
     prTextureLinkContext(depthTextureDepth, test->openglContext);
-    prTextureUpdate(depthTextureDepth, PR_FORMAT_DEPTH, PR_WRAPPING_EDGE, PR_FILTER_LINEAR, NULL, 0, 2048, 2048);
+    prTextureUpdate(depthTextureDepth, PR_FORMAT_DEPTH, PR_WRAPPING_EDGE, PR_FILTER_LINEAR, NULL, 0, 2048, 2048, 0);
     prTextureBorderColor(depthTextureDepth, (GLfloat[]){1.0f, 0.0f, 0.0f, 0.0f});
 
     prFramebufferData* framebufferDepth = prFramebufferCreate();
@@ -106,22 +106,28 @@ int main(int argc, char** argv) {
     prRenderBufferLinkContext(colorRBOMultisampled, test->openglContext);
     prRenderBufferUpdate(colorRBOMultisampled, PR_FORMAT_RGBA, windowWidth, windowHeight, SAMPLES);
 
+    colorTexture2 = prTextureCreate();
+    prTextureLinkContext(colorTexture2, test->openglContext);
+    prTextureUpdate(colorTexture2, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR, NULL, 0, windowWidth, windowHeight, SAMPLES);
+
     depthStencilRBOMultisampled = prRenderBufferCreate();
     prRenderBufferLinkContext(depthStencilRBOMultisampled, test->openglContext);
     prRenderBufferUpdate(depthStencilRBOMultisampled, PR_FORMAT_DEPTH_STENCIL, windowWidth, windowHeight, SAMPLES);
 
     framebufferMultisampled = prFramebufferCreate();
     prFramebufferLinkContext(framebufferMultisampled, test->openglContext);
-    prFramebufferLinkColorTextureRBO(framebufferMultisampled, colorRBOMultisampled);
+    prFramebufferLinkColorTextureRBO(framebufferMultisampled, colorRBOMultisampled, 0);
+    prFramebufferLinkColorTexture(framebufferMultisampled, colorTexture2, 1);
+    prFramebufferDrawBuffers(framebufferMultisampled, 2, (GLenum[]){GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1});
     prFramebufferLinkDepthStencilTextureRBO(framebufferMultisampled, depthStencilRBOMultisampled);
 
     postProcessingTexture = prTextureCreate();
     prTextureLinkContext(postProcessingTexture, test->openglContext);
-    prTextureUpdate(postProcessingTexture, PR_FORMAT_RGBA, PR_FILTER_LINEAR, PR_WRAPPING_EDGE, NULL, 0, windowWidth, windowHeight);
+    prTextureUpdate(postProcessingTexture, PR_FORMAT_RGBA, PR_FILTER_LINEAR, PR_WRAPPING_EDGE, NULL, 0, windowWidth, windowHeight, 0);
 
     colorTexture = prTextureCreate();
     prTextureLinkContext(colorTexture, test->openglContext);
-    prTextureUpdate(colorTexture, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR, NULL, 0, windowWidth, windowHeight);
+    prTextureUpdate(colorTexture, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR, NULL, 0, windowWidth, windowHeight, 0);
 
     depthStencilRBO = prRenderBufferCreate();
     prRenderBufferLinkContext(depthStencilRBO, test->openglContext);
@@ -129,7 +135,7 @@ int main(int argc, char** argv) {
 
     framebuffer = prFramebufferCreate();
     prFramebufferLinkContext(framebuffer, test->openglContext);
-    prFramebufferLinkColorTexture(framebuffer, colorTexture);
+    prFramebufferLinkColorTexture(framebuffer, colorTexture, 0);
     prFramebufferLinkDepthStencilTextureRBO(framebuffer, depthStencilRBO);
 
     prCubeMapData* skyboxDefaultCubeMap = makeCubeMapSingleColors(test->openglContext, (float[PR_CUBE_MAP_SIDES][4]){
@@ -360,13 +366,14 @@ int main(int argc, char** argv) {
 
     while(!glfwWindowShouldClose(test->window)) {
         test->openglContext->Enable(GL_DEPTH_TEST);
-        prFramebufferClearColor(test->openglContext, NULL, (GLfloat[]){0.3f, 0.5f, 0.7f, 1.0f});
+        prFramebufferClearColor(test->openglContext, NULL, 0, (GLfloat[]){0.3f, 0.5f, 0.7f, 1.0f});
         prFramebufferClearDepth(test->openglContext, NULL, 1.0f);
         prFramebufferClearDepth(test->openglContext, framebufferDepth, 1.0f);
         prFramebufferClearDepth(test->openglContext, framebufferDepth2, 1.0f);
-        prFramebufferClearColor(test->openglContext, framebufferMultisampled, (GLfloat[]){0.7f, 0.5f, 0.3f, 1.0f});
+        prFramebufferClearColor(test->openglContext, framebufferMultisampled, 0, (GLfloat[]){0.7f, 0.5f, 0.3f, 1.0f});
+        prFramebufferClearColor(test->openglContext, framebufferMultisampled, 1, (GLfloat[]){0.7f, 0.5f, 0.3f, 1.0f});
         prFramebufferClearDepthStencil(test->openglContext, framebufferMultisampled, 1.0f, 0);
-        prFramebufferClearColor(test->openglContext, framebuffer, (GLfloat[]){0.3f, 0.5f, 0.7f, 1.0f});
+        prFramebufferClearColor(test->openglContext, framebuffer, 0, (GLfloat[]){0.3f, 0.5f, 0.7f, 1.0f});
         prFramebufferClearDepthStencil(test->openglContext, framebuffer, 1.0f, 0);
 
         float currentFrame = glfwGetTime();
@@ -581,6 +588,8 @@ int main(int argc, char** argv) {
     framebufferMultisampled = NULL;
     prRenderBufferDestroy(depthStencilRBOMultisampled);
     depthStencilRBOMultisampled = NULL;
+    prTextureDestroy(colorTexture2);
+    colorTexture2 = NULL;
     prRenderBufferDestroy(colorRBOMultisampled);
     colorRBOMultisampled = NULL;
     prFramebufferDestroy(framebufferDepth2);

@@ -40,12 +40,15 @@ void prTextureLinkContext(prTextureData* texture, GladGLContext* context) {
     }
 }
 
-void prTextureUpdate(prTextureData* texture, GLenum format, GLint wrappingMode, GLint filter, GLubyte* rawTextureData, size_t rawTextureDataCount, GLsizei width, GLsizei height) {
+void prTextureUpdate(prTextureData* texture, GLenum format, GLint wrappingMode, GLint filter, GLubyte* rawTextureData, size_t rawTextureDataCount, GLsizei width, GLsizei height, GLsizei samples) {
     if(rawTextureDataCount && !rawTextureData) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_WARNING, "prTextureUpdate: Texture data count not zero while texture data is NULL. Assuming no texture data, texture data will be NULL");
     }
     if(rawTextureData && (width || height)) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_INFO, "prTextureUpdate: Width and/or height provided in conjunction with texture data was provided. Assuming raw, unconpressed texture data to be passed directly to GPU");
+    }
+    if(samples >= 4) {
+        prLogEvent(PR_EVENT_DATA, PR_LOG_INFO, "prRenderBufferUpdate: Using multisamples (samples: %i), this will ignore all passed texture data", samples);
     }
 
     if((wrappingMode != PR_WRAPPING_REPEAT) && (wrappingMode != PR_WRAPPING_REPEAT_MIRRORED) && 
@@ -76,7 +79,7 @@ void prTextureUpdate(prTextureData* texture, GLenum format, GLint wrappingMode, 
     }
 
     unsigned char* temp = NULL;
-    if(rawTextureData && (!width || !height)) {
+    if(rawTextureData && (!width || !height) && samples < 4) {
         temp = stbi_load_from_memory(rawTextureData, rawTextureDataCount, &texture->width, &texture->height, &texture->channels, 0);
         if(!temp) {
             prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prTextureUpdate: Texture data failed to unpack. Aborting operation, nothing was modified: %s", stbi_failure_reason());
@@ -86,12 +89,14 @@ void prTextureUpdate(prTextureData* texture, GLenum format, GLint wrappingMode, 
         temp = NULL;
         texture->width = width;
         texture->height = height;
+        texture->samples = samples;
         texture->channels = 0;
-    } else if(rawTextureData && (width || height)) {
+    } else if(rawTextureData && (width || height) && samples < 4) {
         temp = prMalloc(rawTextureDataCount);
         prMemcpy(temp, (void*)rawTextureData, rawTextureDataCount);
         texture->width = width;
         texture->height = height;
+        texture->samples = samples;
         texture->channels = 0;
     }
 

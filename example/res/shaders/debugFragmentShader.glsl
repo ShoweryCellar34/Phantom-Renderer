@@ -1,5 +1,6 @@
 #version 460 core
-out vec4 fragmentColor;
+layout(location = 0) out vec4 fragmentColor;
+layout(location = 1) out vec4 brightColor;
 
 uniform vec3 cameraPosition;
 uniform mat4 translation;

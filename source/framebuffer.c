@@ -61,6 +61,7 @@ GLuint prFramebufferGetHandle(prFramebufferData* framebuffer) {
     if(!framebuffer) {
         return 0;
     }
+
     return framebuffer->FBO;
 }
 
@@ -68,15 +69,25 @@ GLenum prFramebufferCheckStatus(prFramebufferData* framebuffer) {
     if(!framebuffer || !framebuffer->context) {
         return GL_FRAMEBUFFER_UNDEFINED;
     }
+
     return framebuffer->context->CheckNamedFramebufferStatus(framebuffer->FBO, GL_FRAMEBUFFER);
 }
 
-void prFramebufferLinkColorTexture(prFramebufferData* framebuffer, prTextureData* colorTexture) {
+void prFramebufferLinkColorTexture(prFramebufferData* framebuffer, prTextureData* colorTexture, unsigned int attachmentPoint) {
     if(colorTexture && framebuffer->context != colorTexture->context) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferLinkColorTexture: Texture context does not match framebuffer context. Aborting operation, nothing was modified");
         return;
     }
-    framebuffer->colorTexture = colorTexture;
+    if(attachmentPoint >= PR_MAX_FRAMEBUFFER_COLOR_ATTACHMENTS) {
+        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferLinkColorTexture: Requested attachment point (%i) too high. Aborting operation, nothing was modified");
+        return;
+    }
+
+    prLogEvent(PR_EVENT_DATA, PR_LOG_TRACE, "prFramebufferLinkColorTexture: Setting framebuffer color attachment %i (Texture)", attachmentPoint);
+
+    framebuffer->colorTexture[attachmentPoint] = colorTexture;
+    framebuffer->colorCubeMap[attachmentPoint] = NULL;
+    framebuffer->colorRBO[attachmentPoint] = NULL;
 
     if(framebuffer->FBO) {
         i_prFramebufferUpdateBuffers(framebuffer);
@@ -119,12 +130,21 @@ void prFramebufferLinkDepthStencilTexture(prFramebufferData* framebuffer, prText
     }
 }
 
-void prFramebufferLinkColorCubeMap(prFramebufferData* framebuffer, prCubeMapData* colorCubeMap) {
+void prFramebufferLinkColorCubeMap(prFramebufferData* framebuffer, prCubeMapData* colorCubeMap, unsigned int attachmentPoint) {
     if(framebuffer->context != colorCubeMap->context) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferLinkColorCubeMap: Cube map context does not match framebuffer context. Aborting operation, nothing was modified");
         return;
     }
-    framebuffer->colorCubeMap = colorCubeMap;
+    if(attachmentPoint >= PR_MAX_FRAMEBUFFER_COLOR_ATTACHMENTS) {
+        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferLinkColorCubeMap: Requested attachment point (%i) too high. Aborting operation, nothing was modified");
+        return;
+    }
+
+    prLogEvent(PR_EVENT_DATA, PR_LOG_TRACE, "prFramebufferLinkColorCubeMap: Setting framebuffer color attachment %i (Cube Map)", attachmentPoint);
+
+    framebuffer->colorTexture[attachmentPoint] = NULL;
+    framebuffer->colorCubeMap[attachmentPoint] = colorCubeMap;
+    framebuffer->colorRBO[attachmentPoint] = NULL;
 
     if(framebuffer->FBO) {
         i_prFramebufferUpdateBuffers(framebuffer);
@@ -167,12 +187,21 @@ void prFramebufferLinkDepthStencilCubeMap(prFramebufferData* framebuffer, prCube
     }
 }
 
-void prFramebufferLinkColorTextureRBO(prFramebufferData* framebuffer, prRenderBufferData* colorRBO) {
+void prFramebufferLinkColorTextureRBO(prFramebufferData* framebuffer, prRenderBufferData* colorRBO, unsigned int attachmentPoint) {
     if(framebuffer->context != colorRBO->context) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferLinkColorTextureRBO: RenderBuffer context does not match framebuffer context. Aborting operation, nothing was modified");
         return;
     }
-    framebuffer->colorRBO = colorRBO;
+    if(attachmentPoint >= PR_MAX_FRAMEBUFFER_COLOR_ATTACHMENTS) {
+        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferLinkColorRBO: Requested attachment point (%i) too high. Aborting operation, nothing was modified");
+        return;
+    }
+
+    prLogEvent(PR_EVENT_DATA, PR_LOG_TRACE, "prFramebufferLinkColorRBO: Setting framebuffer color attachment %i (RBO)", attachmentPoint);
+
+    framebuffer->colorTexture[attachmentPoint] = NULL;
+    framebuffer->colorCubeMap[attachmentPoint] = NULL;
+    framebuffer->colorRBO[attachmentPoint] = colorRBO;
 
     if(framebuffer->FBO) {
         i_prFramebufferUpdateBuffers(framebuffer);
@@ -215,22 +244,6 @@ void prFramebufferLinkDepthStencilTextureRBO(prFramebufferData* framebuffer, prR
     }
 }
 
-void prFramebufferTextureAttachment(prFramebufferData* framebuffer, GLenum attachment, GLuint textureHandle, GLint level) {
-    if(!framebuffer->context) {
-        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferTextureAttachment: Framebuffer context cannot be NULL. Aborting operation, nothing was modified");
-        return;
-    }
-    framebuffer->context->FramebufferTexture2D(GL_FRAMEBUFFER, attachment, GL_TEXTURE_2D, textureHandle, level);
-}
-
-void prFramebufferRenderBufferAttachment(prFramebufferData* framebuffer, GLenum attachment, GLuint rboHandle) {
-    if(!framebuffer->context) {
-        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferRenderBufferAttachment: Framebuffer context cannot be NULL. Aborting operation, nothing was modified");
-        return;
-    }
-    framebuffer->context->FramebufferRenderbuffer(GL_FRAMEBUFFER, attachment, GL_RENDERBUFFER, rboHandle);
-}
-
 void prFramebufferSetDrawBuffer(prFramebufferData* framebuffer, GLenum buffer) {
     if(!framebuffer->context) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferSetDrawBuffer: Framebuffer context cannot be NULL. Aborting operation, nothing was modified");
@@ -238,6 +251,19 @@ void prFramebufferSetDrawBuffer(prFramebufferData* framebuffer, GLenum buffer) {
     }
 
     framebuffer->context->NamedFramebufferDrawBuffer(framebuffer->FBO, buffer);
+}
+
+void prFramebufferDrawBuffers(prFramebufferData* framebuffer, GLsizei count, const GLenum* buffers) {
+    if(!framebuffer->context) {
+        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferDrawBuffers: Framebuffer context cannot be NULL. Aborting operation, nothing was modified");
+        return;
+    }
+    if(count < 0) {
+        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferDrawBuffers: Count cannot be less than zero. Aborting operation, nothing was modified");
+        return;
+    }
+
+    framebuffer->context->NamedFramebufferDrawBuffers(framebuffer->FBO, count, buffers);
 }
 
 void prFramebufferSetReadBuffer(prFramebufferData* framebuffer, GLenum buffer) {
@@ -282,7 +308,12 @@ void prFramebufferBlit(GladGLContext* context, prFramebufferData* source, prFram
     i_prFramebufferBlitOnGPU(context, source, destination, srcX0, srcY0, srcX1, srcY1, dstX0, dstY0, dstX1, dstY1, mask, filter);
 }
 
-void prFramebufferClearColor(GladGLContext* context, prFramebufferData* framebuffer, GLfloat color[4]) {
+void prFramebufferClearColor(GladGLContext* context, prFramebufferData* framebuffer, unsigned int attachmentIndex, GLfloat color[4]) {
+    if(attachmentIndex >= PR_MAX_FRAMEBUFFER_COLOR_ATTACHMENTS) {
+        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferClearColor: Attachment index too hight (%i). Aborting operation, nothing was modified", attachmentIndex);
+        return;
+    }
+
     if(framebuffer) {
         if(!framebuffer->context) {
             prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferClearColor: Framebuffer context cannot be NULL. Aborting operation, nothing was modified");
@@ -297,9 +328,9 @@ void prFramebufferClearColor(GladGLContext* context, prFramebufferData* framebuf
             return;
         }
 
-        context->ClearNamedFramebufferfv(framebuffer->FBO, GL_COLOR, 0, color);
+        context->ClearNamedFramebufferfv(framebuffer->FBO, GL_COLOR, attachmentIndex, color);
     } else {
-        context->ClearNamedFramebufferfv(0, GL_COLOR, 0, color);
+        context->ClearNamedFramebufferfv(0, GL_COLOR, attachmentIndex, color);
     }
 }
 
