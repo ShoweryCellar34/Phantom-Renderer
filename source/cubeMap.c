@@ -42,15 +42,18 @@ void prCubeMapLinkContext(prCubeMapData* cubeMap, GladGLContext* context) {
 
 void prCubeMapUpdateAll(prCubeMapData* cubeMap, GLenum format[PR_CUBE_MAP_SIDES], GLint wrappingMode, GLint filter, GLubyte* rawTextureData[PR_CUBE_MAP_SIDES], size_t rawTextureDataCount[PR_CUBE_MAP_SIDES], GLsizei width[PR_CUBE_MAP_SIDES], GLsizei height[PR_CUBE_MAP_SIDES]) {
     for(int i = 0; i < PR_CUBE_MAP_SIDES; i++) {
-        if(rawTextureDataCount && !rawTextureData) {
-            prLogEvent(PR_EVENT_DATA, PR_LOG_WARNING, "prCubeMapUpdateAll: [Face %i] Cube map face data count not zero while cube map face data is NULL. Assuming no texture data, texture data will be NULL", i);
+        if(rawTextureDataCount[i] && !rawTextureData[i]) {
+            prLogEvent(PR_EVENT_DATA, PR_LOG_WARNING, "prCubeMapUpdateAll: [Face %i] Cube map face data count not zero while cube map face data is NULL, assuming no texture data", i);
         }
-        if(rawTextureData && (width[i] || height[i])) {
-            prLogEvent(PR_EVENT_DATA, PR_LOG_INFO, "prCubeMapUpdateAll: [Face %i] Width and/or height provided in conjunction with cube map face data was provided. Assuming raw, unconpressed texture data to be passed directly to GPU", i);
-        }
-
         if(!rawTextureData[i]) {
-            prLogEvent(PR_EVENT_DATA, PR_LOG_WARNING, "prCubeMapUpdateAll: [Face %i] Cube map face data NULL, aborting operation, nothing was modified", i);
+            prLogEvent(PR_EVENT_DATA, PR_LOG_INFO, "prCubeMapUpdateAll: [Face %i] Cube map face data NULL, assuming no texture data", i);
+        }
+        if((!width[i] || !height[i]) && (!rawTextureDataCount[i] || !rawTextureData[i])) {
+            prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prCubeMapUpdateAll: [Face: %i] Cube map data NULL and no dimentions provided, this data is insufficent. Aborting operation, modifications may have occurred", i);
+            return;
+        }
+        if(rawTextureData[i] && (width[i] || height[i])) {
+            prLogEvent(PR_EVENT_DATA, PR_LOG_INFO, "prCubeMapUpdateAll: [Face %i] Width and/or height provided in conjunction with cube map face data was provided. Assuming raw, unconpressed texture data to be passed directly to GPU", i);
         }
 
         if((format[i] != PR_FORMAT_A) && (format[i] != PR_FORMAT_G) && (format[i] != PR_FORMAT_B) &&
@@ -68,7 +71,7 @@ void prCubeMapUpdateAll(prCubeMapData* cubeMap, GLenum format[PR_CUBE_MAP_SIDES]
         if(rawTextureData[i] && (!width[i] || !height[i])) {
             temp = stbi_load_from_memory(rawTextureData[i], rawTextureDataCount[i], &cubeMap->width[i], &cubeMap->height[i], &cubeMap->channels[i], 0);
             if(!temp) {
-                prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prCubeMapUpdateAll: [Face %i] Cube map face data failed to unpack. Aborting operation, nothing was modified", i);
+                prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prCubeMapUpdateAll: [Face %i] Cube map face data failed to unpack. Aborting operation, modifications may have occurred", i);
                 return;
             }
         } else if(!rawTextureData[i] && (width[i] || height[i])) {
@@ -100,6 +103,22 @@ void prCubeMapUpdateAll(prCubeMapData* cubeMap, GLenum format[PR_CUBE_MAP_SIDES]
                     break;
             }
         }
+        if(format[i] == PR_FORMAT_SRGB_AUTO) {
+            prLogEvent(PR_EVENT_DATA, PR_LOG_TRACE, "prCubeMapUpdateAll: [Face %i] Automatically determining cube map face sRGB format based on channel count (%d channels)", i, cubeMap->channels[i]);
+            switch(cubeMap->channels[i]) {
+                case 3:
+                    cubeMap->format[i] = PR_FORMAT_SRGB;
+                    break;
+
+                case 4:
+                    cubeMap->format[i] = PR_FORMAT_SRGBA;
+                    break;
+
+                default:
+                    cubeMap->format[i] = PR_FORMAT_SRGB;
+                    break;
+            }
+        }
 
         if(cubeMap->textureData[i]) {
             stbi_image_free(cubeMap->textureData[i]);
@@ -109,7 +128,7 @@ void prCubeMapUpdateAll(prCubeMapData* cubeMap, GLenum format[PR_CUBE_MAP_SIDES]
         cubeMap->textureData[i] = temp;
     }
 
-    if((wrappingMode != PR_WRAPPING_REPEAT) && (wrappingMode != PR_WRAPPING_REPEAT_MIRRORED) && 
+    if((wrappingMode != PR_WRAPPING_REPEAT) && (wrappingMode != PR_WRAPPING_REPEAT_MIRRORED) &&
     (wrappingMode != PR_WRAPPING_EDGE) && (wrappingMode != PR_WRAPPING_BORDER)
     ) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_WARNING, "prCubeMapUpdateAll: Invalid wrapping mode for cube map (was %i), using PR_WRAPPING_EDGE", wrappingMode);
@@ -147,16 +166,23 @@ void prCubeMapUpdateAll(prCubeMapData* cubeMap, GLenum format[PR_CUBE_MAP_SIDES]
 
 void prCubeMapUpdate(prCubeMapData* cubeMap, int side, GLenum format, GLint wrappingMode, GLint filter, GLubyte* rawTextureData, size_t rawTextureDataCount, GLsizei width, GLsizei height) {
     if(rawTextureDataCount && !rawTextureData) {
-        prLogEvent(PR_EVENT_DATA, PR_LOG_WARNING, "prCubeMapUpdate: [Face %i] Cube map face data count not zero while cube map face data is NULL. Assuming no texture data, texture data will be NULL", side);
+        prLogEvent(PR_EVENT_DATA, PR_LOG_WARNING, "prCubeMapUpdate: [Face %i] Cube map face data count not zero while cube map face data is NULL, assuming no texture data", side);
     }
-    if(rawTextureData && (width == 0 || height == 0)) {
+    if(!rawTextureData[side]) {
+        prLogEvent(PR_EVENT_DATA, PR_LOG_INFO, "prCubeMapUpdate: [Face %i] Cube map face data NULL, assuming no texture data", side);
+    }
+    if((!width || !height) && (!rawTextureDataCount || !rawTextureData)) {
+        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prCubeMapUpdate: [Face: %i] Cube map data NULL and no dimentions provided, this data is insufficent. Aborting operation, modifications may have occurred", side);
+        return;
+    }
+    if(rawTextureData && (width || height)) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_INFO, "prCubeMapUpdate: [Face %i] Width and/or height provided in conjunction with cube map face data was provided. Assuming raw, unconpressed texture data to be passed directly to GPU", side);
     }
 
     if((format != PR_FORMAT_A) && (format != PR_FORMAT_G) && (format != PR_FORMAT_B) &&
         (format != PR_FORMAT_RGB) && (format != PR_FORMAT_RGBA) &&
         (format != PR_FORMAT_STENCIL) && (format != PR_FORMAT_DEPTH) && (format != PR_FORMAT_DEPTH_STENCIL) &&
-        (format != PR_FORMAT_AUTO)
+        (format != PR_FORMAT_AUTO) && (format != PR_FORMAT_SRGB_AUTO)
     ) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_WARNING, "prCubeMapUpdate: [Face %i] Invalid format for cube map face (was %i), using PR_FORMAT_RGB type", side, format);
         cubeMap->format[side] = PR_FORMAT_RGB;
@@ -164,7 +190,7 @@ void prCubeMapUpdate(prCubeMapData* cubeMap, int side, GLenum format, GLint wrap
         cubeMap->format[side] = format;
     }
 
-    if((wrappingMode != PR_WRAPPING_REPEAT) && (wrappingMode != PR_WRAPPING_REPEAT_MIRRORED) && 
+    if((wrappingMode != PR_WRAPPING_REPEAT) && (wrappingMode != PR_WRAPPING_REPEAT_MIRRORED) &&
     (wrappingMode != PR_WRAPPING_EDGE) && (wrappingMode != PR_WRAPPING_BORDER)
     ) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_WARNING, "prCubeMapUpdate: Invalid wrapping mode for cube map (was %i), using PR_WRAPPING_EDGE", wrappingMode);

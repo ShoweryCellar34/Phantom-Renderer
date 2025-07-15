@@ -26,6 +26,7 @@ void _prLogRaw(const char* format, ...) {
     for(int i = 0; i < i_logStreamCount; i++) {
         va_start(arg, format);
         vfprintf(i_logStream[i], format, arg);
+        fflush(i_logStream[i]);
         va_end(arg);
     }
 }
@@ -49,6 +50,7 @@ void _prLog(prLogLevel_t level, const char* format, ...) {
     for(int i = 0; i < i_logStreamCount; i++) {
         va_start(arg, format);
         vfprintf(i_logStream[i], computedFormat, arg);
+        fflush(i_logStream[i]);
         va_end(arg);
     }
 }
@@ -72,6 +74,7 @@ void _prLogEvent(prEvent_t event, prLogLevel_t level, const char* format, ...) {
     for(int i = 0; i < i_logStreamCount; i++) {
         va_start(arg, format);
         vfprintf(i_logStream[i], computedFormat, arg);
+        fflush(i_logStream[i]);
         va_end(arg);
     }
 }

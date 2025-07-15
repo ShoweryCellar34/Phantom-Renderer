@@ -75,7 +75,7 @@ void i_prTextureSetDataOnGPU(prTextureData* texture) {
     GLint internalFomrat;
     i_prTextureComputeFormats(texture, &format, &internalFomrat);
 
-    if(texture->samples < 4) {
+    if(texture->samples < PR_MIN_SAMPLES) {
         texture->context->TextureParameteri(texture->TBO, GL_TEXTURE_WRAP_S, texture->wrappingMode);
         texture->context->TextureParameteri(texture->TBO, GL_TEXTURE_WRAP_T, texture->wrappingMode);
         texture->context->TextureParameteri(texture->TBO, GL_TEXTURE_MIN_FILTER, texture->filter);
@@ -84,15 +84,15 @@ void i_prTextureSetDataOnGPU(prTextureData* texture) {
 
     texture->context->PixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
-    texture->context->BindTexture(GL_TEXTURE_2D, texture->TBO);
-    if(texture->samples >= 4) {
-        texture->context->TexImage2DMultisample(GL_TEXTURE_2D, texture->samples, internalFomrat, texture->width, texture->height, false);
+    texture->context->BindTexture((texture->samples >= PR_MIN_SAMPLES ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D), texture->TBO);
+    if(texture->samples >= PR_MIN_SAMPLES) {
+        texture->context->TexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, texture->samples, internalFomrat, texture->width, texture->height, false);
     } else {
         texture->context->TexImage2D(GL_TEXTURE_2D, 0, internalFomrat, texture->width, texture->height, 0, format, GL_UNSIGNED_BYTE, texture->textureData);
     }
-    texture->context->BindTexture(GL_TEXTURE_2D, 0);
+    texture->context->BindTexture((texture->samples >= PR_MIN_SAMPLES ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D), 0);
 
-    if(texture->samples < 4) {
+    if(texture->samples < PR_MIN_SAMPLES) {
         texture->context->GenerateTextureMipmap(texture->TBO);
     }
 }
@@ -100,7 +100,7 @@ void i_prTextureSetDataOnGPU(prTextureData* texture) {
 void i_prTextureCreateOnGPU(prTextureData* texture) {
     prLogEvent(PR_EVENT_OPENGL, PR_LOG_INFO, "i_prTextureCreateOnGPU: Creating texture buffer object. Width: %i Height: %i Channels: %i", texture->width, texture->height, texture->channels);
 
-    texture->context->CreateTextures((texture->samples >= 4 ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D), 1, &texture->TBO);
+    texture->context->CreateTextures((texture->samples >= PR_MIN_SAMPLES ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D), 1, &texture->TBO);
     if(!texture->TBO) {
         prLogEvent(PR_EVENT_OPENGL, PR_LOG_WARNING, "i_prTextureCreateOnGPU: Failed to create texture buffer object. Aborting operation, nothing was modified");
         return;
@@ -137,5 +137,6 @@ void i_prTextureUpdateBorderColorOnGPU(prTextureData* texture) {
         return;
     }
 
+    if(texture->samples < PR_MIN_SAMPLES)
     texture->context->TextureParameterfv(texture->TBO, GL_TEXTURE_BORDER_COLOR, texture->borderColor);
 }

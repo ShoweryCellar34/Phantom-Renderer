@@ -36,8 +36,12 @@ void prRenderBufferUpdate(prRenderBufferData* renderBuffer, GLenum format, GLsiz
         prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prRenderBufferUpdate: Invalid dimensions (width: %i, height: %i). Aborting operation, nothing was modified", width, height);
         return;
     }
-    if(samples >= 4) {
+    if(samples >= PR_MIN_SAMPLES && samples <= PR_MAX_SAMPLES) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_INFO, "prRenderBufferUpdate: Using multisamples (samples: %i)", samples);
+    }
+    if(samples > PR_MAX_SAMPLES) {
+        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prRenderBufferUpdate: Provided samples (samples: %i) too high. Aborting operation, nothing was modified", samples);
+        return;
     }
     if((format != PR_FORMAT_A) && (format != PR_FORMAT_G) && (format != PR_FORMAT_B) &&
         (format != PR_FORMAT_RGB) && (format != PR_FORMAT_RGBA) &&
