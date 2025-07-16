@@ -85,9 +85,8 @@ void prFramebufferLinkColorTexture(prFramebufferData* framebuffer, prTextureData
 
     prLogEvent(PR_EVENT_DATA, PR_LOG_TRACE, "prFramebufferLinkColorTexture: Setting framebuffer color attachment %i (Texture)", attachmentPoint);
 
-    framebuffer->colorTexture[attachmentPoint] = colorTexture;
-    framebuffer->colorCubeMap[attachmentPoint] = NULL;
-    framebuffer->colorRBO[attachmentPoint] = NULL;
+    framebuffer->colorAttachments[attachmentPoint] = colorTexture;
+    framebuffer->colorAttachmentsTypes[attachmentPoint] = 1;
 
     if(framebuffer->FBO) {
         i_prFramebufferUpdateBuffers(framebuffer);
@@ -99,7 +98,8 @@ void prFramebufferLinkDepthTexture(prFramebufferData* framebuffer, prTextureData
         prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferLinkDepthTexture: Texture context does not match framebuffer context. Aborting operation, nothing was modified");
         return;
     }
-    framebuffer->depthTexture = depthTexture;
+    framebuffer->depthAttachment = depthTexture;
+    framebuffer->depthAttachmentType = 1;
 
     if(framebuffer->FBO) {
         i_prFramebufferUpdateBuffers(framebuffer);
@@ -111,7 +111,8 @@ void prFramebufferLinkStencilTexture(prFramebufferData* framebuffer, prTextureDa
         prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferLinkStencilTexture: Texture context does not match framebuffer context. Aborting operation, nothing was modified");
         return;
     }
-    framebuffer->stencilTexture = stencilTexture;
+    framebuffer->stencilAttachment = stencilTexture;
+    framebuffer->stencilAttachmentType = 1;
 
     if(framebuffer->FBO) {
         i_prFramebufferUpdateBuffers(framebuffer);
@@ -123,7 +124,8 @@ void prFramebufferLinkDepthStencilTexture(prFramebufferData* framebuffer, prText
         prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferLinkDepthStencilTexture: Texture context does not match framebuffer context. Aborting operation, nothing was modified");
         return;
     }
-    framebuffer->depthStencilTexture = depthStencilTexture;
+    framebuffer->depthStencilAttachment = depthStencilTexture;
+    framebuffer->depthStencilAttachmentType = 1;
 
     if(framebuffer->FBO) {
         i_prFramebufferUpdateBuffers(framebuffer);
@@ -142,9 +144,8 @@ void prFramebufferLinkColorCubeMap(prFramebufferData* framebuffer, prCubeMapData
 
     prLogEvent(PR_EVENT_DATA, PR_LOG_TRACE, "prFramebufferLinkColorCubeMap: Setting framebuffer color attachment %i (Cube Map)", attachmentPoint);
 
-    framebuffer->colorTexture[attachmentPoint] = NULL;
-    framebuffer->colorCubeMap[attachmentPoint] = colorCubeMap;
-    framebuffer->colorRBO[attachmentPoint] = NULL;
+    framebuffer->colorAttachments[attachmentPoint] = colorCubeMap;
+    framebuffer->colorAttachmentsTypes[attachmentPoint] = 2;
 
     if(framebuffer->FBO) {
         i_prFramebufferUpdateBuffers(framebuffer);
@@ -156,7 +157,8 @@ void prFramebufferLinkDepthCubeMap(prFramebufferData* framebuffer, prCubeMapData
         prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferLinkDepthCubeMap: Cube map context does not match framebuffer context. Aborting operation, nothing was modified");
         return;
     }
-    framebuffer->depthCubeMap = depthCubeMap;
+    framebuffer->depthAttachment = depthCubeMap;
+    framebuffer->depthAttachmentType = 2;
 
     if(framebuffer->FBO) {
         i_prFramebufferUpdateBuffers(framebuffer);
@@ -168,7 +170,8 @@ void prFramebufferLinkStencilCubeMap(prFramebufferData* framebuffer, prCubeMapDa
         prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferLinkStencilCubeMap: Cube map context does not match framebuffer context. Aborting operation, nothing was modified");
         return;
     }
-    framebuffer->stencilCubeMap = stencilCubeMap;
+    framebuffer->stencilAttachment = stencilCubeMap;
+    framebuffer->stencilAttachmentType = 2;
 
     if(framebuffer->FBO) {
         i_prFramebufferUpdateBuffers(framebuffer);
@@ -180,16 +183,61 @@ void prFramebufferLinkDepthStencilCubeMap(prFramebufferData* framebuffer, prCube
         prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferLinkDepthStencilCubeMap: Cube map context does not match framebuffer context. Aborting operation, nothing was modified");
         return;
     }
-    framebuffer->depthStencilCubeMap = depthStencilCubeMap;
+    framebuffer->depthStencilAttachment = depthStencilCubeMap;
+    framebuffer->depthStencilAttachmentType = 2;
 
     if(framebuffer->FBO) {
         i_prFramebufferUpdateBuffers(framebuffer);
     }
 }
 
-void prFramebufferLinkColorTextureRBO(prFramebufferData* framebuffer, prRenderBufferData* colorRBO, unsigned int attachmentPoint) {
+void prFramebufferUnlinkColorAttachment(prFramebufferData* framebuffer, unsigned int attachmentPoint) {
+    prLogEvent(PR_EVENT_DATA, PR_LOG_TRACE, "prFramebufferUnlinkColorAttachment: Unlinking color attachment (attachment point: %i)", attachmentPoint);
+
+    framebuffer->colorAttachments[attachmentPoint] = NULL;
+    framebuffer->colorAttachmentsTypes[attachmentPoint] = 0;
+
+    if(framebuffer->FBO) {
+        i_prFramebufferUpdateBuffers(framebuffer);
+    }
+}
+
+void prFramebufferUnlinkDepthAttachment(prFramebufferData* framebuffer) {
+    prLogEvent(PR_EVENT_DATA, PR_LOG_TRACE, "prFramebufferUnlinkDepthAttachment: Unlinking depth attachment");
+
+    framebuffer->depthAttachment = NULL;
+    framebuffer->depthAttachmentType = 0;
+
+    if(framebuffer->FBO) {
+        i_prFramebufferUpdateBuffers(framebuffer);
+    }
+}
+
+void prFramebufferUnlinkStencilAttachment(prFramebufferData* framebuffer) {
+    prLogEvent(PR_EVENT_DATA, PR_LOG_TRACE, "prFramebufferUnlinkStencilAttachment: Unlinking stencil attachment");
+
+    framebuffer->stencilAttachment = NULL;
+    framebuffer->stencilAttachmentType = 0;
+
+    if(framebuffer->FBO) {
+        i_prFramebufferUpdateBuffers(framebuffer);
+    }
+}
+
+void prFramebufferUnlinkDepthStencilAttachment(prFramebufferData* framebuffer) {
+    prLogEvent(PR_EVENT_DATA, PR_LOG_TRACE, "prFramebufferUnlinkDepthStencilAttachment: Unlinking depth stencil attachment");
+
+    framebuffer->depthStencilAttachment = NULL;
+    framebuffer->depthStencilAttachmentType = 0;
+
+    if(framebuffer->FBO) {
+        i_prFramebufferUpdateBuffers(framebuffer);
+    }
+}
+
+void prFramebufferLinkColorRBO(prFramebufferData* framebuffer, prRenderBufferData* colorRBO, unsigned int attachmentPoint) {
     if(framebuffer->context != colorRBO->context) {
-        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferLinkColorTextureRBO: RenderBuffer context does not match framebuffer context. Aborting operation, nothing was modified");
+        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferLinkColorRBO: RenderBuffer context does not match framebuffer context. Aborting operation, nothing was modified");
         return;
     }
     if(attachmentPoint >= PR_MAX_FRAMEBUFFER_COLOR_ATTACHMENTS) {
@@ -199,45 +247,47 @@ void prFramebufferLinkColorTextureRBO(prFramebufferData* framebuffer, prRenderBu
 
     prLogEvent(PR_EVENT_DATA, PR_LOG_TRACE, "prFramebufferLinkColorRBO: Setting framebuffer color attachment %i (RBO)", attachmentPoint);
 
-    framebuffer->colorTexture[attachmentPoint] = NULL;
-    framebuffer->colorCubeMap[attachmentPoint] = NULL;
-    framebuffer->colorRBO[attachmentPoint] = colorRBO;
+    framebuffer->colorAttachments[attachmentPoint] = colorRBO;
+    framebuffer->colorAttachmentsTypes[attachmentPoint] = 3;
 
     if(framebuffer->FBO) {
         i_prFramebufferUpdateBuffers(framebuffer);
     }
 }
 
-void prFramebufferLinkDepthTextureRBO(prFramebufferData* framebuffer, prRenderBufferData* depthRBO) {
+void prFramebufferLinkDepthRBO(prFramebufferData* framebuffer, prRenderBufferData* depthRBO) {
     if(framebuffer->context != depthRBO->context) {
-        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferLinkDepthTextureRBO: RenderBuffer context does not match framebuffer context. Aborting operation, nothing was modified");
+        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferLinkDepthRBO: RenderBuffer context does not match framebuffer context. Aborting operation, nothing was modified");
         return;
     }
-    framebuffer->depthRBO = depthRBO;
+    framebuffer->depthAttachment = depthRBO;
+    framebuffer->depthAttachmentType = 3;
 
     if(framebuffer->FBO) {
         i_prFramebufferUpdateBuffers(framebuffer);
     }
 }
 
-void prFramebufferLinkStencilTextureRBO(prFramebufferData* framebuffer, prRenderBufferData* stencilRBO) {
+void prFramebufferLinkStencilRBO(prFramebufferData* framebuffer, prRenderBufferData* stencilRBO) {
     if(framebuffer->context != stencilRBO->context) {
-        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferLinkStencilTextureRBO: RenderBuffer context does not match framebuffer context. Aborting operation, nothing was modified");
+        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferLinkStencilRBO: RenderBuffer context does not match framebuffer context. Aborting operation, nothing was modified");
         return;
     }
-    framebuffer->stencilRBO = stencilRBO;
+    framebuffer->stencilAttachment = stencilRBO;
+    framebuffer->stencilAttachmentType = 3;
 
     if(framebuffer->FBO) {
         i_prFramebufferUpdateBuffers(framebuffer);
     }
 }
 
-void prFramebufferLinkDepthStencilTextureRBO(prFramebufferData* framebuffer, prRenderBufferData* depthStencilRBO) {
+void prFramebufferLinkDepthStencilRBO(prFramebufferData* framebuffer, prRenderBufferData* depthStencilRBO) {
     if(framebuffer->context != depthStencilRBO->context) {
-        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferLinkDepthStencilTextureRBO: RenderBuffer context does not match framebuffer context. Aborting operation, nothing was modified");
+        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferLinkDepthStencilRBO: RenderBuffer context does not match framebuffer context. Aborting operation, nothing was modified");
         return;
     }
-    framebuffer->depthStencilRBO = depthStencilRBO;
+    framebuffer->depthStencilAttachment = depthStencilRBO;
+    framebuffer->depthStencilAttachmentType = 2;
 
     if(framebuffer->FBO) {
         i_prFramebufferUpdateBuffers(framebuffer);

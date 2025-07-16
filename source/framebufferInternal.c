@@ -31,29 +31,29 @@ void i_prFramebufferUpdateBuffers(prFramebufferData* framebuffer) {
 
 void i_prFramebufferSetDataOnGPU(prFramebufferData* framebuffer) {
     for(int i = 0; i < PR_MAX_FRAMEBUFFER_COLOR_ATTACHMENTS; i++) {
-        i_prFramebufferSetAttachment(framebuffer, framebuffer->colorTexture[i], framebuffer->colorCubeMap[i], framebuffer->colorRBO[i], GL_COLOR_ATTACHMENT0 + i);
+        i_prFramebufferSetAttachment(framebuffer, framebuffer->colorAttachments[i], framebuffer->colorAttachmentsTypes[i], GL_COLOR_ATTACHMENT0 + i);
     }
-    i_prFramebufferSetAttachment(framebuffer, framebuffer->depthTexture, framebuffer->depthCubeMap, framebuffer->depthRBO, GL_DEPTH_ATTACHMENT);
-    i_prFramebufferSetAttachment(framebuffer, framebuffer->stencilTexture, framebuffer->stencilCubeMap, framebuffer->stencilRBO, GL_STENCIL_ATTACHMENT);
-    i_prFramebufferSetAttachment(framebuffer, framebuffer->depthStencilTexture, framebuffer->depthStencilCubeMap, framebuffer->depthStencilRBO, GL_DEPTH_STENCIL_ATTACHMENT);
+    i_prFramebufferSetAttachment(framebuffer, framebuffer->depthAttachment, framebuffer->depthAttachmentType, GL_DEPTH_ATTACHMENT);
+    i_prFramebufferSetAttachment(framebuffer, framebuffer->stencilAttachment, framebuffer->stencilAttachmentType, GL_STENCIL_ATTACHMENT);
+    i_prFramebufferSetAttachment(framebuffer, framebuffer->depthStencilAttachment, framebuffer->depthStencilAttachmentType, GL_DEPTH_STENCIL_ATTACHMENT);
 }
 
-void i_prFramebufferSetAttachment(prFramebufferData* framebuffer, prTextureData* texture, prCubeMapData* cubeMap, prRenderBufferData* renderbuffer, GLenum attachment) {
-    if(texture) {
-        if(texture->TBO) {
-            framebuffer->context->NamedFramebufferTexture(framebuffer->FBO, attachment, texture->TBO, 0);
+void i_prFramebufferSetAttachment(prFramebufferData* framebuffer, void* attachment, unsigned int type, GLenum attachmentPoint) {
+    if(attachment && type == 1) {
+        if((prTextureData*)attachment->TBO) {
+            framebuffer->context->NamedFramebufferTexture(framebuffer->FBO, attachmentPoint, texture->TBO, 0);
         }
     }
 
     if(cubeMap) {
         if(cubeMap->TBO) {
-            framebuffer->context->NamedFramebufferTexture(framebuffer->FBO, attachment, cubeMap->TBO, 0);
+            framebuffer->context->NamedFramebufferTexture(framebuffer->FBO, attachmentPoint, cubeMap->TBO, 0);
         }
     }
 
     if(renderbuffer) {
         if(renderbuffer->RBO) {
-            framebuffer->context->NamedFramebufferRenderbuffer(framebuffer->FBO, attachment, GL_RENDERBUFFER, renderbuffer->RBO);
+            framebuffer->context->NamedFramebufferRenderbuffer(framebuffer->FBO, attachmentPoint, GL_RENDERBUFFER, renderbuffer->RBO);
         }
     }
 }

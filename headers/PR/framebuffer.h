@@ -11,20 +11,14 @@ typedef struct prRenderBufferData prRenderBufferData;
 typedef struct prFramebufferData {
     GladGLContext* context;
     GLuint FBO;
-    prTextureData* colorTexture[PR_MAX_FRAMEBUFFER_COLOR_ATTACHMENTS];
-    prTextureData* depthTexture;
-    prTextureData* stencilTexture;
-    prTextureData* depthStencilTexture;
-
-    prCubeMapData* colorCubeMap[PR_MAX_FRAMEBUFFER_COLOR_ATTACHMENTS];
-    prCubeMapData* depthCubeMap;
-    prCubeMapData* stencilCubeMap;
-    prCubeMapData* depthStencilCubeMap;
-
-    prRenderBufferData* colorRBO[PR_MAX_FRAMEBUFFER_COLOR_ATTACHMENTS];
-    prRenderBufferData* depthRBO;
-    prRenderBufferData* stencilRBO;
-    prRenderBufferData* depthStencilRBO;
+    void* colorAttachments[PR_MAX_FRAMEBUFFER_COLOR_ATTACHMENTS];
+    void* depthAttachment;
+    void* stencilAttachment;
+    void* depthStencilAttachment;
+    int colorAttachmentsTypes[PR_MAX_FRAMEBUFFER_COLOR_ATTACHMENTS];
+    int depthAttachmentType;
+    int stencilAttachmentType;
+    int depthStencilAttachmentType;
 } prFramebufferData;
 
 prFramebufferData* prFramebufferCreate();
@@ -48,10 +42,15 @@ void prFramebufferLinkDepthCubeMap(prFramebufferData* framebuffer, prCubeMapData
 void prFramebufferLinkStencilCubeMap(prFramebufferData* framebuffer, prCubeMapData* stencilCubeMap);
 void prFramebufferLinkDepthStencilCubeMap(prFramebufferData* framebuffer, prCubeMapData* depthStencilCubeMap);
 
-void prFramebufferLinkColorTextureRBO(prFramebufferData* framebuffer, prRenderBufferData* colorRBO, unsigned int attachmentPoint);
-void prFramebufferLinkDepthTextureRBO(prFramebufferData* framebuffer, prRenderBufferData* depthRBO);
-void prFramebufferLinkStencilTextureRBO(prFramebufferData* framebuffer, prRenderBufferData* stencilRBO);
-void prFramebufferLinkDepthStencilTextureRBO(prFramebufferData* framebuffer, prRenderBufferData* depthStencilRBO);
+void prFramebufferLinkColorRBO(prFramebufferData* framebuffer, prRenderBufferData* colorRBO, unsigned int attachmentPoint);
+void prFramebufferLinkDepthRBO(prFramebufferData* framebuffer, prRenderBufferData* depthRBO);
+void prFramebufferLinkStencilRBO(prFramebufferData* framebuffer, prRenderBufferData* stencilRBO);
+void prFramebufferLinkDepthStencilRBO(prFramebufferData* framebuffer, prRenderBufferData* depthStencilRBO);
+
+void prFramebufferUnlinkColorAttachment(prFramebufferData* framebuffer, unsigned int attachmentPoint);
+void prFramebufferUnlinkDepthAttachment(prFramebufferData* framebuffer);
+void prFramebufferUnlinkStencilAttachment(prFramebufferData* framebuffer);
+void prFramebufferUnlinkDepthStencilAttachment(prFramebufferData* framebuffer);
 
 void prFramebufferSetDrawBuffer(prFramebufferData* framebuffer, GLenum buffer);
 void prFramebufferSetReadBuffer(prFramebufferData* framebuffer, GLenum buffer);

@@ -116,14 +116,14 @@ int main(int argc, char** argv) {
 
     framebufferMultisampled = prFramebufferCreate();
     prFramebufferLinkContext(framebufferMultisampled, test->openglContext);
-    prFramebufferLinkColorTextureRBO(framebufferMultisampled, colorRBOMultisampled, 0);
+    prFramebufferLinkColorRBO(framebufferMultisampled, colorRBOMultisampled, 0);
     prFramebufferLinkColorTexture(framebufferMultisampled, colorTexture2, 1);
     prFramebufferDrawBuffers(framebufferMultisampled, 2, (GLenum[]){GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1});
-    prFramebufferLinkDepthStencilTextureRBO(framebufferMultisampled, depthStencilRBOMultisampled);
+    prFramebufferLinkDepthStencilRBO(framebufferMultisampled, depthStencilRBOMultisampled);
 
     postProcessingTexture = prTextureCreate();
     prTextureLinkContext(postProcessingTexture, test->openglContext);
-    prTextureUpdate(postProcessingTexture, PR_FORMAT_RGBA, PR_FILTER_LINEAR, PR_WRAPPING_EDGE, NULL, 0, windowWidth, windowHeight, 0);
+    prTextureUpdate(postProcessingTexture, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR, NULL, 0, windowWidth, windowHeight, 0);
 
     colorTexture = prTextureCreate();
     prTextureLinkContext(colorTexture, test->openglContext);
@@ -136,7 +136,7 @@ int main(int argc, char** argv) {
     framebuffer = prFramebufferCreate();
     prFramebufferLinkContext(framebuffer, test->openglContext);
     prFramebufferLinkColorTexture(framebuffer, colorTexture, 0);
-    prFramebufferLinkDepthStencilTextureRBO(framebuffer, depthStencilRBO);
+    prFramebufferLinkDepthStencilRBO(framebuffer, depthStencilRBO);
 
     prCubeMapData* skyboxDefaultCubeMap = makeCubeMapSingleColors(test->openglContext, (float[PR_CUBE_MAP_SIDES][4]){
         {0.0f, 0.0f, 0.0f, 1.0f},
