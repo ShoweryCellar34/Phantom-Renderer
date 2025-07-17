@@ -191,50 +191,6 @@ void prFramebufferLinkDepthStencilCubeMap(prFramebufferData* framebuffer, prCube
     }
 }
 
-void prFramebufferUnlinkColorAttachment(prFramebufferData* framebuffer, unsigned int attachmentPoint) {
-    prLogEvent(PR_EVENT_DATA, PR_LOG_TRACE, "prFramebufferUnlinkColorAttachment: Unlinking color attachment (attachment point: %i)", attachmentPoint);
-
-    framebuffer->colorAttachments[attachmentPoint] = NULL;
-    framebuffer->colorAttachmentsTypes[attachmentPoint] = 0;
-
-    if(framebuffer->FBO) {
-        i_prFramebufferUpdateBuffers(framebuffer);
-    }
-}
-
-void prFramebufferUnlinkDepthAttachment(prFramebufferData* framebuffer) {
-    prLogEvent(PR_EVENT_DATA, PR_LOG_TRACE, "prFramebufferUnlinkDepthAttachment: Unlinking depth attachment");
-
-    framebuffer->depthAttachment = NULL;
-    framebuffer->depthAttachmentType = 0;
-
-    if(framebuffer->FBO) {
-        i_prFramebufferUpdateBuffers(framebuffer);
-    }
-}
-
-void prFramebufferUnlinkStencilAttachment(prFramebufferData* framebuffer) {
-    prLogEvent(PR_EVENT_DATA, PR_LOG_TRACE, "prFramebufferUnlinkStencilAttachment: Unlinking stencil attachment");
-
-    framebuffer->stencilAttachment = NULL;
-    framebuffer->stencilAttachmentType = 0;
-
-    if(framebuffer->FBO) {
-        i_prFramebufferUpdateBuffers(framebuffer);
-    }
-}
-
-void prFramebufferUnlinkDepthStencilAttachment(prFramebufferData* framebuffer) {
-    prLogEvent(PR_EVENT_DATA, PR_LOG_TRACE, "prFramebufferUnlinkDepthStencilAttachment: Unlinking depth stencil attachment");
-
-    framebuffer->depthStencilAttachment = NULL;
-    framebuffer->depthStencilAttachmentType = 0;
-
-    if(framebuffer->FBO) {
-        i_prFramebufferUpdateBuffers(framebuffer);
-    }
-}
-
 void prFramebufferLinkColorRBO(prFramebufferData* framebuffer, prRenderBufferData* colorRBO, unsigned int attachmentPoint) {
     if(framebuffer->context != colorRBO->context) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferLinkColorRBO: RenderBuffer context does not match framebuffer context. Aborting operation, nothing was modified");
@@ -287,7 +243,51 @@ void prFramebufferLinkDepthStencilRBO(prFramebufferData* framebuffer, prRenderBu
         return;
     }
     framebuffer->depthStencilAttachment = depthStencilRBO;
-    framebuffer->depthStencilAttachmentType = 2;
+    framebuffer->depthStencilAttachmentType = 3;
+
+    if(framebuffer->FBO) {
+        i_prFramebufferUpdateBuffers(framebuffer);
+    }
+}
+
+void prFramebufferUnlinkColorAttachment(prFramebufferData* framebuffer, unsigned int attachmentPoint) {
+    prLogEvent(PR_EVENT_DATA, PR_LOG_TRACE, "prFramebufferUnlinkColorAttachment: Unlinking color attachment (attachment point: %i)", attachmentPoint);
+
+    framebuffer->colorAttachments[attachmentPoint] = NULL;
+    framebuffer->colorAttachmentsTypes[attachmentPoint] = 0;
+
+    if(framebuffer->FBO) {
+        i_prFramebufferUpdateBuffers(framebuffer);
+    }
+}
+
+void prFramebufferUnlinkDepthAttachment(prFramebufferData* framebuffer) {
+    prLogEvent(PR_EVENT_DATA, PR_LOG_TRACE, "prFramebufferUnlinkDepthAttachment: Unlinking depth attachment");
+
+    framebuffer->depthAttachment = NULL;
+    framebuffer->depthAttachmentType = 0;
+
+    if(framebuffer->FBO) {
+        i_prFramebufferUpdateBuffers(framebuffer);
+    }
+}
+
+void prFramebufferUnlinkStencilAttachment(prFramebufferData* framebuffer) {
+    prLogEvent(PR_EVENT_DATA, PR_LOG_TRACE, "prFramebufferUnlinkStencilAttachment: Unlinking stencil attachment");
+
+    framebuffer->stencilAttachment = NULL;
+    framebuffer->stencilAttachmentType = 0;
+
+    if(framebuffer->FBO) {
+        i_prFramebufferUpdateBuffers(framebuffer);
+    }
+}
+
+void prFramebufferUnlinkDepthStencilAttachment(prFramebufferData* framebuffer) {
+    prLogEvent(PR_EVENT_DATA, PR_LOG_TRACE, "prFramebufferUnlinkDepthStencilAttachment: Unlinking depth stencil attachment");
+
+    framebuffer->depthStencilAttachment = NULL;
+    framebuffer->depthStencilAttachmentType = 0;
 
     if(framebuffer->FBO) {
         i_prFramebufferUpdateBuffers(framebuffer);

@@ -39,21 +39,28 @@ void i_prFramebufferSetDataOnGPU(prFramebufferData* framebuffer) {
 }
 
 void i_prFramebufferSetAttachment(prFramebufferData* framebuffer, void* attachment, unsigned int type, GLenum attachmentPoint) {
-    if(attachment && type == 1) {
-        if((prTextureData*)attachment->TBO) {
-            framebuffer->context->NamedFramebufferTexture(framebuffer->FBO, attachmentPoint, texture->TBO, 0);
-        }
-    }
+    if(attachment) {
+        switch(type) {
+            case 1:
+                if(((prTextureData*)attachment)->TBO) {
+                    prTextureData* texture = attachment;
+                    framebuffer->context->NamedFramebufferTexture(framebuffer->FBO, attachmentPoint, texture->TBO, 0);
+                }
+                break;
 
-    if(cubeMap) {
-        if(cubeMap->TBO) {
-            framebuffer->context->NamedFramebufferTexture(framebuffer->FBO, attachmentPoint, cubeMap->TBO, 0);
-        }
-    }
+            case 2:
+                if(((prCubeMapData*)attachment)->TBO) {
+                    prCubeMapData* cubeMap = attachment;
+                    framebuffer->context->NamedFramebufferTexture(framebuffer->FBO, attachmentPoint, cubeMap->TBO, 0);
+                }
+                break;
 
-    if(renderbuffer) {
-        if(renderbuffer->RBO) {
-            framebuffer->context->NamedFramebufferRenderbuffer(framebuffer->FBO, attachmentPoint, GL_RENDERBUFFER, renderbuffer->RBO);
+            case 3:
+                if(((prRenderBufferData*)attachment)->RBO) {
+                    prRenderBufferData* RBO = attachment;
+                    framebuffer->context->NamedFramebufferRenderbuffer(framebuffer->FBO, attachmentPoint, GL_RENDERBUFFER, RBO->RBO);
+                }
+                break;
         }
     }
 }

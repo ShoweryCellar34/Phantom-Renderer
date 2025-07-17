@@ -137,6 +137,7 @@ void i_prTextureUpdateBorderColorOnGPU(prTextureData* texture) {
         return;
     }
 
-    if(texture->samples < PR_MIN_SAMPLES)
-    texture->context->TextureParameterfv(texture->TBO, GL_TEXTURE_BORDER_COLOR, texture->borderColor);
+    if(texture->samples < PR_MIN_SAMPLES) {
+        texture->context->TextureParameterfv(texture->TBO, GL_TEXTURE_BORDER_COLOR, texture->borderColor);
+    }
 }
