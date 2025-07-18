@@ -120,9 +120,6 @@ int main(int argc, char** argv) {
     // prFramebufferLinkColorTexture(framebufferMultisampled, colorTexture2, 1);
     // prFramebufferDrawBuffers(framebufferMultisampled, 2, (GLenum[]){GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1});
     prFramebufferLinkDepthStencilRBO(framebufferMultisampled, depthStencilRBOMultisampled);
-    // if(prFramebufferCheckStatus(framebufferMultisampled) != GL_FRAMEBUFFER_COMPLETE) {
-    //     return;
-    // }
 
     postProcessingTexture = prTextureCreate();
     prTextureLinkContext(postProcessingTexture, test->openglContext);

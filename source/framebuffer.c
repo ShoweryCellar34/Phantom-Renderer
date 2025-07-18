@@ -308,7 +308,7 @@ void prFramebufferDrawBuffers(prFramebufferData* framebuffer, GLsizei count, con
         prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferDrawBuffers: Framebuffer context cannot be NULL. Aborting operation, nothing was modified");
         return;
     }
-    if(count < 0) {
+    if(count < 1) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferDrawBuffers: Count cannot be less than zero. Aborting operation, nothing was modified");
         return;
     }

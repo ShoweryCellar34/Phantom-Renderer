@@ -100,7 +100,8 @@ void i_prTextureSetDataOnGPU(prTextureData* texture) {
 void i_prTextureCreateOnGPU(prTextureData* texture) {
     prLogEvent(PR_EVENT_OPENGL, PR_LOG_INFO, "i_prTextureCreateOnGPU: Creating texture buffer object. Width: %i Height: %i Channels: %i", texture->width, texture->height, texture->channels);
 
-    texture->context->CreateTextures((texture->samples >= PR_MIN_SAMPLES ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D), 1, &texture->TBO);
+    GLenum format = (texture->samples >= PR_MIN_SAMPLES ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D);
+    texture->context->CreateTextures(format, 1, &texture->TBO);
     if(!texture->TBO) {
         prLogEvent(PR_EVENT_OPENGL, PR_LOG_WARNING, "i_prTextureCreateOnGPU: Failed to create texture buffer object. Aborting operation, nothing was modified");
         return;

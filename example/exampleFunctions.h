@@ -4,7 +4,6 @@
 #include <time.h>
 #include <string.h>
 #include <GLFW/glfw3.h>
-#define STB_IMAGE_WRITE_IMPLEMENTATION
 #define STBIW_MALLOC prMalloc
 #define STBIW_REALLOC prRealloc
 #define STBIW_FREE prFree
@@ -86,11 +85,6 @@ void framebufferSizeCallback(GLFWwindow* window, int width, int height) {
 
     prTextureUpdate(colorTexture, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR, NULL, 0, windowWidth, windowHeight, 0);
     prRenderBufferUpdate(depthStencilRBO, PR_FORMAT_DEPTH_STENCIL, windowWidth, windowHeight, 0);
-
-    context->BlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    prTextureBindImage(postProcessingTexture, 0, 0, PR_ACCESS_WRITE_ONLY, GL_RGBA32F);
-    prComputeShaderDispatch(computeShaderProgram, windowWidth, windowHeight, 1);
-    context->MemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
 }
 
 void cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
