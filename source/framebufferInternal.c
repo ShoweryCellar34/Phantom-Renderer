@@ -2,6 +2,7 @@
 
 #include <PR/logger.h>
 #include <PR/texture.h>
+#include <PR/textureMultisampled.h>
 #include <PR/cubeMap.h>
 #include <PR/renderbuffer.h>
 
@@ -49,13 +50,20 @@ void i_prFramebufferSetAttachment(prFramebufferData* framebuffer, void* attachme
                 break;
 
             case 2:
+                if(((prTextureMultisampledData*)attachment)->TBO) {
+                    prTextureMultisampledData* texture = attachment;
+                    framebuffer->context->NamedFramebufferTexture(framebuffer->FBO, attachmentPoint, texture->TBO, 0);
+                }
+                break;
+
+            case 3:
                 if(((prCubeMapData*)attachment)->TBO) {
                     prCubeMapData* cubeMap = attachment;
                     framebuffer->context->NamedFramebufferTexture(framebuffer->FBO, attachmentPoint, cubeMap->TBO, 0);
                 }
                 break;
 
-            case 3:
+            case 4:
                 if(((prRenderBufferData*)attachment)->RBO) {
                     prRenderBufferData* RBO = attachment;
                     framebuffer->context->NamedFramebufferRenderbuffer(framebuffer->FBO, attachmentPoint, GL_RENDERBUFFER, RBO->RBO);

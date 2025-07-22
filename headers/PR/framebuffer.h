@@ -5,6 +5,7 @@
 #include <glad/gl.h>
 
 typedef struct prTextureData prTextureData;
+typedef struct prTextureMultisampledData prTextureMultisampledData;
 typedef struct prCubeMapData prCubeMapData;
 typedef struct prRenderBufferData prRenderBufferData;
 
@@ -36,6 +37,11 @@ void prFramebufferLinkColorTexture(prFramebufferData* framebuffer, prTextureData
 void prFramebufferLinkDepthTexture(prFramebufferData* framebuffer, prTextureData* depthTexture);
 void prFramebufferLinkStencilTexture(prFramebufferData* framebuffer, prTextureData* stencilTexture);
 void prFramebufferLinkDepthStencilTexture(prFramebufferData* framebuffer, prTextureData* depthStencilTexture);
+
+void prFramebufferLinkColorTextureMultisampled(prFramebufferData* framebuffer, prTextureMultisampledData* colorTexture, unsigned int attachmentPoint);
+void prFramebufferLinkDepthTextureMultisampled(prFramebufferData* framebuffer, prTextureMultisampledData* depthTexture);
+void prFramebufferLinkStencilTextureMultisampled(prFramebufferData* framebuffer, prTextureMultisampledData* stencilTexture);
+void prFramebufferLinkDepthStencilTextureMultisampled(prFramebufferData* framebuffer, prTextureMultisampledData* depthStencilTexture);
 
 void prFramebufferLinkColorCubeMap(prFramebufferData* framebuffer, prCubeMapData* colorCubeMap, unsigned int attachmentPoint);
 void prFramebufferLinkDepthCubeMap(prFramebufferData* framebuffer, prCubeMapData* depthCubeMap);

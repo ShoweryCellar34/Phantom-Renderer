@@ -15,6 +15,7 @@ extern "C" {
 #include "renderbuffer.h"
 #include "shader.h"
 #include "texture.h"
+#include "textureMultisampled.h"
 #include "window.h"
 
 #ifdef __cplusplus

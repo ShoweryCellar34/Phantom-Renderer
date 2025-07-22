@@ -121,7 +121,7 @@ void i_prCubeMapCreateOnGPU(prCubeMapData* cubeMap) {
 
     cubeMap->context->CreateTextures(GL_TEXTURE_CUBE_MAP, 1, &cubeMap->TBO);
     if(!cubeMap->TBO) {
-        prLogEvent(PR_EVENT_OPENGL, PR_LOG_WARNING, "i_prCubeMapCreateOnGPU: Failed to create cube map buffer object. Aborting operation, nothing was modified");
+        prLogEvent(PR_EVENT_OPENGL, PR_LOG_ERROR, "i_prCubeMapCreateOnGPU: Failed to create cube map buffer object. Aborting operation, nothing was modified");
         return;
     }
 
@@ -139,7 +139,7 @@ void i_prCubeMapUpdateAllOnGPU(prCubeMapData* cubeMap) {
     prLogEvent(PR_EVENT_OPENGL, PR_LOG_INFO, "i_prCubeMapUpdateAllOnGPU: Updating all faces of cube map buffer object. Width: %i Height: %i Channels: %i", cubeMap->width[0], cubeMap->height[0], cubeMap->channels[0]);
 
     if(!cubeMap->TBO) {
-        prLogEvent(PR_EVENT_OPENGL, PR_LOG_WARNING, "i_prCubeMapUpdateAllOnGPU: Failed to update all faces of cube map buffer object, invalid ID. Aborting operation, nothing was modified");
+        prLogEvent(PR_EVENT_OPENGL, PR_LOG_ERROR, "i_prCubeMapUpdateAllOnGPU: Failed to update all faces of cube map buffer object, invalid ID. Aborting operation, nothing was modified");
         return;
     }
 
@@ -151,7 +151,7 @@ void i_prCubeMapUpdateOnGPU(prCubeMapData* cubeMap, int side) {
     prLogEvent(PR_EVENT_OPENGL, PR_LOG_INFO, "i_prCubeMapUpdateOnGPU: Updating face %i of cube map buffer object. Width: %i Height: %i Channels: %i", side, cubeMap->width[side], cubeMap->height[side], cubeMap->channels[side]);
 
     if(!cubeMap->TBO) {
-        prLogEvent(PR_EVENT_OPENGL, PR_LOG_WARNING, "i_prCubeMapUpdateOnGPU: Failed to update face %i of cube map buffer object, invalid ID. Aborting operation, nothing was modified", side);
+        prLogEvent(PR_EVENT_OPENGL, PR_LOG_ERROR, "i_prCubeMapUpdateOnGPU: Failed to update face %i of cube map buffer object, invalid ID. Aborting operation, nothing was modified", side);
         return;
     }
 
@@ -164,7 +164,7 @@ void i_prCubeMapUpdateBorderColorOnGPU(prCubeMapData* cubeMap) {
         cubeMap->borderColor[0], cubeMap->borderColor[1], cubeMap->borderColor[2], cubeMap->borderColor[3]);
 
     if(!cubeMap->TBO) {
-        prLogEvent(PR_EVENT_OPENGL, PR_LOG_WARNING, "i_prCubeMapUpdateBorderColorOnGPU: Failed to update cube map buffer object, invalid ID. Aborting operation, nothing was modified");
+        prLogEvent(PR_EVENT_OPENGL, PR_LOG_ERROR, "i_prCubeMapUpdateBorderColorOnGPU: Failed to update cube map buffer object, invalid ID. Aborting operation, nothing was modified");
         return;
     }
 

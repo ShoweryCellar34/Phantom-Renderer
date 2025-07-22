@@ -4,6 +4,7 @@
 
 #include <PR/memory.h>
 #include <PR/texture.h>
+#include <PR/textureMultisampled.h>
 #include <PR/cubeMap.h>
 #include <PR/renderbuffer.h>
 #include <PR/logger.h>
@@ -132,6 +133,65 @@ void prFramebufferLinkDepthStencilTexture(prFramebufferData* framebuffer, prText
     }
 }
 
+void prFramebufferLinkColorTextureMultisampled(prFramebufferData* framebuffer, prTextureMultisampledData* colorTexture, unsigned int attachmentPoint) {
+    if(colorTexture && framebuffer->context != colorTexture->context) {
+        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferLinkColorTextureMultisampled: Multisampled texture context does not match framebuffer context. Aborting operation, nothing was modified");
+        return;
+    }
+    if(attachmentPoint >= PR_MAX_FRAMEBUFFER_COLOR_ATTACHMENTS) {
+        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferLinkColorTextureMultisampled: Requested attachment point (%i) too high. Aborting operation, nothing was modified");
+        return;
+    }
+
+    prLogEvent(PR_EVENT_DATA, PR_LOG_TRACE, "prFramebufferLinkColorTextureMultisampled: Setting framebuffer color attachment %i (Multisampled texture)", attachmentPoint);
+
+    framebuffer->colorAttachments[attachmentPoint] = colorTexture;
+    framebuffer->colorAttachmentsTypes[attachmentPoint] = 2;
+
+    if(framebuffer->FBO) {
+        i_prFramebufferUpdateBuffers(framebuffer);
+    }
+}
+
+void prFramebufferLinkDepthTextureMultisampled(prFramebufferData* framebuffer, prTextureMultisampledData* depthTexture) {
+    if(depthTexture && framebuffer->context != depthTexture->context) {
+        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferLinkDepthTextureMultisampled: Multisampled texture context does not match framebuffer context. Aborting operation, nothing was modified");
+        return;
+    }
+    framebuffer->depthAttachment = depthTexture;
+    framebuffer->depthAttachmentType = 2;
+
+    if(framebuffer->FBO) {
+        i_prFramebufferUpdateBuffers(framebuffer);
+    }
+}
+
+void prFramebufferLinkStencilTextureMultisampled(prFramebufferData* framebuffer, prTextureMultisampledData* stencilTexture) {
+    if(stencilTexture && framebuffer->context != stencilTexture->context) {
+        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferLinkStencilTextureMultisampled: Multisampled texture context does not match framebuffer context. Aborting operation, nothing was modified");
+        return;
+    }
+    framebuffer->stencilAttachment = stencilTexture;
+    framebuffer->stencilAttachmentType = 2;
+
+    if(framebuffer->FBO) {
+        i_prFramebufferUpdateBuffers(framebuffer);
+    }
+}
+
+void prFramebufferLinkDepthStencilTextureMultisampled(prFramebufferData* framebuffer, prTextureMultisampledData* depthStencilTexture) {
+    if(depthStencilTexture && framebuffer->context != depthStencilTexture->context) {
+        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferLinkDepthStencilTextureMultisampled: Multisampled texture context does not match framebuffer context. Aborting operation, nothing was modified");
+        return;
+    }
+    framebuffer->depthStencilAttachment = depthStencilTexture;
+    framebuffer->depthStencilAttachmentType = 2;
+
+    if(framebuffer->FBO) {
+        i_prFramebufferUpdateBuffers(framebuffer);
+    }
+}
+
 void prFramebufferLinkColorCubeMap(prFramebufferData* framebuffer, prCubeMapData* colorCubeMap, unsigned int attachmentPoint) {
     if(framebuffer->context != colorCubeMap->context) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferLinkColorCubeMap: Cube map context does not match framebuffer context. Aborting operation, nothing was modified");
@@ -145,7 +205,7 @@ void prFramebufferLinkColorCubeMap(prFramebufferData* framebuffer, prCubeMapData
     prLogEvent(PR_EVENT_DATA, PR_LOG_TRACE, "prFramebufferLinkColorCubeMap: Setting framebuffer color attachment %i (Cube Map)", attachmentPoint);
 
     framebuffer->colorAttachments[attachmentPoint] = colorCubeMap;
-    framebuffer->colorAttachmentsTypes[attachmentPoint] = 2;
+    framebuffer->colorAttachmentsTypes[attachmentPoint] = 3;
 
     if(framebuffer->FBO) {
         i_prFramebufferUpdateBuffers(framebuffer);
@@ -158,7 +218,7 @@ void prFramebufferLinkDepthCubeMap(prFramebufferData* framebuffer, prCubeMapData
         return;
     }
     framebuffer->depthAttachment = depthCubeMap;
-    framebuffer->depthAttachmentType = 2;
+    framebuffer->depthAttachmentType = 3;
 
     if(framebuffer->FBO) {
         i_prFramebufferUpdateBuffers(framebuffer);
@@ -171,7 +231,7 @@ void prFramebufferLinkStencilCubeMap(prFramebufferData* framebuffer, prCubeMapDa
         return;
     }
     framebuffer->stencilAttachment = stencilCubeMap;
-    framebuffer->stencilAttachmentType = 2;
+    framebuffer->stencilAttachmentType = 3;
 
     if(framebuffer->FBO) {
         i_prFramebufferUpdateBuffers(framebuffer);
@@ -184,7 +244,7 @@ void prFramebufferLinkDepthStencilCubeMap(prFramebufferData* framebuffer, prCube
         return;
     }
     framebuffer->depthStencilAttachment = depthStencilCubeMap;
-    framebuffer->depthStencilAttachmentType = 2;
+    framebuffer->depthStencilAttachmentType = 3;
 
     if(framebuffer->FBO) {
         i_prFramebufferUpdateBuffers(framebuffer);
@@ -204,7 +264,7 @@ void prFramebufferLinkColorRBO(prFramebufferData* framebuffer, prRenderBufferDat
     prLogEvent(PR_EVENT_DATA, PR_LOG_TRACE, "prFramebufferLinkColorRBO: Setting framebuffer color attachment %i (RBO)", attachmentPoint);
 
     framebuffer->colorAttachments[attachmentPoint] = colorRBO;
-    framebuffer->colorAttachmentsTypes[attachmentPoint] = 3;
+    framebuffer->colorAttachmentsTypes[attachmentPoint] = 4;
 
     if(framebuffer->FBO) {
         i_prFramebufferUpdateBuffers(framebuffer);
@@ -217,7 +277,7 @@ void prFramebufferLinkDepthRBO(prFramebufferData* framebuffer, prRenderBufferDat
         return;
     }
     framebuffer->depthAttachment = depthRBO;
-    framebuffer->depthAttachmentType = 3;
+    framebuffer->depthAttachmentType = 4;
 
     if(framebuffer->FBO) {
         i_prFramebufferUpdateBuffers(framebuffer);
@@ -230,7 +290,7 @@ void prFramebufferLinkStencilRBO(prFramebufferData* framebuffer, prRenderBufferD
         return;
     }
     framebuffer->stencilAttachment = stencilRBO;
-    framebuffer->stencilAttachmentType = 3;
+    framebuffer->stencilAttachmentType = 4;
 
     if(framebuffer->FBO) {
         i_prFramebufferUpdateBuffers(framebuffer);
@@ -243,7 +303,7 @@ void prFramebufferLinkDepthStencilRBO(prFramebufferData* framebuffer, prRenderBu
         return;
     }
     framebuffer->depthStencilAttachment = depthStencilRBO;
-    framebuffer->depthStencilAttachmentType = 3;
+    framebuffer->depthStencilAttachmentType = 4;
 
     if(framebuffer->FBO) {
         i_prFramebufferUpdateBuffers(framebuffer);

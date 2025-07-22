@@ -59,7 +59,7 @@ void i_prRenderBufferCreateOnGPU(prRenderBufferData* renderBuffer) {
 
     renderBuffer->context->CreateRenderbuffers(1, &renderBuffer->RBO);
     if(!renderBuffer->RBO) {
-        prLogEvent(PR_EVENT_OPENGL, PR_LOG_WARNING, "i_prRenderBufferCreateOnGPU: Failed to create renderbuffer buffer object. Aborting operation, nothing was modified");
+        prLogEvent(PR_EVENT_OPENGL, PR_LOG_ERROR, "i_prRenderBufferCreateOnGPU: Failed to create renderbuffer buffer object. Aborting operation, nothing was modified");
         return;
     }
 
@@ -83,7 +83,7 @@ void i_prRenderBufferUpdateOnGPU(prRenderBufferData* renderBuffer) {
     prLogEvent(PR_EVENT_OPENGL, PR_LOG_INFO, "i_prRenderBufferUpdateOnGPU: Updating renderbuffer buffer object. Width: %i Height: %i", renderBuffer->width, renderBuffer->height);
 
     if(!renderBuffer->RBO) {
-        prLogEvent(PR_EVENT_OPENGL, PR_LOG_WARNING, "i_prRenderBufferUpdateOnGPU: Failed to update renderbuffer buffer object, invalid ID. Aborting operation, nothing was modified");
+        prLogEvent(PR_EVENT_OPENGL, PR_LOG_ERROR, "i_prRenderBufferUpdateOnGPU: Failed to update renderbuffer buffer object, invalid ID. Aborting operation, nothing was modified");
         return;
     }
 

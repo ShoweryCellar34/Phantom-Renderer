@@ -39,20 +39,23 @@ void prRenderBufferUpdate(prRenderBufferData* renderBuffer, GLenum format, GLsiz
     if(samples >= PR_MIN_SAMPLES && samples <= PR_MAX_SAMPLES) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_INFO, "prRenderBufferUpdate: Using multisamples (samples: %i)", samples);
     }
+    if(samples < PR_MIN_SAMPLES) {
+        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prRenderBufferUpdate: Provided samples (samples: %i min samples: %i) too low. Aborting operation, nothing was modified", samples, PR_MIN_SAMPLES);
+        return;
+    }
     if(samples > PR_MAX_SAMPLES) {
-        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prRenderBufferUpdate: Provided samples (samples: %i) too high. Aborting operation, nothing was modified", samples);
+        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prRenderBufferUpdate: Provided samples (samples: %i max samples: %i) too high. Aborting operation, nothing was modified", samples, PR_MAX_SAMPLES);
         return;
     }
     if((format != PR_FORMAT_A) && (format != PR_FORMAT_G) && (format != PR_FORMAT_B) &&
         (format != PR_FORMAT_RGB) && (format != PR_FORMAT_RGBA) &&
         (format != PR_FORMAT_STENCIL) && (format != PR_FORMAT_DEPTH) && (format != PR_FORMAT_DEPTH_STENCIL)
     ) {
-        prLogEvent(PR_EVENT_DATA, PR_LOG_WARNING, "prRenderBufferUpdate: Invalid format for renderbuffer (was %i), using PR_FORMAT_RGB type", format);
-        renderBuffer->format = PR_FORMAT_RGB;
-    } else {
-        renderBuffer->format = format;
+        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prRenderBufferUpdate: Invalid format for renderbuffer (was %i). Aborting operation, nothing was modified", format);
+        return;
     }
 
+    renderBuffer->format = format;
     renderBuffer->width = width;
     renderBuffer->height = height;
     renderBuffer->samples = samples;

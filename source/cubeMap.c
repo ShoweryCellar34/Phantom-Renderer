@@ -61,11 +61,10 @@ void prCubeMapUpdateAll(prCubeMapData* cubeMap, GLenum format[PR_CUBE_MAP_SIDES]
             (format[i] != PR_FORMAT_STENCIL) && (format[i] != PR_FORMAT_DEPTH) && (format[i] != PR_FORMAT_DEPTH_STENCIL) &&
             (format[i] != PR_FORMAT_AUTO)
         ) {
-            prLogEvent(PR_EVENT_DATA, PR_LOG_WARNING, "prCubeMapUpdateAll: [Face %i] Invalid format for cube map face (was %i), using PR_FORMAT_RGB type", i, format);
-            cubeMap->format[i] = PR_FORMAT_RGB;
-        } else {
-            cubeMap->format[i] = format[i];
+            prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prCubeMapUpdateAll: [Face %i] Invalid format for cube map face (was %i). Aborting operation, modifications may have occurred", i, format);
+            return;
         }
+        cubeMap->format[i] = format[i];
 
         unsigned char* temp = NULL;
         if(rawTextureData[i] && (!width[i] || !height[i])) {
@@ -184,11 +183,10 @@ void prCubeMapUpdate(prCubeMapData* cubeMap, int side, GLenum format, GLint wrap
         (format != PR_FORMAT_STENCIL) && (format != PR_FORMAT_DEPTH) && (format != PR_FORMAT_DEPTH_STENCIL) &&
         (format != PR_FORMAT_AUTO) && (format != PR_FORMAT_SRGB_AUTO)
     ) {
-        prLogEvent(PR_EVENT_DATA, PR_LOG_WARNING, "prCubeMapUpdate: [Face %i] Invalid format for cube map face (was %i), using PR_FORMAT_RGB type", side, format);
-        cubeMap->format[side] = PR_FORMAT_RGB;
-    } else {
-        cubeMap->format[side] = format;
+        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prCubeMapUpdate: [Face %i] Invalid format for cube map face (was %i). Aborting operation, modifications may have occurred", side, format);
+        return;
     }
+    cubeMap->format[side] = format;
 
     if((wrappingMode != PR_WRAPPING_REPEAT) && (wrappingMode != PR_WRAPPING_REPEAT_MIRRORED) &&
     (wrappingMode != PR_WRAPPING_EDGE) && (wrappingMode != PR_WRAPPING_BORDER)
