@@ -39,7 +39,7 @@ void prRenderBufferUpdate(prRenderBufferData* renderBuffer, GLenum format, GLsiz
     if(samples >= PR_MIN_SAMPLES && samples <= PR_MAX_SAMPLES) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_INFO, "prRenderBufferUpdate: Using multisamples (samples: %i)", samples);
     }
-    if(samples < PR_MIN_SAMPLES) {
+    if(samples < PR_MIN_SAMPLES && samples > 0) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prRenderBufferUpdate: Provided samples (samples: %i min samples: %i) too low. Aborting operation, nothing was modified", samples, PR_MIN_SAMPLES);
         return;
     }

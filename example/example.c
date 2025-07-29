@@ -289,7 +289,7 @@ int main(int argc, char** argv) {
         {-0.25f, -0.5f, -0.75f},
         {0.02f, 0.015f, 0.015f},
         {0.6f, 0.6f, 0.55f},
-        {0.8f, 0.8f, 0.75f},
+        {1.3f, 1.3f, 1.25f},
         4
     };
 
@@ -315,7 +315,7 @@ int main(int argc, char** argv) {
         {0.0f, 0.0f, 0.0f},
         {0.0f, 0.0f, 0.0f},
         {0.0f, 0.0f, 1.0f},
-        {1.0f, 0.0f, 0.0f},
+        {1.5f, 0.0f, 0.0f},
         5,
         100.0f
     };
@@ -371,7 +371,7 @@ int main(int argc, char** argv) {
         prFramebufferClearDepth(test->openglContext, framebufferDepth, 1.0f);
         prFramebufferClearDepth(test->openglContext, framebufferDepth2, 1.0f);
         prFramebufferClearColor(test->openglContext, framebufferMultisampled, 0, (GLfloat[]){0.7f, 0.5f, 0.3f, 1.0f});
-        // prFramebufferClearColor(test->openglContext, framebufferMultisampled, 1, (GLfloat[]){0.7f, 0.5f, 0.3f, 1.0f});
+        prFramebufferClearColor(test->openglContext, framebufferMultisampled, 1, (GLfloat[]){0.7f, 0.5f, 0.3f, 1.0f});
         prFramebufferClearDepthStencil(test->openglContext, framebufferMultisampled, 1.0f, 0);
         prFramebufferClearColor(test->openglContext, framebuffer, 0, (GLfloat[]){0.3f, 0.5f, 0.7f, 1.0f});
         prFramebufferClearDepthStencil(test->openglContext, framebuffer, 1.0f, 0);
