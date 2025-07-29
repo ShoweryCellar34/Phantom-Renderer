@@ -55,7 +55,7 @@ void i_prRenderbufferComputeFormats(prRenderBufferData* renderBuffer, GLenum* in
 }
 
 void i_prRenderBufferCreateOnGPU(prRenderBufferData* renderBuffer) {
-    prLogEvent(PR_EVENT_OPENGL, PR_LOG_INFO, "i_prRenderBufferCreateOnGPU: Creating renderbuffer buffer object. Width: %i Height: %i%s", renderBuffer->width, renderBuffer->height, (renderBuffer->samples >= PR_MIN_SAMPLES ? " Samples: %i" : ""), renderBuffer->samples);
+    prLogEvent(PR_EVENT_OPENGL, PR_LOG_INFO, "i_prRenderBufferCreateOnGPU: Creating renderbuffer buffer object. Width: %i Height: %i Samples: %i", renderBuffer->width, renderBuffer->height, renderBuffer->samples);
 
     renderBuffer->context->CreateRenderbuffers(1, &renderBuffer->RBO);
     if(!renderBuffer->RBO) {

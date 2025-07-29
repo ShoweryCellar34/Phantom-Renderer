@@ -106,9 +106,9 @@ int main(int argc, char** argv) {
     prRenderBufferLinkContext(colorRBOMultisampled, test->openglContext);
     prRenderBufferUpdate(colorRBOMultisampled, PR_FORMAT_RGBA, windowWidth, windowHeight, SAMPLES);
 
-    colorTexture2 = prTextureMultisampledCreate();
-    prTextureMultisampledLinkContext(colorTexture2, test->openglContext);
-    prTextureMultisampledUpdate(colorTexture2, PR_FORMAT_RGBA, windowWidth, windowHeight, SAMPLES);
+    colorMultisamlpedTexture2 = prTextureMultisampledCreate();
+    prTextureMultisampledLinkContext(colorMultisamlpedTexture2, test->openglContext);
+    prTextureMultisampledUpdate(colorMultisamlpedTexture2, PR_FORMAT_RGBA, windowWidth, windowHeight, SAMPLES);
 
     depthStencilRBOMultisampled = prRenderBufferCreate();
     prRenderBufferLinkContext(depthStencilRBOMultisampled, test->openglContext);
@@ -117,7 +117,7 @@ int main(int argc, char** argv) {
     framebufferMultisampled = prFramebufferCreate();
     prFramebufferLinkContext(framebufferMultisampled, test->openglContext);
     prFramebufferLinkColorRBO(framebufferMultisampled, colorRBOMultisampled, 0);
-    prFramebufferLinkColorTextureMultisampled(framebufferMultisampled, colorTexture2, 1);
+    prFramebufferLinkColorTextureMultisampled(framebufferMultisampled, colorMultisamlpedTexture2, 1);
     prFramebufferDrawBuffers(framebufferMultisampled, 2, (GLenum[]){GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1});
     prFramebufferLinkDepthStencilRBO(framebufferMultisampled, depthStencilRBOMultisampled);
 
@@ -588,8 +588,8 @@ int main(int argc, char** argv) {
     framebufferMultisampled = NULL;
     prRenderBufferDestroy(depthStencilRBOMultisampled);
     depthStencilRBOMultisampled = NULL;
-    prTextureMultisampledDestroy(colorTexture2);
-    colorTexture2 = NULL;
+    prTextureMultisampledDestroy(colorMultisamlpedTexture2);
+    colorMultisamlpedTexture2 = NULL;
     prRenderBufferDestroy(colorRBOMultisampled);
     colorRBOMultisampled = NULL;
     prFramebufferDestroy(framebufferDepth2);

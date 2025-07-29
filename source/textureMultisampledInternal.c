@@ -63,7 +63,7 @@ void i_prTextureMultisampledSetDataOnGPU(prTextureMultisampledData* texture) {
     i_prTextureMultisampledComputeFormats(texture, &internalFomrat);
 
     texture->context->BindTexture(GL_TEXTURE_2D_MULTISAMPLE, texture->TBO);
-    texture->context->TexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, texture->samples, internalFomrat, texture->width, texture->height, false);
+    texture->context->TexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, texture->samples, internalFomrat, texture->width, texture->height, true);
     texture->context->BindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
 }
 

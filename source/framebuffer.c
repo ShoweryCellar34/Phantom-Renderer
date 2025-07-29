@@ -314,7 +314,7 @@ void prFramebufferUnlinkColorAttachment(prFramebufferData* framebuffer, unsigned
     prLogEvent(PR_EVENT_DATA, PR_LOG_TRACE, "prFramebufferUnlinkColorAttachment: Unlinking color attachment (attachment point: %i)", attachmentPoint);
 
     framebuffer->colorAttachments[attachmentPoint] = NULL;
-    framebuffer->colorAttachmentsTypes[attachmentPoint] = 0;
+    // framebuffer->colorAttachmentsTypes[attachmentPoint] = 0; this is not set to zero so the internal API can unlink the attachment properly.
 
     if(framebuffer->FBO) {
         i_prFramebufferUpdateBuffers(framebuffer);
@@ -325,7 +325,7 @@ void prFramebufferUnlinkDepthAttachment(prFramebufferData* framebuffer) {
     prLogEvent(PR_EVENT_DATA, PR_LOG_TRACE, "prFramebufferUnlinkDepthAttachment: Unlinking depth attachment");
 
     framebuffer->depthAttachment = NULL;
-    framebuffer->depthAttachmentType = 0;
+    // framebuffer->depthAttachmentType = 0; this is not set to zero so the internal API can unlink the attachment properly.
 
     if(framebuffer->FBO) {
         i_prFramebufferUpdateBuffers(framebuffer);
@@ -336,7 +336,7 @@ void prFramebufferUnlinkStencilAttachment(prFramebufferData* framebuffer) {
     prLogEvent(PR_EVENT_DATA, PR_LOG_TRACE, "prFramebufferUnlinkStencilAttachment: Unlinking stencil attachment");
 
     framebuffer->stencilAttachment = NULL;
-    framebuffer->stencilAttachmentType = 0;
+    // framebuffer->stencilAttachmentType = 0; this is not set to zero so the internal API can unlink the attachment properly.
 
     if(framebuffer->FBO) {
         i_prFramebufferUpdateBuffers(framebuffer);
@@ -347,7 +347,7 @@ void prFramebufferUnlinkDepthStencilAttachment(prFramebufferData* framebuffer) {
     prLogEvent(PR_EVENT_DATA, PR_LOG_TRACE, "prFramebufferUnlinkDepthStencilAttachment: Unlinking depth stencil attachment");
 
     framebuffer->depthStencilAttachment = NULL;
-    framebuffer->depthStencilAttachmentType = 0;
+    // framebuffer->depthStencilAttachmentType = 0; this is not set to zero so the internal API can unlink the attachment properly.
 
     if(framebuffer->FBO) {
         i_prFramebufferUpdateBuffers(framebuffer);

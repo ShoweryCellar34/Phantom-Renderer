@@ -78,7 +78,7 @@ void framebufferSizeCallback(GLFWwindow* window, int width, int height) {
     prCameraUpdateDimentions(camera);
 
     prRenderBufferUpdate(colorRBOMultisampled, PR_FORMAT_RGBA, windowWidth, windowHeight, SAMPLES);
-    prTextureMultisampledUpdate(colorTexture2, PR_FORMAT_RGBA, windowWidth, windowHeight, SAMPLES);
+    prTextureMultisampledUpdate(colorMultisamlpedTexture2, PR_FORMAT_RGBA, windowWidth, windowHeight, SAMPLES);
     prRenderBufferUpdate(depthStencilRBOMultisampled, PR_FORMAT_DEPTH_STENCIL, windowWidth, windowHeight, SAMPLES);
 
     prTextureUpdate(postProcessingTexture, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR, NULL, 0, windowWidth, windowHeight);
