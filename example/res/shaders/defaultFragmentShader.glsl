@@ -168,12 +168,12 @@ void main() {
     normal = normalize(geometryOut.TBN * normal);
 
     vec3 result = calculateShadedResult(ambient, diffuse, specular, normal);
-    fragmentColor = vec4(result, 1.0);
-
     float brightness = dot(result.rgb, vec3(0.2126, 0.7152, 0.0722));
     if(brightness > 1.0) {
         brightColor = vec4(result.rgb, 1.0);
     } else {
         brightColor = vec4(0.0, 0.0, 0.0, 1.0);
     }
+
+    fragmentColor = vec4(result, 1.0);
 }

@@ -43,6 +43,8 @@ int main(int argc, char** argv) {
 
     prShaderData* hudShaderProgram = loadShader(test->openglContext, "res/shaders/HUDVertexShader.glsl", "res/shaders/HUDFragmentShader.glsl", NULL);
 
+    prShaderData* gaussianShaderProgram = loadShader(test->openglContext, "res/shaders/HUDVertexShader.glsl", "res/shaders/gaussianFragmentShader.glsl", NULL);
+
     prShaderData* hdrShaderProgram = loadShader(test->openglContext, "res/shaders/hdrVertexShader.glsl", "res/shaders/hdrFragmentShader.glsl", NULL);
 
     computeShaderProgram = loadComputeShader(test->openglContext, "res/shaders/postProcessingComputeShader.glsl");
@@ -66,8 +68,6 @@ int main(int argc, char** argv) {
     prTextureData* blackTexture = makeTextureSingleColor(test->openglContext, (float[4]){0.0f, 0.0f, 0.0f, 1.0f});
 
     prTextureData* whiteTexture = makeTextureSingleColor(test->openglContext, (float[4]){1.0f, 1.0f, 1.0f, 1.0f});
-
-    prTextureData* grassTexture = makeTextureSingleColor(test->openglContext, (float[4]){0.0f, 1.0f, 0.0f, 1.0f});
 
     prTextureData* defaultNormal = makeTextureSingleColor(test->openglContext, (float[4]){0.0f, -1.0f, 0.0f, 1.0f});
 
@@ -114,12 +114,39 @@ int main(int argc, char** argv) {
     prRenderBufferLinkContext(depthStencilRBOMultisampled, test->openglContext);
     prRenderBufferUpdate(depthStencilRBOMultisampled, PR_FORMAT_DEPTH_STENCIL, windowWidth, windowHeight, SAMPLES);
 
+    colorTexture2 = prTextureCreate();
+    prTextureLinkContext(colorTexture2, test->openglContext);
+    prTextureUpdate(colorTexture2, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR, NULL, 0, windowWidth, windowHeight);
+
+    prFramebufferData* framebuffer2 = prFramebufferCreate();
+    prFramebufferLinkContext(framebuffer2, test->openglContext);
+    prFramebufferLinkColorTexture(framebuffer2, colorTexture2, 0);
+
+    colorTexture3 = prTextureCreate();
+    prTextureLinkContext(colorTexture3, test->openglContext);
+    prTextureUpdate(colorTexture3, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR, NULL, 0, windowWidth, windowHeight);
+
+    prFramebufferData* framebuffer3 = prFramebufferCreate();
+    prFramebufferLinkContext(framebuffer3, test->openglContext);
+    prFramebufferLinkColorTexture(framebuffer3, colorTexture3, 0);
+
+    prFramebufferData* gaussianFramebuffers[] = {framebuffer2, framebuffer3};
+    prTextureData* gaussianTextures[] = {colorTexture2, colorTexture3};
+
     framebufferMultisampled = prFramebufferCreate();
     prFramebufferLinkContext(framebufferMultisampled, test->openglContext);
     prFramebufferLinkColorRBO(framebufferMultisampled, colorRBOMultisampled, 0);
     prFramebufferLinkColorTextureMultisampled(framebufferMultisampled, colorMultisamlpedTexture2, 1);
     prFramebufferDrawBuffers(framebufferMultisampled, 2, (GLenum[]){GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1});
     prFramebufferLinkDepthStencilRBO(framebufferMultisampled, depthStencilRBOMultisampled);
+
+    bloomTexture = prTextureCreate();
+    prTextureLinkContext(bloomTexture, test->openglContext);
+    prTextureUpdate(bloomTexture, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR, NULL, 0, windowWidth, windowHeight);
+
+    prFramebufferData* bloomFramebuffer = prFramebufferCreate();
+    prFramebufferLinkContext(bloomFramebuffer, test->openglContext);
+    prFramebufferLinkColorTexture(bloomFramebuffer, bloomTexture, 0);
 
     postProcessingTexture = prTextureCreate();
     prTextureLinkContext(postProcessingTexture, test->openglContext);
@@ -249,14 +276,6 @@ int main(int argc, char** argv) {
         0.0f
     };
 
-    materialData materialGrass = {
-        grassTexture,
-        grassTexture,
-        blackTexture,
-        blackTexture,
-        0.0f
-    };
-
     prMeshData* meshCube = prMeshCreate();
     prMeshLinkContext(meshCube, test->openglContext);
     prMeshSetVertexAttribute(meshCube, 0, 3, GL_FLOAT, GL_FALSE, 14 * sizeof(GLfloat), (void*)(0 * sizeof(GLfloat)));
@@ -370,6 +389,9 @@ int main(int argc, char** argv) {
         prFramebufferClearDepth(test->openglContext, NULL, 1.0f);
         prFramebufferClearDepth(test->openglContext, framebufferDepth, 1.0f);
         prFramebufferClearDepth(test->openglContext, framebufferDepth2, 1.0f);
+        prFramebufferClearColor(test->openglContext, framebuffer2, 0, (GLfloat[]){0.0f, 0.0f, 0.0f, 0.0f});
+        prFramebufferClearColor(test->openglContext, framebuffer3, 0, (GLfloat[]){0.0f, 0.0f, 0.0f, 0.0f});
+        prFramebufferClearColor(test->openglContext, bloomFramebuffer, 0, (GLfloat[]){0.0f, 0.0f, 0.0f, 0.0f});
         prFramebufferClearColor(test->openglContext, framebufferMultisampled, 0, (GLfloat[]){0.7f, 0.5f, 0.3f, 1.0f});
         prFramebufferClearColor(test->openglContext, framebufferMultisampled, 1, (GLfloat[]){0.7f, 0.5f, 0.3f, 1.0f});
         prFramebufferClearDepthStencil(test->openglContext, framebufferMultisampled, 1.0f, 0);
@@ -540,6 +562,30 @@ int main(int argc, char** argv) {
         bindMaterialAmbientOnly(&materialHDR, hdrShaderProgram);
         prMeshDrawIndices(meshQuad);
 
+        prFramebufferSetReadBuffer(framebufferMultisampled, GL_COLOR_ATTACHMENT1);
+        prFramebufferBlit(test->openglContext, framebufferMultisampled, bloomFramebuffer,
+            0, 0, windowWidth, windowHeight,
+            0, 0, windowWidth, windowHeight,
+            PR_BUFFER_BIT_COLOR, PR_FILTER_NEAREST
+        );
+        prFramebufferSetReadBuffer(framebufferMultisampled, GL_COLOR_ATTACHMENT0);
+        bool horizontal = true, firstIteration = true;
+        int amount = 10;
+        prShaderBind(gaussianShaderProgram);
+        prShaderSetUniform1i(gaussianShaderProgram, "image", 0);
+        for(int i = 0; i < amount; i++) {
+            prFramebufferBind(gaussianFramebuffers[horizontal]);
+            prShaderSetUniform1i(gaussianShaderProgram, "horizontal", horizontal);
+            prTextureBindTexture(firstIteration == true ? bloomTexture : gaussianTextures[!horizontal], 0);
+            test->openglContext->Disable(GL_DEPTH_TEST);
+            prMeshDrawIndices(meshQuad);
+            horizontal = !horizontal;
+            if(firstIteration) {
+                firstIteration = false;
+            }
+        }
+        prFramebufferBind(framebuffer);
+
         if(showHUD == 1) {
             test->openglContext->Disable(GL_DEPTH_TEST);
             bindMaterialAmbientOnly(&materialHUD, hudShaderProgram);
@@ -586,6 +632,18 @@ int main(int argc, char** argv) {
     colorTexture = NULL;
     prFramebufferDestroy(framebufferMultisampled);
     framebufferMultisampled = NULL;
+    prFramebufferDestroy(bloomFramebuffer);
+    bloomFramebuffer = NULL;
+    prTextureDestroy(bloomTexture);
+    bloomTexture = NULL;
+    prFramebufferDestroy(framebuffer3);
+    framebuffer3 = NULL;
+    prTextureDestroy(colorTexture3);
+    colorTexture3 = NULL;
+    prFramebufferDestroy(framebuffer2);
+    framebuffer2 = NULL;
+    prTextureDestroy(colorTexture2);
+    colorTexture2 = NULL;
     prRenderBufferDestroy(depthStencilRBOMultisampled);
     depthStencilRBOMultisampled = NULL;
     prTextureMultisampledDestroy(colorMultisamlpedTexture2);
@@ -617,8 +675,6 @@ int main(int argc, char** argv) {
     HUDTexture = NULL;
     prTextureDestroy(defaultNormal);
     defaultNormal = NULL;
-    prTextureDestroy(grassTexture);
-    grassTexture = NULL;
     prTextureDestroy(whiteTexture);
     whiteTexture = NULL;
     prTextureDestroy(blackTexture);
@@ -642,6 +698,8 @@ int main(int argc, char** argv) {
     computeShaderProgram = NULL;
     prShaderDestroy(hdrShaderProgram);
     hdrShaderProgram = NULL;
+    prShaderDestroy(gaussianShaderProgram);
+    gaussianShaderProgram = NULL;
     prShaderDestroy(hudShaderProgram);
     hudShaderProgram = NULL;
     prShaderDestroy(skyboxShaderProgram);

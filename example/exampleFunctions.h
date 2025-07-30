@@ -36,14 +36,12 @@ void proccessInput(GLFWwindow* window) {
         glm_normalize(temp[2]);
         glm_vec3_scale(temp[2], cameraSpeed, temp[2]);
         glm_vec3_sub(cameraPosition, temp[2], cameraPosition);
-        // cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
     }
     if(glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
         glm_cross(camera->front, camera->up, temp[3]);
         glm_normalize(temp[3]);
         glm_vec3_scale(temp[3], cameraSpeed, temp[3]);
         glm_vec3_add(cameraPosition, temp[3], cameraPosition);
-        // cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
     }
     if(glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
         glm_vec3_scale(camera->up, cameraSpeed, temp[1]);
@@ -80,6 +78,9 @@ void framebufferSizeCallback(GLFWwindow* window, int width, int height) {
     prRenderBufferUpdate(colorRBOMultisampled, PR_FORMAT_RGBA, windowWidth, windowHeight, SAMPLES);
     prTextureMultisampledUpdate(colorMultisamlpedTexture2, PR_FORMAT_RGBA, windowWidth, windowHeight, SAMPLES);
     prRenderBufferUpdate(depthStencilRBOMultisampled, PR_FORMAT_DEPTH_STENCIL, windowWidth, windowHeight, SAMPLES);
+    prTextureUpdate(colorTexture2, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR, NULL, 0, windowWidth, windowHeight);
+    prTextureUpdate(colorTexture3, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR, NULL, 0, windowWidth, windowHeight);
+    prTextureUpdate(bloomTexture, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR, NULL, 0, windowWidth, windowHeight);
 
     prTextureUpdate(postProcessingTexture, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR, NULL, 0, windowWidth, windowHeight);
 
