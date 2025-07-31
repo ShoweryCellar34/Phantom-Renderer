@@ -206,10 +206,6 @@ void APIENTRY openglDebugOutput(GLenum source,
                             const char* message, 
                             const void* userParam
 ) {
-    // ignore non-significant error/warning codes
-    if(id == 131169 || id == 131185 || id == 131218 || id == 131204) {
-        return;
-    } 
 
     prLogRaw("---------------\n");
     prLogRaw("Debug message (%i): %s\n", id, message);

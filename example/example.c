@@ -252,14 +252,6 @@ int main(int argc, char** argv) {
         32.0f
     };
 
-    materialData materialHDR = {
-        colorTexture,
-        blackTexture,
-        blackTexture,
-        blackTexture,
-        0.0f
-    };
-
     materialData materialHUD = {
         HUDTexture,
         blackTexture,
@@ -473,7 +465,7 @@ int main(int argc, char** argv) {
 
             translationsToMatrix(translation, (vec3){-30.0f, 0.0f, 0.0f}, GLM_VEC3_ZERO, (vec3){30.0f, 30.0f, 30.0f});
             if(i == 2) {
-                bindMaterial(&materialMetal, currentShaderProgram);
+                bindMaterial(&materialWhite, currentShaderProgram);
             }
             prShaderSetUniformMatrix4fv(currentShaderProgram, "translation", translation[0]);
             prMeshDrawIndices(meshCube);
@@ -551,6 +543,12 @@ int main(int argc, char** argv) {
         prShaderBind(skyboxShaderProgram);
         prMeshDrawIndices(meshCube);
 
+        if(showHUD == 1) {
+            test->openglContext->Disable(GL_DEPTH_TEST);
+            bindMaterialAmbientOnly(&materialHUD, hudShaderProgram);
+            prMeshDrawIndices(meshQuad);
+        }
+
         prFramebufferBlit(test->openglContext, framebufferMultisampled, framebuffer,
             0, 0, windowWidth, windowHeight,
             0, 0, windowWidth, windowHeight,
@@ -558,9 +556,16 @@ int main(int argc, char** argv) {
         );
         prFramebufferBind(framebuffer);
 
-        test->openglContext->Disable(GL_DEPTH_TEST);
-        bindMaterialAmbientOnly(&materialHDR, hdrShaderProgram);
-        prMeshDrawIndices(meshQuad);
+        if(showPostProcessing) {
+            test->openglContext->BlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+            prTextureBindTexture(colorTexture, 0);
+            prTextureBindImage(postProcessingTexture, 1, 0, PR_ACCESS_WRITE_ONLY, GL_RGBA32F);
+            prComputeShaderDispatch(computeShaderProgram, windowWidth , windowHeight, 1);
+            test->openglContext->MemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
+
+            bindMaterialAmbientOnly(&materialPostProcessing, hudShaderProgram);
+            prMeshDrawIndices(meshQuad);
+        }
 
         prFramebufferSetReadBuffer(framebufferMultisampled, GL_COLOR_ATTACHMENT1);
         prFramebufferBlit(test->openglContext, framebufferMultisampled, bloomFramebuffer,
@@ -586,30 +591,20 @@ int main(int argc, char** argv) {
         }
         prFramebufferBind(framebuffer);
 
-        if(showHUD == 1) {
-            test->openglContext->Disable(GL_DEPTH_TEST);
-            bindMaterialAmbientOnly(&materialHUD, hudShaderProgram);
-            prMeshDrawIndices(meshQuad);
-        }
+        test->openglContext->Disable(GL_DEPTH_TEST);
+        prTextureBindTexture(colorTexture, 0);
+        prTextureBindTexture(gaussianTextures[!horizontal], 1);
+        prShaderSetUniform1i(hdrShaderProgram, "scene", 0);
+        prShaderSetUniform1i(hdrShaderProgram, "bloomBlur", 1);
+        prShaderSetUniform1f(hdrShaderProgram, "exposure", 1.5);
+        prShaderBind(hdrShaderProgram);
+        prMeshDrawIndices(meshQuad);
 
-        if(showPostProcessing) {
-            test->openglContext->BlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-            prTextureBindTexture(colorTexture, 0);
-            prTextureBindImage(postProcessingTexture, 1, 0, PR_ACCESS_WRITE_ONLY, GL_RGBA32F);
-            prComputeShaderDispatch(computeShaderProgram, windowWidth , windowHeight, 1);
-            test->openglContext->MemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
-
-            bindMaterialAmbientOnly(&materialPostProcessing, hudShaderProgram);
-            prMeshDrawIndices(meshQuad);
-        }
-
-        test->openglContext->Enable(GL_FRAMEBUFFER_SRGB);
         prFramebufferBlit(test->openglContext, framebuffer, NULL,
             0, 0, windowWidth, windowHeight,
             0, 0, windowWidth, windowHeight,
             PR_BUFFER_BIT_COLOR, PR_FILTER_NEAREST
         );
-        test->openglContext->Disable(GL_FRAMEBUFFER_SRGB);
 
         glfwSwapBuffers(test->window);
         glfwPollEvents();
