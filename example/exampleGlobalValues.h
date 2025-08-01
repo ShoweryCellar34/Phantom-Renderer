@@ -146,6 +146,7 @@ prTextureData* colorTexture = NULL;
 prRenderBufferData* depthStencilRBO = NULL;
 prFramebufferData* framebuffer = NULL;
 
+#define BLOOM_BLUR_PASSES 6
 #define SAMPLES 4
 #define DEF_WIDTH 1280
 #define DEF_HEIGHT 720

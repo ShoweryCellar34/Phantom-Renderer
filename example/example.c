@@ -51,19 +51,19 @@ int main(int argc, char** argv) {
 
     prTextureData* defaultTexture = makeTextureCheckerboard(test->openglContext, 8, (float[4]){1.0f, 0.0f, 1.0f, 1.0f}, (float[4]){0.0f, 0.0f, 0.0f, 1.0f});
 
-    prTextureData* containerTexture = loadTexture(test->openglContext, PR_FILTER_LINEAR, true, "res/textures/container.jpg");
+    prTextureData* containerTexture = loadTexture(test->openglContext, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, true, "res/textures/container.jpg");
 
-    prTextureData* containerMetalTexture = loadTexture(test->openglContext, PR_FILTER_LINEAR, true, "res/textures/container2.png");
+    prTextureData* containerMetalTexture = loadTexture(test->openglContext, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, true, "res/textures/container2.png");
 
-    prTextureData* containerMetalSpecularTexture = loadTexture(test->openglContext, PR_FILTER_LINEAR, false, "res/textures/container2_specular.png");
+    prTextureData* containerMetalSpecularTexture = loadTexture(test->openglContext, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, false, "res/textures/container2_specular.png");
 
-    prTextureData* steelTexture = loadTexture(test->openglContext, PR_FILTER_LINEAR, true, "res/textures/steel.jpg");
+    prTextureData* steelTexture = loadTexture(test->openglContext, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, true, "res/textures/steel.jpg");
 
-    prTextureData* steelNormal = loadTexture(test->openglContext, PR_FILTER_LINEAR, false, "res/textures/steelNormal.png");
+    prTextureData* steelNormal = loadTexture(test->openglContext, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, false, "res/textures/steelNormal.png");
 
-    prTextureData* brickWallDiffuseTexture = loadTexture(test->openglContext, PR_FILTER_LINEAR, true, "res/textures/brickwall.jpg");
+    prTextureData* brickWallDiffuseTexture = loadTexture(test->openglContext, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, true, "res/textures/brickwall.jpg");
 
-    prTextureData* brickWallNormalTexture = loadTexture(test->openglContext, PR_FILTER_LINEAR, false, "res/textures/brickwall_normal.jpg");
+    prTextureData* brickWallNormalTexture = loadTexture(test->openglContext, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, false, "res/textures/brickwall_normal.jpg");
 
     prTextureData* blackTexture = makeTextureSingleColor(test->openglContext, (float[4]){0.0f, 0.0f, 0.0f, 1.0f});
 
@@ -71,24 +71,24 @@ int main(int argc, char** argv) {
 
     prTextureData* defaultNormal = makeTextureSingleColor(test->openglContext, (float[4]){0.0f, -1.0f, 0.0f, 1.0f});
 
-    prTextureData* HUDTexture = loadTexture(test->openglContext, PR_FILTER_NEAREST, true, "res/textures/HUD.png");
+    prTextureData* HUDTexture = loadTexture(test->openglContext, PR_FILTER_NEAREST_MIPMAP_NEAREST, PR_FILTER_LINEAR, true, "res/textures/HUD.png");
 
     prTextureData* depthTextureDepth = prTextureCreate();
     prTextureLinkContext(depthTextureDepth, test->openglContext);
-    prTextureUpdate(depthTextureDepth, PR_FORMAT_DEPTH, PR_WRAPPING_EDGE, PR_FILTER_LINEAR, NULL, 0, 2048, 2048);
+    prTextureUpdate(depthTextureDepth, PR_FORMAT_DEPTH, PR_WRAPPING_EDGE, PR_FILTER_LINEAR, PR_FILTER_LINEAR, NULL, 0, 2048, 2048);
     prTextureBorderColor(depthTextureDepth, (GLfloat[]){1.0f, 0.0f, 0.0f, 0.0f});
 
     prFramebufferData* framebufferDepth = prFramebufferCreate();
     prFramebufferLinkContext(framebufferDepth, test->openglContext);
     prFramebufferLinkDepthTexture(framebufferDepth, depthTextureDepth);
-    prFramebufferSetDrawBuffer(framebufferDepth, GL_NONE);
-    prFramebufferSetReadBuffer(framebufferDepth, GL_NONE);
+    prFramebufferSetDrawBuffer(framebufferDepth, PR_NONE);
+    prFramebufferSetReadBuffer(framebufferDepth, PR_NONE);
 
     prCubeMapData* depthCubeMapDepth2 = prCubeMapCreate();
     prCubeMapLinkContext(depthCubeMapDepth2, test->openglContext);
     prCubeMapUpdateAll(depthCubeMapDepth2,
         (GLenum[]){PR_FORMAT_DEPTH, PR_FORMAT_DEPTH, PR_FORMAT_DEPTH, PR_FORMAT_DEPTH, PR_FORMAT_DEPTH, PR_FORMAT_DEPTH},
-        PR_WRAPPING_EDGE, PR_FILTER_LINEAR,
+        PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_LINEAR, PR_FILTER_LINEAR,
         (GLubyte*[]){NULL, NULL, NULL, NULL, NULL, NULL},
         (size_t[]){0, 0, 0, 0, 0, 0},
         (GLsizei[]){1024, 1024, 1024, 1024, 1024, 1024},
@@ -116,7 +116,7 @@ int main(int argc, char** argv) {
 
     colorTexture2 = prTextureCreate();
     prTextureLinkContext(colorTexture2, test->openglContext);
-    prTextureUpdate(colorTexture2, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR, NULL, 0, windowWidth, windowHeight);
+    prTextureUpdate(colorTexture2, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, NULL, 0, windowWidth, windowHeight);
 
     prFramebufferData* framebuffer2 = prFramebufferCreate();
     prFramebufferLinkContext(framebuffer2, test->openglContext);
@@ -124,7 +124,7 @@ int main(int argc, char** argv) {
 
     colorTexture3 = prTextureCreate();
     prTextureLinkContext(colorTexture3, test->openglContext);
-    prTextureUpdate(colorTexture3, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR, NULL, 0, windowWidth, windowHeight);
+    prTextureUpdate(colorTexture3, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, NULL, 0, windowWidth, windowHeight);
 
     prFramebufferData* framebuffer3 = prFramebufferCreate();
     prFramebufferLinkContext(framebuffer3, test->openglContext);
@@ -137,12 +137,12 @@ int main(int argc, char** argv) {
     prFramebufferLinkContext(framebufferMultisampled, test->openglContext);
     prFramebufferLinkColorRBO(framebufferMultisampled, colorRBOMultisampled, 0);
     prFramebufferLinkColorTextureMultisampled(framebufferMultisampled, colorMultisamlpedTexture2, 1);
-    prFramebufferDrawBuffers(framebufferMultisampled, 2, (GLenum[]){GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1});
+    prFramebufferDrawBuffers(framebufferMultisampled, 2, (GLenum[]){PR_COLOR_ATTACHMENT_0, PR_COLOR_ATTACHMENT_1});
     prFramebufferLinkDepthStencilRBO(framebufferMultisampled, depthStencilRBOMultisampled);
 
     bloomTexture = prTextureCreate();
     prTextureLinkContext(bloomTexture, test->openglContext);
-    prTextureUpdate(bloomTexture, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR, NULL, 0, windowWidth, windowHeight);
+    prTextureUpdate(bloomTexture, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, NULL, 0, windowWidth, windowHeight);
 
     prFramebufferData* bloomFramebuffer = prFramebufferCreate();
     prFramebufferLinkContext(bloomFramebuffer, test->openglContext);
@@ -150,11 +150,11 @@ int main(int argc, char** argv) {
 
     postProcessingTexture = prTextureCreate();
     prTextureLinkContext(postProcessingTexture, test->openglContext);
-    prTextureUpdate(postProcessingTexture, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR, NULL, 0, windowWidth, windowHeight);
+    prTextureUpdate(postProcessingTexture, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, NULL, 0, windowWidth, windowHeight);
 
     colorTexture = prTextureCreate();
     prTextureLinkContext(colorTexture, test->openglContext);
-    prTextureUpdate(colorTexture, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR, NULL, 0, windowWidth, windowHeight);
+    prTextureUpdate(colorTexture, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, NULL, 0, windowWidth, windowHeight);
 
     depthStencilRBO = prRenderBufferCreate();
     prRenderBufferLinkContext(depthStencilRBO, test->openglContext);
@@ -175,8 +175,8 @@ int main(int argc, char** argv) {
     });
 
     stbi_set_flip_vertically_on_load(0);
-    prCubeMapData* skyboxCubeMap1 = loadCubeMap(test->openglContext, PR_FILTER_LINEAR, skybox1Textures);
-    prCubeMapData* skyboxCubeMap2 = loadCubeMap(test->openglContext, PR_FILTER_LINEAR, skybox2Textures);
+    prCubeMapData* skyboxCubeMap1 = loadCubeMap(test->openglContext, PR_FILTER_LINEAR_MIPMAP_LINEAR, PR_FILTER_LINEAR, skybox1Textures);
+    prCubeMapData* skyboxCubeMap2 = loadCubeMap(test->openglContext, PR_FILTER_LINEAR_MIPMAP_LINEAR, PR_FILTER_LINEAR, skybox2Textures);
     stbi_set_flip_vertically_on_load(1);
 
     prCubeMapData* skyboxCubeMap3 = makeCubeMapSingleColors(test->openglContext, (float[PR_CUBE_MAP_SIDES][4]){
@@ -270,19 +270,19 @@ int main(int argc, char** argv) {
 
     prMeshData* meshCube = prMeshCreate();
     prMeshLinkContext(meshCube, test->openglContext);
-    prMeshSetVertexAttribute(meshCube, 0, 3, GL_FLOAT, GL_FALSE, 14 * sizeof(GLfloat), (void*)(0 * sizeof(GLfloat)));
-    prMeshSetVertexAttribute(meshCube, 1, 2, GL_FLOAT, GL_FALSE, 14 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
-    prMeshSetVertexAttribute(meshCube, 2, 3, GL_FLOAT, GL_FALSE, 14 * sizeof(GLfloat), (void*)(5 * sizeof(GLfloat)));
-    prMeshSetVertexAttribute(meshCube, 3, 3, GL_FLOAT, GL_FALSE, 14 * sizeof(GLfloat), (void*)(8 * sizeof(GLfloat)));
-    prMeshSetVertexAttribute(meshCube, 4, 3, GL_FLOAT, GL_FALSE, 14 * sizeof(GLfloat), (void*)(11 * sizeof(GLfloat)));
+    prMeshSetVertexAttribute(meshCube, 0, 3, PR_FLOAT, PR_FALSE, 14 * sizeof(GLfloat), (void*)(0 * sizeof(GLfloat)));
+    prMeshSetVertexAttribute(meshCube, 1, 2, PR_FLOAT, PR_FALSE, 14 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
+    prMeshSetVertexAttribute(meshCube, 2, 3, PR_FLOAT, PR_FALSE, 14 * sizeof(GLfloat), (void*)(5 * sizeof(GLfloat)));
+    prMeshSetVertexAttribute(meshCube, 3, 3, PR_FLOAT, PR_FALSE, 14 * sizeof(GLfloat), (void*)(8 * sizeof(GLfloat)));
+    prMeshSetVertexAttribute(meshCube, 4, 3, PR_FLOAT, PR_FALSE, 14 * sizeof(GLfloat), (void*)(11 * sizeof(GLfloat)));
     prMeshUpdate(meshCube,
         cubeData, cubeDataSize,
         indices, indicesSize);
 
     prMeshData* meshQuad = prMeshCreate();
     prMeshLinkContext(meshQuad, test->openglContext);
-    prMeshSetVertexAttribute(meshQuad, 0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (void*)(0 * sizeof(GLfloat)));
-    prMeshSetVertexAttribute(meshQuad, 1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (void*)(2 * sizeof(GLfloat)));
+    prMeshSetVertexAttribute(meshQuad, 0, 2, PR_FLOAT, PR_FALSE, 4 * sizeof(GLfloat), (void*)(0 * sizeof(GLfloat)));
+    prMeshSetVertexAttribute(meshQuad, 1, 2, PR_FLOAT, PR_FALSE, 4 * sizeof(GLfloat), (void*)(2 * sizeof(GLfloat)));
     prMeshUpdate(meshQuad,
         quadData, quadDataSize,
         indicesQuad, indicesQuadSize);
@@ -451,7 +451,7 @@ int main(int argc, char** argv) {
 
             translationsToMatrix(translation, (vec3){0.0f, 0.0f, -30.0f}, GLM_VEC3_ZERO, (vec3){30.0f, 30.0f, 30.0f});
             if(i == 2) {
-                bindMaterial(&materialMetal, currentShaderProgram);
+                bindMaterial(&materialWood, currentShaderProgram);
             }
             prShaderSetUniformMatrix4fv(currentShaderProgram, "translation", translation[0]);
             prMeshDrawIndices(meshCube);
@@ -465,7 +465,7 @@ int main(int argc, char** argv) {
 
             translationsToMatrix(translation, (vec3){-30.0f, 0.0f, 0.0f}, GLM_VEC3_ZERO, (vec3){30.0f, 30.0f, 30.0f});
             if(i == 2) {
-                bindMaterial(&materialWhite, currentShaderProgram);
+                bindMaterial(&materialBrick, currentShaderProgram);
             }
             prShaderSetUniformMatrix4fv(currentShaderProgram, "translation", translation[0]);
             prMeshDrawIndices(meshCube);
@@ -567,15 +567,15 @@ int main(int argc, char** argv) {
             prMeshDrawIndices(meshQuad);
         }
 
-        prFramebufferSetReadBuffer(framebufferMultisampled, GL_COLOR_ATTACHMENT1);
+        prFramebufferSetReadBuffer(framebufferMultisampled, PR_COLOR_ATTACHMENT_1);
         prFramebufferBlit(test->openglContext, framebufferMultisampled, bloomFramebuffer,
             0, 0, windowWidth, windowHeight,
             0, 0, windowWidth, windowHeight,
             PR_BUFFER_BIT_COLOR, PR_FILTER_NEAREST
         );
-        prFramebufferSetReadBuffer(framebufferMultisampled, GL_COLOR_ATTACHMENT0);
+        prFramebufferSetReadBuffer(framebufferMultisampled, PR_COLOR_ATTACHMENT_0);
         bool horizontal = true, firstIteration = true;
-        int amount = 10;
+        int amount = BLOOM_BLUR_PASSES;
         prShaderBind(gaussianShaderProgram);
         prShaderSetUniform1i(gaussianShaderProgram, "image", 0);
         for(int i = 0; i < amount; i++) {

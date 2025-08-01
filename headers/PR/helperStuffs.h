@@ -10,13 +10,13 @@ typedef struct prCubeMapData prCubeMapData;
 typedef struct prShaderData prShaderData;
 typedef struct prComputeShaderData prComputeShaderData;
 
-prTextureData* loadTexture(GladGLContext* context, unsigned int filtering, bool srgb, const char* path);
+prTextureData* loadTexture(GladGLContext* context, unsigned int minFiltering, unsigned int magFiltering, bool srgb, const char* path);
 
 prTextureData* makeTextureSingleColor(GladGLContext* context, float color[4]);
 
 prTextureData* makeTextureCheckerboard(GladGLContext* context, size_t scale, float* color1, float* color2);
 
-prCubeMapData* loadCubeMap(GladGLContext* context, unsigned int filtering, const char* paths[PR_CUBE_MAP_SIDES]);
+prCubeMapData* loadCubeMap(GladGLContext* context, unsigned int minFiltering, unsigned int magFiltering, const char* paths[PR_CUBE_MAP_SIDES]);
 
 prCubeMapData* makeCubeMapSingleColors(GladGLContext* context, float color[PR_CUBE_MAP_SIDES][4]);
 

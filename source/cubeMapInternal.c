@@ -74,8 +74,8 @@ void i_prCubeMapSetDataAllOnGPU(prCubeMapData* cubeMap) {
     cubeMap->context->TextureParameteri(cubeMap->TBO, GL_TEXTURE_WRAP_S, cubeMap->wrappingMode);
     cubeMap->context->TextureParameteri(cubeMap->TBO, GL_TEXTURE_WRAP_T, cubeMap->wrappingMode);
     cubeMap->context->TextureParameteri(cubeMap->TBO, GL_TEXTURE_WRAP_R, cubeMap->wrappingMode);
-    cubeMap->context->TextureParameteri(cubeMap->TBO, GL_TEXTURE_MIN_FILTER, cubeMap->filter);
-    cubeMap->context->TextureParameteri(cubeMap->TBO, GL_TEXTURE_MAG_FILTER, cubeMap->filter);
+    cubeMap->context->TextureParameteri(cubeMap->TBO, GL_TEXTURE_MIN_FILTER, cubeMap->minFilter);
+    cubeMap->context->TextureParameteri(cubeMap->TBO, GL_TEXTURE_MAG_FILTER, cubeMap->magFilter);
 
     cubeMap->context->PixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
@@ -98,8 +98,8 @@ void i_prCubeMapSetDataOnGPU(prCubeMapData* cubeMap, int side) {
     cubeMap->context->TextureParameteri(cubeMap->TBO, GL_TEXTURE_WRAP_S, cubeMap->wrappingMode);
     cubeMap->context->TextureParameteri(cubeMap->TBO, GL_TEXTURE_WRAP_T, cubeMap->wrappingMode);
     cubeMap->context->TextureParameteri(cubeMap->TBO, GL_TEXTURE_WRAP_R, cubeMap->wrappingMode);
-    cubeMap->context->TextureParameteri(cubeMap->TBO, GL_TEXTURE_MIN_FILTER, cubeMap->filter);
-    cubeMap->context->TextureParameteri(cubeMap->TBO, GL_TEXTURE_MAG_FILTER, cubeMap->filter);
+    cubeMap->context->TextureParameteri(cubeMap->TBO, GL_TEXTURE_MIN_FILTER, cubeMap->minFilter);
+    cubeMap->context->TextureParameteri(cubeMap->TBO, GL_TEXTURE_MAG_FILTER, cubeMap->magFilter);
 
     cubeMap->context->PixelStorei(GL_UNPACK_ALIGNMENT, 1);
 

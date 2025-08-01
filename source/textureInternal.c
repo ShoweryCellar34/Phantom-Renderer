@@ -77,8 +77,8 @@ void i_prTextureSetDataOnGPU(prTextureData* texture) {
 
     texture->context->TextureParameteri(texture->TBO, GL_TEXTURE_WRAP_S, texture->wrappingMode);
     texture->context->TextureParameteri(texture->TBO, GL_TEXTURE_WRAP_T, texture->wrappingMode);
-    texture->context->TextureParameteri(texture->TBO, GL_TEXTURE_MIN_FILTER, texture->filter);
-    texture->context->TextureParameteri(texture->TBO, GL_TEXTURE_MAG_FILTER, texture->filter);
+    texture->context->TextureParameteri(texture->TBO, GL_TEXTURE_MIN_FILTER, texture->minFilter);
+    texture->context->TextureParameteri(texture->TBO, GL_TEXTURE_MAG_FILTER, texture->magFilter);
 
     texture->context->PixelStorei(GL_UNPACK_ALIGNMENT, 1);
 

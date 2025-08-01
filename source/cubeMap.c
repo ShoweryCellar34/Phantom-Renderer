@@ -40,7 +40,7 @@ void prCubeMapLinkContext(prCubeMapData* cubeMap, GladGLContext* context) {
     }
 }
 
-void prCubeMapUpdateAll(prCubeMapData* cubeMap, GLenum format[PR_CUBE_MAP_SIDES], GLint wrappingMode, GLint filter, GLubyte* rawTextureData[PR_CUBE_MAP_SIDES], size_t rawTextureDataCount[PR_CUBE_MAP_SIDES], GLsizei width[PR_CUBE_MAP_SIDES], GLsizei height[PR_CUBE_MAP_SIDES]) {
+void prCubeMapUpdateAll(prCubeMapData* cubeMap, GLenum format[PR_CUBE_MAP_SIDES], GLint wrappingMode, GLint minFilter, GLint magFilter, GLubyte* rawTextureData[PR_CUBE_MAP_SIDES], size_t rawTextureDataCount[PR_CUBE_MAP_SIDES], GLsizei width[PR_CUBE_MAP_SIDES], GLsizei height[PR_CUBE_MAP_SIDES]) {
     for(int i = 0; i < PR_CUBE_MAP_SIDES; i++) {
         if(rawTextureDataCount[i] && !rawTextureData[i]) {
             prLogEvent(PR_EVENT_DATA, PR_LOG_WARNING, "prCubeMapUpdateAll: [Face %i] Cube map face data count not zero while cube map face data is NULL, assuming no texture data", i);
@@ -130,17 +130,26 @@ void prCubeMapUpdateAll(prCubeMapData* cubeMap, GLenum format[PR_CUBE_MAP_SIDES]
     if((wrappingMode != PR_WRAPPING_REPEAT) && (wrappingMode != PR_WRAPPING_REPEAT_MIRRORED) &&
     (wrappingMode != PR_WRAPPING_EDGE) && (wrappingMode != PR_WRAPPING_BORDER)
     ) {
-        prLogEvent(PR_EVENT_DATA, PR_LOG_WARNING, "prCubeMapUpdateAll: Invalid wrapping mode for cube map (was %i), using PR_WRAPPING_EDGE", wrappingMode);
+        prLogEvent(PR_EVENT_DATA, PR_LOG_WARNING, "prCubeMapUpdate: Invalid wrapping mode for cube map (was %i), using PR_WRAPPING_EDGE", wrappingMode);
         cubeMap->wrappingMode = PR_WRAPPING_EDGE;
     } else {
         cubeMap->wrappingMode = wrappingMode;
     }
 
-    if(filter != PR_FILTER_LINEAR && filter != PR_FILTER_NEAREST) {
-        prLogEvent(PR_EVENT_DATA, PR_LOG_WARNING, "prCubeMapUpdateAll: Invalid filter mode for cube map (was %i), using PR_FILTER_LINEAR", filter);
-        cubeMap->filter = PR_FILTER_LINEAR;
+    if(minFilter != PR_FILTER_LINEAR && minFilter != PR_FILTER_NEAREST &&
+        minFilter != PR_FILTER_LINEAR_MIPMAP_LINEAR && minFilter != PR_FILTER_LINEAR_MIPMAP_NEAREST &&
+        minFilter != PR_FILTER_NEAREST_MIPMAP_NEAREST && minFilter != PR_FILTER_NEAREST_MIPMAP_LINEAR) {
+        prLogEvent(PR_EVENT_DATA, PR_LOG_WARNING, "prCubeMapUpdateAll: Invalid min filter for cube map (was %i), using PR_FILTER_LINEAR", minFilter);
+        cubeMap->minFilter = PR_FILTER_LINEAR;
     } else {
-        cubeMap->filter = filter;
+        cubeMap->minFilter = minFilter;
+    }
+
+    if(magFilter != PR_FILTER_LINEAR && magFilter != PR_FILTER_NEAREST) {
+        prLogEvent(PR_EVENT_DATA, PR_LOG_WARNING, "prCubeMapUpdateAll: Invalid mag filter for cube map (was %i), using PR_FILTER_LINEAR", magFilter);
+        cubeMap->magFilter = PR_FILTER_LINEAR;
+    } else {
+        cubeMap->magFilter = magFilter;
     }
 
     int unifiedAttributes = 1;
@@ -163,7 +172,7 @@ void prCubeMapUpdateAll(prCubeMapData* cubeMap, GLenum format[PR_CUBE_MAP_SIDES]
     }
 }
 
-void prCubeMapUpdate(prCubeMapData* cubeMap, int side, GLenum format, GLint wrappingMode, GLint filter, GLubyte* rawTextureData, size_t rawTextureDataCount, GLsizei width, GLsizei height) {
+void prCubeMapUpdate(prCubeMapData* cubeMap, int side, GLenum format, GLint wrappingMode, GLint minFilter, GLint magFilter, GLubyte* rawTextureData, size_t rawTextureDataCount, GLsizei width, GLsizei height) {
     if(rawTextureDataCount && !rawTextureData) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_WARNING, "prCubeMapUpdate: [Face %i] Cube map face data count not zero while cube map face data is NULL, assuming no texture data", side);
     }
@@ -197,11 +206,20 @@ void prCubeMapUpdate(prCubeMapData* cubeMap, int side, GLenum format, GLint wrap
         cubeMap->wrappingMode = wrappingMode;
     }
 
-    if(filter != PR_FILTER_LINEAR && filter != PR_FILTER_NEAREST) {
-        prLogEvent(PR_EVENT_DATA, PR_LOG_WARNING, "prCubeMapUpdate: Invalid filter mode for cube map (was %i), using PR_FILTER_LINEAR", filter);
-        cubeMap->filter = PR_FILTER_LINEAR;
+    if(minFilter != PR_FILTER_LINEAR && minFilter != PR_FILTER_NEAREST &&
+        minFilter != PR_FILTER_LINEAR_MIPMAP_LINEAR && minFilter != PR_FILTER_LINEAR_MIPMAP_NEAREST &&
+        minFilter != PR_FILTER_NEAREST_MIPMAP_NEAREST && minFilter != PR_FILTER_NEAREST_MIPMAP_LINEAR) {
+        prLogEvent(PR_EVENT_DATA, PR_LOG_WARNING, "prCubeMapUpdate: Invalid min filter for cube map (was %i), using PR_FILTER_LINEAR", minFilter);
+        cubeMap->minFilter = PR_FILTER_LINEAR;
     } else {
-        cubeMap->filter = filter;
+        cubeMap->minFilter = minFilter;
+    }
+
+    if(magFilter != PR_FILTER_LINEAR && magFilter != PR_FILTER_NEAREST) {
+        prLogEvent(PR_EVENT_DATA, PR_LOG_WARNING, "prCubeMapUpdate: Invalid mag filter for cube map (was %i), using PR_FILTER_LINEAR", magFilter);
+        cubeMap->magFilter = PR_FILTER_LINEAR;
+    } else {
+        cubeMap->magFilter = magFilter;
     }
 
     unsigned char* temp = NULL;

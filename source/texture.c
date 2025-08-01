@@ -40,7 +40,7 @@ void prTextureLinkContext(prTextureData* texture, GladGLContext* context) {
     }
 }
 
-void prTextureUpdate(prTextureData* texture, GLenum format, GLint wrappingMode, GLint filter, GLubyte* rawTextureData, size_t rawTextureDataCount, GLsizei width, GLsizei height) {
+void prTextureUpdate(prTextureData* texture, GLenum format, GLint wrappingMode, GLint minFilter, GLint magFilter, GLubyte* rawTextureData, size_t rawTextureDataCount, GLsizei width, GLsizei height) {
     if(rawTextureDataCount && !rawTextureData) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_WARNING, "prTextureUpdate: Texture data count not zero while texture data is NULL. Assuming no texture data, texture data will be NULL");
     }
@@ -48,8 +48,8 @@ void prTextureUpdate(prTextureData* texture, GLenum format, GLint wrappingMode, 
         prLogEvent(PR_EVENT_DATA, PR_LOG_INFO, "prTextureUpdate: Width and/or height provided in conjunction with texture data was provided. Assuming raw, unconpressed texture data to be passed directly to GPU");
     }
 
-    if((wrappingMode != PR_WRAPPING_REPEAT) && (wrappingMode != PR_WRAPPING_REPEAT_MIRRORED) && 
-       (wrappingMode != PR_WRAPPING_EDGE) && (wrappingMode != PR_WRAPPING_BORDER)
+    if(wrappingMode != PR_WRAPPING_REPEAT && wrappingMode != PR_WRAPPING_REPEAT_MIRRORED && 
+        wrappingMode != PR_WRAPPING_EDGE && wrappingMode != PR_WRAPPING_BORDER
     ) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_WARNING, "prTextureUpdate: Invalid wrapping mode for texture (was %i), using PR_WRAPPING_EDGE", wrappingMode);
         texture->wrappingMode = PR_WRAPPING_EDGE;
@@ -57,17 +57,26 @@ void prTextureUpdate(prTextureData* texture, GLenum format, GLint wrappingMode, 
         texture->wrappingMode = wrappingMode;
     }
 
-    if(filter != PR_FILTER_LINEAR && filter != PR_FILTER_NEAREST) {
-        prLogEvent(PR_EVENT_DATA, PR_LOG_WARNING, "prTextureSetFilter: Invalid filter mode for cube map (was %i), using PR_FILTER_LINEAR", filter);
-        texture->filter = PR_FILTER_LINEAR;
+    if(minFilter != PR_FILTER_LINEAR && minFilter != PR_FILTER_NEAREST &&
+        minFilter != PR_FILTER_LINEAR_MIPMAP_LINEAR && minFilter != PR_FILTER_LINEAR_MIPMAP_NEAREST &&
+        minFilter != PR_FILTER_NEAREST_MIPMAP_NEAREST && minFilter != PR_FILTER_NEAREST_MIPMAP_LINEAR) {
+        prLogEvent(PR_EVENT_DATA, PR_LOG_WARNING, "prTextureSetFilter: Invalid min filter for texture (was %i), using PR_FILTER_LINEAR", minFilter);
+        texture->minFilter = PR_FILTER_LINEAR;
     } else {
-        texture->filter = filter;
+        texture->minFilter = minFilter;
     }
 
-    if((format != PR_FORMAT_A) && (format != PR_FORMAT_G) && (format != PR_FORMAT_B) &&
-        (format != PR_FORMAT_RGB) && (format != PR_FORMAT_RGBA) &&
-        (format != PR_FORMAT_STENCIL) && (format != PR_FORMAT_DEPTH) && (format != PR_FORMAT_DEPTH_STENCIL) &&
-        (format != PR_FORMAT_AUTO) && (format != PR_FORMAT_SRGB_AUTO)
+    if(magFilter != PR_FILTER_LINEAR && magFilter != PR_FILTER_NEAREST) {
+        prLogEvent(PR_EVENT_DATA, PR_LOG_WARNING, "prTextureUpdate: Invalid mag filter for texture (was %i), using PR_FILTER_LINEAR", magFilter);
+        texture->magFilter = PR_FILTER_LINEAR;
+    } else {
+        texture->magFilter = magFilter;
+    }
+
+    if(format != PR_FORMAT_A && format != PR_FORMAT_G && format != PR_FORMAT_B &&
+        format != PR_FORMAT_RGB && format != PR_FORMAT_RGBA &&
+        format != PR_FORMAT_STENCIL && format != PR_FORMAT_DEPTH && format != PR_FORMAT_DEPTH_STENCIL &&
+        format != PR_FORMAT_AUTO && format != PR_FORMAT_SRGB_AUTO
     ) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prTextureUpdate: Invalid format for texture (was %i). Aborting operation, nothing was modified", format);
         return;

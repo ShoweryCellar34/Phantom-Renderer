@@ -78,14 +78,16 @@ void framebufferSizeCallback(GLFWwindow* window, int width, int height) {
     prRenderBufferUpdate(colorRBOMultisampled, PR_FORMAT_RGBA, windowWidth, windowHeight, SAMPLES);
     prTextureMultisampledUpdate(colorMultisamlpedTexture2, PR_FORMAT_RGBA, windowWidth, windowHeight, SAMPLES);
     prRenderBufferUpdate(depthStencilRBOMultisampled, PR_FORMAT_DEPTH_STENCIL, windowWidth, windowHeight, SAMPLES);
-    prTextureUpdate(colorTexture2, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR, NULL, 0, windowWidth, windowHeight);
-    prTextureUpdate(colorTexture3, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR, NULL, 0, windowWidth, windowHeight);
-    prTextureUpdate(bloomTexture, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR, NULL, 0, windowWidth, windowHeight);
+    prTextureUpdate(colorTexture2, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, NULL, 0, windowWidth, windowHeight);
+    prTextureUpdate(colorTexture3, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, NULL, 0, windowWidth, windowHeight);
+    prTextureUpdate(bloomTexture, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, NULL, 0, windowWidth, windowHeight);
 
-    prTextureUpdate(postProcessingTexture, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR, NULL, 0, windowWidth, windowHeight);
+    prTextureUpdate(postProcessingTexture, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, NULL, 0, windowWidth, windowHeight);
 
-    prTextureUpdate(colorTexture, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR, NULL, 0, windowWidth, windowHeight);
+    prTextureUpdate(colorTexture, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, NULL, 0, windowWidth, windowHeight);
     prRenderBufferUpdate(depthStencilRBO, PR_FORMAT_DEPTH_STENCIL, windowWidth, windowHeight, 0);
+
+    prShaderSetUniform2f(debugShaderProgram, "screenSize", windowWidth, windowHeight);
 }
 
 void cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
@@ -160,7 +162,7 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 
         stbi_flip_vertically_on_write(1);
         stbi_write_png(name, width, height, 4, pixels, width * 4);
-        prLogEvent(PR_EVENT_USER, PR_LOG_INFO, "Save screenshot with name: %s", name);
+        prLogEvent(PR_EVENT_USER, PR_LOG_INFO, "Save screenshot with dimentions %ix%i and name: %s", width, height, name);
 
         prFree(pixels);
     }
