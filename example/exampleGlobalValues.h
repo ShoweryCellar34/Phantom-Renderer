@@ -98,6 +98,30 @@ typedef struct skyboxMaterialData {
     prTextureData* frontTexture;
 } skyboxMaterialData;
 
+typedef struct directionalLightData {
+    vec3 direction;
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
+
+    GLuint shadowMap;
+} directionalLightData;
+
+typedef struct pointLightData {
+    float constant;
+    float linear;
+    float quadratic;
+
+    vec3 position;
+
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
+
+    GLuint shadowMap;
+    float farPlane;
+} pointLightData;
+
 prCamera* camera = NULL;
 vec3 cameraPosition = {35.0f, 35.0f, 35.0f};
 float deltaTime = 0.0f;

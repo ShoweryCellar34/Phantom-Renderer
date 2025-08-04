@@ -75,7 +75,7 @@ int main(int argc, char** argv) {
 
     prTextureData* depthTextureDepth = prTextureCreate();
     prTextureLinkContext(depthTextureDepth, test->openglContext);
-    prTextureUpdate(depthTextureDepth, PR_FORMAT_DEPTH, PR_WRAPPING_EDGE, PR_FILTER_LINEAR, PR_FILTER_LINEAR, NULL, 0, 2048, 2048);
+    prTextureUpdate(depthTextureDepth, PR_FORMAT_DEPTH, PR_WRAPPING_EDGE, PR_FILTER_LINEAR, PR_FILTER_LINEAR, false, NULL, 0, 2048, 2048);
     prTextureBorderColor(depthTextureDepth, (GLfloat[]){1.0f, 0.0f, 0.0f, 0.0f});
 
     prFramebufferData* framebufferDepth = prFramebufferCreate();
@@ -88,7 +88,7 @@ int main(int argc, char** argv) {
     prCubeMapLinkContext(depthCubeMapDepth2, test->openglContext);
     prCubeMapUpdateAll(depthCubeMapDepth2,
         (GLenum[]){PR_FORMAT_DEPTH, PR_FORMAT_DEPTH, PR_FORMAT_DEPTH, PR_FORMAT_DEPTH, PR_FORMAT_DEPTH, PR_FORMAT_DEPTH},
-        PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_LINEAR, PR_FILTER_LINEAR,
+        PR_WRAPPING_EDGE, PR_FILTER_LINEAR, PR_FILTER_LINEAR, false,
         (GLubyte*[]){NULL, NULL, NULL, NULL, NULL, NULL},
         (size_t[]){0, 0, 0, 0, 0, 0},
         (GLsizei[]){1024, 1024, 1024, 1024, 1024, 1024},
@@ -116,7 +116,7 @@ int main(int argc, char** argv) {
 
     colorTexture2 = prTextureCreate();
     prTextureLinkContext(colorTexture2, test->openglContext);
-    prTextureUpdate(colorTexture2, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, NULL, 0, windowWidth, windowHeight);
+    prTextureUpdate(colorTexture2, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, true, NULL, 0, windowWidth, windowHeight);
 
     prFramebufferData* framebuffer2 = prFramebufferCreate();
     prFramebufferLinkContext(framebuffer2, test->openglContext);
@@ -124,7 +124,7 @@ int main(int argc, char** argv) {
 
     colorTexture3 = prTextureCreate();
     prTextureLinkContext(colorTexture3, test->openglContext);
-    prTextureUpdate(colorTexture3, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, NULL, 0, windowWidth, windowHeight);
+    prTextureUpdate(colorTexture3, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, true, NULL, 0, windowWidth, windowHeight);
 
     prFramebufferData* framebuffer3 = prFramebufferCreate();
     prFramebufferLinkContext(framebuffer3, test->openglContext);
@@ -142,7 +142,7 @@ int main(int argc, char** argv) {
 
     bloomTexture = prTextureCreate();
     prTextureLinkContext(bloomTexture, test->openglContext);
-    prTextureUpdate(bloomTexture, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, NULL, 0, windowWidth, windowHeight);
+    prTextureUpdate(bloomTexture, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, true, NULL, 0, windowWidth, windowHeight);
 
     prFramebufferData* bloomFramebuffer = prFramebufferCreate();
     prFramebufferLinkContext(bloomFramebuffer, test->openglContext);
@@ -150,11 +150,11 @@ int main(int argc, char** argv) {
 
     postProcessingTexture = prTextureCreate();
     prTextureLinkContext(postProcessingTexture, test->openglContext);
-    prTextureUpdate(postProcessingTexture, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, NULL, 0, windowWidth, windowHeight);
+    prTextureUpdate(postProcessingTexture, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, true, NULL, 0, windowWidth, windowHeight);
 
     colorTexture = prTextureCreate();
     prTextureLinkContext(colorTexture, test->openglContext);
-    prTextureUpdate(colorTexture, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, NULL, 0, windowWidth, windowHeight);
+    prTextureUpdate(colorTexture, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, true, NULL, 0, windowWidth, windowHeight);
 
     depthStencilRBO = prRenderBufferCreate();
     prRenderBufferLinkContext(depthStencilRBO, test->openglContext);
@@ -287,15 +287,6 @@ int main(int argc, char** argv) {
         quadData, quadDataSize,
         indicesQuad, indicesQuadSize);
 
-    typedef struct directionalLightData {
-        vec3 direction;
-        vec3 ambient;
-        vec3 diffuse;
-        vec3 specular;
-
-        GLuint shadowMap;
-    } directionalLightData;
-
     directionalLightData sun = {
         {-0.25f, -0.5f, -0.75f},
         {0.02f, 0.015f, 0.015f},
@@ -303,21 +294,6 @@ int main(int argc, char** argv) {
         {1.3f, 1.3f, 1.25f},
         4
     };
-
-    typedef struct pointLightData {
-        float constant;
-        float linear;
-        float quadratic;
-
-        vec3 position;
-
-        vec3 ambient;
-        vec3 diffuse;
-        vec3 specular;
-
-        GLuint shadowMap;
-        float farPlane;
-    } pointLightData;
 
     pointLightData point = {
         1.0f,
@@ -404,6 +380,7 @@ int main(int argc, char** argv) {
         static float seed = 0;
         seed += deltaTime;
         float smoothSinOverTime = sin(seed);
+        float smoothOverTime = seed;
 
         prShaderSetUniform3f(currentShaderProgram, "directionalLights[0].direction", sun.direction[0], sun.direction[1], sun.direction[2]);
         prShaderSetUniform3f(currentShaderProgram, "directionalLights[0].ambient", sun.ambient[0], sun.ambient[1], sun.ambient[2]);
@@ -484,21 +461,21 @@ int main(int argc, char** argv) {
             prShaderSetUniformMatrix4fv(currentShaderProgram, "translation", translation[0]);
             prMeshDrawIndices(meshCube);
 
-            translationsToMatrix(translation, (vec3){0.0f, 2.0f, 0.0f}, (vec3){0.0f, smoothSinOverTime, 0.0f}, GLM_VEC3_ONE);
+            translationsToMatrix(translation, (vec3){0.0f, 2.0f, 0.0f}, (vec3){0.0f, smoothOverTime, 0.0f}, GLM_VEC3_ONE);
             if(i == 2) {
                 bindMaterial(&materialBrick, currentShaderProgram);
             }
             prShaderSetUniformMatrix4fv(currentShaderProgram, "translation", translation[0]);
             prMeshDrawIndices(meshCube);
 
-            translationsToMatrix(translation, (vec3){0.0f, -2.0f, 0.0f}, (vec3){0.0f, glm_rad(smoothSinOverTime * 100.0f), 0.0f}, GLM_VEC3_ONE);
+            translationsToMatrix(translation, (vec3){0.0f, -2.0f, 0.0f}, (vec3){0.0f, glm_rad(smoothOverTime * 100.0f), 0.0f}, GLM_VEC3_ONE);
             if(i == 2) {
                 bindMaterial(&defaultMaterial, currentShaderProgram);
             }
             prShaderSetUniformMatrix4fv(currentShaderProgram, "translation", translation[0]);
             prMeshDrawIndices(meshCube);
 
-            translationsToMatrix(translation, (vec3){0.0f, 0.0f, 2.0f}, (vec3){0.0f, glm_rad(smoothSinOverTime * 100.0f), 0.0f}, GLM_VEC3_ONE);
+            translationsToMatrix(translation, (vec3){0.0f, 0.0f, 2.0f}, (vec3){0.0f, glm_rad(smoothOverTime * 100.0f), 0.0f}, GLM_VEC3_ONE);
             if(i == 2) {
                 bindMaterial(&materialMetal, currentShaderProgram);
             }
@@ -596,7 +573,7 @@ int main(int argc, char** argv) {
         prTextureBindTexture(gaussianTextures[!horizontal], 1);
         prShaderSetUniform1i(hdrShaderProgram, "scene", 0);
         prShaderSetUniform1i(hdrShaderProgram, "bloomBlur", 1);
-        prShaderSetUniform1f(hdrShaderProgram, "exposure", 1.5);
+        prShaderSetUniform1f(hdrShaderProgram, "exposure", 1.2f);
         prShaderBind(hdrShaderProgram);
         prMeshDrawIndices(meshQuad);
 

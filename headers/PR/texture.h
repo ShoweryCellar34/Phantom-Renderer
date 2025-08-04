@@ -10,6 +10,7 @@ typedef struct prTextureData {
     GLint wrappingMode;
     GLint minFilter;
     GLint magFilter;
+    bool generateMipmaps;
     GLubyte* textureData;
     GLsizei width, height;
     int channels;
@@ -23,7 +24,7 @@ void prTextureDestroy(prTextureData* texture);
 
 void prTextureLinkContext(prTextureData* texture, GladGLContext* context);
 
-void prTextureUpdate(prTextureData* texture, GLenum format, GLint wrappingMode, GLint minFilter, GLint magFilter, GLubyte* rawTextureData, size_t rawTextureDataCount, GLsizei width, GLsizei height);
+void prTextureUpdate(prTextureData* texture, GLenum format, GLint wrappingMode, GLint minFilter, GLint magFilter, bool generateMipmaps, GLubyte* rawTextureData, size_t rawTextureDataCount, GLsizei width, GLsizei height);
 
 void prTextureBorderColor(prTextureData* texture, GLfloat borderColor[4]);
 

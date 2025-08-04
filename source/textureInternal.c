@@ -86,7 +86,9 @@ void i_prTextureSetDataOnGPU(prTextureData* texture) {
     texture->context->TexImage2D(GL_TEXTURE_2D, 0, internalFomrat, texture->width, texture->height, 0, format, GL_UNSIGNED_BYTE, texture->textureData);
     texture->context->BindTexture(GL_TEXTURE_2D, 0);
 
-    texture->context->GenerateTextureMipmap(texture->TBO);
+    if(texture->generateMipmaps) {
+        texture->context->GenerateTextureMipmap(texture->TBO);
+    }
 }
 
 void i_prTextureCreateOnGPU(prTextureData* texture) {

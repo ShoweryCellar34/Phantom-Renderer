@@ -40,7 +40,7 @@ void prCubeMapLinkContext(prCubeMapData* cubeMap, GladGLContext* context) {
     }
 }
 
-void prCubeMapUpdateAll(prCubeMapData* cubeMap, GLenum format[PR_CUBE_MAP_SIDES], GLint wrappingMode, GLint minFilter, GLint magFilter, GLubyte* rawTextureData[PR_CUBE_MAP_SIDES], size_t rawTextureDataCount[PR_CUBE_MAP_SIDES], GLsizei width[PR_CUBE_MAP_SIDES], GLsizei height[PR_CUBE_MAP_SIDES]) {
+void prCubeMapUpdateAll(prCubeMapData* cubeMap, GLenum format[PR_CUBE_MAP_SIDES], GLint wrappingMode, GLint minFilter, GLint magFilter, bool generateMipmaps, GLubyte* rawTextureData[PR_CUBE_MAP_SIDES], size_t rawTextureDataCount[PR_CUBE_MAP_SIDES], GLsizei width[PR_CUBE_MAP_SIDES], GLsizei height[PR_CUBE_MAP_SIDES]) {
     for(int i = 0; i < PR_CUBE_MAP_SIDES; i++) {
         if(rawTextureDataCount[i] && !rawTextureData[i]) {
             prLogEvent(PR_EVENT_DATA, PR_LOG_WARNING, "prCubeMapUpdateAll: [Face %i] Cube map face data count not zero while cube map face data is NULL, assuming no texture data", i);
@@ -152,6 +152,8 @@ void prCubeMapUpdateAll(prCubeMapData* cubeMap, GLenum format[PR_CUBE_MAP_SIDES]
         cubeMap->magFilter = magFilter;
     }
 
+    cubeMap->generateMipmaps = generateMipmaps;
+
     int unifiedAttributes = 1;
     for(int i = 0; i < PR_CUBE_MAP_SIDES; i++) {
         if((cubeMap->width[i] != cubeMap->height[i]) || (cubeMap->width[i] != cubeMap->width[0]) || (cubeMap->channels[i] != cubeMap->channels[0])) {
@@ -172,7 +174,7 @@ void prCubeMapUpdateAll(prCubeMapData* cubeMap, GLenum format[PR_CUBE_MAP_SIDES]
     }
 }
 
-void prCubeMapUpdate(prCubeMapData* cubeMap, int side, GLenum format, GLint wrappingMode, GLint minFilter, GLint magFilter, GLubyte* rawTextureData, size_t rawTextureDataCount, GLsizei width, GLsizei height) {
+void prCubeMapUpdate(prCubeMapData* cubeMap, int side, GLenum format, GLint wrappingMode, GLint minFilter, GLint magFilter, bool generateMipmaps, GLubyte* rawTextureData, size_t rawTextureDataCount, GLsizei width, GLsizei height) {
     if(rawTextureDataCount && !rawTextureData) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_WARNING, "prCubeMapUpdate: [Face %i] Cube map face data count not zero while cube map face data is NULL, assuming no texture data", side);
     }
@@ -221,6 +223,8 @@ void prCubeMapUpdate(prCubeMapData* cubeMap, int side, GLenum format, GLint wrap
     } else {
         cubeMap->magFilter = magFilter;
     }
+
+    cubeMap->generateMipmaps = generateMipmaps;
 
     unsigned char* temp = NULL;
     if(rawTextureData && (!width || !height)) {

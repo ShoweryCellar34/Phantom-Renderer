@@ -40,7 +40,7 @@ void prTextureLinkContext(prTextureData* texture, GladGLContext* context) {
     }
 }
 
-void prTextureUpdate(prTextureData* texture, GLenum format, GLint wrappingMode, GLint minFilter, GLint magFilter, GLubyte* rawTextureData, size_t rawTextureDataCount, GLsizei width, GLsizei height) {
+void prTextureUpdate(prTextureData* texture, GLenum format, GLint wrappingMode, GLint minFilter, GLint magFilter, bool generateMipmaps, GLubyte* rawTextureData, size_t rawTextureDataCount, GLsizei width, GLsizei height) {
     if(rawTextureDataCount && !rawTextureData) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_WARNING, "prTextureUpdate: Texture data count not zero while texture data is NULL. Assuming no texture data, texture data will be NULL");
     }
@@ -82,6 +82,8 @@ void prTextureUpdate(prTextureData* texture, GLenum format, GLint wrappingMode, 
         return;
     }
     texture->format = format;
+
+    texture->generateMipmaps = generateMipmaps;
 
     unsigned char* temp = NULL;
     if(rawTextureData && (!width || !height)) {

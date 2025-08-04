@@ -113,7 +113,9 @@ void i_prCubeMapSetDataOnGPU(prCubeMapData* cubeMap, int side) {
     );
     cubeMap->context->BindTexture(GL_TEXTURE_CUBE_MAP, 0);
 
-    cubeMap->context->GenerateMipmap(GL_TEXTURE_CUBE_MAP);
+    if(cubeMap->generateMipmaps) {
+        cubeMap->context->GenerateMipmap(GL_TEXTURE_CUBE_MAP);
+    }
 }
 
 void i_prCubeMapCreateOnGPU(prCubeMapData* cubeMap) {

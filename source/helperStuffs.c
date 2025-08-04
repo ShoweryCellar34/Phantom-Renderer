@@ -26,7 +26,7 @@ prTextureData* loadTexture(GladGLContext* context, unsigned int minFiltering, un
     prTextureData* texture = prTextureCreate();
 
     prTextureLinkContext(texture, context);
-    prTextureUpdate(texture, (srgb ? PR_FORMAT_SRGB_AUTO : PR_FORMAT_AUTO), PR_WRAPPING_EDGE, minFiltering, magFiltering, textureData, textureFileSize, 0, 0);
+    prTextureUpdate(texture, (srgb ? PR_FORMAT_SRGB_AUTO : PR_FORMAT_AUTO), PR_WRAPPING_EDGE, minFiltering, magFiltering, true, textureData, textureFileSize, 0, 0);
     prFree(textureData);
 
     return texture;
@@ -38,7 +38,7 @@ prTextureData* makeTextureSingleColor(GladGLContext* context, float color[4]) {
 
     GLubyte textureData[4] = {color[0] * 255.0f, color[1] * 255.0f, color[2] * 255.0f, color[3] * 255.0f};
 
-    prTextureUpdate(texture, PR_FORMAT_RGBA, PR_WRAPPING_REPEAT, PR_FILTER_LINEAR, PR_FILTER_LINEAR, textureData, 4, 1, 1);
+    prTextureUpdate(texture, PR_FORMAT_RGBA, PR_WRAPPING_REPEAT, PR_FILTER_LINEAR, PR_FILTER_LINEAR, false, textureData, 4, 1, 1);
 
     return texture;
 }
@@ -72,7 +72,7 @@ prTextureData* makeTextureCheckerboard(GladGLContext* context, size_t scale, flo
 
     prFree(template);
 
-    prTextureUpdate(texture, PR_FORMAT_RGBA, PR_WRAPPING_REPEAT, PR_FILTER_NEAREST_MIPMAP_NEAREST, PR_FILTER_NEAREST, textureData, scale * scale * 4, scale, scale);
+    prTextureUpdate(texture, PR_FORMAT_RGBA, PR_WRAPPING_REPEAT, PR_FILTER_NEAREST_MIPMAP_NEAREST, PR_FILTER_NEAREST, true, textureData, scale * scale * 4, scale, scale);
     
     prFree(textureData);
 
@@ -102,7 +102,7 @@ prCubeMapData* loadCubeMap(GladGLContext* context, unsigned int minFiltering, un
     prCubeMapLinkContext(cubeMap, context);
     prCubeMapUpdateAll(cubeMap,
         (GLenum[PR_CUBE_MAP_SIDES]){PR_FORMAT_AUTO, PR_FORMAT_AUTO, PR_FORMAT_AUTO, PR_FORMAT_AUTO, PR_FORMAT_AUTO, PR_FORMAT_AUTO},
-        PR_WRAPPING_EDGE, minFiltering, magFiltering,
+        PR_WRAPPING_EDGE, minFiltering, magFiltering, true,
         (GLubyte*[PR_CUBE_MAP_SIDES]){textureData[0], textureData[1], textureData[2], textureData[3], textureData[4], textureData[5]},
         (size_t[PR_CUBE_MAP_SIDES]){textureFileSize[0], textureFileSize[1], textureFileSize[2], textureFileSize[3], textureFileSize[4], textureFileSize[5]},
         (GLsizei[PR_CUBE_MAP_SIDES]){0, 0, 0, 0, 0 ,0}, (GLsizei[PR_CUBE_MAP_SIDES]){0, 0, 0, 0, 0 ,0});
@@ -129,7 +129,7 @@ prCubeMapData* makeCubeMapSingleColors(GladGLContext* context, float color[PR_CU
     prCubeMapLinkContext(cubeMap, context);
     prCubeMapUpdateAll(cubeMap,
         (GLenum[PR_CUBE_MAP_SIDES]){PR_FORMAT_RGBA, PR_FORMAT_RGBA, PR_FORMAT_RGBA, PR_FORMAT_RGBA, PR_FORMAT_RGBA, PR_FORMAT_RGBA},
-        PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_LINEAR, PR_FILTER_LINEAR,
+        PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_LINEAR, PR_FILTER_LINEAR, false,
         (GLubyte*[PR_CUBE_MAP_SIDES]){textureData[0], textureData[1], textureData[2], textureData[3], textureData[4], textureData[5]},
         (size_t[PR_CUBE_MAP_SIDES]){textureFileSize[0], textureFileSize[1], textureFileSize[2], textureFileSize[3], textureFileSize[4], textureFileSize[5]},
         (GLsizei[PR_CUBE_MAP_SIDES]){1, 1, 1, 1, 1, 1}, (GLsizei[PR_CUBE_MAP_SIDES]){1, 1, 1, 1, 1, 1});
@@ -173,7 +173,7 @@ prCubeMapData* makeCubeMapCheckerboards(GladGLContext* context, size_t scale, fl
 
     prCubeMapUpdateAll(cubeMap,
         (GLenum[PR_CUBE_MAP_SIDES]){PR_FORMAT_RGBA, PR_FORMAT_RGBA, PR_FORMAT_RGBA, PR_FORMAT_RGBA, PR_FORMAT_RGBA, PR_FORMAT_RGBA},
-        PR_WRAPPING_EDGE, PR_FILTER_NEAREST_MIPMAP_LINEAR, PR_FILTER_NEAREST,
+        PR_WRAPPING_EDGE, PR_FILTER_NEAREST_MIPMAP_LINEAR, PR_FILTER_NEAREST, true,
         (GLubyte*[PR_CUBE_MAP_SIDES]){textureData[0], textureData[1], textureData[2], textureData[3], textureData[4], textureData[5]},
         (size_t[PR_CUBE_MAP_SIDES]){scale * scale * 4, scale * scale * 4, scale * scale * 4, scale * scale * 4, scale * scale * 4, scale * scale * 4},
         (GLsizei[PR_CUBE_MAP_SIDES]){scale, scale, scale, scale, scale, scale},
