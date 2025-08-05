@@ -12,6 +12,8 @@ typedef struct prTextureData {
     GLint magFilter;
     bool generateMipmaps;
     GLubyte* textureData;
+    GLfloat* textureHDRData;
+    bool HDR;
     GLsizei width, height;
     int channels;
     GLfloat borderColor[4];

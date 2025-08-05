@@ -2,10 +2,6 @@
 
 #include <PR/cubeMapInternal.h>
 
-#define STBI_MALLOC(size) prMalloc(size)
-#define STBI_REALLOC(size) prRealloc(size)
-#define STBI_FREE(size) prFree(size)
-
 #include <stb_image.h>
 #include <PR/logger.h>
 #include <PR/memory.h>
@@ -64,11 +60,17 @@ void prCubeMapUpdateAll(prCubeMapData* cubeMap, GLenum format[PR_CUBE_MAP_SIDES]
             prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prCubeMapUpdateAll: [Face %i] Invalid format for cube map face (was %i). Aborting operation, modifications may have occurred", i, format);
             return;
         }
-        cubeMap->format[i] = format[i];
 
         unsigned char* temp = NULL;
+        float* tempHDR = NULL;
         if(rawTextureData[i] && (!width[i] || !height[i])) {
-            temp = stbi_load_from_memory(rawTextureData[i], rawTextureDataCount[i], &cubeMap->width[i], &cubeMap->height[i], &cubeMap->channels[i], 0);
+            if(stbi_is_hdr_from_memory(rawTextureData[i], rawTextureDataCount[i])) {
+                tempHDR = stbi_loadf_from_memory(rawTextureData[i], rawTextureDataCount[i], &cubeMap->width[i], &cubeMap->height[i], &cubeMap->channels[i], 0);
+                cubeMap->HDR[i] = true;
+            } else {
+                temp = stbi_load_from_memory(rawTextureData[i], rawTextureDataCount[i], &cubeMap->width[i], &cubeMap->height[i], &cubeMap->channels[i], 0);
+                cubeMap->HDR[i] = false;
+            }
             if(!temp) {
                 prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prCubeMapUpdateAll: [Face %i] Cube map face data failed to unpack. Aborting operation, modifications may have occurred", i);
                 return;
@@ -85,6 +87,8 @@ void prCubeMapUpdateAll(prCubeMapData* cubeMap, GLenum format[PR_CUBE_MAP_SIDES]
             cubeMap->height[i] = height[i];
             cubeMap->channels[i] = 0;
         }
+
+        cubeMap->format[i] = format[i];
 
         if(format[i] == PR_FORMAT_AUTO) {
             prLogEvent(PR_EVENT_DATA, PR_LOG_TRACE, "prCubeMapUpdateAll: [Face %i] Automatically determining cube map face format based on channel count (%d channels)", i, cubeMap->channels[i]);
@@ -123,8 +127,13 @@ void prCubeMapUpdateAll(prCubeMapData* cubeMap, GLenum format[PR_CUBE_MAP_SIDES]
             stbi_image_free(cubeMap->textureData[i]);
             cubeMap->textureData[i] = NULL;
         }
+        if(cubeMap->textureHDRData[i]) {
+            stbi_image_free(cubeMap->textureHDRData[i]);
+            cubeMap->textureHDRData[i] = NULL;
+        }
 
         cubeMap->textureData[i] = temp;
+        cubeMap->textureHDRData[i] = tempHDR;
     }
 
     if((wrappingMode != PR_WRAPPING_REPEAT) && (wrappingMode != PR_WRAPPING_REPEAT_MIRRORED) &&
@@ -197,6 +206,34 @@ void prCubeMapUpdate(prCubeMapData* cubeMap, int side, GLenum format, GLint wrap
         prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prCubeMapUpdate: [Face %i] Invalid format for cube map face (was %i). Aborting operation, modifications may have occurred", side, format);
         return;
     }
+
+    unsigned char* temp = NULL;
+    float* tempHDR = NULL;
+    if(rawTextureData && (!width || !height)) {
+        if(stbi_is_hdr_from_memory(rawTextureData, rawTextureDataCount)) {
+            tempHDR = stbi_loadf_from_memory(rawTextureData, rawTextureDataCount, &cubeMap->width[side], &cubeMap->height[side], &cubeMap->channels[side], 0);
+            cubeMap->HDR[side] = true;
+        } else {
+            temp = stbi_load_from_memory(rawTextureData, rawTextureDataCount, &cubeMap->width[side], &cubeMap->height[side], &cubeMap->channels[side], 0);
+            cubeMap->HDR[side] = false;
+        }
+        if(!temp) {
+            prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prCubeMapUpdate: [Face %i] Cube map face data failed to unpack. Aborting operation, nothing was modified", side);
+            return;
+        }
+    } else if(!rawTextureData && (width || height)) {
+        temp = NULL;
+        cubeMap->width[side] = width;
+        cubeMap->height[side] = height;
+        cubeMap->channels[side] = 0;
+    } else if(rawTextureData && (width || height)) {
+        temp = prMalloc(rawTextureDataCount);
+        prMemcpy(temp, (void*)rawTextureData, rawTextureDataCount);
+        cubeMap->width[side] = width;
+        cubeMap->height[side] = height;
+        cubeMap->channels[side] = 0;
+    }
+
     cubeMap->format[side] = format;
 
     if((wrappingMode != PR_WRAPPING_REPEAT) && (wrappingMode != PR_WRAPPING_REPEAT_MIRRORED) &&
@@ -225,26 +262,6 @@ void prCubeMapUpdate(prCubeMapData* cubeMap, int side, GLenum format, GLint wrap
     }
 
     cubeMap->generateMipmaps = generateMipmaps;
-
-    unsigned char* temp = NULL;
-    if(rawTextureData && (!width || !height)) {
-        temp = stbi_load_from_memory(rawTextureData, rawTextureDataCount, &cubeMap->width[side], &cubeMap->height[side], &cubeMap->channels[side], 0);
-        if(!temp) {
-            prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prCubeMapUpdate: [Face %i] Cube map face data failed to unpack. Aborting operation, nothing was modified", side);
-            return;
-        }
-    } else if(!rawTextureData && (width || height)) {
-        temp = NULL;
-        cubeMap->width[side] = width;
-        cubeMap->height[side] = height;
-        cubeMap->channels[side] = 0;
-    } else if(rawTextureData && (width || height)) {
-        temp = prMalloc(rawTextureDataCount);
-        prMemcpy(temp, (void*)rawTextureData, rawTextureDataCount);
-        cubeMap->width[side] = width;
-        cubeMap->height[side] = height;
-        cubeMap->channels[side] = 0;
-    }
 
     if(format == PR_FORMAT_AUTO) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_TRACE, "prCubeMapUpdate: [Face %i] Automatically determining cube map face format based on channel count (%d channels)", side, cubeMap->channels[side]);

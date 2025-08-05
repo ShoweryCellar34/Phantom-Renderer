@@ -1,12 +1,8 @@
 #pragma once
 
-#include <math.h>
 #include <time.h>
 #include <string.h>
 #include <GLFW/glfw3.h>
-#define STBIW_MALLOC prMalloc
-#define STBIW_REALLOC prRealloc
-#define STBIW_FREE prFree
 #include <stb_image_write.h>
 #include "exampleGlobalValues.h"
 

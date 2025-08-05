@@ -4,10 +4,6 @@
 
 #include <PR/textureInternal.h>
 
-#define STBI_MALLOC(size) prMalloc(size)
-#define STBI_REALLOC(size) prRealloc(size)
-#define STBI_FREE(size) prFree(size)
-
 #include <stb_image.h>
 #include <PR/memory.h>
 #include <PR/logger.h>
@@ -47,6 +43,41 @@ void prTextureUpdate(prTextureData* texture, GLenum format, GLint wrappingMode, 
     if(rawTextureData && (width || height)) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_INFO, "prTextureUpdate: Width and/or height provided in conjunction with texture data was provided. Assuming raw, unconpressed texture data to be passed directly to GPU");
     }
+    if(format != PR_FORMAT_A && format != PR_FORMAT_G && format != PR_FORMAT_B &&
+        format != PR_FORMAT_RGB && format != PR_FORMAT_RGBA &&
+        format != PR_FORMAT_STENCIL && format != PR_FORMAT_DEPTH && format != PR_FORMAT_DEPTH_STENCIL &&
+        format != PR_FORMAT_AUTO && format != PR_FORMAT_SRGB_AUTO
+    ) {
+        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prTextureUpdate: Invalid format for texture (was %i). Aborting operation, nothing was modified", format);
+        return;
+    }
+
+    unsigned char* temp = NULL;
+    float* tempHDR = NULL;
+    if(rawTextureData && (!width || !height)) {
+        if(stbi_is_hdr_from_memory(rawTextureData, rawTextureDataCount)) {
+            tempHDR = stbi_loadf_from_memory(rawTextureData, rawTextureDataCount, &texture->width, &texture->height, &texture->channels, 0);
+            texture->HDR = true;
+        } else {
+            temp = stbi_load_from_memory(rawTextureData, rawTextureDataCount, &texture->width, &texture->height, &texture->channels, 0);
+            texture->HDR = false;
+        }
+        if(!temp) {
+            prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prTextureUpdate: Texture data failed to unpack. Aborting operation, nothing was modified: %s", stbi_failure_reason());
+            return;
+        }
+    } else if(!rawTextureData && (width || height)) {
+        temp = NULL;
+        texture->width = width;
+        texture->height = height;
+        texture->channels = 0;
+    } else if(rawTextureData && (width || height)) {
+        temp = prMalloc(rawTextureDataCount);
+        prMemcpy(temp, (void*)rawTextureData, rawTextureDataCount);
+        texture->width = width;
+        texture->height = height;
+        texture->channels = 0;
+    }
 
     if(wrappingMode != PR_WRAPPING_REPEAT && wrappingMode != PR_WRAPPING_REPEAT_MIRRORED && 
         wrappingMode != PR_WRAPPING_EDGE && wrappingMode != PR_WRAPPING_BORDER
@@ -72,38 +103,9 @@ void prTextureUpdate(prTextureData* texture, GLenum format, GLint wrappingMode, 
     } else {
         texture->magFilter = magFilter;
     }
-
-    if(format != PR_FORMAT_A && format != PR_FORMAT_G && format != PR_FORMAT_B &&
-        format != PR_FORMAT_RGB && format != PR_FORMAT_RGBA &&
-        format != PR_FORMAT_STENCIL && format != PR_FORMAT_DEPTH && format != PR_FORMAT_DEPTH_STENCIL &&
-        format != PR_FORMAT_AUTO && format != PR_FORMAT_SRGB_AUTO
-    ) {
-        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prTextureUpdate: Invalid format for texture (was %i). Aborting operation, nothing was modified", format);
-        return;
-    }
     texture->format = format;
 
     texture->generateMipmaps = generateMipmaps;
-
-    unsigned char* temp = NULL;
-    if(rawTextureData && (!width || !height)) {
-        temp = stbi_load_from_memory(rawTextureData, rawTextureDataCount, &texture->width, &texture->height, &texture->channels, 0);
-        if(!temp) {
-            prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prTextureUpdate: Texture data failed to unpack. Aborting operation, nothing was modified: %s", stbi_failure_reason());
-            return;
-        }
-    } else if(!rawTextureData && (width || height)) {
-        temp = NULL;
-        texture->width = width;
-        texture->height = height;
-        texture->channels = 0;
-    } else if(rawTextureData && (width || height)) {
-        temp = prMalloc(rawTextureDataCount);
-        prMemcpy(temp, (void*)rawTextureData, rawTextureDataCount);
-        texture->width = width;
-        texture->height = height;
-        texture->channels = 0;
-    }
 
     if(format == PR_FORMAT_AUTO) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_TRACE, "prTextureUpdate: Automatically determining texture format based on channel count (%d channels)", texture->channels);
@@ -142,8 +144,13 @@ void prTextureUpdate(prTextureData* texture, GLenum format, GLint wrappingMode, 
         stbi_image_free(texture->textureData);
         texture->textureData = NULL;
     }
+    if(texture->textureHDRData) {
+        stbi_image_free(texture->textureHDRData);
+        texture->textureHDRData = NULL;
+    }
 
     texture->textureData = temp;
+    texture->textureHDRData = tempHDR;
 
     if(texture->context && !texture->TBO) {
         i_prTextureCreateOnGPU(texture);

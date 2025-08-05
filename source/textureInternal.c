@@ -83,7 +83,11 @@ void i_prTextureSetDataOnGPU(prTextureData* texture) {
     texture->context->PixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
     texture->context->BindTexture(GL_TEXTURE_2D, texture->TBO);
-    texture->context->TexImage2D(GL_TEXTURE_2D, 0, internalFomrat, texture->width, texture->height, 0, format, GL_UNSIGNED_BYTE, texture->textureData);
+    if(texture->HDR) {
+        texture->context->TexImage2D(GL_TEXTURE_2D, 0, internalFomrat, texture->width, texture->height, 0, format, GL_FLOAT, texture->textureHDRData);
+    } else {
+        texture->context->TexImage2D(GL_TEXTURE_2D, 0, internalFomrat, texture->width, texture->height, 0, format, GL_UNSIGNED_BYTE, texture->textureData);
+    }
     texture->context->BindTexture(GL_TEXTURE_2D, 0);
 
     if(texture->generateMipmaps) {

@@ -84,10 +84,17 @@ void i_prCubeMapSetDataAllOnGPU(prCubeMapData* cubeMap) {
         GLenum format;
         GLint internalFomrat;
         i_prCubeMapComputeFormats(cubeMap, i, &format, &internalFomrat);
-        cubeMap->context->TexImage2D(
-            GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
-            0, internalFomrat, cubeMap->width[i], cubeMap->height[i], 0, format, GL_UNSIGNED_BYTE, cubeMap->textureData[i]
-        );
+        if(cubeMap->HDR[i]) {
+            cubeMap->context->TexImage2D(
+                GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+                0, internalFomrat, cubeMap->width[i], cubeMap->height[i], 0, format, GL_FLOAT, cubeMap->textureHDRData[i]
+            );
+        } else {
+            cubeMap->context->TexImage2D(
+                GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+                0, internalFomrat, cubeMap->width[i], cubeMap->height[i], 0, format, GL_UNSIGNED_BYTE, cubeMap->textureData[i]
+            );
+        }
     }
     cubeMap->context->GenerateMipmap(GL_TEXTURE_CUBE_MAP);
 
@@ -107,10 +114,17 @@ void i_prCubeMapSetDataOnGPU(prCubeMapData* cubeMap, int side) {
     GLenum format;
     GLint internalFomrat;
     i_prCubeMapComputeFormats(cubeMap, side, &format, &internalFomrat);
-    cubeMap->context->TexImage2D(
-        GL_TEXTURE_CUBE_MAP_POSITIVE_X + side,
-        0, internalFomrat, cubeMap->width[side], cubeMap->height[side], 0, format, GL_UNSIGNED_BYTE, cubeMap->textureData[side]
-    );
+    if(cubeMap->HDR[side]) {
+        cubeMap->context->TexImage2D(
+            GL_TEXTURE_CUBE_MAP_POSITIVE_X + side,
+            0, internalFomrat, cubeMap->width[side], cubeMap->height[side], 0, format, GL_FLOAT, cubeMap->textureHDRData[side]
+        );
+    } else {
+        cubeMap->context->TexImage2D(
+            GL_TEXTURE_CUBE_MAP_POSITIVE_X + side,
+            0, internalFomrat, cubeMap->width[side], cubeMap->height[side], 0, format, GL_UNSIGNED_BYTE, cubeMap->textureData[side]
+        );
+    }
     cubeMap->context->BindTexture(GL_TEXTURE_CUBE_MAP, 0);
 
     if(cubeMap->generateMipmaps) {

@@ -46,13 +46,26 @@ void* prRealloc(void* sourceMemory, size_t size) {
     return memory;
 }
 
-void* prMemcpy(void* destinatonMemory, void* sourceMemory, size_t size) {
+void* prMemcpy(void* destinatonMemory, const void* sourceMemory, size_t size) {
     prLogEvent(PR_EVENT_MEMORY, PR_LOG_TRACE, "prMemcpy: Copying %zu bytes of memory", size);
 
     void* memory = memcpy(destinatonMemory, sourceMemory, size);
 
     if(!memory) {
         prLogEvent(PR_EVENT_MEMORY, PR_LOG_FATAL, "prMemcpy: Failed to copy %zu bytes of memory", size);
+        return NULL;
+    }
+
+    return memory;
+}
+
+void* prMemmove(void* destinationMemory, const void* sourceMemory, size_t size) {
+    prLogEvent(PR_EVENT_MEMORY, PR_LOG_TRACE, "prMemmove: Moving %zu bytes of memory", size);
+
+    void* memory = memmove(destinationMemory, sourceMemory, size);
+
+    if(!memory) {
+        prLogEvent(PR_EVENT_MEMORY, PR_LOG_FATAL, "prMemmove: Failed to move %zu bytes of memory", size);
         return NULL;
     }
 

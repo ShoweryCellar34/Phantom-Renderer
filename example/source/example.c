@@ -2,11 +2,8 @@
 #include <PR/helperStuffs.h>
 
 #include <stdio.h>
-#include <cglm/cglm.h>
-#include <stb_image.h>
-#include <PR/memory.h>
-#include "exampleGlobalValues.h"
-#include "exampleFunctions.h"
+#include <exampleGlobalValues.h>
+#include <exampleFunctions.h>
 
 int main(int argc, char** argv) {
     prLogSetLevel(PR_LOG_TRACE);
@@ -209,6 +206,14 @@ int main(int argc, char** argv) {
         defaultTexture,
         defaultTexture,
         defaultNormal,
+        48.0f
+    };
+
+    materialData nullMaterial = {
+        whiteTexture,
+        whiteTexture,
+        blackTexture,
+        blackTexture,
         48.0f
     };
 
@@ -449,7 +454,7 @@ int main(int argc, char** argv) {
 
             translationsToMatrix(translation, (vec3){2.0f, 0.0f, 0.0f}, (vec3){0.0f, smoothSinOverTime, 0.0f}, GLM_VEC3_ONE);
             if(i == 2) {
-                bindMaterial(&materialWood, currentShaderProgram);
+                bindMaterial(&nullMaterial, currentShaderProgram);
             }
             prShaderSetUniformMatrix4fv(currentShaderProgram, "translation", translation[0]);
             prMeshDrawIndices(meshCube);

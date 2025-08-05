@@ -14,6 +14,8 @@ typedef struct prCubeMapData {
     GLint magFilter;
     bool generateMipmaps;
     GLubyte* textureData[PR_CUBE_MAP_SIDES];
+    GLfloat* textureHDRData[PR_CUBE_MAP_SIDES];
+    bool HDR[PR_CUBE_MAP_SIDES];
     GLsizei width[PR_CUBE_MAP_SIDES], height[PR_CUBE_MAP_SIDES];
     int channels[PR_CUBE_MAP_SIDES];
     GLfloat borderColor[4];
