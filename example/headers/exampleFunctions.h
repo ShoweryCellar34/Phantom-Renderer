@@ -1,7 +1,5 @@
 #pragma once
 
-#include <time.h>
-#include <string.h>
 #include <GLFW/glfw3.h>
 #include <stb_image_write.h>
 #include "exampleGlobalValues.h"
