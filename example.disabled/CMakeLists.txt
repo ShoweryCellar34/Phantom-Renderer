@@ -1,10 +1,10 @@
 cmake_minimum_required(VERSION 3.20)
 
-project(Example LANGUAGES CXX)
+project(Example LANGUAGES C)
 
-file(GLOB SOURCE source/*.cpp)
-add_executable(Example ${SOURCE})
-set_property(TARGET Example PROPERTY CXX_STANDARD 17)
+file(GLOB SOURCE source/*.c)
+add_executable(Example source/example.c ${SOURCE})
+set_property(TARGET Example PROPERTY C_STANDARD 99)
 target_include_directories(Example PUBLIC headers)
 
 target_link_libraries(Example Phantom-Renderer)
