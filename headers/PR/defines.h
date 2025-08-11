@@ -7,6 +7,7 @@ typedef int8_t prLogLevel_t;
 typedef int8_t prEvent_t;
 
 #define PR_MAXSTR_LEN                           1024
+#define PR_MAX_LOG_STREAMS                      8
 #define PR_CUBE_MAP_SIDES                       6 // This is just for taking the place of a magic number
 #define PR_MAX_VERTEX_ATTRIBUTES                16
 #define PR_MAX_FRAMEBUFFER_COLOR_ATTACHMENTS    8

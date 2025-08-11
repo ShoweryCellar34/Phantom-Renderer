@@ -5,7 +5,13 @@
 
 int main(int argc, char** argv) {
     setupPaths();
-    setupLog(userDataPath / "prLog.txt");
+    setLogFilePath(g_userDataPath / "prLog.txt");
+    setupLog();
+
+    setupWindow();
+    setupShaders();
+    shutdownShaders();
+    shutdownWindow();
 
     shutdownLog();
     return 0;

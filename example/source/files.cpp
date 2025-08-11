@@ -1,12 +1,12 @@
 #include <files.hpp>
 
-#include <PR/PR.h>
-
 #ifdef _WIN32
 #include <windows.h>
 #include <shlobj.h>
 #include <objbase.h>
 #endif
+
+#include <PR/PR.h>
 
 std::filesystem::path getUserDataPath() {
     std::filesystem::path path;

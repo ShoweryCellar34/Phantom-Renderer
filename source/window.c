@@ -11,9 +11,6 @@ prWindow* prWindowCreate(const char* title, int width, int height) {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    #ifdef __APPLE__
-        glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-    #endif
     window->window = glfwCreateWindow(width, height, title, NULL, NULL);
 
     return window;
@@ -29,7 +26,9 @@ void prWindowDestroy(prWindow* window) {
     if(window->openglContext) {
         prFree(window->openglContext);
     }
-    glfwDestroyWindow(window->window);
+    if(window->window) {
+        glfwDestroyWindow(window->window);
+    }
 
     prFree(window);
 }

@@ -1,5 +1,13 @@
 #pragma once
 
+#include <glad/gl.h>
+#include <GLFW/glfw3.h>
+
+#include <cglm/cglm.h>
+
+#include <stb_image.h>
+#include <stb_image_write.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -9,6 +17,7 @@ extern "C" {
 #include "cubeMap.h"
 #include "defines.h"
 #include "framebuffer.h"
+#include "helperStuffs.h"
 #include "logger.h"
 #include "memory.h"
 #include "mesh.h"

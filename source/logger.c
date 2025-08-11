@@ -8,7 +8,7 @@
 #include <string.h>
 
 int i_logStreamCount = 0;
-FILE** i_logStream = NULL;
+FILE* i_logStream[PR_MAX_LOG_STREAMS] = {NULL};
 prLogLevel_t i_logLevel = PR_LOG_TRACE;
 
 void prLogSetLevel(prLogLevel_t level) {
@@ -17,7 +17,12 @@ void prLogSetLevel(prLogLevel_t level) {
 
 void prLogSetStream(int streamCount, FILE** stream) {
     i_logStreamCount = streamCount;
-    i_logStream = stream;
+    if(i_logStreamCount > PR_MAX_LOG_STREAMS) {
+        i_logStreamCount = PR_MAX_LOG_STREAMS;
+    }
+    for(int i = 0; i < i_logStreamCount; i++) {
+        i_logStream[i] = stream[i];
+    }
 }
 
 void _prLogRaw(const char* format, ...) {
