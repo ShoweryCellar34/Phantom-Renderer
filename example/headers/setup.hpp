@@ -17,3 +17,11 @@ void shutdownWindow();
 void setupShaders();
 
 void shutdownShaders();
+
+void setupFramebuffers();
+
+void shutdownFramebuffers();
+
+void setupTextures();
+
+void shutdownTextures();

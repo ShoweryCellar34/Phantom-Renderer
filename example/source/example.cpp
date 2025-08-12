@@ -10,6 +10,9 @@ int main(int argc, char** argv) {
 
     setupWindow();
     setupShaders();
+    setupFramebuffers();
+
+    shutdownFramebuffers();
     shutdownShaders();
     shutdownWindow();
 
