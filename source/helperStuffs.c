@@ -9,7 +9,7 @@
 #include <PR/shader.h>
 #include <PR/computeShader.h>
 
-prTextureData* loadTexture(GladGLContext* context, unsigned int minFiltering, unsigned int magFiltering, bool srgb, const char* path) {
+prTextureData* loadTexture(GladGLContext* context, unsigned int minFiltering, unsigned int magFiltering, const char* path) {
     FILE* textureFile = fopen(path, "rb");
     if(textureFile == NULL) {
         prLogEvent(PR_EVENT_USER, PR_LOG_ERROR, "Failed to load file \"%s\"", path);
@@ -26,7 +26,7 @@ prTextureData* loadTexture(GladGLContext* context, unsigned int minFiltering, un
     prTextureData* texture = prTextureCreate();
 
     prTextureLinkContext(texture, context);
-    prTextureUpdate(texture, (srgb ? PR_FORMAT_SRGB_AUTO : PR_FORMAT_AUTO), PR_WRAPPING_EDGE, minFiltering, magFiltering, true, textureData, textureFileSize, 0, 0);
+    prTextureUpdate(texture, PR_FORMAT_AUTO, PR_WRAPPING_EDGE, minFiltering, magFiltering, true, textureData, textureFileSize, 0, 0);
     prFree(textureData);
 
     return texture;

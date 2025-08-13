@@ -46,7 +46,7 @@ void prTextureUpdate(prTextureData* texture, GLenum format, GLint wrappingMode, 
     if(format != PR_FORMAT_A && format != PR_FORMAT_G && format != PR_FORMAT_B &&
         format != PR_FORMAT_RGB && format != PR_FORMAT_RGBA &&
         format != PR_FORMAT_STENCIL && format != PR_FORMAT_DEPTH && format != PR_FORMAT_DEPTH_STENCIL &&
-        format != PR_FORMAT_AUTO && format != PR_FORMAT_SRGB_AUTO
+        format != PR_FORMAT_AUTO
     ) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prTextureUpdate: Invalid format for texture (was %i). Aborting operation, nothing was modified", format);
         return;
@@ -107,7 +107,7 @@ void prTextureUpdate(prTextureData* texture, GLenum format, GLint wrappingMode, 
 
     texture->generateMipmaps = generateMipmaps;
 
-    if(format == PR_FORMAT_AUTO) {
+    if(format == PR_FORMAT_AUTO && texture->HDR == false) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_TRACE, "prTextureUpdate: Automatically determining texture format based on channel count (%d channels)", texture->channels);
         switch(texture->channels) {
             case 3:
@@ -123,7 +123,7 @@ void prTextureUpdate(prTextureData* texture, GLenum format, GLint wrappingMode, 
                 break;
         }
     }
-    if(format == PR_FORMAT_SRGB_AUTO) {
+    if(format == PR_FORMAT_AUTO && texture->HDR == true) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_TRACE, "prTextureUpdate: Automatically determining texture sRGB format based on channel count (%d channels)", texture->channels);
         switch(texture->channels) {
             case 3:

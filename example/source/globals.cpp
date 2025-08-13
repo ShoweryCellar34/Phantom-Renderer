@@ -53,20 +53,25 @@ prRenderBufferData* g_depthStencilRBODefault = nullptr;
 prFramebufferData* g_framebufferDefault = nullptr;
 
 // Textures
-bool g_textureInit = false;
+bool g_texturesInit = false;
 
-prTextureData* defaultTexture = nullptr;
-prTextureData* containerTexture = nullptr;
-prTextureData* containerMetalTexture = nullptr;
-prTextureData* containerMetalSpecularTexture = nullptr;
-prTextureData* steelTexture = nullptr;
-prTextureData* steelNormal = nullptr;
-prTextureData* brickWallDiffuseTexture = nullptr;
-prTextureData* brickWallNormalTexture = nullptr;
-prTextureData* blackTexture = nullptr;
-prTextureData* whiteTexture = nullptr;
-prTextureData* defaultNormal = nullptr;
-prTextureData* HUDTexture = nullptr;
+prTextureData* g_textureCheckerboard = nullptr;
+prTextureData* g_textureContainer = nullptr;
+prTextureData* g_textureMetalRimmedContainer = nullptr;
+prTextureData* g_textureMetalRimmedContainerSpecular = nullptr;
+prTextureData* g_textureSteel = nullptr;
+prTextureData* g_textureSteelNormal = nullptr;
+prTextureData* g_textureBrickWall = nullptr;
+prTextureData* g_textureBrickWallNormal = nullptr;
+prTextureData* g_textureBlack = nullptr;
+prTextureData* g_textureWhite = nullptr;
+prTextureData* g_textureNormalDefault = nullptr;
+prTextureData* g_textureHUD = nullptr;
+prCubeMapData* skyboxDefaultCubeMap = nullptr;
+prCubeMapData* g_cubeMapIslands = nullptr;
+prCubeMapData* g_cubeMapSpace = nullptr;
+prCubeMapData* skyboxCubeMap3 = nullptr;
+prCubeMapData* skybox4CubeMap = nullptr;
 
 float pitch = 0.0f;
 float yaw = 0.0f;

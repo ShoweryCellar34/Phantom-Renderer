@@ -10,7 +10,7 @@ typedef struct prCubeMapData prCubeMapData;
 typedef struct prShaderData prShaderData;
 typedef struct prComputeShaderData prComputeShaderData;
 
-prTextureData* loadTexture(GladGLContext* context, unsigned int minFiltering, unsigned int magFiltering, bool srgb, const char* path);
+prTextureData* loadTexture(GladGLContext* context, unsigned int minFiltering, unsigned int magFiltering, const char* path);
 
 prTextureData* makeTextureSingleColor(GladGLContext* context, float color[4]);
 

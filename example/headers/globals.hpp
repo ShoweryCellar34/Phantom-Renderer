@@ -6,6 +6,65 @@
 
 #define TO_RES(x) (g_resourcesPath / x).u8string().c_str()
 
+inline GLfloat* TEMP_RGBA(GLfloat r, GLfloat g, GLfloat b, GLfloat a) {
+    static GLfloat tempRGBA[4] = {0.0f, 0.0f, 0.0f, 0.0f};
+
+    tempRGBA[0] = r;
+    tempRGBA[1] = g;
+    tempRGBA[2] = b;
+    tempRGBA[3] = a;
+
+    return tempRGBA;
+}
+
+inline GLfloat** TEMP_RGBA_6(GLfloat r1, GLfloat g1, GLfloat b1, GLfloat a1,
+                             GLfloat r2, GLfloat g2, GLfloat b2, GLfloat a2,
+                             GLfloat r3, GLfloat g3, GLfloat b3, GLfloat a3,
+                             GLfloat r4, GLfloat g4, GLfloat b4, GLfloat a4,
+                             GLfloat r5, GLfloat g5, GLfloat b5, GLfloat a5,
+                             GLfloat r6, GLfloat g6, GLfloat b6, GLfloat a6
+) {
+    static GLfloat tempRGBA[PR_CUBE_MAP_SIDES][4] = {
+        {0.0f, 0.0f, 0.0f, 0.0f},
+        {0.0f, 0.0f, 0.0f, 0.0f},
+        {0.0f, 0.0f, 0.0f, 0.0f},
+        {0.0f, 0.0f, 0.0f, 0.0f},
+        {0.0f, 0.0f, 0.0f, 0.0f},
+        {0.0f, 0.0f, 0.0f, 0.0f}};
+
+    tempRGBA[0][0] = r1;
+    tempRGBA[0][1] = g1;
+    tempRGBA[0][2] = b1;
+    tempRGBA[0][3] = a1;
+
+    tempRGBA[1][0] = r2;
+    tempRGBA[1][1] = g2;
+    tempRGBA[1][2] = b2;
+    tempRGBA[1][3] = a2;
+
+    tempRGBA[2][0] = r3;
+    tempRGBA[2][1] = g3;
+    tempRGBA[2][2] = b3;
+    tempRGBA[2][3] = a3;
+
+    tempRGBA[3][0] = r4;
+    tempRGBA[3][1] = g4;
+    tempRGBA[3][2] = b4;
+    tempRGBA[3][3] = a4;
+
+    tempRGBA[4][0] = r5;
+    tempRGBA[4][1] = g5;
+    tempRGBA[4][2] = b5;
+    tempRGBA[4][3] = a5;
+
+    tempRGBA[5][0] = r6;
+    tempRGBA[5][1] = g6;
+    tempRGBA[5][2] = b6;
+    tempRGBA[5][3] = a6;
+
+    return reinterpret_cast<GLfloat**>(&tempRGBA[0][0]);
+}
+
 // Global Constants
 #define TITLE "Phantom-Renderer Example"
 #define DEFAULT_WINDOW_WIDTH 1280
@@ -65,20 +124,25 @@ extern prRenderBufferData* g_depthStencilRBODefault;
 extern prFramebufferData* g_framebufferDefault;
 
 // Textures
-extern bool g_textureInit;
+extern bool g_texturesInit;
 
-extern prTextureData* defaultTexture;
-extern prTextureData* containerTexture;
-extern prTextureData* containerMetalTexture;
-extern prTextureData* containerMetalSpecularTexture;
-extern prTextureData* steelTexture;
-extern prTextureData* steelNormal;
-extern prTextureData* brickWallDiffuseTexture;
-extern prTextureData* brickWallNormalTexture;
-extern prTextureData* blackTexture;
-extern prTextureData* whiteTexture;
-extern prTextureData* defaultNormal;
-extern prTextureData* HUDTexture;
+extern prTextureData* g_textureCheckerboard;
+extern prTextureData* g_textureContainer;
+extern prTextureData* g_textureMetalRimmedContainer;
+extern prTextureData* g_textureMetalRimmedContainerSpecular;
+extern prTextureData* g_textureSteel;
+extern prTextureData* g_textureSteelNormal;
+extern prTextureData* g_textureBrickWall;
+extern prTextureData* g_textureBrickWallNormal;
+extern prTextureData* g_textureBlack;
+extern prTextureData* g_textureWhite;
+extern prTextureData* g_textureNormalDefault;
+extern prTextureData* g_textureHUD;
+extern prCubeMapData* skyboxDefaultCubeMap;
+extern prCubeMapData* g_cubeMapIslands;
+extern prCubeMapData* g_cubeMapSpace;
+extern prCubeMapData* skyboxCubeMap3;
+extern prCubeMapData* skybox4CubeMap;
 
 extern float pitch;
 extern float yaw;

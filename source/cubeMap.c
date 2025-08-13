@@ -90,7 +90,7 @@ void prCubeMapUpdateAll(prCubeMapData* cubeMap, GLenum format[PR_CUBE_MAP_SIDES]
 
         cubeMap->format[i] = format[i];
 
-        if(format[i] == PR_FORMAT_AUTO) {
+        if(format[i] == PR_FORMAT_AUTO && cubeMap->HDR[i] == false){
             prLogEvent(PR_EVENT_DATA, PR_LOG_TRACE, "prCubeMapUpdateAll: [Face %i] Automatically determining cube map face format based on channel count (%d channels)", i, cubeMap->channels[i]);
             switch(cubeMap->channels[i]) {
                 case 3:
@@ -106,7 +106,7 @@ void prCubeMapUpdateAll(prCubeMapData* cubeMap, GLenum format[PR_CUBE_MAP_SIDES]
                     break;
             }
         }
-        if(format[i] == PR_FORMAT_SRGB_AUTO) {
+        if(format[i] == PR_FORMAT_AUTO && cubeMap->HDR[i] == true) {
             prLogEvent(PR_EVENT_DATA, PR_LOG_TRACE, "prCubeMapUpdateAll: [Face %i] Automatically determining cube map face sRGB format based on channel count (%d channels)", i, cubeMap->channels[i]);
             switch(cubeMap->channels[i]) {
                 case 3:
@@ -201,7 +201,7 @@ void prCubeMapUpdate(prCubeMapData* cubeMap, int side, GLenum format, GLint wrap
     if((format != PR_FORMAT_A) && (format != PR_FORMAT_G) && (format != PR_FORMAT_B) &&
         (format != PR_FORMAT_RGB) && (format != PR_FORMAT_RGBA) &&
         (format != PR_FORMAT_STENCIL) && (format != PR_FORMAT_DEPTH) && (format != PR_FORMAT_DEPTH_STENCIL) &&
-        (format != PR_FORMAT_AUTO) && (format != PR_FORMAT_SRGB_AUTO)
+        (format != PR_FORMAT_AUTO)
     ) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prCubeMapUpdate: [Face %i] Invalid format for cube map face (was %i). Aborting operation, modifications may have occurred", side, format);
         return;
@@ -263,7 +263,7 @@ void prCubeMapUpdate(prCubeMapData* cubeMap, int side, GLenum format, GLint wrap
 
     cubeMap->generateMipmaps = generateMipmaps;
 
-    if(format == PR_FORMAT_AUTO) {
+    if(format == PR_FORMAT_AUTO && cubeMap->HDR[side] == false) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_TRACE, "prCubeMapUpdate: [Face %i] Automatically determining cube map face format based on channel count (%d channels)", side, cubeMap->channels[side]);
         switch(cubeMap->channels[side]) {
             case 3:
@@ -279,7 +279,7 @@ void prCubeMapUpdate(prCubeMapData* cubeMap, int side, GLenum format, GLint wrap
                 break;
         }
     }
-    if(format == PR_FORMAT_SRGB_AUTO) {
+    if(format == PR_FORMAT_AUTO && cubeMap->HDR[side] == true) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_TRACE, "prCubeMapUpdate: [Face %i] Automatically determining cube map face sRGB format based on channel count (%d channels)", side, cubeMap->channels[side]);
         switch(cubeMap->channels[side]) {
             case 3:

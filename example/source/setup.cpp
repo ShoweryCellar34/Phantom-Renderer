@@ -232,8 +232,7 @@ void setupFramebuffers() {
         g_depthTextureSunShadowMap = prTextureCreate();
         prTextureLinkContext(g_depthTextureSunShadowMap, g_window->openglContext);
         prTextureUpdate(g_depthTextureSunShadowMap, PR_FORMAT_DEPTH, PR_WRAPPING_EDGE, PR_FILTER_LINEAR, PR_FILTER_LINEAR, false, NULL, 0, 2048, 2048);
-        GLfloat tempBorderColorArray[] = {1.0f, 0.0f, 0.0f, 1.0f};
-        prTextureBorderColor(g_depthTextureSunShadowMap, tempBorderColorArray);
+        prTextureBorderColor(g_depthTextureSunShadowMap, TEMP_RGBA(1.0f, 0.0f, 0.0f, 1.0f));
 
         g_framebufferSunShadowMap = prFramebufferCreate();
         prFramebufferLinkContext(g_framebufferSunShadowMap, g_window->openglContext);
@@ -254,7 +253,7 @@ void setupFramebuffers() {
             tempTextureDataSizeArray,
             tempCubeMapSizeArray,
             tempCubeMapSizeArray);
-        prCubeMapBorderColor(g_depthCubeMapPointShadowMap, tempBorderColorArray);
+        prCubeMapBorderColor(g_depthCubeMapPointShadowMap, TEMP_RGBA(1.0f, 0.0f, 0.0f, 1.0f));
 
         g_framebufferPointShadowMap = prFramebufferCreate();
         prFramebufferLinkContext(g_framebufferPointShadowMap, g_window->openglContext);
@@ -325,49 +324,132 @@ void shutdownFramebuffers() {
 }
 
 void setupTextures() {
-    if(!g_textureInit) {
+    if(!g_texturesInit) {
         prLogEvent(PR_EVENT_USER, PR_LOG_INFO, "setupTextures: Creating textures");
 
-        defaultTexture = makeTextureCheckerboard(g_window->openglContext, 8, (float[4]){1.0f, 0.0f, 1.0f, 1.0f}, (float[4]){0.0f, 0.0f, 0.0f, 1.0f});
-        containerTexture = loadTexture(g_window->openglContext, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, true, TO_RES("res/textures/container.jpg"));
-        containerMetalTexture = loadTexture(g_window->openglContext, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, true, TO_RES("res/textures/container2.png"));
-        containerMetalSpecularTexture = loadTexture(g_window->openglContext, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, false, TO_RES("res/textures/container2_specular.png"));
-        steelTexture = loadTexture(g_window->openglContext, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, true, TO_RES("res/textures/steel.jpg"));
-        steelNormal = loadTexture(g_window->openglContext, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, false, TO_RES("res/textures/steelNormal.png"));
-        brickWallDiffuseTexture = loadTexture(g_window->openglContext, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, true, TO_RES("res/textures/brickwall.jpg"));
-        brickWallNormalTexture = loadTexture(g_window->openglContext, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, false, TO_RES("res/textures/brickwall_normal.jpg"));
-        blackTexture = makeTextureSingleColor(g_window->openglContext, (float[4]){0.0f, 0.0f, 0.0f, 1.0f});
-        whiteTexture = makeTextureSingleColor(g_window->openglContext, (float[4]){1.0f, 1.0f, 1.0f, 1.0f});
-        defaultNormal = makeTextureSingleColor(g_window->openglContext, (float[4]){0.0f, -1.0f, 0.0f, 1.0f});
-        HUDTexture = loadTexture(g_window->openglContext, PR_FILTER_NEAREST_MIPMAP_NEAREST, PR_FILTER_LINEAR, true, TO_RES("res/textures/HUD.png"));
+        stbi_set_flip_vertically_on_load(1);
+
+        g_textureCheckerboard = makeTextureCheckerboard(g_window->openglContext, 8, TEMP_RGBA(1.0f, 0.0f, 1.0f, 1.0f), TEMP_RGBA(0.0f, 0.0f, 0.0f, 1.0f));
+        g_textureBlack = makeTextureSingleColor(g_window->openglContext, TEMP_RGBA(0.0f, 0.0f, 0.0f, 1.0f));
+        g_textureWhite = makeTextureSingleColor(g_window->openglContext, TEMP_RGBA(1.0f, 1.0f, 1.0f, 1.0f));
+        g_textureNormalDefault = makeTextureSingleColor(g_window->openglContext, TEMP_RGBA(0.5f, 0.0f, 0.5f, 1.0f));
+
+        g_textureHUD = loadTexture(g_window->openglContext, PR_FILTER_NEAREST_MIPMAP_NEAREST, PR_FILTER_LINEAR, TO_RES("res/textures/HUD.png"));
+
+        g_textureContainer = loadTexture(g_window->openglContext, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, TO_RES("res/textures/container.jpg"));
+        g_textureMetalRimmedContainer = loadTexture(g_window->openglContext, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, TO_RES("res/textures/container2.png"));
+        g_textureMetalRimmedContainerSpecular = loadTexture(g_window->openglContext, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, TO_RES("res/textures/container2_specular.png"));
+        g_textureSteel = loadTexture(g_window->openglContext, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, TO_RES("res/textures/steel.jpg"));
+        g_textureSteelNormal = loadTexture(g_window->openglContext, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, TO_RES("res/textures/steelNormal.png"));
+        g_textureBrickWall = loadTexture(g_window->openglContext, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, TO_RES("res/textures/brickwall.jpg"));
+        g_textureBrickWallNormal = loadTexture(g_window->openglContext, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, TO_RES("res/textures/brickwall_normal.jpg"));
+
+        skyboxDefaultCubeMap = makeCubeMapSingleColors(g_window->openglContext, TEMP_RGBA_6(
+            0.0f, 0.0f, 0.0f, 1.0f,
+            0.0f, 0.0f, 0.0f, 1.0f,
+            0.0f, 0.0f, 0.0f, 1.0f,
+            0.0f, 0.0f, 0.0f, 1.0f,
+            0.0f, 0.0f, 0.0f, 1.0f,
+            0.0f, 0.0f, 0.0f, 1.0f
+        ));
+
+        const char* cubeMapIslandsTextures[6] = {
+            "res/skyboxes/1/right.jpg",
+            "res/skyboxes/1/left.jpg",
+            "res/skyboxes/1/top.jpg",
+            "res/skyboxes/1/bottom.jpg",
+            "res/skyboxes/1/front.jpg",
+            "res/skyboxes/1/back.jpg",
+        };
+        const char* cubeMapSpaceTextures[6] = {
+            "res/skyboxes/2/px.png",
+            "res/skyboxes/2/nx.png",
+            "res/skyboxes/2/py.png",
+            "res/skyboxes/2/ny.png",
+            "res/skyboxes/2/pz.png",
+            "res/skyboxes/2/nz.png",
+        };
+
+        stbi_set_flip_vertically_on_load(0);
+        g_cubeMapIslands = loadCubeMap(g_window->openglContext, PR_FILTER_LINEAR_MIPMAP_LINEAR, PR_FILTER_LINEAR, cubeMapIslandsTextures);
+        g_cubeMapSpace = loadCubeMap(g_window->openglContext, PR_FILTER_LINEAR_MIPMAP_LINEAR, PR_FILTER_LINEAR, cubeMapSpaceTextures);
+        stbi_set_flip_vertically_on_load(1);
+
+        skyboxCubeMap3 = makeCubeMapSingleColors(g_window->openglContext, TEMP_RGBA_6(
+            1.0f, 0.0f, 0.0f, 1.0f,
+            1.0f, 0.0f, 1.0f, 1.0f,
+            0.0f, 1.0f, 0.0f, 1.0f,
+            1.0f, 1.0f, 0.0f, 1.0f,
+            0.0f, 0.0f, 1.0f, 1.0f,
+            0.0f, 1.0f, 1.0f, 1.0f
+        ));
+
+        skybox4CubeMap = makeCubeMapCheckerboards(g_window->openglContext, 32, TEMP_RGBA_6(
+            1.0f, 0.0f, 0.0f, 1.0f,
+            1.0f, 0.0f, 1.0f, 1.0f,
+            0.0f, 1.0f, 0.0f, 1.0f,
+            1.0f, 1.0f, 0.0f, 1.0f,
+            0.0f, 0.0f, 1.0f, 1.0f,
+            0.0f, 1.0f, 1.0f, 1.0f
+        ), TEMP_RGBA_6(
+            0.0f, 0.0f, 0.0f, 1.0f,
+            0.0f, 0.0f, 0.0f, 1.0f,
+            0.0f, 0.0f, 0.0f, 1.0f,
+            0.0f, 0.0f, 0.0f, 1.0f,
+            0.0f, 0.0f, 0.0f, 1.0f,
+            0.0f, 0.0f, 0.0f, 1.0f
+        ));
+
+        g_texturesInit = true;
     } else {
         prLogEvent(PR_EVENT_USER, PR_LOG_ERROR, "setupTextures: Textures already initialized. Aborting operation, nothing was modified");
     }
 }
 
 void shutdownTextures() {
-    prTextureDestroy(defaultTexture);
-    defaultTexture = nullptr;
-    prTextureDestroy(containerTexture);
-    containerTexture = nullptr;
-    prTextureDestroy(containerMetalTexture);
-    containerMetalTexture = nullptr;
-    prTextureDestroy(containerMetalSpecularTexture);
-    containerMetalSpecularTexture = nullptr;
-    prTextureDestroy(steelTexture);
-    steelTexture = nullptr;
-    prTextureDestroy(steelNormal);
-    steelNormal = nullptr;
-    prTextureDestroy(brickWallDiffuseTexture);
-    brickWallDiffuseTexture = nullptr;
-    prTextureDestroy(brickWallNormalTexture);
-    brickWallNormalTexture = nullptr;
-    prTextureDestroy(blackTexture);
-    blackTexture = nullptr;
-    prTextureDestroy(whiteTexture);
-    whiteTexture = nullptr;
-    prTextureDestroy(defaultNormal);
-    defaultNormal = nullptr;
-    prTextureDestroy(HUDTexture);
-    HUDTexture = nullptr;
+    if(g_texturesInit) {
+        prLogEvent(PR_EVENT_USER, PR_LOG_INFO, "shutdownTextures: Destroying textures");
+
+        prTextureDestroy(g_textureCheckerboard);
+        g_textureCheckerboard = nullptr;
+        prTextureDestroy(g_textureBlack);
+        g_textureBlack = nullptr;
+        prTextureDestroy(g_textureWhite);
+        g_textureWhite = nullptr;
+        prTextureDestroy(g_textureNormalDefault);
+        g_textureNormalDefault = nullptr;
+
+        prTextureDestroy(g_textureHUD);
+        g_textureHUD = nullptr;
+
+        prTextureDestroy(g_textureContainer);
+        g_textureContainer = nullptr;
+        prTextureDestroy(g_textureMetalRimmedContainer);
+        g_textureMetalRimmedContainer = nullptr;
+        prTextureDestroy(g_textureMetalRimmedContainerSpecular);
+        g_textureMetalRimmedContainerSpecular = nullptr;
+        prTextureDestroy(g_textureSteel);
+        g_textureSteel = nullptr;
+        prTextureDestroy(g_textureSteelNormal);
+        g_textureSteelNormal = nullptr;
+        prTextureDestroy(g_textureBrickWall);
+        g_textureBrickWall = nullptr;
+        prTextureDestroy(g_textureBrickWallNormal);
+        g_textureBrickWallNormal = nullptr;
+
+        prCubeMapDestroy(skyboxDefaultCubeMap);
+        skyboxDefaultCubeMap = nullptr;
+        prCubeMapDestroy(g_cubeMapIslands);
+        g_cubeMapIslands = nullptr;
+        prCubeMapDestroy(g_cubeMapSpace);
+        g_cubeMapSpace = nullptr;
+        prCubeMapDestroy(skyboxCubeMap3);
+        skyboxCubeMap3 = nullptr;
+        prCubeMapDestroy(skybox4CubeMap);
+        skybox4CubeMap = nullptr;
+
+        g_texturesInit = false;
+    } else {
+        prLogEvent(PR_EVENT_USER, PR_LOG_ERROR, "shutdownTextures: Textures not initialized. Aborting operation, nothing was modified");
+    }
 }

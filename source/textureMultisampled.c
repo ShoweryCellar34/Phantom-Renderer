@@ -46,8 +46,8 @@ void prTextureMultisampledUpdate(prTextureMultisampledData* texture, GLenum form
         return;
     }
 
-    if(format == PR_FORMAT_AUTO || format == PR_FORMAT_SRGB_AUTO) {
-        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prTextureMultisampledUpdate: PR_FORMAT_AUTO and PR_FORMAT_SRGB_AUTO are not supported by multisampled textures. Aborting operation, nothing was modified");
+    if(format == PR_FORMAT_AUTO) {
+        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prTextureMultisampledUpdate: PR_FORMAT_AUTO is not supported by multisampled textures. Aborting operation, nothing was modified");
         return;
     }
 
