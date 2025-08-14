@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <filesystem>
 #include <PR/PR.h>
+#include <materials.hpp>
 
 #define TO_RES(x) (g_resourcesPath / x).u8string().c_str()
 
@@ -17,13 +18,13 @@ inline GLfloat* TEMP_RGBA(GLfloat r, GLfloat g, GLfloat b, GLfloat a) {
     return tempRGBA;
 }
 
-inline GLfloat** TEMP_RGBA_6(GLfloat r1, GLfloat g1, GLfloat b1, GLfloat a1,
+inline GLfloat (*TEMP_RGBA_6(GLfloat r1, GLfloat g1, GLfloat b1, GLfloat a1,
                              GLfloat r2, GLfloat g2, GLfloat b2, GLfloat a2,
                              GLfloat r3, GLfloat g3, GLfloat b3, GLfloat a3,
                              GLfloat r4, GLfloat g4, GLfloat b4, GLfloat a4,
                              GLfloat r5, GLfloat g5, GLfloat b5, GLfloat a5,
                              GLfloat r6, GLfloat g6, GLfloat b6, GLfloat a6
-) {
+))[4] {
     static GLfloat tempRGBA[PR_CUBE_MAP_SIDES][4] = {
         {0.0f, 0.0f, 0.0f, 0.0f},
         {0.0f, 0.0f, 0.0f, 0.0f},
@@ -62,7 +63,7 @@ inline GLfloat** TEMP_RGBA_6(GLfloat r1, GLfloat g1, GLfloat b1, GLfloat a1,
     tempRGBA[5][2] = b6;
     tempRGBA[5][3] = a6;
 
-    return reinterpret_cast<GLfloat**>(&tempRGBA[0][0]);
+    return tempRGBA;
 }
 
 // Global Constants
@@ -127,6 +128,12 @@ extern prFramebufferData* g_framebufferDefault;
 extern bool g_texturesInit;
 
 extern prTextureData* g_textureCheckerboard;
+extern prTextureData* g_textureBlack;
+extern prTextureData* g_textureWhite;
+extern prTextureData* g_textureNormalDefault;
+
+extern prTextureData* g_textureHUD;
+
 extern prTextureData* g_textureContainer;
 extern prTextureData* g_textureMetalRimmedContainer;
 extern prTextureData* g_textureMetalRimmedContainerSpecular;
@@ -134,15 +141,33 @@ extern prTextureData* g_textureSteel;
 extern prTextureData* g_textureSteelNormal;
 extern prTextureData* g_textureBrickWall;
 extern prTextureData* g_textureBrickWallNormal;
-extern prTextureData* g_textureBlack;
-extern prTextureData* g_textureWhite;
-extern prTextureData* g_textureNormalDefault;
-extern prTextureData* g_textureHUD;
+
 extern prCubeMapData* skyboxDefaultCubeMap;
 extern prCubeMapData* g_cubeMapIslands;
 extern prCubeMapData* g_cubeMapSpace;
-extern prCubeMapData* skyboxCubeMap3;
-extern prCubeMapData* skybox4CubeMap;
+extern prCubeMapData* g_cubeMap3;
+extern prCubeMapData* g_cubeMap4;
+
+// Materials
+extern bool g_materialsInit;
+
+material defaultMaterial;
+
+material nullMaterial;
+
+material materialWhite;
+
+material materialMetal;
+
+material materialWood;
+
+material materialWoodMetal;
+
+material materialBrick;
+
+material materialHUD;
+
+material materialPostProcessing;
 
 extern float pitch;
 extern float yaw;

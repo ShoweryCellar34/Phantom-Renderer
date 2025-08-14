@@ -25,3 +25,7 @@ void shutdownFramebuffers();
 void setupTextures();
 
 void shutdownTextures();
+
+void setupMaterials();
+
+void shutdownMaterials();

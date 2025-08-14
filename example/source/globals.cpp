@@ -56,6 +56,12 @@ prFramebufferData* g_framebufferDefault = nullptr;
 bool g_texturesInit = false;
 
 prTextureData* g_textureCheckerboard = nullptr;
+prTextureData* g_textureBlack = nullptr;
+prTextureData* g_textureWhite = nullptr;
+prTextureData* g_textureNormalDefault = nullptr;
+
+prTextureData* g_textureHUD = nullptr;
+
 prTextureData* g_textureContainer = nullptr;
 prTextureData* g_textureMetalRimmedContainer = nullptr;
 prTextureData* g_textureMetalRimmedContainerSpecular = nullptr;
@@ -63,15 +69,15 @@ prTextureData* g_textureSteel = nullptr;
 prTextureData* g_textureSteelNormal = nullptr;
 prTextureData* g_textureBrickWall = nullptr;
 prTextureData* g_textureBrickWallNormal = nullptr;
-prTextureData* g_textureBlack = nullptr;
-prTextureData* g_textureWhite = nullptr;
-prTextureData* g_textureNormalDefault = nullptr;
-prTextureData* g_textureHUD = nullptr;
+
 prCubeMapData* skyboxDefaultCubeMap = nullptr;
 prCubeMapData* g_cubeMapIslands = nullptr;
 prCubeMapData* g_cubeMapSpace = nullptr;
-prCubeMapData* skyboxCubeMap3 = nullptr;
-prCubeMapData* skybox4CubeMap = nullptr;
+prCubeMapData* g_cubeMap3 = nullptr;
+prCubeMapData* g_cubeMap4 = nullptr;
+
+// Materials
+bool g_materialsInit = false;
 
 float pitch = 0.0f;
 float yaw = 0.0f;

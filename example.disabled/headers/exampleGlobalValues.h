@@ -19,15 +19,6 @@ typedef struct materialData {
     GLfloat shininess;
 } materialData;
 
-typedef struct skyboxMaterialData {
-    prTextureData* rightTexture;
-    prTextureData* leftTexture;
-    prTextureData* topTexture;
-    prTextureData* bottomTexture;
-    prTextureData* backTexture;
-    prTextureData* frontTexture;
-} skyboxMaterialData;
-
 typedef struct directionalLightData {
     vec3 direction;
     vec3 ambient;

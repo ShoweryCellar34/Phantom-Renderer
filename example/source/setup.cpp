@@ -375,7 +375,7 @@ void setupTextures() {
         g_cubeMapSpace = loadCubeMap(g_window->openglContext, PR_FILTER_LINEAR_MIPMAP_LINEAR, PR_FILTER_LINEAR, cubeMapSpaceTextures);
         stbi_set_flip_vertically_on_load(1);
 
-        skyboxCubeMap3 = makeCubeMapSingleColors(g_window->openglContext, TEMP_RGBA_6(
+        g_cubeMap3 = makeCubeMapSingleColors(g_window->openglContext, TEMP_RGBA_6(
             1.0f, 0.0f, 0.0f, 1.0f,
             1.0f, 0.0f, 1.0f, 1.0f,
             0.0f, 1.0f, 0.0f, 1.0f,
@@ -384,7 +384,7 @@ void setupTextures() {
             0.0f, 1.0f, 1.0f, 1.0f
         ));
 
-        skybox4CubeMap = makeCubeMapCheckerboards(g_window->openglContext, 32, TEMP_RGBA_6(
+        g_cubeMap4 = makeCubeMapCheckerboards(g_window->openglContext, 32, TEMP_RGBA_6(
             1.0f, 0.0f, 0.0f, 1.0f,
             1.0f, 0.0f, 1.0f, 1.0f,
             0.0f, 1.0f, 0.0f, 1.0f,
@@ -443,13 +443,31 @@ void shutdownTextures() {
         g_cubeMapIslands = nullptr;
         prCubeMapDestroy(g_cubeMapSpace);
         g_cubeMapSpace = nullptr;
-        prCubeMapDestroy(skyboxCubeMap3);
-        skyboxCubeMap3 = nullptr;
-        prCubeMapDestroy(skybox4CubeMap);
-        skybox4CubeMap = nullptr;
+        prCubeMapDestroy(g_cubeMap3);
+        g_cubeMap3 = nullptr;
+        prCubeMapDestroy(g_cubeMap4);
+        g_cubeMap4 = nullptr;
 
         g_texturesInit = false;
     } else {
         prLogEvent(PR_EVENT_USER, PR_LOG_ERROR, "shutdownTextures: Textures not initialized. Aborting operation, nothing was modified");
+    }
+}
+
+void setupMaterials() {
+    if(!g_materialsInit) {
+        prLogEvent(PR_EVENT_USER, PR_LOG_INFO, "setupMaterials: Creating materials");
+        
+    } else {
+        prLogEvent(PR_EVENT_USER, PR_LOG_ERROR, "setupMaterials: Materials already initialized. Aborting operation, nothing was modified");
+    }
+}
+
+void shutdownMaterials() {
+    if(g_materialsInit) {
+        prLogEvent(PR_EVENT_USER, PR_LOG_INFO, "shutdownMaterials: Destroying materials");
+
+    } else {
+        prLogEvent(PR_EVENT_USER, PR_LOG_ERROR, "shutdownmaterials: Materials not initialized. Aborting operation, nothing was modified");
     }
 }
