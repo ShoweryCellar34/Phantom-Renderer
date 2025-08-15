@@ -55,15 +55,15 @@ GLfloat material::getShininess() {
 }
 
 void material::bind(prShaderData* shader) {
-    if(prShaderGetUniformLocation(shader, "material.diffuse") != -1) {
+    if(prShaderGetUniformLocation(shader, "material.diffuse") != -1 && this->diffuseMap) {
         prTextureBindTexture(this->diffuseMap, 0);
         prShaderSetUniform1i(shader, "material.diffuse", 0);
     }
-    if(prShaderGetUniformLocation(shader, "material.specular") != -1) {
+    if(prShaderGetUniformLocation(shader, "material.specular") != -1 && this->specularMap) {
         prTextureBindTexture(this->specularMap, 1);
         prShaderSetUniform1i(shader, "material.specular", 1);
     }
-    if(prShaderGetUniformLocation(shader, "material.normal") != -1) {
+    if(prShaderGetUniformLocation(shader, "material.normal") != -1 && this->normalMap) {
         prTextureBindTexture(this->normalMap, 2);
         prShaderSetUniform1i(shader, "material.normal", 2);
     }

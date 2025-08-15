@@ -93,6 +93,6 @@ extern prFramebufferData* framebuffer;
 #define SAMPLES 4
 #define DEF_WIDTH 1280
 #define DEF_HEIGHT 720
-extern int windowWidth;
-extern int windowHeight;
+extern int g_windowWidth;
+extern int g_windowHeight;
 #define TITLE "Phantom-Renderer Demo"

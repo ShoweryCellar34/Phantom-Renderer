@@ -41,7 +41,7 @@ void setupWindow() {
         }
 
         glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
-        g_window = prWindowCreate(TITLE, windowWidth, windowHeight);
+        g_window = prWindowCreate(TITLE, g_windowWidth, g_windowHeight);
         if(!g_window->window) {
             prLogEvent(PR_EVENT_USER, PR_LOG_ERROR, "setupWindow: Failed to create window. Aborting operation, nothing was modified");
             prWindowDestroy(g_window);
@@ -109,6 +109,9 @@ void setupShaders() {
         hdrShaderProgram = loadShader(g_window->openglContext, TO_RES("res/shaders/hdrVertexShader.glsl"), TO_RES("res/shaders/hdrFragmentShader.glsl"), NULL);
 
         computeShaderProgram = loadComputeShader(g_window->openglContext, TO_RES("res/shaders/postProcessingComputeShader.glsl"));
+        g_texturePostProcessing = prTextureCreate();
+        prTextureLinkContext(g_texturePostProcessing, g_window->openglContext);
+        prTextureUpdate(g_texturePostProcessing, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, true, NULL, 0, g_windowWidth, g_windowHeight);
 
         g_shadersInit = true;
     } else {
@@ -143,6 +146,8 @@ void shutdownShaders() {
         hdrShaderProgram = nullptr;
         prComputeShaderDestroy(computeShaderProgram);
         computeShaderProgram = nullptr;
+        prTextureDestroy(g_texturePostProcessing);
+        g_texturePostProcessing = nullptr;
 
         g_shadersInit = false;
     } else {
@@ -156,11 +161,11 @@ void setupFramebuffers() {
 
         g_colorTextureDefault = prTextureCreate();
         prTextureLinkContext(g_colorTextureDefault, g_window->openglContext);
-        prTextureUpdate(g_colorTextureDefault, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, true, NULL, 0, windowWidth, windowHeight);
+        prTextureUpdate(g_colorTextureDefault, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, true, NULL, 0, g_windowWidth, g_windowHeight);
 
         g_depthStencilRBODefault = prRenderBufferCreate();
         prRenderBufferLinkContext(g_depthStencilRBODefault, g_window->openglContext);
-        prRenderBufferUpdate(g_depthStencilRBODefault, PR_FORMAT_DEPTH_STENCIL, windowWidth, windowHeight, 0);
+        prRenderBufferUpdate(g_depthStencilRBODefault, PR_FORMAT_DEPTH_STENCIL, g_windowWidth, g_windowHeight, 0);
 
         g_framebufferDefault = prFramebufferCreate();
         prFramebufferLinkContext(g_framebufferDefault, g_window->openglContext);
@@ -172,15 +177,15 @@ void setupFramebuffers() {
         g_window->openglContext->Enable(GL_MULTISAMPLE);
         g_colorRBOMultisampled = prRenderBufferCreate();
         prRenderBufferLinkContext(g_colorRBOMultisampled, g_window->openglContext);
-        prRenderBufferUpdate(g_colorRBOMultisampled, PR_FORMAT_RGBA, windowWidth, windowHeight, SAMPLES);
+        prRenderBufferUpdate(g_colorRBOMultisampled, PR_FORMAT_RGBA, g_windowWidth, g_windowHeight, SAMPLES);
 
         g_colorMultisamlpedTextureMultisampled = prTextureMultisampledCreate();
         prTextureMultisampledLinkContext(g_colorMultisamlpedTextureMultisampled, g_window->openglContext);
-        prTextureMultisampledUpdate(g_colorMultisamlpedTextureMultisampled, PR_FORMAT_RGBA, windowWidth, windowHeight, SAMPLES);
+        prTextureMultisampledUpdate(g_colorMultisamlpedTextureMultisampled, PR_FORMAT_RGBA, g_windowWidth, g_windowHeight, SAMPLES);
 
         g_depthStencilMultisampledRBOMultisampled = prRenderBufferCreate();
         prRenderBufferLinkContext(g_depthStencilMultisampledRBOMultisampled, g_window->openglContext);
-        prRenderBufferUpdate(g_depthStencilMultisampledRBOMultisampled, PR_FORMAT_DEPTH_STENCIL, windowWidth, windowHeight, SAMPLES);
+        prRenderBufferUpdate(g_depthStencilMultisampledRBOMultisampled, PR_FORMAT_DEPTH_STENCIL, g_windowWidth, g_windowHeight, SAMPLES);
 
         g_framebufferMultisampled = prFramebufferCreate();
         prFramebufferLinkContext(g_framebufferMultisampled, g_window->openglContext);
@@ -194,7 +199,7 @@ void setupFramebuffers() {
 
         g_bloomTexture = prTextureCreate();
         prTextureLinkContext(g_bloomTexture, g_window->openglContext);
-        prTextureUpdate(g_bloomTexture, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, true, NULL, 0, windowWidth, windowHeight);
+        prTextureUpdate(g_bloomTexture, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, true, NULL, 0, g_windowWidth, g_windowHeight);
 
         g_framebufferBloom = prFramebufferCreate();
         prFramebufferLinkContext(g_framebufferBloom, g_window->openglContext);
@@ -204,7 +209,7 @@ void setupFramebuffers() {
 
         g_colorTextureGaussian1 = prTextureCreate();
         prTextureLinkContext(g_colorTextureGaussian1, g_window->openglContext);
-        prTextureUpdate(g_colorTextureGaussian1, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, true, NULL, 0, windowWidth, windowHeight);
+        prTextureUpdate(g_colorTextureGaussian1, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, true, NULL, 0, g_windowWidth, g_windowHeight);
 
         g_framebufferGaussian1 = prFramebufferCreate();
         prFramebufferLinkContext(g_framebufferGaussian1, g_window->openglContext);
@@ -214,7 +219,7 @@ void setupFramebuffers() {
 
         g_colorTextureGaussian2 = prTextureCreate();
         prTextureLinkContext(g_colorTextureGaussian2, g_window->openglContext);
-        prTextureUpdate(g_colorTextureGaussian2, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, true, NULL, 0, windowWidth, windowHeight);
+        prTextureUpdate(g_colorTextureGaussian2, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, true, NULL, 0, g_windowWidth, g_windowHeight);
 
         g_framebufferGaussian2 = prFramebufferCreate();
         prFramebufferLinkContext(g_framebufferGaussian2, g_window->openglContext);
@@ -332,7 +337,7 @@ void setupTextures() {
         g_textureCheckerboard = makeTextureCheckerboard(g_window->openglContext, 8, TEMP_RGBA(1.0f, 0.0f, 1.0f, 1.0f), TEMP_RGBA(0.0f, 0.0f, 0.0f, 1.0f));
         g_textureBlack = makeTextureSingleColor(g_window->openglContext, TEMP_RGBA(0.0f, 0.0f, 0.0f, 1.0f));
         g_textureWhite = makeTextureSingleColor(g_window->openglContext, TEMP_RGBA(1.0f, 1.0f, 1.0f, 1.0f));
-        g_textureNormalDefault = makeTextureSingleColor(g_window->openglContext, TEMP_RGBA(0.5f, 0.0f, 0.5f, 1.0f));
+        g_textureNormalDefault = makeTextureSingleColor(g_window->openglContext, TEMP_RGBA(0.0f, 0.0f, 1.0f, 1.0f));
 
         g_textureHUD = loadTexture(g_window->openglContext, PR_FILTER_NEAREST_MIPMAP_NEAREST, PR_FILTER_LINEAR, TO_RES("res/textures/HUD.png"));
 
@@ -457,7 +462,29 @@ void shutdownTextures() {
 void setupMaterials() {
     if(!g_materialsInit) {
         prLogEvent(PR_EVENT_USER, PR_LOG_INFO, "setupMaterials: Creating materials");
-        
+
+        if(!g_shadersInit) {
+            prLogEvent(PR_EVENT_USER, PR_LOG_ERROR, "setupMaterials: Shaders not initialized. Aborting operation, nothing was modified");
+            return;
+        }
+        if(!g_texturesInit) {
+            prLogEvent(PR_EVENT_USER, PR_LOG_ERROR, "setupMaterials: Textures not initialized. Aborting operation, nothing was modified");
+            return;
+        }
+
+        g_materialCheckerboard.setMaps(g_textureCheckerboard, g_textureCheckerboard, g_textureNormalDefault, 0.0f);
+        g_materialBlack.setMaps(g_textureBlack, g_textureWhite, g_textureNormalDefault, 32.0f);
+        g_materialWhite.setMaps(g_textureWhite, g_textureWhite, g_textureNormalDefault, 32.0f);
+
+        g_materialHUD.setMaps(g_textureHUD, g_textureBlack, g_textureNormalDefault, 0.0f);
+        g_materialPostProcessing.setMaps(g_texturePostProcessing, g_textureBlack, g_textureNormalDefault, 0.0f);
+
+        g_materialContainer.setMaps(g_textureContainer, g_textureBlack, g_textureNormalDefault, 0.0f);
+        g_materialMetalRimmedContainer.setMaps(g_textureMetalRimmedContainer, g_textureMetalRimmedContainerSpecular, g_textureNormalDefault, 64.0f);
+        g_materialSteel.setMaps(g_textureSteel, g_textureBlack, g_textureSteelNormal, 48.0f);
+        g_materialBrickWall.setMaps(g_textureBrickWall, g_textureBlack, g_textureBrickWallNormal, 16.0f);
+
+        g_materialsInit = true;
     } else {
         prLogEvent(PR_EVENT_USER, PR_LOG_ERROR, "setupMaterials: Materials already initialized. Aborting operation, nothing was modified");
     }
@@ -467,6 +494,19 @@ void shutdownMaterials() {
     if(g_materialsInit) {
         prLogEvent(PR_EVENT_USER, PR_LOG_INFO, "shutdownMaterials: Destroying materials");
 
+        g_materialCheckerboard.setMaps(nullptr, nullptr, nullptr, 0.0f);
+        g_materialBlack.setMaps(nullptr, nullptr, nullptr, 0.0f);
+        g_materialWhite.setMaps(nullptr, nullptr, nullptr, 0.0f);
+
+        g_materialHUD.setMaps(nullptr, nullptr, nullptr, 0.0f);
+        g_materialPostProcessing.setMaps(nullptr, nullptr, nullptr, 0.0f);
+
+        g_materialContainer.setMaps(nullptr, nullptr, nullptr, 0.0f);
+        g_materialMetalRimmedContainer.setMaps(nullptr, nullptr, nullptr, 0.0f);
+        g_materialSteel.setMaps(nullptr, nullptr, nullptr, 0.0f);
+        g_materialBrickWall.setMaps(nullptr, nullptr, nullptr, 0.0f);
+
+        g_materialsInit = false;
     } else {
         prLogEvent(PR_EVENT_USER, PR_LOG_ERROR, "shutdownmaterials: Materials not initialized. Aborting operation, nothing was modified");
     }

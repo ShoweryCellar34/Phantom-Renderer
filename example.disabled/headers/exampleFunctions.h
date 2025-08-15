@@ -63,25 +63,25 @@ void proccessInput(GLFWwindow* window) {
 }
 
 void framebufferSizeCallback(GLFWwindow* window, int width, int height) {
-    windowWidth = width;
-    windowHeight = height;
+    g_windowWidth = width;
+    g_windowHeight = height;
     GladGLContext* context = glfwGetWindowUserPointer(window);
-    context->Viewport(0, 0, windowWidth, windowHeight);
+    context->Viewport(0, 0, g_windowWidth, g_windowHeight);
     prCameraUpdateDimentions(camera);
 
-    prRenderBufferUpdate(colorRBOMultisampled, PR_FORMAT_RGBA, windowWidth, windowHeight, SAMPLES);
-    prTextureMultisampledUpdate(colorMultisamlpedTexture2, PR_FORMAT_RGBA, windowWidth, windowHeight, SAMPLES);
-    prRenderBufferUpdate(depthStencilRBOMultisampled, PR_FORMAT_DEPTH_STENCIL, windowWidth, windowHeight, SAMPLES);
-    prTextureUpdate(colorTexture2, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, true, NULL, 0, windowWidth, windowHeight);
-    prTextureUpdate(colorTexture3, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, true, NULL, 0, windowWidth, windowHeight);
-    prTextureUpdate(bloomTexture, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, true, NULL, 0, windowWidth, windowHeight);
+    prRenderBufferUpdate(colorRBOMultisampled, PR_FORMAT_RGBA, g_windowWidth, g_windowHeight, SAMPLES);
+    prTextureMultisampledUpdate(colorMultisamlpedTexture2, PR_FORMAT_RGBA, g_windowWidth, g_windowHeight, SAMPLES);
+    prRenderBufferUpdate(depthStencilRBOMultisampled, PR_FORMAT_DEPTH_STENCIL, g_windowWidth, g_windowHeight, SAMPLES);
+    prTextureUpdate(colorTexture2, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, true, NULL, 0, g_windowWidth, g_windowHeight);
+    prTextureUpdate(colorTexture3, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, true, NULL, 0, g_windowWidth, g_windowHeight);
+    prTextureUpdate(bloomTexture, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, true, NULL, 0, g_windowWidth, g_windowHeight);
 
-    prTextureUpdate(postProcessingTexture, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, true, NULL, 0, windowWidth, windowHeight);
+    prTextureUpdate(postProcessingTexture, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, true, NULL, 0, g_windowWidth, g_windowHeight);
 
-    prTextureUpdate(colorTexture, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, true, NULL, 0, windowWidth, windowHeight);
-    prRenderBufferUpdate(depthStencilRBO, PR_FORMAT_DEPTH_STENCIL, windowWidth, windowHeight, 0);
+    prTextureUpdate(colorTexture, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, true, NULL, 0, g_windowWidth, g_windowHeight);
+    prRenderBufferUpdate(depthStencilRBO, PR_FORMAT_DEPTH_STENCIL, g_windowWidth, g_windowHeight, 0);
 
-    prShaderSetUniform2f(debugShaderProgram, "screenSize", windowWidth, windowHeight);
+    prShaderSetUniform2f(debugShaderProgram, "screenSize", g_windowWidth, g_windowHeight);
 }
 
 void cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {

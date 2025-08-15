@@ -12,7 +12,9 @@ int main(int argc, char** argv) {
     setupShaders();
     setupFramebuffers();
     setupTextures();
+    setupMaterials();
 
+    shutdownMaterials();
     shutdownTextures();
     shutdownFramebuffers();
     shutdownShaders();

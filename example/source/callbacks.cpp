@@ -3,24 +3,26 @@
 #include <globals.hpp>
 
 void framebufferSizeCallback(GLFWwindow* window, int width, int height) {
-    windowWidth = width;
-    windowHeight = height;
+    g_windowWidth = width;
+    g_windowHeight = height;
     GladGLContext* context = reinterpret_cast<GladGLContext*>(glfwGetWindowUserPointer(window));
-    context->Viewport(0, 0, windowWidth, windowHeight);
+    context->Viewport(0, 0, g_windowWidth, g_windowHeight);
 
-    prShaderSetUniform2f(debugShaderProgram, "screenSize", windowWidth, windowHeight);
+    prShaderSetUniform2f(debugShaderProgram, "screenSize", g_windowWidth, g_windowHeight);
 
-    prRenderBufferUpdate(g_colorRBOMultisampled, PR_FORMAT_RGBA, windowWidth, windowHeight, SAMPLES);
-    prTextureMultisampledUpdate(g_colorMultisamlpedTextureMultisampled, PR_FORMAT_RGBA, windowWidth, windowHeight, SAMPLES);
-    prRenderBufferUpdate(g_depthStencilMultisampledRBOMultisampled, PR_FORMAT_DEPTH_STENCIL, windowWidth, windowHeight, SAMPLES);
+    prTextureUpdate(g_texturePostProcessing, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, true, NULL, 0, g_windowWidth, g_windowHeight);
 
-    prTextureUpdate(g_colorTextureGaussian1, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, true, NULL, 0, windowWidth, windowHeight);
-    prTextureUpdate(g_colorTextureGaussian2, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, true, NULL, 0, windowWidth, windowHeight);
+    prRenderBufferUpdate(g_colorRBOMultisampled, PR_FORMAT_RGBA, g_windowWidth, g_windowHeight, SAMPLES);
+    prTextureMultisampledUpdate(g_colorMultisamlpedTextureMultisampled, PR_FORMAT_RGBA, g_windowWidth, g_windowHeight, SAMPLES);
+    prRenderBufferUpdate(g_depthStencilMultisampledRBOMultisampled, PR_FORMAT_DEPTH_STENCIL, g_windowWidth, g_windowHeight, SAMPLES);
 
-    prTextureUpdate(g_bloomTexture, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, true, NULL, 0, windowWidth, windowHeight);
+    prTextureUpdate(g_colorTextureGaussian1, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, true, NULL, 0, g_windowWidth, g_windowHeight);
+    prTextureUpdate(g_colorTextureGaussian2, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, true, NULL, 0, g_windowWidth, g_windowHeight);
 
-    prTextureUpdate(g_colorTextureDefault, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, true, NULL, 0, windowWidth, windowHeight);
-    prRenderBufferUpdate(g_depthStencilRBODefault, PR_FORMAT_DEPTH_STENCIL, windowWidth, windowHeight, 0);
+    prTextureUpdate(g_bloomTexture, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, true, NULL, 0, g_windowWidth, g_windowHeight);
+
+    prTextureUpdate(g_colorTextureDefault, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, true, NULL, 0, g_windowWidth, g_windowHeight);
+    prRenderBufferUpdate(g_depthStencilRBODefault, PR_FORMAT_DEPTH_STENCIL, g_windowWidth, g_windowHeight, 0);
 
     prCameraUpdateDimentions(camera);
 }

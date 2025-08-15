@@ -13,7 +13,7 @@ int main(int argc, char** argv) {
     glfwInit();
 
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
-    prWindow* test = prWindowCreate(TITLE, windowWidth, windowHeight);
+    prWindow* test = prWindowCreate(TITLE, g_windowWidth, g_windowHeight);
     prWindowInitContext(test);
 
     glfwMakeContextCurrent(test->window);
@@ -101,19 +101,19 @@ int main(int argc, char** argv) {
     test->openglContext->Enable(GL_MULTISAMPLE);
     colorRBOMultisampled = prRenderBufferCreate();
     prRenderBufferLinkContext(colorRBOMultisampled, test->openglContext);
-    prRenderBufferUpdate(colorRBOMultisampled, PR_FORMAT_RGBA, windowWidth, windowHeight, SAMPLES);
+    prRenderBufferUpdate(colorRBOMultisampled, PR_FORMAT_RGBA, g_windowWidth, g_windowHeight, SAMPLES);
 
     colorMultisamlpedTexture2 = prTextureMultisampledCreate();
     prTextureMultisampledLinkContext(colorMultisamlpedTexture2, test->openglContext);
-    prTextureMultisampledUpdate(colorMultisamlpedTexture2, PR_FORMAT_RGBA, windowWidth, windowHeight, SAMPLES);
+    prTextureMultisampledUpdate(colorMultisamlpedTexture2, PR_FORMAT_RGBA, g_windowWidth, g_windowHeight, SAMPLES);
 
     depthStencilRBOMultisampled = prRenderBufferCreate();
     prRenderBufferLinkContext(depthStencilRBOMultisampled, test->openglContext);
-    prRenderBufferUpdate(depthStencilRBOMultisampled, PR_FORMAT_DEPTH_STENCIL, windowWidth, windowHeight, SAMPLES);
+    prRenderBufferUpdate(depthStencilRBOMultisampled, PR_FORMAT_DEPTH_STENCIL, g_windowWidth, g_windowHeight, SAMPLES);
 
     colorTexture2 = prTextureCreate();
     prTextureLinkContext(colorTexture2, test->openglContext);
-    prTextureUpdate(colorTexture2, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, true, NULL, 0, windowWidth, windowHeight);
+    prTextureUpdate(colorTexture2, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, true, NULL, 0, g_windowWidth, g_windowHeight);
 
     prFramebufferData* framebuffer2 = prFramebufferCreate();
     prFramebufferLinkContext(framebuffer2, test->openglContext);
@@ -121,7 +121,7 @@ int main(int argc, char** argv) {
 
     colorTexture3 = prTextureCreate();
     prTextureLinkContext(colorTexture3, test->openglContext);
-    prTextureUpdate(colorTexture3, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, true, NULL, 0, windowWidth, windowHeight);
+    prTextureUpdate(colorTexture3, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, true, NULL, 0, g_windowWidth, g_windowHeight);
 
     prFramebufferData* framebuffer3 = prFramebufferCreate();
     prFramebufferLinkContext(framebuffer3, test->openglContext);
@@ -139,7 +139,7 @@ int main(int argc, char** argv) {
 
     bloomTexture = prTextureCreate();
     prTextureLinkContext(bloomTexture, test->openglContext);
-    prTextureUpdate(bloomTexture, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, true, NULL, 0, windowWidth, windowHeight);
+    prTextureUpdate(bloomTexture, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, true, NULL, 0, g_windowWidth, g_windowHeight);
 
     prFramebufferData* bloomFramebuffer = prFramebufferCreate();
     prFramebufferLinkContext(bloomFramebuffer, test->openglContext);
@@ -147,15 +147,15 @@ int main(int argc, char** argv) {
 
     postProcessingTexture = prTextureCreate();
     prTextureLinkContext(postProcessingTexture, test->openglContext);
-    prTextureUpdate(postProcessingTexture, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, true, NULL, 0, windowWidth, windowHeight);
+    prTextureUpdate(postProcessingTexture, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, true, NULL, 0, g_windowWidth, g_windowHeight);
 
     colorTexture = prTextureCreate();
     prTextureLinkContext(colorTexture, test->openglContext);
-    prTextureUpdate(colorTexture, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, true, NULL, 0, windowWidth, windowHeight);
+    prTextureUpdate(colorTexture, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, true, NULL, 0, g_windowWidth, g_windowHeight);
 
     depthStencilRBO = prRenderBufferCreate();
     prRenderBufferLinkContext(depthStencilRBO, test->openglContext);
-    prRenderBufferUpdate(depthStencilRBO, PR_FORMAT_DEPTH_STENCIL, windowWidth, windowHeight, 0);
+    prRenderBufferUpdate(depthStencilRBO, PR_FORMAT_DEPTH_STENCIL, g_windowWidth, g_windowHeight, 0);
 
     framebuffer = prFramebufferCreate();
     prFramebufferLinkContext(framebuffer, test->openglContext);
@@ -354,7 +354,7 @@ int main(int argc, char** argv) {
 
     glfwMaximizeWindow(test->window);
 
-    prShaderSetUniform2f(debugShaderProgram, "screenSize", windowWidth, windowHeight);
+    prShaderSetUniform2f(debugShaderProgram, "screenSize", g_windowWidth, g_windowHeight);
 
     while(!glfwWindowShouldClose(test->window)) {
         test->openglContext->Enable(GL_DEPTH_TEST);
@@ -427,7 +427,7 @@ int main(int argc, char** argv) {
                 case 2:
                     prFramebufferBind(framebufferMultisampled);
                     currentShaderProgram = (useDebugShader ? debugShaderProgram : shaderProgram);
-                    test->openglContext->Viewport(0, 0, windowWidth, windowHeight);
+                    test->openglContext->Viewport(0, 0, g_windowWidth, g_windowHeight);
                     break;
             }
 
@@ -532,8 +532,8 @@ int main(int argc, char** argv) {
         }
 
         prFramebufferBlit(test->openglContext, framebufferMultisampled, framebuffer,
-            0, 0, windowWidth, windowHeight,
-            0, 0, windowWidth, windowHeight,
+            0, 0, g_windowWidth, g_windowHeight,
+            0, 0, g_windowWidth, g_windowHeight,
             PR_BUFFER_BIT_COLOR, PR_FILTER_NEAREST
         );
         prFramebufferBind(framebuffer);
@@ -542,7 +542,7 @@ int main(int argc, char** argv) {
             test->openglContext->BlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
             prTextureBindTexture(colorTexture, 0);
             prTextureBindImage(postProcessingTexture, 1, 0, PR_ACCESS_WRITE_ONLY, GL_RGBA32F);
-            prComputeShaderDispatch(computeShaderProgram, windowWidth , windowHeight, 1);
+            prComputeShaderDispatch(computeShaderProgram, g_windowWidth , g_windowHeight, 1);
             test->openglContext->MemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
 
             bindMaterialAmbientOnly(&materialPostProcessing, hudShaderProgram);
@@ -551,8 +551,8 @@ int main(int argc, char** argv) {
 
         prFramebufferSetReadBuffer(framebufferMultisampled, PR_COLOR_ATTACHMENT_1);
         prFramebufferBlit(test->openglContext, framebufferMultisampled, bloomFramebuffer,
-            0, 0, windowWidth, windowHeight,
-            0, 0, windowWidth, windowHeight,
+            0, 0, g_windowWidth, g_windowHeight,
+            0, 0, g_windowWidth, g_windowHeight,
             PR_BUFFER_BIT_COLOR, PR_FILTER_NEAREST
         );
         prFramebufferSetReadBuffer(framebufferMultisampled, PR_COLOR_ATTACHMENT_0);
@@ -583,8 +583,8 @@ int main(int argc, char** argv) {
         prMeshDrawIndices(meshQuad);
 
         prFramebufferBlit(test->openglContext, framebuffer, NULL,
-            0, 0, windowWidth, windowHeight,
-            0, 0, windowWidth, windowHeight,
+            0, 0, g_windowWidth, g_windowHeight,
+            0, 0, g_windowWidth, g_windowHeight,
             PR_BUFFER_BIT_COLOR, PR_FILTER_NEAREST
         );
 

@@ -13,8 +13,8 @@ bool g_windowInit = false;
 
 prWindow* g_window = nullptr;
 
-int windowWidth = DEFAULT_WINDOW_WIDTH;
-int windowHeight = DEFAULT_WINDOW_HEIGHT;
+int g_windowWidth = DEFAULT_WINDOW_WIDTH;
+int g_windowHeight = DEFAULT_WINDOW_HEIGHT;
 
 // Shaders
 bool g_shadersInit = false;
@@ -28,6 +28,7 @@ prShaderData* hudShaderProgram = nullptr;
 prShaderData* gaussianShaderProgram = nullptr;
 prShaderData* hdrShaderProgram = nullptr;
 prComputeShaderData* computeShaderProgram = nullptr;
+prTextureData* g_texturePostProcessing = nullptr;
 
 // Framebuffers
 bool g_framebuffersInit = false;
@@ -78,6 +79,18 @@ prCubeMapData* g_cubeMap4 = nullptr;
 
 // Materials
 bool g_materialsInit = false;
+
+material g_materialCheckerboard;
+material g_materialBlack;
+material g_materialWhite;
+
+material g_materialHUD;
+material g_materialPostProcessing;
+
+material g_materialContainer;
+material g_materialMetalRimmedContainer;
+material g_materialSteel;
+material g_materialBrickWall;
 
 float pitch = 0.0f;
 float yaw = 0.0f;

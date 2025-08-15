@@ -85,8 +85,8 @@ extern bool g_windowInit;
 
 extern prWindow* g_window;
 
-extern int windowWidth;
-extern int windowHeight;
+extern int g_windowWidth;
+extern int g_windowHeight;
 
 // Shaders
 extern bool g_shadersInit;
@@ -100,6 +100,7 @@ extern prShaderData* hudShaderProgram;
 extern prShaderData* gaussianShaderProgram;
 extern prShaderData* hdrShaderProgram;
 extern prComputeShaderData* computeShaderProgram;
+extern prTextureData* g_texturePostProcessing;
 
 // Framebuffers
 extern bool g_framebuffersInit;
@@ -151,23 +152,17 @@ extern prCubeMapData* g_cubeMap4;
 // Materials
 extern bool g_materialsInit;
 
-material defaultMaterial;
+extern material g_materialCheckerboard;
+extern material g_materialBlack;
+extern material g_materialWhite;
 
-material nullMaterial;
+extern material g_materialHUD;
+extern material g_materialPostProcessing;
 
-material materialWhite;
-
-material materialMetal;
-
-material materialWood;
-
-material materialWoodMetal;
-
-material materialBrick;
-
-material materialHUD;
-
-material materialPostProcessing;
+extern material g_materialContainer;
+extern material g_materialMetalRimmedContainer;
+extern material g_materialSteel;
+extern material g_materialBrickWall;
 
 extern float pitch;
 extern float yaw;
