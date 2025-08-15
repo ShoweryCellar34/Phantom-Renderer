@@ -96,7 +96,7 @@ void setupShaders() {
         g_shaderDefault = loadShader(g_window->openglContext, TO_RES("res/shaders/defaultVertexShader.glsl"), TO_RES("res/shaders/defaultFragmentShader.glsl"), TO_RES("res/shaders/defaultGeometryShader.glsl"));
         g_shaderDebug = loadShader(g_window->openglContext, TO_RES("res/shaders/debugVertexShader.glsl"), TO_RES("res/shaders/debugFragmentShader.glsl"), TO_RES("res/shaders/debugGeometryShader.glsl"));
 
-        g_shaderDirectionLight = loadShader(g_window->openglContext, TO_RES("res/shaders/depthVertexShader.glsl"), TO_RES("res/shaders/depthFragmentShader.glsl"), NULL);
+        g_shaderDirectionalLight = loadShader(g_window->openglContext, TO_RES("res/shaders/depthVertexShader.glsl"), TO_RES("res/shaders/depthFragmentShader.glsl"), NULL);
         g_shaderPointLight = loadShader(g_window->openglContext, TO_RES("res/shaders/depth2VertexShader.glsl"), TO_RES("res/shaders/depth2FragmentShader.glsl"), TO_RES("res/shaders/depth2GeometryShader.glsl"));
 
         g_shaderSkybox = loadShader(g_window->openglContext, TO_RES("res/shaders/skyboxVertexShader.glsl"), TO_RES("res/shaders/skyboxFragmentShader.glsl"), NULL);
@@ -126,8 +126,8 @@ void shutdownShaders() {
         g_shaderDefault = nullptr;
         prShaderDestroy(g_shaderDebug);
         g_shaderDebug = nullptr;
-        prShaderDestroy(g_shaderDirectionLight);
-        g_shaderDirectionLight = nullptr;
+        prShaderDestroy(g_shaderDirectionalLight);
+        g_shaderDirectionalLight = nullptr;
         prShaderDestroy(g_shaderPointLight);
         g_shaderPointLight = nullptr;
         prShaderDestroy(g_shaderSkybox);
@@ -206,30 +206,30 @@ void setupFramebuffers() {
 
 
 
-        g_colorTextureGaussian1 = prTextureCreate();
-        prTextureUpdate(g_colorTextureGaussian1, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, true, NULL, 0, g_windowWidth, g_windowHeight);
-        prTextureLinkContext(g_colorTextureGaussian1, g_window->openglContext);
+        g_colorTextureGaussianBlur1 = prTextureCreate();
+        prTextureUpdate(g_colorTextureGaussianBlur1, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, true, NULL, 0, g_windowWidth, g_windowHeight);
+        prTextureLinkContext(g_colorTextureGaussianBlur1, g_window->openglContext);
 
-        g_framebufferGaussian1 = prFramebufferCreate();
-        prFramebufferLinkColorTexture(g_framebufferGaussian1, g_colorTextureGaussian1, 0);
-        prFramebufferLinkContext(g_framebufferGaussian1, g_window->openglContext);
-
-
-
-        g_colorTextureGaussian2 = prTextureCreate();
-        prTextureUpdate(g_colorTextureGaussian2, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, true, NULL, 0, g_windowWidth, g_windowHeight);
-        prTextureLinkContext(g_colorTextureGaussian2, g_window->openglContext);
-
-        g_framebufferGaussian2 = prFramebufferCreate();
-        prFramebufferLinkColorTexture(g_framebufferGaussian2, g_colorTextureGaussian2, 0);
-        prFramebufferLinkContext(g_framebufferGaussian2, g_window->openglContext);
+        g_framebufferGaussianBlur1 = prFramebufferCreate();
+        prFramebufferLinkColorTexture(g_framebufferGaussianBlur1, g_colorTextureGaussianBlur1, 0);
+        prFramebufferLinkContext(g_framebufferGaussianBlur1, g_window->openglContext);
 
 
 
-        gaussianFramebuffers[0] = g_framebufferGaussian1;
-        gaussianFramebuffers[1] = g_framebufferGaussian2;
-        gaussianTextures[0] = g_colorTextureGaussian1;
-        gaussianTextures[1] = g_colorTextureGaussian2;
+        g_colorTextureGaussianBlur2 = prTextureCreate();
+        prTextureUpdate(g_colorTextureGaussianBlur2, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, true, NULL, 0, g_windowWidth, g_windowHeight);
+        prTextureLinkContext(g_colorTextureGaussianBlur2, g_window->openglContext);
+
+        g_framebufferGaussianBlur2 = prFramebufferCreate();
+        prFramebufferLinkColorTexture(g_framebufferGaussianBlur2, g_colorTextureGaussianBlur2, 0);
+        prFramebufferLinkContext(g_framebufferGaussianBlur2, g_window->openglContext);
+
+
+
+        g_gaussianBlurFramebuffers[0] = g_framebufferGaussianBlur1;
+        g_gaussianBlurFramebuffers[1] = g_framebufferGaussianBlur2;
+        g_gaussianBlurTextures[0] = g_colorTextureGaussianBlur1;
+        g_gaussianBlurTextures[1] = g_colorTextureGaussianBlur2;
 
 
 
@@ -296,20 +296,20 @@ void shutdownFramebuffers() {
         prTextureDestroy(g_bloomTexture);
         g_bloomTexture = nullptr;
 
-        prFramebufferDestroy(g_framebufferGaussian1);
-        g_framebufferGaussian1 = nullptr;
-        prTextureDestroy(g_colorTextureGaussian1);
-        g_colorTextureGaussian1 = nullptr;
+        prFramebufferDestroy(g_framebufferGaussianBlur1);
+        g_framebufferGaussianBlur1 = nullptr;
+        prTextureDestroy(g_colorTextureGaussianBlur1);
+        g_colorTextureGaussianBlur1 = nullptr;
 
-        prFramebufferDestroy(g_framebufferGaussian2);
-        g_framebufferGaussian2 = nullptr;
-        prTextureDestroy(g_colorTextureGaussian2);
-        g_colorTextureGaussian2 = nullptr;
+        prFramebufferDestroy(g_framebufferGaussianBlur2);
+        g_framebufferGaussianBlur2 = nullptr;
+        prTextureDestroy(g_colorTextureGaussianBlur2);
+        g_colorTextureGaussianBlur2 = nullptr;
 
-        gaussianFramebuffers[0] = nullptr;
-        gaussianFramebuffers[1] = nullptr;
-        gaussianTextures[0] = nullptr;
-        gaussianTextures[1] = nullptr;
+        g_gaussianBlurFramebuffers[0] = nullptr;
+        g_gaussianBlurFramebuffers[1] = nullptr;
+        g_gaussianBlurTextures[0] = nullptr;
+        g_gaussianBlurTextures[1] = nullptr;
 
         prFramebufferDestroy(g_framebufferSunShadowMap);
         g_framebufferSunShadowMap = nullptr;
