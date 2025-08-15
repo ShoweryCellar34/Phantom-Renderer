@@ -29,3 +29,7 @@ void shutdownTextures();
 void setupMaterials();
 
 void shutdownMaterials();
+
+void setupMeshes();
+
+void shutdownMeshes();

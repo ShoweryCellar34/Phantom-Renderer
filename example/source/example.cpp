@@ -13,7 +13,9 @@ int main(int argc, char** argv) {
     setupFramebuffers();
     setupTextures();
     setupMaterials();
+    setupMeshes();
 
+    shutdownMeshes();
     shutdownMaterials();
     shutdownTextures();
     shutdownFramebuffers();

@@ -91,15 +91,15 @@ extern int g_windowHeight;
 // Shaders
 extern bool g_shadersInit;
 
-extern prShaderData* shaderProgram;
-extern prShaderData* debugShaderProgram;
-extern prShaderData* depthShaderProgram;
-extern prShaderData* depth2ShaderProgram;
-extern prShaderData* skyboxShaderProgram;
-extern prShaderData* hudShaderProgram;
-extern prShaderData* gaussianShaderProgram;
-extern prShaderData* hdrShaderProgram;
-extern prComputeShaderData* computeShaderProgram;
+extern prShaderData* g_shaderDefault;
+extern prShaderData* g_shaderDebug;
+extern prShaderData* g_shaderDirectionLight;
+extern prShaderData* g_shaderPointLight;
+extern prShaderData* g_shaderSkybox;
+extern prShaderData* g_shaderHUD;
+extern prShaderData* g_shaderGaussianBlur;
+extern prShaderData* g_shaderHDR;
+extern prComputeShaderData* g_computeShaderPostProcessing;
 extern prTextureData* g_texturePostProcessing;
 
 // Framebuffers
@@ -163,6 +163,12 @@ extern material g_materialContainer;
 extern material g_materialMetalRimmedContainer;
 extern material g_materialSteel;
 extern material g_materialBrickWall;
+
+// Meshes
+extern bool g_meshesInit;
+
+extern prMeshData* g_meshCube;
+extern prMeshData* g_meshQuad;
 
 extern float pitch;
 extern float yaw;

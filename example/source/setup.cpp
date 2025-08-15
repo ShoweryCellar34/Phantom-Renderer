@@ -69,7 +69,7 @@ void setupWindow() {
 void shutdownWindow() {
     if(g_windowInit) {
         prLogEvent(PR_EVENT_USER, PR_LOG_INFO, "shutdownWindow: Deinitializing window");
-        
+
         prWindowDestroy(g_window);
 
         glfwTerminate();
@@ -88,30 +88,29 @@ void setupShaders() {
             prLogEvent(PR_EVENT_USER, PR_LOG_ERROR, "setupShaders: Window not initialized. Aborting operation, nothing was modified");
             return;
         }
-
         if(g_resourcesPath.empty()) {
             prLogEvent(PR_EVENT_USER, PR_LOG_ERROR, "setupShaders: Resources path not set. Aborting operation, nothing was modified");
             return;
         }
 
-        shaderProgram = loadShader(g_window->openglContext, TO_RES("res/shaders/defaultVertexShader.glsl"), TO_RES("res/shaders/defaultFragmentShader.glsl"), TO_RES("res/shaders/defaultGeometryShader.glsl"));
-        debugShaderProgram = loadShader(g_window->openglContext, TO_RES("res/shaders/debugVertexShader.glsl"), TO_RES("res/shaders/debugFragmentShader.glsl"), TO_RES("res/shaders/debugGeometryShader.glsl"));
+        g_shaderDefault = loadShader(g_window->openglContext, TO_RES("res/shaders/defaultVertexShader.glsl"), TO_RES("res/shaders/defaultFragmentShader.glsl"), TO_RES("res/shaders/defaultGeometryShader.glsl"));
+        g_shaderDebug = loadShader(g_window->openglContext, TO_RES("res/shaders/debugVertexShader.glsl"), TO_RES("res/shaders/debugFragmentShader.glsl"), TO_RES("res/shaders/debugGeometryShader.glsl"));
 
-        depthShaderProgram = loadShader(g_window->openglContext, TO_RES("res/shaders/depthVertexShader.glsl"), TO_RES("res/shaders/depthFragmentShader.glsl"), NULL);
-        depth2ShaderProgram = loadShader(g_window->openglContext, TO_RES("res/shaders/depth2VertexShader.glsl"), TO_RES("res/shaders/depth2FragmentShader.glsl"), TO_RES("res/shaders/depth2GeometryShader.glsl"));
+        g_shaderDirectionLight = loadShader(g_window->openglContext, TO_RES("res/shaders/depthVertexShader.glsl"), TO_RES("res/shaders/depthFragmentShader.glsl"), NULL);
+        g_shaderPointLight = loadShader(g_window->openglContext, TO_RES("res/shaders/depth2VertexShader.glsl"), TO_RES("res/shaders/depth2FragmentShader.glsl"), TO_RES("res/shaders/depth2GeometryShader.glsl"));
 
-        skyboxShaderProgram = loadShader(g_window->openglContext, TO_RES("res/shaders/skyboxVertexShader.glsl"), TO_RES("res/shaders/skyboxFragmentShader.glsl"), NULL);
+        g_shaderSkybox = loadShader(g_window->openglContext, TO_RES("res/shaders/skyboxVertexShader.glsl"), TO_RES("res/shaders/skyboxFragmentShader.glsl"), NULL);
 
-        hudShaderProgram = loadShader(g_window->openglContext, TO_RES("res/shaders/HUDVertexShader.glsl"), TO_RES("res/shaders/HUDFragmentShader.glsl"), NULL);
+        g_shaderHUD = loadShader(g_window->openglContext, TO_RES("res/shaders/HUDVertexShader.glsl"), TO_RES("res/shaders/HUDFragmentShader.glsl"), NULL);
 
-        gaussianShaderProgram = loadShader(g_window->openglContext, TO_RES("res/shaders/HUDVertexShader.glsl"), TO_RES("res/shaders/gaussianFragmentShader.glsl"), NULL);
+        g_shaderGaussianBlur = loadShader(g_window->openglContext, TO_RES("res/shaders/HUDVertexShader.glsl"), TO_RES("res/shaders/gaussianFragmentShader.glsl"), NULL);
 
-        hdrShaderProgram = loadShader(g_window->openglContext, TO_RES("res/shaders/hdrVertexShader.glsl"), TO_RES("res/shaders/hdrFragmentShader.glsl"), NULL);
+        g_shaderHDR = loadShader(g_window->openglContext, TO_RES("res/shaders/hdrVertexShader.glsl"), TO_RES("res/shaders/hdrFragmentShader.glsl"), NULL);
 
-        computeShaderProgram = loadComputeShader(g_window->openglContext, TO_RES("res/shaders/postProcessingComputeShader.glsl"));
+        g_computeShaderPostProcessing = loadComputeShader(g_window->openglContext, TO_RES("res/shaders/postProcessingComputeShader.glsl"));
         g_texturePostProcessing = prTextureCreate();
-        prTextureLinkContext(g_texturePostProcessing, g_window->openglContext);
         prTextureUpdate(g_texturePostProcessing, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, true, NULL, 0, g_windowWidth, g_windowHeight);
+        prTextureLinkContext(g_texturePostProcessing, g_window->openglContext);
 
         g_shadersInit = true;
     } else {
@@ -123,29 +122,24 @@ void shutdownShaders() {
     if(g_shadersInit) {
         prLogEvent(PR_EVENT_USER, PR_LOG_INFO, "shutdownShaders: Destroying shaders");
 
-        if(!g_windowInit) {
-            prLogEvent(PR_EVENT_USER, PR_LOG_ERROR, "shutdownShaders: Window not initialized. Aborting operation, nothing was modified");
-            return;
-        }
-
-        prShaderDestroy(shaderProgram);
-        shaderProgram = nullptr;
-        prShaderDestroy(debugShaderProgram);
-        debugShaderProgram = nullptr;
-        prShaderDestroy(depthShaderProgram);
-        depthShaderProgram = nullptr;
-        prShaderDestroy(depth2ShaderProgram);
-        depth2ShaderProgram = nullptr;
-        prShaderDestroy(skyboxShaderProgram);
-        skyboxShaderProgram = nullptr;
-        prShaderDestroy(hudShaderProgram);
-        hudShaderProgram = nullptr;
-        prShaderDestroy(gaussianShaderProgram);
-        gaussianShaderProgram = nullptr;
-        prShaderDestroy(hdrShaderProgram);
-        hdrShaderProgram = nullptr;
-        prComputeShaderDestroy(computeShaderProgram);
-        computeShaderProgram = nullptr;
+        prShaderDestroy(g_shaderDefault);
+        g_shaderDefault = nullptr;
+        prShaderDestroy(g_shaderDebug);
+        g_shaderDebug = nullptr;
+        prShaderDestroy(g_shaderDirectionLight);
+        g_shaderDirectionLight = nullptr;
+        prShaderDestroy(g_shaderPointLight);
+        g_shaderPointLight = nullptr;
+        prShaderDestroy(g_shaderSkybox);
+        g_shaderSkybox = nullptr;
+        prShaderDestroy(g_shaderHUD);
+        g_shaderHUD = nullptr;
+        prShaderDestroy(g_shaderGaussianBlur);
+        g_shaderGaussianBlur = nullptr;
+        prShaderDestroy(g_shaderHDR);
+        g_shaderHDR = nullptr;
+        prComputeShaderDestroy(g_computeShaderPostProcessing);
+        g_computeShaderPostProcessing = nullptr;
         prTextureDestroy(g_texturePostProcessing);
         g_texturePostProcessing = nullptr;
 
@@ -159,38 +153,43 @@ void setupFramebuffers() {
     if(!g_framebuffersInit) {
         prLogEvent(PR_EVENT_USER, PR_LOG_INFO, "setupFramebuffers: Creating framebuffers");
 
+        if(!g_windowInit) {
+            prLogEvent(PR_EVENT_USER, PR_LOG_ERROR, "setupFramebuffers: Window not initialized. Aborting operation, nothing was modified");
+            return;
+        }
+
         g_colorTextureDefault = prTextureCreate();
-        prTextureLinkContext(g_colorTextureDefault, g_window->openglContext);
         prTextureUpdate(g_colorTextureDefault, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, true, NULL, 0, g_windowWidth, g_windowHeight);
+        prTextureLinkContext(g_colorTextureDefault, g_window->openglContext);
 
         g_depthStencilRBODefault = prRenderBufferCreate();
-        prRenderBufferLinkContext(g_depthStencilRBODefault, g_window->openglContext);
         prRenderBufferUpdate(g_depthStencilRBODefault, PR_FORMAT_DEPTH_STENCIL, g_windowWidth, g_windowHeight, 0);
+        prRenderBufferLinkContext(g_depthStencilRBODefault, g_window->openglContext);
 
         g_framebufferDefault = prFramebufferCreate();
-        prFramebufferLinkContext(g_framebufferDefault, g_window->openglContext);
         prFramebufferLinkColorTexture(g_framebufferDefault, g_colorTextureDefault, 0);
         prFramebufferLinkDepthStencilRBO(g_framebufferDefault, g_depthStencilRBODefault);
+        prFramebufferLinkContext(g_framebufferDefault, g_window->openglContext);
 
 
 
         g_window->openglContext->Enable(GL_MULTISAMPLE);
         g_colorRBOMultisampled = prRenderBufferCreate();
-        prRenderBufferLinkContext(g_colorRBOMultisampled, g_window->openglContext);
         prRenderBufferUpdate(g_colorRBOMultisampled, PR_FORMAT_RGBA, g_windowWidth, g_windowHeight, SAMPLES);
+        prRenderBufferLinkContext(g_colorRBOMultisampled, g_window->openglContext);
 
         g_colorMultisamlpedTextureMultisampled = prTextureMultisampledCreate();
-        prTextureMultisampledLinkContext(g_colorMultisamlpedTextureMultisampled, g_window->openglContext);
         prTextureMultisampledUpdate(g_colorMultisamlpedTextureMultisampled, PR_FORMAT_RGBA, g_windowWidth, g_windowHeight, SAMPLES);
+        prTextureMultisampledLinkContext(g_colorMultisamlpedTextureMultisampled, g_window->openglContext);
 
         g_depthStencilMultisampledRBOMultisampled = prRenderBufferCreate();
-        prRenderBufferLinkContext(g_depthStencilMultisampledRBOMultisampled, g_window->openglContext);
         prRenderBufferUpdate(g_depthStencilMultisampledRBOMultisampled, PR_FORMAT_DEPTH_STENCIL, g_windowWidth, g_windowHeight, SAMPLES);
+        prRenderBufferLinkContext(g_depthStencilMultisampledRBOMultisampled, g_window->openglContext);
 
         g_framebufferMultisampled = prFramebufferCreate();
-        prFramebufferLinkContext(g_framebufferMultisampled, g_window->openglContext);
         prFramebufferLinkColorRBO(g_framebufferMultisampled, g_colorRBOMultisampled, 0);
         prFramebufferLinkColorTextureMultisampled(g_framebufferMultisampled, g_colorMultisamlpedTextureMultisampled, 1);
+        prFramebufferLinkContext(g_framebufferMultisampled, g_window->openglContext);
         GLenum tempAttachmentsArray[] = {PR_COLOR_ATTACHMENT_0, PR_COLOR_ATTACHMENT_1};
         prFramebufferDrawBuffers(g_framebufferMultisampled, 2, tempAttachmentsArray);
         prFramebufferLinkDepthStencilRBO(g_framebufferMultisampled, g_depthStencilMultisampledRBOMultisampled);
@@ -198,32 +197,32 @@ void setupFramebuffers() {
 
 
         g_bloomTexture = prTextureCreate();
-        prTextureLinkContext(g_bloomTexture, g_window->openglContext);
         prTextureUpdate(g_bloomTexture, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, true, NULL, 0, g_windowWidth, g_windowHeight);
+        prTextureLinkContext(g_bloomTexture, g_window->openglContext);
 
         g_framebufferBloom = prFramebufferCreate();
-        prFramebufferLinkContext(g_framebufferBloom, g_window->openglContext);
         prFramebufferLinkColorTexture(g_framebufferBloom, g_bloomTexture, 0);
+        prFramebufferLinkContext(g_framebufferBloom, g_window->openglContext);
 
 
 
         g_colorTextureGaussian1 = prTextureCreate();
-        prTextureLinkContext(g_colorTextureGaussian1, g_window->openglContext);
         prTextureUpdate(g_colorTextureGaussian1, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, true, NULL, 0, g_windowWidth, g_windowHeight);
+        prTextureLinkContext(g_colorTextureGaussian1, g_window->openglContext);
 
         g_framebufferGaussian1 = prFramebufferCreate();
-        prFramebufferLinkContext(g_framebufferGaussian1, g_window->openglContext);
         prFramebufferLinkColorTexture(g_framebufferGaussian1, g_colorTextureGaussian1, 0);
+        prFramebufferLinkContext(g_framebufferGaussian1, g_window->openglContext);
 
 
 
         g_colorTextureGaussian2 = prTextureCreate();
-        prTextureLinkContext(g_colorTextureGaussian2, g_window->openglContext);
         prTextureUpdate(g_colorTextureGaussian2, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, true, NULL, 0, g_windowWidth, g_windowHeight);
+        prTextureLinkContext(g_colorTextureGaussian2, g_window->openglContext);
 
         g_framebufferGaussian2 = prFramebufferCreate();
-        prFramebufferLinkContext(g_framebufferGaussian2, g_window->openglContext);
         prFramebufferLinkColorTexture(g_framebufferGaussian2, g_colorTextureGaussian2, 0);
+        prFramebufferLinkContext(g_framebufferGaussian2, g_window->openglContext);
 
 
 
@@ -235,18 +234,17 @@ void setupFramebuffers() {
 
 
         g_depthTextureSunShadowMap = prTextureCreate();
-        prTextureLinkContext(g_depthTextureSunShadowMap, g_window->openglContext);
         prTextureUpdate(g_depthTextureSunShadowMap, PR_FORMAT_DEPTH, PR_WRAPPING_EDGE, PR_FILTER_LINEAR, PR_FILTER_LINEAR, false, NULL, 0, 2048, 2048);
         prTextureBorderColor(g_depthTextureSunShadowMap, TEMP_RGBA(1.0f, 0.0f, 0.0f, 1.0f));
+        prTextureLinkContext(g_depthTextureSunShadowMap, g_window->openglContext);
 
         g_framebufferSunShadowMap = prFramebufferCreate();
-        prFramebufferLinkContext(g_framebufferSunShadowMap, g_window->openglContext);
         prFramebufferLinkDepthTexture(g_framebufferSunShadowMap, g_depthTextureSunShadowMap);
         prFramebufferSetDrawBuffer(g_framebufferSunShadowMap, PR_NONE);
         prFramebufferSetReadBuffer(g_framebufferSunShadowMap, PR_NONE);
+        prFramebufferLinkContext(g_framebufferSunShadowMap, g_window->openglContext);
 
         g_depthCubeMapPointShadowMap = prCubeMapCreate();
-        prCubeMapLinkContext(g_depthCubeMapPointShadowMap, g_window->openglContext);
         GLenum tempFormatsArray[6] = {PR_FORMAT_DEPTH, PR_FORMAT_DEPTH, PR_FORMAT_DEPTH, PR_FORMAT_DEPTH, PR_FORMAT_DEPTH, PR_FORMAT_DEPTH};
         GLubyte* tempTextureDataArray[6] = {NULL, NULL, NULL, NULL, NULL, NULL};
         size_t tempTextureDataSizeArray[6] = {0, 0, 0, 0, 0, 0};
@@ -259,12 +257,13 @@ void setupFramebuffers() {
             tempCubeMapSizeArray,
             tempCubeMapSizeArray);
         prCubeMapBorderColor(g_depthCubeMapPointShadowMap, TEMP_RGBA(1.0f, 0.0f, 0.0f, 1.0f));
+        prCubeMapLinkContext(g_depthCubeMapPointShadowMap, g_window->openglContext);
 
         g_framebufferPointShadowMap = prFramebufferCreate();
-        prFramebufferLinkContext(g_framebufferPointShadowMap, g_window->openglContext);
         prFramebufferLinkDepthCubeMap(g_framebufferPointShadowMap, g_depthCubeMapPointShadowMap);
         prFramebufferSetDrawBuffer(g_framebufferPointShadowMap, GL_NONE);
         prFramebufferSetReadBuffer(g_framebufferPointShadowMap, GL_NONE);
+        prFramebufferLinkContext(g_framebufferPointShadowMap, g_window->openglContext);
 
         g_framebuffersInit = true;
     } else {
@@ -332,6 +331,16 @@ void setupTextures() {
     if(!g_texturesInit) {
         prLogEvent(PR_EVENT_USER, PR_LOG_INFO, "setupTextures: Creating textures");
 
+        if(!g_windowInit) {
+            prLogEvent(PR_EVENT_USER, PR_LOG_ERROR, "setupTextures: Window not initialized. Aborting operation, nothing was modified");
+            return;
+        }
+
+        if(g_resourcesPath.empty()) {
+            prLogEvent(PR_EVENT_USER, PR_LOG_ERROR, "setupTextures: Resources path not set. Aborting operation, nothing was modified");
+            return;
+        }
+
         stbi_set_flip_vertically_on_load(1);
 
         g_textureCheckerboard = makeTextureCheckerboard(g_window->openglContext, 8, TEMP_RGBA(1.0f, 0.0f, 1.0f, 1.0f), TEMP_RGBA(0.0f, 0.0f, 0.0f, 1.0f));
@@ -358,7 +367,7 @@ void setupTextures() {
             0.0f, 0.0f, 0.0f, 1.0f
         ));
 
-        const char* cubeMapIslandsTextures[6] = {
+        static const char* cubeMapIslandsTextures[6] = {
             "res/skyboxes/1/right.jpg",
             "res/skyboxes/1/left.jpg",
             "res/skyboxes/1/top.jpg",
@@ -366,7 +375,7 @@ void setupTextures() {
             "res/skyboxes/1/front.jpg",
             "res/skyboxes/1/back.jpg",
         };
-        const char* cubeMapSpaceTextures[6] = {
+        static const char* cubeMapSpaceTextures[6] = {
             "res/skyboxes/2/px.png",
             "res/skyboxes/2/nx.png",
             "res/skyboxes/2/py.png",
@@ -463,6 +472,10 @@ void setupMaterials() {
     if(!g_materialsInit) {
         prLogEvent(PR_EVENT_USER, PR_LOG_INFO, "setupMaterials: Creating materials");
 
+        if(!g_windowInit) {
+            prLogEvent(PR_EVENT_USER, PR_LOG_ERROR, "setupMaterials: Window not initialized. Aborting operation, nothing was modified");
+            return;
+        }
         if(!g_shadersInit) {
             prLogEvent(PR_EVENT_USER, PR_LOG_ERROR, "setupMaterials: Shaders not initialized. Aborting operation, nothing was modified");
             return;
@@ -508,6 +521,132 @@ void shutdownMaterials() {
 
         g_materialsInit = false;
     } else {
-        prLogEvent(PR_EVENT_USER, PR_LOG_ERROR, "shutdownmaterials: Materials not initialized. Aborting operation, nothing was modified");
+        prLogEvent(PR_EVENT_USER, PR_LOG_ERROR, "shutdownMaterials: Materials not initialized. Aborting operation, nothing was modified");
+    }
+}
+
+void setupMeshes() {
+    if(!g_meshesInit) {
+        prLogEvent(PR_EVENT_USER, PR_LOG_INFO, "shutdownMeshes: Creating meshes");
+
+        if(!g_windowInit) {
+            prLogEvent(PR_EVENT_USER, PR_LOG_ERROR, "setupMeshes: Window not initialized. Aborting operation, nothing was modified");
+            return;
+        }
+
+        static float cubeData[] = {
+    //  Position             Tex Coods    Tangent            Bitangent          Normal
+       -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,  1.0f, 0.0f, 0.0f,  0.0f, 1.0f, 0.0f,  0.0f, 0.0f, -1.0f,
+        0.5f, -0.5f, -0.5f,  1.0f, 0.0f,  1.0f, 0.0f, 0.0f,  0.0f, 1.0f, 0.0f,  0.0f, 0.0f, -1.0f,
+        0.5f,  0.5f, -0.5f,  1.0f, 1.0f,  1.0f, 0.0f, 0.0f,  0.0f, 1.0f, 0.0f,  0.0f, 0.0f, -1.0f,
+        0.5f,  0.5f, -0.5f,  1.0f, 1.0f,  1.0f, 0.0f, 0.0f,  0.0f, 1.0f, 0.0f,  0.0f, 0.0f, -1.0f,
+       -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,  1.0f, 0.0f, 0.0f,  0.0f, 1.0f, 0.0f,  0.0f, 0.0f, -1.0f,
+       -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,  1.0f, 0.0f, 0.0f,  0.0f, 1.0f, 0.0f,  0.0f, 0.0f, -1.0f,
+
+       -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,  1.0f, 0.0f, 0.0f,  0.0f, 1.0f, 0.0f,  0.0f, 0.0f,  1.0f,
+        0.5f, -0.5f,  0.5f,  1.0f, 0.0f,  1.0f, 0.0f, 0.0f,  0.0f, 1.0f, 0.0f,  0.0f, 0.0f,  1.0f,
+        0.5f,  0.5f,  0.5f,  1.0f, 1.0f,  1.0f, 0.0f, 0.0f,  0.0f, 1.0f, 0.0f,  0.0f, 0.0f,  1.0f,
+        0.5f,  0.5f,  0.5f,  1.0f, 1.0f,  1.0f, 0.0f, 0.0f,  0.0f, 1.0f, 0.0f,  0.0f, 0.0f,  1.0f,
+       -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,  1.0f, 0.0f, 0.0f,  0.0f, 1.0f, 0.0f,  0.0f, 0.0f,  1.0f,
+       -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,  1.0f, 0.0f, 0.0f,  0.0f, 1.0f, 0.0f,  0.0f, 0.0f,  1.0f,
+
+       -0.5f,  0.5f,  0.5f,  1.0f, 1.0f,  0.0f, 0.0f, 1.0f,  0.0f, 1.0f, 0.0f,  1.0f, 0.0f,  0.0f,
+       -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,  0.0f, 0.0f, 1.0f,  0.0f, 1.0f, 0.0f,  1.0f, 0.0f,  0.0f,
+       -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,  0.0f, 0.0f, 1.0f,  0.0f, 1.0f, 0.0f,  1.0f, 0.0f,  0.0f,
+       -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,  0.0f, 0.0f, 1.0f,  0.0f, 1.0f, 0.0f,  1.0f, 0.0f,  0.0f,
+       -0.5f, -0.5f,  0.5f,  1.0f, 0.0f,  0.0f, 0.0f, 1.0f,  0.0f, 1.0f, 0.0f,  1.0f, 0.0f,  0.0f,
+       -0.5f,  0.5f,  0.5f,  1.0f, 1.0f,  0.0f, 0.0f, 1.0f,  0.0f, 1.0f, 0.0f,  1.0f, 0.0f,  0.0f,
+
+        0.5f,  0.5f,  0.5f,  1.0f, 1.0f,  0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f,  1.0f, 0.0f,  0.0f,
+        0.5f,  0.5f, -0.5f,  0.0f, 1.0f,  0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f,  1.0f, 0.0f,  0.0f,
+        0.5f, -0.5f, -0.5f,  0.0f, 0.0f,  0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f,  1.0f, 0.0f,  0.0f,
+        0.5f, -0.5f, -0.5f,  0.0f, 0.0f,  0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f,  1.0f, 0.0f,  0.0f,
+        0.5f, -0.5f,  0.5f,  1.0f, 0.0f,  0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f,  1.0f, 0.0f,  0.0f,
+        0.5f,  0.5f,  0.5f,  1.0f, 1.0f,  0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f,  1.0f, 0.0f,  0.0f,
+
+       -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,  1.0f, 0.0f, 0.0f,  0.0f, 0.0f, -1.0f, 0.0f, -1.0f, 0.0f,
+        0.5f, -0.5f, -0.5f,  1.0f, 1.0f,  1.0f, 0.0f, 0.0f,  0.0f, 0.0f, -1.0f, 0.0f, -1.0f, 0.0f,
+        0.5f, -0.5f,  0.5f,  1.0f, 0.0f,  1.0f, 0.0f, 0.0f,  0.0f, 0.0f, -1.0f, 0.0f, -1.0f, 0.0f,
+        0.5f, -0.5f,  0.5f,  1.0f, 0.0f,  1.0f, 0.0f, 0.0f,  0.0f, 0.0f, -1.0f, 0.0f, -1.0f, 0.0f,
+       -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,  1.0f, 0.0f, 0.0f,  0.0f, 0.0f, -1.0f, 0.0f, -1.0f, 0.0f,
+       -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,  1.0f, 0.0f, 0.0f,  0.0f, 0.0f, -1.0f, 0.0f, -1.0f, 0.0f,
+
+       -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,  1.0f, 0.0f, 0.0f,  0.0f, 0.0f, 1.0f,  0.0f,  1.0f, 0.0f,
+        0.5f,  0.5f, -0.5f,  1.0f, 1.0f,  1.0f, 0.0f, 0.0f,  0.0f, 0.0f, 1.0f,  0.0f,  1.0f, 0.0f,
+        0.5f,  0.5f,  0.5f,  1.0f, 0.0f,  1.0f, 0.0f, 0.0f,  0.0f, 0.0f, 1.0f,  0.0f,  1.0f, 0.0f,
+        0.5f,  0.5f,  0.5f,  1.0f, 0.0f,  1.0f, 0.0f, 0.0f,  0.0f, 0.0f, 1.0f,  0.0f,  1.0f, 0.0f,
+       -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,  1.0f, 0.0f, 0.0f,  0.0f, 0.0f, 1.0f,  0.0f,  1.0f, 0.0f,
+       -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,  1.0f, 0.0f, 0.0f,  0.0f, 0.0f, 1.0f,  0.0f,  1.0f, 0.0f
+        };
+        static int cubeDataSize = sizeof(cubeData);
+
+        static unsigned int indices[] = {
+            0, 2, 1,
+            3, 5, 4,
+
+            6, 7, 8,
+            9, 10, 11,
+
+            12, 13, 14,
+            15, 16, 17,
+
+            18, 20, 19,
+            21, 23, 22,
+
+            24, 25, 26,
+            27, 28, 29,
+
+            30, 32, 31,
+            33, 35, 34
+        };
+        static int indicesSize = sizeof(indices);
+
+        static float quadData[] = {
+            0.0f, 1.0f, 0.0f, 1.0f,
+            0.0f, 0.0f, 0.0f, 0.0f,
+            1.0f, 0.0f, 1.0f, 0.0f,
+            1.0f, 1.0f, 1.0f, 1.0f
+        };
+        static int quadDataSize = sizeof(quadData);
+
+        static unsigned int indicesQuad[] = {
+            0, 1, 2,
+            2, 3, 0
+        };
+        static int indicesQuadSize = sizeof(indicesQuad);
+
+        g_meshCube = prMeshCreate();
+        prMeshSetVertexAttribute(g_meshCube, 0, 3, PR_FLOAT, PR_FALSE, 14 * sizeof(GLfloat), (void*)(0 * sizeof(GLfloat)));
+        prMeshSetVertexAttribute(g_meshCube, 1, 2, PR_FLOAT, PR_FALSE, 14 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
+        prMeshSetVertexAttribute(g_meshCube, 2, 3, PR_FLOAT, PR_FALSE, 14 * sizeof(GLfloat), (void*)(5 * sizeof(GLfloat)));
+        prMeshSetVertexAttribute(g_meshCube, 3, 3, PR_FLOAT, PR_FALSE, 14 * sizeof(GLfloat), (void*)(8 * sizeof(GLfloat)));
+        prMeshSetVertexAttribute(g_meshCube, 4, 3, PR_FLOAT, PR_FALSE, 14 * sizeof(GLfloat), (void*)(11 * sizeof(GLfloat)));
+        prMeshUpdate(g_meshCube, cubeData, cubeDataSize, indices, indicesSize);
+        prMeshLinkContext(g_meshCube, g_window->openglContext);
+
+        g_meshQuad = prMeshCreate();
+        prMeshSetVertexAttribute(g_meshQuad, 0, 2, PR_FLOAT, PR_FALSE, 4 * sizeof(GLfloat), (void*)(0 * sizeof(GLfloat)));
+        prMeshSetVertexAttribute(g_meshQuad, 1, 2, PR_FLOAT, PR_FALSE, 4 * sizeof(GLfloat), (void*)(2 * sizeof(GLfloat)));
+        prMeshUpdate(g_meshQuad, quadData, quadDataSize, indicesQuad, indicesQuadSize);
+        prMeshLinkContext(g_meshQuad, g_window->openglContext);
+
+        g_meshesInit = true;
+    } else {
+        prLogEvent(PR_EVENT_USER, PR_LOG_ERROR, "shutdownMeshes: Meshes already initialized. Aborting operation, nothing was modified");
+    }
+}
+
+void shutdownMeshes() {
+    if(g_meshesInit) {
+        prLogEvent(PR_EVENT_USER, PR_LOG_INFO, "shutdownMeshes: Destroying meshes");
+
+        prMeshDestroy(g_meshCube);
+        g_meshCube = nullptr;
+        prMeshDestroy(g_meshQuad);
+        g_meshQuad = nullptr;
+
+        g_meshesInit = false;
+    } else {
+        prLogEvent(PR_EVENT_USER, PR_LOG_ERROR, "shutdownMeshes: Meshes not initialized. Aborting operation, nothing was modified");
     }
 }

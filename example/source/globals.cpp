@@ -19,15 +19,15 @@ int g_windowHeight = DEFAULT_WINDOW_HEIGHT;
 // Shaders
 bool g_shadersInit = false;
 
-prShaderData* shaderProgram = nullptr;
-prShaderData* debugShaderProgram = nullptr;
-prShaderData* depthShaderProgram = nullptr;
-prShaderData* depth2ShaderProgram = nullptr;
-prShaderData* skyboxShaderProgram = nullptr;
-prShaderData* hudShaderProgram = nullptr;
-prShaderData* gaussianShaderProgram = nullptr;
-prShaderData* hdrShaderProgram = nullptr;
-prComputeShaderData* computeShaderProgram = nullptr;
+prShaderData* g_shaderDefault = nullptr;
+prShaderData* g_shaderDebug = nullptr;
+prShaderData* g_shaderDirectionLight = nullptr;
+prShaderData* g_shaderPointLight = nullptr;
+prShaderData* g_shaderSkybox = nullptr;
+prShaderData* g_shaderHUD = nullptr;
+prShaderData* g_shaderGaussianBlur = nullptr;
+prShaderData* g_shaderHDR = nullptr;
+prComputeShaderData* g_computeShaderPostProcessing = nullptr;
 prTextureData* g_texturePostProcessing = nullptr;
 
 // Framebuffers
@@ -91,6 +91,12 @@ material g_materialContainer;
 material g_materialMetalRimmedContainer;
 material g_materialSteel;
 material g_materialBrickWall;
+
+// Meshes
+bool g_meshesInit = false;
+
+prMeshData* g_meshCube = nullptr;
+prMeshData* g_meshQuad = nullptr;
 
 float pitch = 0.0f;
 float yaw = 0.0f;

@@ -8,7 +8,7 @@ void framebufferSizeCallback(GLFWwindow* window, int width, int height) {
     GladGLContext* context = reinterpret_cast<GladGLContext*>(glfwGetWindowUserPointer(window));
     context->Viewport(0, 0, g_windowWidth, g_windowHeight);
 
-    prShaderSetUniform2f(debugShaderProgram, "screenSize", g_windowWidth, g_windowHeight);
+    prShaderSetUniform2f(g_shaderDebug, "screenSize", g_windowWidth, g_windowHeight);
 
     prTextureUpdate(g_texturePostProcessing, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, true, NULL, 0, g_windowWidth, g_windowHeight);
 
