@@ -33,24 +33,24 @@ prTextureData* g_texturePostProcessing = nullptr;
 // Framebuffers
 bool g_framebuffersInit = false;
 
-prTextureData* g_depthTextureSunShadowMap = nullptr;
+prTextureData* g_textureDepthSunShadowMap = nullptr;
 prFramebufferData* g_framebufferSunShadowMap = nullptr;
-prCubeMapData* g_depthCubeMapPointShadowMap = nullptr;
+prCubeMapData* g_cubeMapDepthPointShadowMap = nullptr;
 prFramebufferData* g_framebufferPointShadowMap = nullptr;
-prRenderBufferData* g_colorRBOMultisampled = nullptr;
-prTextureMultisampledData* g_colorMultisamlpedTextureMultisampled = nullptr;
-prRenderBufferData* g_depthStencilMultisampledRBOMultisampled = nullptr;
-prTextureData* g_colorTextureGaussianBlur1 = nullptr;
+prRenderBufferData* g_RBOColorMultisampled = nullptr;
+prTextureMultisampledData* g_multisampledTextureColorMultisampled = nullptr;
+prRenderBufferData* g_multisampledRBODepthStencilMultisampled = nullptr;
+prTextureData* g_textureColorGaussianBlur1 = nullptr;
 prFramebufferData* g_framebufferGaussianBlur1 = nullptr;
-prTextureData* g_colorTextureGaussianBlur2 = nullptr;
+prTextureData* g_textureColorGaussianBlur2 = nullptr;
 prFramebufferData* g_framebufferGaussianBlur2 = nullptr;
 prFramebufferData* g_gaussianBlurFramebuffers[2] = {nullptr};
 prTextureData* g_gaussianBlurTextures[2] = {nullptr};
-prTextureData* g_bloomTexture = nullptr;
+prTextureData* g_textureBloom = nullptr;
 prFramebufferData* g_framebufferBloom = nullptr;
 prFramebufferData* g_framebufferMultisampled = nullptr;
-prTextureData* g_colorTextureDefault = nullptr;
-prRenderBufferData* g_depthStencilRBODefault = nullptr;
+prTextureData* g_textureColorDefault = nullptr;
+prRenderBufferData* g_RBODepthStencilDefault = nullptr;
 prFramebufferData* g_framebufferDefault = nullptr;
 
 // Textures
@@ -108,3 +108,7 @@ bool showPostProcessing = true;
 bool useDebugShader = false;
 
 prCamera* camera = nullptr;
+extern vec3 cameraPosition = {35.0f, 35.0f, 35.0f};
+
+float deltaTime = 0.0f;
+float lastFrame = 0.0f;

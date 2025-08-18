@@ -66,11 +66,15 @@ inline GLfloat (*TEMP_RGBA_6(GLfloat r1, GLfloat g1, GLfloat b1, GLfloat a1,
     return tempRGBA;
 }
 
+vec3 VEC3_ZERO = {0.0f, 0.0f, 0.0f};
+vec3 VEC3_ONE = {1.0f, 1.0f, 1.0f};
+
 // Global Constants
 #define TITLE "Phantom-Renderer Example"
 #define DEFAULT_WINDOW_WIDTH 1280
 #define DEFAULT_WINDOW_HEIGHT 720
 #define SAMPLES 4
+#define BLOOM_BLUR_PASSES 6
 
 // Logging
 extern FILE* g_logFile;
@@ -105,24 +109,24 @@ extern prTextureData* g_texturePostProcessing;
 // Framebuffers
 extern bool g_framebuffersInit;
 
-extern prTextureData* g_depthTextureSunShadowMap;
+extern prTextureData* g_textureDepthSunShadowMap;
 extern prFramebufferData* g_framebufferSunShadowMap;
-extern prCubeMapData* g_depthCubeMapPointShadowMap;
+extern prCubeMapData* g_cubeMapDepthPointShadowMap;
 extern prFramebufferData* g_framebufferPointShadowMap;
-extern prRenderBufferData* g_colorRBOMultisampled;
-extern prTextureMultisampledData* g_colorMultisamlpedTextureMultisampled;
-extern prRenderBufferData* g_depthStencilMultisampledRBOMultisampled;
-extern prTextureData* g_colorTextureGaussianBlur1;
+extern prRenderBufferData* g_RBOColorMultisampled;
+extern prTextureMultisampledData* g_multisampledTextureColorMultisampled;
+extern prRenderBufferData* g_multisampledRBODepthStencilMultisampled;
+extern prTextureData* g_textureColorGaussianBlur1;
 extern prFramebufferData* g_framebufferGaussianBlur1;
-extern prTextureData* g_colorTextureGaussianBlur2;
+extern prTextureData* g_textureColorGaussianBlur2;
 extern prFramebufferData* g_framebufferGaussianBlur2;
 extern prFramebufferData* g_gaussianBlurFramebuffers[2];
 extern prTextureData* g_gaussianBlurTextures[2];
-extern prTextureData* g_bloomTexture;
+extern prTextureData* g_textureBloom;
 extern prFramebufferData* g_framebufferBloom;
 extern prFramebufferData* g_framebufferMultisampled;
-extern prTextureData* g_colorTextureDefault;
-extern prRenderBufferData* g_depthStencilRBODefault;
+extern prTextureData* g_textureColorDefault;
+extern prRenderBufferData* g_RBODepthStencilDefault;
 extern prFramebufferData* g_framebufferDefault;
 
 // Textures
@@ -180,3 +184,7 @@ extern bool showPostProcessing;
 extern bool useDebugShader;
 
 extern prCamera* camera;
+extern vec3 cameraPosition;
+
+extern float deltaTime;
+extern float lastFrame;

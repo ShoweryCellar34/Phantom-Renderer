@@ -158,109 +158,109 @@ void setupFramebuffers() {
             return;
         }
 
-        g_colorTextureDefault = prTextureCreate();
-        prTextureUpdate(g_colorTextureDefault, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, true, NULL, 0, g_windowWidth, g_windowHeight);
-        prTextureLinkContext(g_colorTextureDefault, g_window->openglContext);
+        g_textureColorDefault = prTextureCreate();
+        prTextureUpdate(g_textureColorDefault, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, true, NULL, 0, g_windowWidth, g_windowHeight);
+        prTextureLinkContext(g_textureColorDefault, g_window->openglContext);
 
-        g_depthStencilRBODefault = prRenderBufferCreate();
-        prRenderBufferUpdate(g_depthStencilRBODefault, PR_FORMAT_DEPTH_STENCIL, g_windowWidth, g_windowHeight, 0);
-        prRenderBufferLinkContext(g_depthStencilRBODefault, g_window->openglContext);
+        g_RBODepthStencilDefault = prRenderBufferCreate();
+        prRenderBufferUpdate(g_RBODepthStencilDefault, PR_FORMAT_DEPTH_STENCIL, g_windowWidth, g_windowHeight, 0);
+        prRenderBufferLinkContext(g_RBODepthStencilDefault, g_window->openglContext);
 
         g_framebufferDefault = prFramebufferCreate();
-        prFramebufferLinkColorTexture(g_framebufferDefault, g_colorTextureDefault, 0);
-        prFramebufferLinkDepthStencilRBO(g_framebufferDefault, g_depthStencilRBODefault);
+        prFramebufferLinkColorTexture(g_framebufferDefault, g_textureColorDefault, 0);
+        prFramebufferLinkDepthStencilRBO(g_framebufferDefault, g_RBODepthStencilDefault);
         prFramebufferLinkContext(g_framebufferDefault, g_window->openglContext);
 
 
 
         g_window->openglContext->Enable(GL_MULTISAMPLE);
-        g_colorRBOMultisampled = prRenderBufferCreate();
-        prRenderBufferUpdate(g_colorRBOMultisampled, PR_FORMAT_RGBA, g_windowWidth, g_windowHeight, SAMPLES);
-        prRenderBufferLinkContext(g_colorRBOMultisampled, g_window->openglContext);
+        g_RBOColorMultisampled = prRenderBufferCreate();
+        prRenderBufferUpdate(g_RBOColorMultisampled, PR_FORMAT_RGBA, g_windowWidth, g_windowHeight, SAMPLES);
+        prRenderBufferLinkContext(g_RBOColorMultisampled, g_window->openglContext);
 
-        g_colorMultisamlpedTextureMultisampled = prTextureMultisampledCreate();
-        prTextureMultisampledUpdate(g_colorMultisamlpedTextureMultisampled, PR_FORMAT_RGBA, g_windowWidth, g_windowHeight, SAMPLES);
-        prTextureMultisampledLinkContext(g_colorMultisamlpedTextureMultisampled, g_window->openglContext);
+        g_multisampledTextureColorMultisampled = prTextureMultisampledCreate();
+        prTextureMultisampledUpdate(g_multisampledTextureColorMultisampled, PR_FORMAT_RGBA, g_windowWidth, g_windowHeight, SAMPLES);
+        prTextureMultisampledLinkContext(g_multisampledTextureColorMultisampled, g_window->openglContext);
 
-        g_depthStencilMultisampledRBOMultisampled = prRenderBufferCreate();
-        prRenderBufferUpdate(g_depthStencilMultisampledRBOMultisampled, PR_FORMAT_DEPTH_STENCIL, g_windowWidth, g_windowHeight, SAMPLES);
-        prRenderBufferLinkContext(g_depthStencilMultisampledRBOMultisampled, g_window->openglContext);
+        g_multisampledRBODepthStencilMultisampled = prRenderBufferCreate();
+        prRenderBufferUpdate(g_multisampledRBODepthStencilMultisampled, PR_FORMAT_DEPTH_STENCIL, g_windowWidth, g_windowHeight, SAMPLES);
+        prRenderBufferLinkContext(g_multisampledRBODepthStencilMultisampled, g_window->openglContext);
 
         g_framebufferMultisampled = prFramebufferCreate();
-        prFramebufferLinkColorRBO(g_framebufferMultisampled, g_colorRBOMultisampled, 0);
-        prFramebufferLinkColorTextureMultisampled(g_framebufferMultisampled, g_colorMultisamlpedTextureMultisampled, 1);
+        prFramebufferLinkColorRBO(g_framebufferMultisampled, g_RBOColorMultisampled, 0);
+        prFramebufferLinkColorTextureMultisampled(g_framebufferMultisampled, g_multisampledTextureColorMultisampled, 1);
         prFramebufferLinkContext(g_framebufferMultisampled, g_window->openglContext);
         GLenum tempAttachmentsArray[] = {PR_COLOR_ATTACHMENT_0, PR_COLOR_ATTACHMENT_1};
         prFramebufferDrawBuffers(g_framebufferMultisampled, 2, tempAttachmentsArray);
-        prFramebufferLinkDepthStencilRBO(g_framebufferMultisampled, g_depthStencilMultisampledRBOMultisampled);
+        prFramebufferLinkDepthStencilRBO(g_framebufferMultisampled, g_multisampledRBODepthStencilMultisampled);
 
 
 
-        g_bloomTexture = prTextureCreate();
-        prTextureUpdate(g_bloomTexture, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, true, NULL, 0, g_windowWidth, g_windowHeight);
-        prTextureLinkContext(g_bloomTexture, g_window->openglContext);
+        g_textureBloom = prTextureCreate();
+        prTextureUpdate(g_textureBloom, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, true, NULL, 0, g_windowWidth, g_windowHeight);
+        prTextureLinkContext(g_textureBloom, g_window->openglContext);
 
         g_framebufferBloom = prFramebufferCreate();
-        prFramebufferLinkColorTexture(g_framebufferBloom, g_bloomTexture, 0);
+        prFramebufferLinkColorTexture(g_framebufferBloom, g_textureBloom, 0);
         prFramebufferLinkContext(g_framebufferBloom, g_window->openglContext);
 
 
 
-        g_colorTextureGaussianBlur1 = prTextureCreate();
-        prTextureUpdate(g_colorTextureGaussianBlur1, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, true, NULL, 0, g_windowWidth, g_windowHeight);
-        prTextureLinkContext(g_colorTextureGaussianBlur1, g_window->openglContext);
+        g_textureColorGaussianBlur1 = prTextureCreate();
+        prTextureUpdate(g_textureColorGaussianBlur1, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, true, NULL, 0, g_windowWidth, g_windowHeight);
+        prTextureLinkContext(g_textureColorGaussianBlur1, g_window->openglContext);
 
         g_framebufferGaussianBlur1 = prFramebufferCreate();
-        prFramebufferLinkColorTexture(g_framebufferGaussianBlur1, g_colorTextureGaussianBlur1, 0);
+        prFramebufferLinkColorTexture(g_framebufferGaussianBlur1, g_textureColorGaussianBlur1, 0);
         prFramebufferLinkContext(g_framebufferGaussianBlur1, g_window->openglContext);
 
 
 
-        g_colorTextureGaussianBlur2 = prTextureCreate();
-        prTextureUpdate(g_colorTextureGaussianBlur2, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, true, NULL, 0, g_windowWidth, g_windowHeight);
-        prTextureLinkContext(g_colorTextureGaussianBlur2, g_window->openglContext);
+        g_textureColorGaussianBlur2 = prTextureCreate();
+        prTextureUpdate(g_textureColorGaussianBlur2, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, true, NULL, 0, g_windowWidth, g_windowHeight);
+        prTextureLinkContext(g_textureColorGaussianBlur2, g_window->openglContext);
 
         g_framebufferGaussianBlur2 = prFramebufferCreate();
-        prFramebufferLinkColorTexture(g_framebufferGaussianBlur2, g_colorTextureGaussianBlur2, 0);
+        prFramebufferLinkColorTexture(g_framebufferGaussianBlur2, g_textureColorGaussianBlur2, 0);
         prFramebufferLinkContext(g_framebufferGaussianBlur2, g_window->openglContext);
 
 
 
         g_gaussianBlurFramebuffers[0] = g_framebufferGaussianBlur1;
         g_gaussianBlurFramebuffers[1] = g_framebufferGaussianBlur2;
-        g_gaussianBlurTextures[0] = g_colorTextureGaussianBlur1;
-        g_gaussianBlurTextures[1] = g_colorTextureGaussianBlur2;
+        g_gaussianBlurTextures[0] = g_textureColorGaussianBlur1;
+        g_gaussianBlurTextures[1] = g_textureColorGaussianBlur2;
 
 
 
-        g_depthTextureSunShadowMap = prTextureCreate();
-        prTextureUpdate(g_depthTextureSunShadowMap, PR_FORMAT_DEPTH, PR_WRAPPING_EDGE, PR_FILTER_LINEAR, PR_FILTER_LINEAR, false, NULL, 0, 2048, 2048);
-        prTextureBorderColor(g_depthTextureSunShadowMap, TEMP_RGBA(1.0f, 0.0f, 0.0f, 1.0f));
-        prTextureLinkContext(g_depthTextureSunShadowMap, g_window->openglContext);
+        g_textureDepthSunShadowMap = prTextureCreate();
+        prTextureUpdate(g_textureDepthSunShadowMap, PR_FORMAT_DEPTH, PR_WRAPPING_EDGE, PR_FILTER_LINEAR, PR_FILTER_LINEAR, false, NULL, 0, 2048, 2048);
+        prTextureBorderColor(g_textureDepthSunShadowMap, TEMP_RGBA(1.0f, 0.0f, 0.0f, 1.0f));
+        prTextureLinkContext(g_textureDepthSunShadowMap, g_window->openglContext);
 
         g_framebufferSunShadowMap = prFramebufferCreate();
-        prFramebufferLinkDepthTexture(g_framebufferSunShadowMap, g_depthTextureSunShadowMap);
+        prFramebufferLinkDepthTexture(g_framebufferSunShadowMap, g_textureDepthSunShadowMap);
         prFramebufferSetDrawBuffer(g_framebufferSunShadowMap, PR_NONE);
         prFramebufferSetReadBuffer(g_framebufferSunShadowMap, PR_NONE);
         prFramebufferLinkContext(g_framebufferSunShadowMap, g_window->openglContext);
 
-        g_depthCubeMapPointShadowMap = prCubeMapCreate();
+        g_cubeMapDepthPointShadowMap = prCubeMapCreate();
         GLenum tempFormatsArray[6] = {PR_FORMAT_DEPTH, PR_FORMAT_DEPTH, PR_FORMAT_DEPTH, PR_FORMAT_DEPTH, PR_FORMAT_DEPTH, PR_FORMAT_DEPTH};
         GLubyte* tempTextureDataArray[6] = {NULL, NULL, NULL, NULL, NULL, NULL};
         size_t tempTextureDataSizeArray[6] = {0, 0, 0, 0, 0, 0};
         GLsizei tempCubeMapSizeArray[6] = {1024, 1024, 1024, 1024, 1024, 1024};
-        prCubeMapUpdateAll(g_depthCubeMapPointShadowMap,
+        prCubeMapUpdateAll(g_cubeMapDepthPointShadowMap,
             tempFormatsArray,
             PR_WRAPPING_EDGE, PR_FILTER_LINEAR, PR_FILTER_LINEAR, false,
             tempTextureDataArray,
             tempTextureDataSizeArray,
             tempCubeMapSizeArray,
             tempCubeMapSizeArray);
-        prCubeMapBorderColor(g_depthCubeMapPointShadowMap, TEMP_RGBA(1.0f, 0.0f, 0.0f, 1.0f));
-        prCubeMapLinkContext(g_depthCubeMapPointShadowMap, g_window->openglContext);
+        prCubeMapBorderColor(g_cubeMapDepthPointShadowMap, TEMP_RGBA(1.0f, 0.0f, 0.0f, 1.0f));
+        prCubeMapLinkContext(g_cubeMapDepthPointShadowMap, g_window->openglContext);
 
         g_framebufferPointShadowMap = prFramebufferCreate();
-        prFramebufferLinkDepthCubeMap(g_framebufferPointShadowMap, g_depthCubeMapPointShadowMap);
+        prFramebufferLinkDepthCubeMap(g_framebufferPointShadowMap, g_cubeMapDepthPointShadowMap);
         prFramebufferSetDrawBuffer(g_framebufferPointShadowMap, GL_NONE);
         prFramebufferSetReadBuffer(g_framebufferPointShadowMap, GL_NONE);
         prFramebufferLinkContext(g_framebufferPointShadowMap, g_window->openglContext);
@@ -277,34 +277,34 @@ void shutdownFramebuffers() {
 
         prFramebufferDestroy(g_framebufferDefault);
         g_framebufferDefault = nullptr;
-        prTextureDestroy(g_colorTextureDefault);
-        g_colorTextureDefault = nullptr;
-        prRenderBufferDestroy(g_depthStencilRBODefault);
-        g_depthStencilRBODefault = nullptr;
+        prTextureDestroy(g_textureColorDefault);
+        g_textureColorDefault = nullptr;
+        prRenderBufferDestroy(g_RBODepthStencilDefault);
+        g_RBODepthStencilDefault = nullptr;
 
         prFramebufferDestroy(g_framebufferMultisampled);
         g_framebufferMultisampled = nullptr;
-        prRenderBufferDestroy(g_colorRBOMultisampled);
-        g_colorRBOMultisampled = nullptr;
-        prTextureMultisampledDestroy(g_colorMultisamlpedTextureMultisampled);
-        g_colorMultisamlpedTextureMultisampled = nullptr;
-        prRenderBufferDestroy(g_depthStencilMultisampledRBOMultisampled);
-        g_depthStencilMultisampledRBOMultisampled = nullptr;
+        prRenderBufferDestroy(g_RBOColorMultisampled);
+        g_RBOColorMultisampled = nullptr;
+        prTextureMultisampledDestroy(g_multisampledTextureColorMultisampled);
+        g_multisampledTextureColorMultisampled = nullptr;
+        prRenderBufferDestroy(g_multisampledRBODepthStencilMultisampled);
+        g_multisampledRBODepthStencilMultisampled = nullptr;
 
         prFramebufferDestroy(g_framebufferBloom);
         g_framebufferBloom = nullptr;
-        prTextureDestroy(g_bloomTexture);
-        g_bloomTexture = nullptr;
+        prTextureDestroy(g_textureBloom);
+        g_textureBloom = nullptr;
 
         prFramebufferDestroy(g_framebufferGaussianBlur1);
         g_framebufferGaussianBlur1 = nullptr;
-        prTextureDestroy(g_colorTextureGaussianBlur1);
-        g_colorTextureGaussianBlur1 = nullptr;
+        prTextureDestroy(g_textureColorGaussianBlur1);
+        g_textureColorGaussianBlur1 = nullptr;
 
         prFramebufferDestroy(g_framebufferGaussianBlur2);
         g_framebufferGaussianBlur2 = nullptr;
-        prTextureDestroy(g_colorTextureGaussianBlur2);
-        g_colorTextureGaussianBlur2 = nullptr;
+        prTextureDestroy(g_textureColorGaussianBlur2);
+        g_textureColorGaussianBlur2 = nullptr;
 
         g_gaussianBlurFramebuffers[0] = nullptr;
         g_gaussianBlurFramebuffers[1] = nullptr;
@@ -313,13 +313,13 @@ void shutdownFramebuffers() {
 
         prFramebufferDestroy(g_framebufferSunShadowMap);
         g_framebufferSunShadowMap = nullptr;
-        prTextureDestroy(g_depthTextureSunShadowMap);
-        g_depthTextureSunShadowMap = nullptr;
+        prTextureDestroy(g_textureDepthSunShadowMap);
+        g_textureDepthSunShadowMap = nullptr;
 
         prFramebufferDestroy(g_framebufferPointShadowMap);
         g_framebufferPointShadowMap = nullptr;
-        prCubeMapDestroy(g_depthCubeMapPointShadowMap);
-        g_depthCubeMapPointShadowMap = nullptr;
+        prCubeMapDestroy(g_cubeMapDepthPointShadowMap);
+        g_cubeMapDepthPointShadowMap = nullptr;
 
         g_framebuffersInit = false;
     } else {
