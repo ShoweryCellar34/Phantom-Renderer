@@ -3,7 +3,6 @@
 #include <PR/defines.h>
 
 #include <glad/gl.h>
-#include <cglm/cglm.h>
 
 typedef struct prCamera prCamera;
 typedef struct prShaderData prShaderData;

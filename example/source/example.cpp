@@ -3,23 +3,20 @@
 #include <PR/PR.h>
 #include <setup.hpp>
 
-void translationsToMatrix(mat4 matrix, vec3 position, vec3 rotation, vec3 scale) {
-    glm_mat4_identity(matrix);
-    glm_translate(matrix, position);
-    mat3 temp = {{0.0f, 0.0f, 1.0f},
-                 {0.0f, 1.0f, 0.0f},
-                 {1.0f, 0.0f, 0.0f}};
-    glm_rotate(matrix, rotation[2], temp[0]);
-    glm_rotate(matrix, rotation[1], temp[1]);
-    glm_rotate(matrix, rotation[0], temp[2]);
-    glm_scale(matrix, scale);
+mat4s translationsToMatrix(vec3s position, vec3s rotation, vec3s scale) {
+    mat4s matrix = glms_mat4_identity();
+    matrix = glms_translate(matrix, position);
+    float tempData[] = {0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f};
+    mat3s temp = glms_mat3_make(tempData);
+    matrix = glms_rotate(matrix, rotation.z, temp.col[0]);
+    matrix = glms_rotate(matrix, rotation.y, temp.col[1]);
+    matrix = glms_rotate(matrix, rotation.x, temp.col[2]);
+    matrix = glms_scale(matrix, scale);
+
+    return matrix;
 }
 
 void proccessInput(GLFWwindow* window) {
-    mat4x3 temp;
-    mat2x3 temp2;
-    glm_mat4x3_zero(temp);
-
     float cameraSpeed = 7.5f * deltaTime;
     if(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
         cameraSpeed *= 2.0f;
@@ -29,47 +26,29 @@ void proccessInput(GLFWwindow* window) {
     }
 
     if(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-        glm_vec3_scale(camera->front, cameraSpeed, temp[0]);
-        glm_vec3_add(cameraPosition, temp[0], cameraPosition);
+        cameraPosition = glms_vec3_add(cameraPosition, glms_vec3_scale(camera->front, cameraSpeed));
     }
     if(glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-        glm_vec3_scale(camera->front, cameraSpeed, temp[1]);
-        glm_vec3_sub(cameraPosition, temp[1], cameraPosition);
+        cameraPosition = glms_vec3_sub(cameraPosition, glms_vec3_scale(camera->front, cameraSpeed));
     }
     if(glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-        glm_cross(camera->front, camera->up, temp[2]);
-        glm_normalize(temp[2]);
-        glm_vec3_scale(temp[2], cameraSpeed, temp[2]);
-        glm_vec3_sub(cameraPosition, temp[2], cameraPosition);
+        cameraPosition = glms_vec3_sub(cameraPosition, glms_vec3_scale(glms_normalize(glms_cross(camera->front, camera->up)), cameraSpeed));
     }
     if(glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-        glm_cross(camera->front, camera->up, temp[3]);
-        glm_normalize(temp[3]);
-        glm_vec3_scale(temp[3], cameraSpeed, temp[3]);
-        glm_vec3_add(cameraPosition, temp[3], cameraPosition);
+        cameraPosition = glms_vec3_add(cameraPosition, glms_vec3_scale(glms_normalize(glms_cross(camera->front, camera->up)), cameraSpeed));
     }
     if(glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
-        glm_vec3_scale(camera->up, cameraSpeed, temp[1]);
-        glm_vec3_add(cameraPosition, temp[1], cameraPosition);
+        cameraPosition = glms_vec3_add(cameraPosition, glms_vec3_scale(camera->up, cameraSpeed));
     }
     if(glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
-        glm_vec3_scale(camera->up, cameraSpeed, temp[1]);
-        glm_vec3_sub(cameraPosition, temp[1], cameraPosition);
+        cameraPosition = glms_vec3_sub(cameraPosition, glms_vec3_scale(camera->up, cameraSpeed));
     }
 
     if(glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) {
-        glm_cross(camera->up, camera->front, temp2[0]);
-        glm_normalize(temp2[0]);
-        glm_cross(camera->front, temp2[0], temp2[0]);
-        glm_vec3_scale(temp2[0], cameraSpeed, temp2[0]);
-        glm_vec3_add(cameraPosition, temp2[0], cameraPosition);
+        cameraPosition = glms_vec3_add(cameraPosition, glms_vec3_scale(glms_cross(camera->front, glms_normalize(glms_cross(camera->up, camera->front))), cameraSpeed));
     }
     if(glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) {
-        glm_cross(camera->up, camera->front, temp2[0]);
-        glm_normalize(temp2[0]);
-        glm_cross(camera->front, temp2[0], temp2[0]);
-        glm_vec3_scale(temp2[0], cameraSpeed, temp2[0]);
-        glm_vec3_sub(cameraPosition, temp2[0], cameraPosition);
+        cameraPosition = glms_vec3_sub(cameraPosition, glms_vec3_scale(glms_cross(camera->front, glms_normalize(glms_cross(camera->up, camera->front))), cameraSpeed));
     }
 }
 
@@ -86,10 +65,10 @@ int main(int argc, char** argv) {
     setupMeshes();
 
     typedef struct directionalLightData {
-        vec3 direction;
-        vec3 ambient;
-        vec3 diffuse;
-        vec3 specular;
+        vec3s direction;
+        vec3s ambient;
+        vec3s diffuse;
+        vec3s specular;
 
         GLuint shadowMap;
     } directionalLightData;
@@ -99,11 +78,11 @@ int main(int argc, char** argv) {
         float linear;
         float quadratic;
 
-        vec3 position;
+        vec3s position;
 
-        vec3 ambient;
-        vec3 diffuse;
-        vec3 specular;
+        vec3s ambient;
+        vec3s diffuse;
+        vec3s specular;
 
         GLuint shadowMap;
         float farPlane;
@@ -132,39 +111,38 @@ int main(int argc, char** argv) {
     camera = prCameraCreate();
     prCameraLinkContext(camera, g_window->openglContext);
 
-    mat4 lightProjection;
-    glm_ortho(-50.0f, 50.0f, -50.0f, 50.0f, 0.1f, 100.0f, lightProjection);
-    mat4 lightView;
-    glm_lookat((vec3){40.0f, 40.0f, 40.0f}, (vec3){0.0f, 0.0f, 0.0f}, (vec3){0.0f, 1.0f, 0.0f}, lightView);
-    mat4 lightSpaceMatrix;
-    glm_mat4_mul(lightProjection, lightView, lightSpaceMatrix);
-    prShaderSetUniformMatrix4fv(g_shaderDirectionalLight, "lightSpaceMatrix", lightSpaceMatrix[0]);
+    mat4s lightProjection = glms_ortho(-50.0f, 50.0f, -50.0f, 50.0f, 0.1f, 100.0f);
+    mat4s lightView = glms_lookat({40.0f, 40.0f, 40.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f});
+    mat4s lightSpaceMatrix = glms_mat4_mul(lightProjection, lightView);
+    prShaderSetUniformMatrix4fv(g_shaderDirectionalLight, "lightSpaceMatrix", &lightSpaceMatrix.m00);
 
     float aspect = (float)1024 / (float)1024;
-    mat4 light2Projection;
-    glm_perspective(glm_rad(90.0f), aspect, 0.1f, 100.0f, light2Projection);
-    mat4 light2View[6];
-    glm_lookat(point.position, (vec3){point.position[0] + 1.0f, point.position[1], point.position[2]}, (vec3){0.0f, -1.0f, 0.0f}, light2View[0]);
-    glm_lookat(point.position, (vec3){point.position[0] + -1.0f, point.position[1], point.position[2]}, (vec3){0.0f, -1.0f, 0.0f}, light2View[1]);
-    glm_lookat(point.position, (vec3){point.position[0], point.position[1] + 1.0f, point.position[2]}, (vec3){0.0f, 0.0f, 1.0f}, light2View[2]);
-    glm_lookat(point.position, (vec3){point.position[0], point.position[1] + -1.0f, point.position[2]}, (vec3){0.0f, 0.0f, -1.0f}, light2View[3]);
-    glm_lookat(point.position, (vec3){point.position[0], point.position[1], point.position[2] + 1.0f}, (vec3){0.0f, -1.0f, 0.0f}, light2View[4]);
-    glm_lookat(point.position, (vec3){point.position[0], point.position[1], point.position[2] + -1.0f}, (vec3){0.0f, -1.0f, 0.0f}, light2View[5]);
-    mat4 light2SpaceMatrix[6];
-    glm_mat4_mul(light2Projection, light2View[0], light2SpaceMatrix[0]);
-    glm_mat4_mul(light2Projection, light2View[1], light2SpaceMatrix[1]);
-    glm_mat4_mul(light2Projection, light2View[2], light2SpaceMatrix[2]);
-    glm_mat4_mul(light2Projection, light2View[3], light2SpaceMatrix[3]);
-    glm_mat4_mul(light2Projection, light2View[4], light2SpaceMatrix[4]);
-    glm_mat4_mul(light2Projection, light2View[5], light2SpaceMatrix[5]);
-    prShaderSetUniformMatrix4fv(g_shaderPointLight, "lightSpaceMatrices[0]", light2SpaceMatrix[0][0]);
-    prShaderSetUniformMatrix4fv(g_shaderPointLight, "lightSpaceMatrices[1]", light2SpaceMatrix[1][0]);
-    prShaderSetUniformMatrix4fv(g_shaderPointLight, "lightSpaceMatrices[2]", light2SpaceMatrix[2][0]);
-    prShaderSetUniformMatrix4fv(g_shaderPointLight, "lightSpaceMatrices[3]", light2SpaceMatrix[3][0]);
-    prShaderSetUniformMatrix4fv(g_shaderPointLight, "lightSpaceMatrices[4]", light2SpaceMatrix[4][0]);
-    prShaderSetUniformMatrix4fv(g_shaderPointLight, "lightSpaceMatrices[5]", light2SpaceMatrix[5][0]);
-    prShaderSetUniform3f(g_shaderPointLight, "lightPosition", point.position[0], point.position[1], point.position[2]);
-    prShaderSetUniform1f(g_shaderPointLight, "farPlane", 100.0f);
+    float farPlane = 100.0f;
+    mat4s light2Projection = glms_perspective(glm_rad(90.0f), aspect, 0.1f, farPlane);
+    mat4s light2View[6] = {
+        glms_lookat(point.position, {point.position.x + 1.0f, point.position.y, point.position.z}, {0.0f, -1.0f, 0.0f}),
+        glms_lookat(point.position, {point.position.x + -1.0f, point.position.y, point.position.z}, {0.0f, -1.0f, 0.0f}),
+        glms_lookat(point.position, {point.position.x, point.position.y + 1.0f, point.position.z}, {0.0f, 0.0f, 1.0f}),
+        glms_lookat(point.position, {point.position.x, point.position.y + -1.0f, point.position.z}, {0.0f, 0.0f, -1.0f}),
+        glms_lookat(point.position, {point.position.x, point.position.y, point.position.z + 1.0f}, {0.0f, -1.0f, 0.0f}),
+        glms_lookat(point.position, {point.position.x, point.position.y, point.position.z + -1.0f}, {0.0f, -1.0f, 0.0f})
+    };
+    mat4s light2SpaceMatrix[6] = {
+        glms_mat4_mul(light2Projection, light2View[0]),
+        glms_mat4_mul(light2Projection, light2View[1]),
+        glms_mat4_mul(light2Projection, light2View[2]),
+        glms_mat4_mul(light2Projection, light2View[3]),
+        glms_mat4_mul(light2Projection, light2View[4]),
+        glms_mat4_mul(light2Projection, light2View[5])
+    };
+    prShaderSetUniformMatrix4fv(g_shaderPointLight, "lightSpaceMatrices[0]", &light2SpaceMatrix[0].m00);
+    prShaderSetUniformMatrix4fv(g_shaderPointLight, "lightSpaceMatrices[1]", &light2SpaceMatrix[1].m00);
+    prShaderSetUniformMatrix4fv(g_shaderPointLight, "lightSpaceMatrices[2]", &light2SpaceMatrix[2].m00);
+    prShaderSetUniformMatrix4fv(g_shaderPointLight, "lightSpaceMatrices[3]", &light2SpaceMatrix[3].m00);
+    prShaderSetUniformMatrix4fv(g_shaderPointLight, "lightSpaceMatrices[4]", &light2SpaceMatrix[4].m00);
+    prShaderSetUniformMatrix4fv(g_shaderPointLight, "lightSpaceMatrices[5]", &light2SpaceMatrix[5].m00);
+    prShaderSetUniform3f(g_shaderPointLight, "lightPosition", point.position.x, point.position.y, point.position.z);
+    prShaderSetUniform1f(g_shaderPointLight, "farPlane", farPlane);
 
     g_window->openglContext->Enable(GL_DEPTH_TEST);
     g_window->openglContext->Enable(GL_BLEND);
@@ -192,9 +170,7 @@ int main(int argc, char** argv) {
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;  
 
-        mat4 translation;
-
-        vec3 rotation = {glm_rad(yaw), glm_rad(pitch), glm_rad(0.0f)};
+        vec3s rotation = {glm_rad(yaw), glm_rad(pitch), glm_rad(0.0f)};
         prCameraUpdate(camera, cameraPosition, rotation, 45.0f, 0.1f, 1500.0f);
 
         prShaderData* currentShaderProgram = (useDebugShader ? g_shaderDebug : g_shaderDefault);
@@ -204,28 +180,28 @@ int main(int argc, char** argv) {
         float smoothSinOverTime = sin(seed);
         float smoothOverTime = seed;
 
-        prShaderSetUniform3f(currentShaderProgram, "directionalLights[0].direction", sun.direction[0], sun.direction[1], sun.direction[2]);
-        prShaderSetUniform3f(currentShaderProgram, "directionalLights[0].ambient", sun.ambient[0], sun.ambient[1], sun.ambient[2]);
-        prShaderSetUniform3f(currentShaderProgram, "directionalLights[0].diffuse", sun.diffuse[0], sun.diffuse[1], sun.diffuse[2]);
-        prShaderSetUniform3f(currentShaderProgram, "directionalLights[0].specular", sun.specular[0], sun.specular[1], sun.specular[2]);
+        prShaderSetUniform3f(currentShaderProgram, "directionalLights[0].direction", sun.direction.x, sun.direction.y, sun.direction.z);
+        prShaderSetUniform3f(currentShaderProgram, "directionalLights[0].ambient", sun.ambient.x, sun.ambient.y, sun.ambient.z);
+        prShaderSetUniform3f(currentShaderProgram, "directionalLights[0].diffuse", sun.diffuse.x, sun.diffuse.y, sun.diffuse.z);
+        prShaderSetUniform3f(currentShaderProgram, "directionalLights[0].specular", sun.specular.x, sun.specular.y, sun.specular.z);
         prTextureBindTexture(g_textureDepthSunShadowMap, sun.shadowMap);
         prShaderSetUniform1i(currentShaderProgram, "directionalLights[0].shadowMap", sun.shadowMap);
 
         prShaderSetUniform1f(currentShaderProgram, "pointLights[0].constant", point.constant);
         prShaderSetUniform1f(currentShaderProgram, "pointLights[0].linear", point.linear);
         prShaderSetUniform1f(currentShaderProgram, "pointLights[0].quadratic", point.quadratic);
-        prShaderSetUniform3f(currentShaderProgram, "pointLights[0].position", point.position[0], point.position[1], point.position[2]);
-        prShaderSetUniform3f(currentShaderProgram, "pointLights[0].ambient", point.ambient[0], point.ambient[1], point.ambient[2]);
-        prShaderSetUniform3f(currentShaderProgram, "pointLights[0].diffuse", point.diffuse[0], point.diffuse[1], point.diffuse[2]);
-        prShaderSetUniform3f(currentShaderProgram, "pointLights[0].specular", point.specular[0], point.specular[1], point.specular[2]);
+        prShaderSetUniform3f(currentShaderProgram, "pointLights[0].position", point.position.x, point.position.y, point.position.z);
+        prShaderSetUniform3f(currentShaderProgram, "pointLights[0].ambient", point.ambient.x, point.ambient.y, point.ambient.z);
+        prShaderSetUniform3f(currentShaderProgram, "pointLights[0].diffuse", point.diffuse.x, point.diffuse.y, point.diffuse.z);
+        prShaderSetUniform3f(currentShaderProgram, "pointLights[0].specular", point.specular.x, point.specular.y, point.specular.z);
         prCubeMapBindTexture(g_cubeMapDepthPointShadowMap, point.shadowMap);
         prShaderSetUniform1i(currentShaderProgram, "pointLights[0].shadowMap", point.shadowMap);
         prShaderSetUniform1f(currentShaderProgram, "pointLights[0].farPlane", point.farPlane);
 
-        prShaderSetUniform3f(currentShaderProgram, "cameraPosition", camera->position[0], camera->position[1], camera->position[2]);
-        prShaderSetUniformMatrix4fv(currentShaderProgram, "view", camera->view[0]);
-        prShaderSetUniformMatrix4fv(currentShaderProgram, "projection", camera->projection[0]);
-        prShaderSetUniformMatrix4fv(currentShaderProgram, "lightSpaceMatrix", lightSpaceMatrix[0]);
+        prShaderSetUniform3f(currentShaderProgram, "cameraPosition", camera->position.x, camera->position.y, camera->position.z);
+        prShaderSetUniformMatrix4fv(currentShaderProgram, "view", &camera->view.m00);
+        prShaderSetUniformMatrix4fv(currentShaderProgram, "projection", &camera->projection.m00);
+        prShaderSetUniformMatrix4fv(currentShaderProgram, "lightSpaceMatrix", &lightSpaceMatrix.m00);
 
         for(int i = 0; i < 3; i++) {
             switch(i) {
@@ -248,49 +224,40 @@ int main(int argc, char** argv) {
                     break;
             }
 
-            translationsToMatrix(translation, (vec3){0.0f, 0.0f, -30.0f}, VEC3_ZERO, (vec3){30.0f, 30.0f, 30.0f});
             g_materialContainer.bind(currentShaderProgram);
-            prShaderSetUniformMatrix4fv(currentShaderProgram, "translation", translation[0]);
+            prShaderSetUniformMatrix4fv(currentShaderProgram, "translation", &translationsToMatrix({0.0f, 0.0f, -30.0f}, {0.0f, 0.0f, 0.0f}, {30.0f, 30.0f, 30.0f}).m00);
             prMeshDrawIndices(g_meshCube);
 
-            translationsToMatrix(translation, (vec3){0.0f, -30.0f, 0.0f}, VEC3_ZERO, (vec3){30.0f, 30.0f, 30.0f});
             g_materialSteel.bind(currentShaderProgram);
-            prShaderSetUniformMatrix4fv(currentShaderProgram, "translation", translation[0]);
+            prShaderSetUniformMatrix4fv(currentShaderProgram, "translation", &translationsToMatrix({0.0f, -30.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, {30.0f, 30.0f, 30.0f}).m00);
             prMeshDrawIndices(g_meshCube);
 
-            translationsToMatrix(translation, (vec3){-30.0f, 0.0f, 0.0f}, VEC3_ZERO, (vec3){30.0f, 30.0f, 30.0f});
             g_materialBrickWall.bind(currentShaderProgram);
-            prShaderSetUniformMatrix4fv(currentShaderProgram, "translation", translation[0]);
+            prShaderSetUniformMatrix4fv(currentShaderProgram, "translation", &translationsToMatrix({-30.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, {30.0f, 30.0f, 30.0f}).m00);
             prMeshDrawIndices(g_meshCube);
 
-            translationsToMatrix(translation, (vec3){2.0f, 0.0f, 0.0f}, (vec3){0.0f, smoothSinOverTime, 0.0f}, VEC3_ONE);
             g_materialBlack.bind(currentShaderProgram);
-            prShaderSetUniformMatrix4fv(currentShaderProgram, "translation", translation[0]);
+            prShaderSetUniformMatrix4fv(currentShaderProgram, "translation", &translationsToMatrix({2.0f, 0.0f, 0.0f}, {0.0f, smoothSinOverTime, 0.0f}, {1.0f, 1.0f, 1.0f}).m00);
             prMeshDrawIndices(g_meshCube);
 
-            translationsToMatrix(translation, (vec3){-2.0f, 0.0f, 0.0f}, (vec3){0.0f, smoothSinOverTime, 0.0f}, VEC3_ONE);
             g_materialMetalRimmedContainer.bind(currentShaderProgram);
-            prShaderSetUniformMatrix4fv(currentShaderProgram, "translation", translation[0]);
+            prShaderSetUniformMatrix4fv(currentShaderProgram, "translation", &translationsToMatrix({-2.0f, 0.0f, 0.0f}, {0.0f, smoothSinOverTime, 0.0f}, {1.0f, 1.0f, 1.0f}).m00);
             prMeshDrawIndices(g_meshCube);
 
-            translationsToMatrix(translation, (vec3){0.0f, 2.0f, 0.0f}, (vec3){0.0f, smoothOverTime, 0.0f}, VEC3_ONE);
             g_materialBrickWall.bind(currentShaderProgram);
-            prShaderSetUniformMatrix4fv(currentShaderProgram, "translation", translation[0]);
+            prShaderSetUniformMatrix4fv(currentShaderProgram, "translation", &translationsToMatrix({0.0f, 2.0f, 0.0f}, {0.0f, smoothSinOverTime, 0.0f}, {1.0f, 1.0f, 1.0f}).m00);
             prMeshDrawIndices(g_meshCube);
 
-            translationsToMatrix(translation, (vec3){0.0f, -2.0f, 0.0f}, (vec3){0.0f, glm_rad(smoothOverTime * 100.0f), 0.0f}, VEC3_ONE);
             g_materialWhite.bind(currentShaderProgram);
-            prShaderSetUniformMatrix4fv(currentShaderProgram, "translation", translation[0]);
+            prShaderSetUniformMatrix4fv(currentShaderProgram, "translation", &translationsToMatrix({0.0f, -2.0f, 0.0f}, {0.0f, glm_rad(smoothSinOverTime * 100.0f), 0.0f}, {1.0f, 1.0f, 1.0f}).m00);
             prMeshDrawIndices(g_meshCube);
 
-            translationsToMatrix(translation, (vec3){0.0f, 0.0f, 2.0f}, (vec3){0.0f, glm_rad(smoothOverTime * 100.0f), 0.0f}, VEC3_ONE);
             g_materialSteel.bind(currentShaderProgram);
-            prShaderSetUniformMatrix4fv(currentShaderProgram, "translation", translation[0]);
+            prShaderSetUniformMatrix4fv(currentShaderProgram, "translation", &translationsToMatrix({0.0f, 0.0f, 2.0f}, {0.0f, glm_rad(smoothSinOverTime * 100.0f), 0.0f}, {1.0f, 1.0f, 1.0f}).m00);
             prMeshDrawIndices(g_meshCube);
 
-            translationsToMatrix(translation, (vec3){0.0f, 0.0f, -2.0f}, (vec3){0.0f, glm_rad(smoothSinOverTime * 100.0f), 0.0f}, VEC3_ONE);
             g_materialSteel.bind(currentShaderProgram);
-            prShaderSetUniformMatrix4fv(currentShaderProgram, "translation", translation[0]);
+            prShaderSetUniformMatrix4fv(currentShaderProgram, "translation", &translationsToMatrix({0.0f, 0.0f, -2.0f}, {0.0f, glm_rad(smoothSinOverTime * 100.0f), 0.0f}, {1.0f, 1.0f, 1.0f}).m00);
             prMeshDrawIndices(g_meshCube);
         }
 
@@ -316,10 +283,9 @@ int main(int argc, char** argv) {
                 break;
         }
 
-        translationsToMatrix(translation, camera->position, VEC3_ZERO, VEC3_ONE);
-        prShaderSetUniformMatrix4fv(g_shaderSkybox, "translation", translation[0]);
-        prShaderSetUniformMatrix4fv(g_shaderSkybox, "view", camera->view[0]);
-        prShaderSetUniformMatrix4fv(g_shaderSkybox, "projection", camera->projection[0]);
+        prShaderSetUniformMatrix4fv(g_shaderSkybox, "translation", &translationsToMatrix(camera->position, {0.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f}).m00);
+        prShaderSetUniformMatrix4fv(g_shaderSkybox, "view", &camera->view.m00);
+        prShaderSetUniformMatrix4fv(g_shaderSkybox, "projection", &camera->projection.m00);
         g_window->openglContext->DepthFunc(GL_LEQUAL);
         prShaderBind(g_shaderSkybox);
         prMeshDrawIndices(g_meshCube);

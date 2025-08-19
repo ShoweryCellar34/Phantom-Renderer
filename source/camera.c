@@ -7,7 +7,7 @@
 prCamera* prCameraCreate() {
     prCamera* camera = prCalloc(1, sizeof(prCamera));
 
-    glm_vec3_copy((vec3){0.0f, 1.0f, 0.0f}, camera->up);
+    camera->up = (vec3s){0.0f, 1.0f, 0.0f};
 
     return camera;
 }
@@ -23,10 +23,8 @@ void prCameraLinkContext(prCamera* camera, GladGLContext* context) {
     }
 }
 
-void prCameraUpdate(prCamera* camera, vec3 position, vec3 rotation, float FOV, float closePlane, float farPlane) {
-    glm_vec3_copy(position, camera->position);
-
-    vec3 temp = {0.0f, 0.0f, 0.0f};
+void prCameraUpdate(prCamera* camera, vec3s position, vec3s rotation, float FOV, float closePlane, float farPlane) {
+    camera->position = position;
 
     // float roll = (rotation[2] * M_PI) / 180.0;
 
@@ -35,17 +33,17 @@ void prCameraUpdate(prCamera* camera, vec3 position, vec3 rotation, float FOV, f
     // glm_rotate(rollMatrix, roll, camera->front);
     // glm_mat4_mulv3(rollMatrix, camera->up, 0.0f, camera->up);
 
-    camera->front[0] = cos(rotation[0]) * cos(rotation[1]);
-    camera->front[1] = sin(rotation[1]);
-    camera->front[2] = sin(rotation[0]) * cos(rotation[1]);
+    camera->front.x = cos(rotation.x) * cos(rotation.y);
+    camera->front.y = sin(rotation.y);
+    camera->front.z = sin(rotation.x) * cos(rotation.y);
 
-    glm_normalize(camera->front);
-    glm_vec3_add(position, camera->front, temp);
+    glms_normalize(camera->front);
+    vec3s temp = glms_vec3_add(position, camera->front);
 
-    glm_mat4_identity(camera->view);
-    glm_lookat(position, temp, camera->up, camera->view);
+    camera->view = glms_mat4_identity();
+    camera->view = glms_lookat(position, temp, camera->up);
 
-    glm_perspective(FOV, (float)camera->viewportWidth/(float)camera->viewportHeight, closePlane, farPlane, camera->projection);
+    camera->projection = glms_perspective(FOV, (float)camera->viewportWidth / (float)camera->viewportHeight, closePlane, farPlane);
 }
 
 void prCameraUpdateDimentions(prCamera* camera) {

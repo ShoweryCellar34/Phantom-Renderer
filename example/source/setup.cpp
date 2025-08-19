@@ -60,6 +60,8 @@ void setupWindow() {
         g_window->openglContext->DebugMessageCallback(openglDebugOutput, NULL);
         g_window->openglContext->DebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
 
+        glfwSetWindowUserPointer(g_window->window, g_window->openglContext);
+
         g_windowInit = true;
     } else {
         prLogEvent(PR_EVENT_USER, PR_LOG_ERROR, "setupWindow: Window already initialized. Aborting operation, nothing was modified");

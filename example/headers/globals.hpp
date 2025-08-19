@@ -66,9 +66,6 @@ inline GLfloat (*TEMP_RGBA_6(GLfloat r1, GLfloat g1, GLfloat b1, GLfloat a1,
     return tempRGBA;
 }
 
-vec3 VEC3_ZERO = {0.0f, 0.0f, 0.0f};
-vec3 VEC3_ONE = {1.0f, 1.0f, 1.0f};
-
 // Global Constants
 #define TITLE "Phantom-Renderer Example"
 #define DEFAULT_WINDOW_WIDTH 1280
@@ -184,7 +181,7 @@ extern bool showPostProcessing;
 extern bool useDebugShader;
 
 extern prCamera* camera;
-extern vec3 cameraPosition;
+extern vec3s cameraPosition;
 
 extern float deltaTime;
 extern float lastFrame;

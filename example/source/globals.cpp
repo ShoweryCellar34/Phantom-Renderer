@@ -108,7 +108,7 @@ bool showPostProcessing = true;
 bool useDebugShader = false;
 
 prCamera* camera = nullptr;
-extern vec3 cameraPosition = {35.0f, 35.0f, 35.0f};
+vec3s cameraPosition = {35.0f, 35.0f, 35.0f};
 
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;

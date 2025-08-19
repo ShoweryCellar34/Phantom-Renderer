@@ -2,7 +2,7 @@
 
 # What is Phantom Renderer?
 
-Phantom Renderer basic OpenGL based renderer using GLFW written in C, It is designed in a way that you are expected to manage the window (some heelper functions provided) because this being purely a renderer it only needs a glad opengl context so using SDL as a GLFW replacement would be simple.
+Phantom Renderer basic OpenGL based renderer using GLFW written in C, It is designed in a way that you are expected to manage the window (some heelper functions provided) because this being purely a renderer it only needs a glad opengl context so using SDL as a GLFW replacement would be simple (mayby, I have never tried it).
 
 ## Platform support
 
