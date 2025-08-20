@@ -13,7 +13,6 @@ in GEOMETRY_OUT {
 } geometryOut;
 
 struct Material {
-    sampler2D ambient;
     sampler2D diffuse;
     sampler2D specular;
     sampler2D normal;
@@ -102,7 +101,7 @@ float pointShadowCalculation(pointLight light, vec3 fragmentPosition, float bias
     return shadow;
 }
 
-vec3 calculateDirectionalLight(directionalLight light, vec3 viewDirection, vec3 ambient, vec3 diffuse, vec3 specular, vec3 normal, float shadow) {
+vec3 calculateDirectionalLight(directionalLight light, vec3 viewDirection, vec3 diffuse, vec3 specular, vec3 normal, float shadow) {
     vec3 lightDir = normalize(-light.direction);
 
     float difference = max(dot(normal, lightDir), 0.0);
@@ -110,14 +109,14 @@ vec3 calculateDirectionalLight(directionalLight light, vec3 viewDirection, vec3 
     vec3 halfwayDirection = normalize(lightDir + viewDirection);
     float spec = pow(max(dot(normal, halfwayDirection), 0.0), material.shininess);
 
-    vec3 ambientOutput  = light.ambient * ambient;
+    vec3 ambientOutput  = light.ambient * diffuse;
     vec3 diffuseOutput  = light.diffuse * difference * diffuse * (1.0 - shadow);
     vec3 specularOutput = light.specular * spec * specular * (1.0 - shadow);
 
     return ambientOutput + diffuseOutput + specularOutput;
 }
 
-vec3 calculatePointLight(pointLight light, vec3 viewDirection, vec3 fragmentPosition, vec3 ambient, vec3 diffuse, vec3 specular, vec3 normal, float shadow) {
+vec3 calculatePointLight(pointLight light, vec3 viewDirection, vec3 fragmentPosition, vec3 diffuse, vec3 specular, vec3 normal, float shadow) {
     vec3 lightDir = normalize(light.position - fragmentPosition);
 
     float difference = max(dot(normal, lightDir), 0.0);
@@ -129,7 +128,7 @@ vec3 calculatePointLight(pointLight light, vec3 viewDirection, vec3 fragmentPosi
     float attenuation = 1.0 / (light.constant + light.linear * distance + 
                 light.quadratic * (distance * distance));    
 
-    vec3 ambientOutput = light.ambient * ambient;
+    vec3 ambientOutput = light.ambient * diffuse;
     vec3 diffuseOutput = light.diffuse * difference * diffuse * (1.0 - shadow);
     vec3 specularOutput = light.specular * spec * specular * (1.0 - shadow);
     ambientOutput *= attenuation;
@@ -139,7 +138,7 @@ vec3 calculatePointLight(pointLight light, vec3 viewDirection, vec3 fragmentPosi
     return ambientOutput + diffuseOutput + specularOutput;
 }
 
-vec3 calculateShadedResult(vec3 ambient, vec3 diffuse, vec3 specular, vec3 normal) {
+vec3 calculateShadedResult(vec3 diffuse, vec3 specular, vec3 normal) {
     vec3 viewDirection = normalize(cameraPosition - geometryOut.fragmentPosition);
 
     vec3 result = vec3(0.0, 0.0, 0.0);
@@ -147,27 +146,26 @@ vec3 calculateShadedResult(vec3 ambient, vec3 diffuse, vec3 specular, vec3 norma
     for(int i = 0; i < NR_DIRECTIONAL_LIGHTS; i++) {
         float bias = max(0.01 * (1.0 - dot(normal, normalize(-directionalLights[i].direction))), 0.005);
         float shadow = directonalShadowCalculation(directionalLights[i], geometryOut.fragmentPositionLightSpace, bias);
-        result += calculateDirectionalLight(directionalLights[i], viewDirection, ambient, diffuse, specular, normal, shadow);
+        result += calculateDirectionalLight(directionalLights[i], viewDirection, diffuse, specular, normal, shadow);
     }
 
     for(int i = 0; i < NR_POINT_LIGHTS; i++) {
         float bias = 0.005;
         float shadow = pointShadowCalculation(pointLights[i], geometryOut.fragmentPosition, bias);
-        result += calculatePointLight(pointLights[i], viewDirection, geometryOut.fragmentPosition, ambient, diffuse, specular, normal, shadow);
+        result += calculatePointLight(pointLights[i], viewDirection, geometryOut.fragmentPosition, diffuse, specular, normal, shadow);
     }
 
     return result;
 }
 
 void main() {
-    vec3 ambient = texture(material.ambient, geometryOut.textureCoordinates).rgb;
     vec3 diffuse = texture(material.diffuse, geometryOut.textureCoordinates).rgb;
     vec3 specular = texture(material.specular, geometryOut.textureCoordinates).rgb;
     vec3 normal = texture(material.normal, geometryOut.textureCoordinates).rgb;
     normal = normal * 2.0 - 1.0;
     normal = normalize(geometryOut.TBN * normal);
 
-    vec3 result = calculateShadedResult(ambient, diffuse, specular, normal);
+    vec3 result = calculateShadedResult(diffuse, specular, normal);
     float brightness = dot(result.rgb, vec3(0.2126, 0.7152, 0.0722));
     if(brightness > 1.0) {
         brightColor = vec4(result.rgb, 1.0);

@@ -5,6 +5,7 @@
 #include <PR/PR.h>
 #include <materials.hpp>
 
+#define TO_USR(x) (g_userDataPath / x).u8string().c_str()
 #define TO_RES(x) (g_resourcesPath / x).u8string().c_str()
 
 inline GLfloat* TEMP_RGBA(GLfloat r, GLfloat g, GLfloat b, GLfloat a) {

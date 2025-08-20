@@ -31,7 +31,14 @@ void prCubeMapLinkContext(prCubeMapData* cubeMap, GladGLContext* context) {
         i_prCubeMapDestroyOnGPU(cubeMap);
     }
     cubeMap->context = context;
-    if(cubeMap->context && (cubeMap->textureData[0] || cubeMap->textureData[1] || cubeMap->textureData[2] || cubeMap->textureData[3] || cubeMap->textureData[4] || cubeMap->textureData[5])) {
+    bool createOnGPU = false;
+    for(int i = 0; i < PR_CUBE_MAP_SIDES; i++) {
+        if(cubeMap->textureData[i] || (cubeMap->width[i] && cubeMap->height[i])) {
+            createOnGPU = true;
+            break;
+        }
+    }
+    if(cubeMap->context && createOnGPU) {
         i_prCubeMapCreateOnGPU(cubeMap);
     }
 }

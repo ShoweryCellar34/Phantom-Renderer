@@ -43,7 +43,7 @@ void i_prShaderCreateOnGPU(prShaderData* shaderProgram) {
     if(!success) {
         context->GetShaderInfoLog(vertexShader, PR_MAXSTR_LEN, NULL, infoLog);
         context->DeleteShader(vertexShader);
-        prLogEvent(PR_EVENT_OPENGL, PR_LOG_WARNING, "i_prShaderCreateOnGPU: Vertex shader failed to compile. Aborting operation, nothing was modified:\n%s", infoLog);
+        prLogEvent(PR_EVENT_OPENGL, PR_LOG_ERROR, "i_prShaderCreateOnGPU: Vertex shader failed to compile. Aborting operation, nothing was modified:\n%s", infoLog);
         return;
     }
 
@@ -56,7 +56,7 @@ void i_prShaderCreateOnGPU(prShaderData* shaderProgram) {
         context->GetShaderInfoLog(fragmentShader, PR_MAXSTR_LEN, NULL, infoLog);
         context->DeleteShader(vertexShader);
         context->DeleteShader(fragmentShader);
-        prLogEvent(PR_EVENT_OPENGL, PR_LOG_WARNING, "i_prShaderCreateOnGPU: Fragment shader failed to compile. Aborting operation, nothing was modified: %s", infoLog);
+        prLogEvent(PR_EVENT_OPENGL, PR_LOG_ERROR, "i_prShaderCreateOnGPU: Fragment shader failed to compile. Aborting operation, nothing was modified: %s", infoLog);
         return;
     }
 
@@ -72,7 +72,7 @@ void i_prShaderCreateOnGPU(prShaderData* shaderProgram) {
             context->DeleteShader(vertexShader);
             context->DeleteShader(fragmentShader);
             context->DeleteShader(geometryShader);
-            prLogEvent(PR_EVENT_OPENGL, PR_LOG_WARNING, "i_prShaderCreateOnGPU: Geometry shader failed to compile. Aborting operation, nothing was modified: %s", infoLog);
+            prLogEvent(PR_EVENT_OPENGL, PR_LOG_ERROR, "i_prShaderCreateOnGPU: Geometry shader failed to compile. Aborting operation, nothing was modified: %s", infoLog);
             return;
         }
     }
@@ -91,7 +91,7 @@ void i_prShaderCreateOnGPU(prShaderData* shaderProgram) {
         context->DeleteShader(vertexShader);
         context->DeleteShader(fragmentShader);
         context->DeleteProgram(shaderProgram->shaderProgramObject);
-        prLogEvent(PR_EVENT_OPENGL, PR_LOG_WARNING, "i_prShaderCreateOnGPU: Shader program failed to link. Aborting operation, nothing was modified: %s", infoLog);
+        prLogEvent(PR_EVENT_OPENGL, PR_LOG_ERROR, "i_prShaderCreateOnGPU: Shader program failed to link. Aborting operation, nothing was modified: %s", infoLog);
         return;
     }
 

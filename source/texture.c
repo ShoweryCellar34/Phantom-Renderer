@@ -31,7 +31,7 @@ void prTextureLinkContext(prTextureData* texture, GladGLContext* context) {
         i_prTextureDestroyOnGPU(texture);
     }
     texture->context = context;
-    if(texture->context && texture->textureData) {
+    if(texture->context && (texture->textureData || (texture->width && texture->height))) {
         i_prTextureCreateOnGPU(texture);
     }
 }

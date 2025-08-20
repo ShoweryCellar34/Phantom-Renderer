@@ -26,7 +26,7 @@ void i_prComputeShaderCreateOnGPU(prComputeShaderData* computeShaderProgram) {
     if(!success) {
         context->GetShaderInfoLog(computeShader, PR_MAXSTR_LEN, NULL, infoLog);
         context->DeleteShader(computeShader);
-        prLogEvent(PR_EVENT_OPENGL, PR_LOG_WARNING, "i_prComputeShaderCreateOnGPU: Compute shader failed to compile. Aborting operation, nothing was modified:\n%s", infoLog);
+        prLogEvent(PR_EVENT_OPENGL, PR_LOG_ERROR, "i_prComputeShaderCreateOnGPU: Compute shader failed to compile. Aborting operation, nothing was modified:\n%s", infoLog);
         return;
     }
 
@@ -39,7 +39,7 @@ void i_prComputeShaderCreateOnGPU(prComputeShaderData* computeShaderProgram) {
         context->GetProgramInfoLog(computeShaderProgram->computeShaderProgramObject, PR_MAXSTR_LEN, NULL, infoLog);
         context->DeleteShader(computeShader);
         context->DeleteProgram(computeShaderProgram->computeShaderProgramObject);
-        prLogEvent(PR_EVENT_OPENGL, PR_LOG_WARNING, "i_prComputeShaderCreateOnGPU: Compute shader program failed to link. Aborting operation, nothing was modified: %s", infoLog);
+        prLogEvent(PR_EVENT_OPENGL, PR_LOG_ERROR, "i_prComputeShaderCreateOnGPU: Compute shader program failed to link. Aborting operation, nothing was modified: %s", infoLog);
         return;
     }
 

@@ -54,7 +54,7 @@ void proccessInput(GLFWwindow* window) {
 
 int main(int argc, char** argv) {
     setupPaths();
-    setLogFilePath(g_userDataPath / "prLog.txt");
+    setLogFilePath(TO_USR("prLog.txt"));
     setupLog();
 
     setupWindow();
@@ -114,7 +114,7 @@ int main(int argc, char** argv) {
     mat4s lightProjection = glms_ortho(-50.0f, 50.0f, -50.0f, 50.0f, 0.1f, 100.0f);
     mat4s lightView = glms_lookat({40.0f, 40.0f, 40.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f});
     mat4s lightSpaceMatrix = glms_mat4_mul(lightProjection, lightView);
-    prShaderSetUniformMatrix4fv(g_shaderDirectionalLight, "lightSpaceMatrix", &lightSpaceMatrix.m00);
+    prShaderSetUniformMatrix4fv(g_shaderDirectionalLight, "lightSpaceMatrix", &lightSpaceMatrix.raw[0][0]);
 
     float aspect = (float)1024 / (float)1024;
     float farPlane = 100.0f;
@@ -135,12 +135,12 @@ int main(int argc, char** argv) {
         glms_mat4_mul(light2Projection, light2View[4]),
         glms_mat4_mul(light2Projection, light2View[5])
     };
-    prShaderSetUniformMatrix4fv(g_shaderPointLight, "lightSpaceMatrices[0]", &light2SpaceMatrix[0].m00);
-    prShaderSetUniformMatrix4fv(g_shaderPointLight, "lightSpaceMatrices[1]", &light2SpaceMatrix[1].m00);
-    prShaderSetUniformMatrix4fv(g_shaderPointLight, "lightSpaceMatrices[2]", &light2SpaceMatrix[2].m00);
-    prShaderSetUniformMatrix4fv(g_shaderPointLight, "lightSpaceMatrices[3]", &light2SpaceMatrix[3].m00);
-    prShaderSetUniformMatrix4fv(g_shaderPointLight, "lightSpaceMatrices[4]", &light2SpaceMatrix[4].m00);
-    prShaderSetUniformMatrix4fv(g_shaderPointLight, "lightSpaceMatrices[5]", &light2SpaceMatrix[5].m00);
+    prShaderSetUniformMatrix4fv(g_shaderPointLight, "lightSpaceMatrices[0]", &light2SpaceMatrix[0].raw[0][0]);
+    prShaderSetUniformMatrix4fv(g_shaderPointLight, "lightSpaceMatrices[1]", &light2SpaceMatrix[1].raw[0][0]);
+    prShaderSetUniformMatrix4fv(g_shaderPointLight, "lightSpaceMatrices[2]", &light2SpaceMatrix[2].raw[0][0]);
+    prShaderSetUniformMatrix4fv(g_shaderPointLight, "lightSpaceMatrices[3]", &light2SpaceMatrix[3].raw[0][0]);
+    prShaderSetUniformMatrix4fv(g_shaderPointLight, "lightSpaceMatrices[4]", &light2SpaceMatrix[4].raw[0][0]);
+    prShaderSetUniformMatrix4fv(g_shaderPointLight, "lightSpaceMatrices[5]", &light2SpaceMatrix[5].raw[0][0]);
     prShaderSetUniform3f(g_shaderPointLight, "lightPosition", point.position.x, point.position.y, point.position.z);
     prShaderSetUniform1f(g_shaderPointLight, "farPlane", farPlane);
 
@@ -199,9 +199,9 @@ int main(int argc, char** argv) {
         prShaderSetUniform1f(currentShaderProgram, "pointLights[0].farPlane", point.farPlane);
 
         prShaderSetUniform3f(currentShaderProgram, "cameraPosition", camera->position.x, camera->position.y, camera->position.z);
-        prShaderSetUniformMatrix4fv(currentShaderProgram, "view", &camera->view.m00);
-        prShaderSetUniformMatrix4fv(currentShaderProgram, "projection", &camera->projection.m00);
-        prShaderSetUniformMatrix4fv(currentShaderProgram, "lightSpaceMatrix", &lightSpaceMatrix.m00);
+        prShaderSetUniformMatrix4fv(currentShaderProgram, "view", &camera->view.raw[0][0]);
+        prShaderSetUniformMatrix4fv(currentShaderProgram, "projection", &camera->projection.raw[0][0]);
+        prShaderSetUniformMatrix4fv(currentShaderProgram, "lightSpaceMatrix", &lightSpaceMatrix.raw[0][0]);
 
         for(int i = 0; i < 3; i++) {
             switch(i) {
@@ -225,39 +225,39 @@ int main(int argc, char** argv) {
             }
 
             g_materialContainer.bind(currentShaderProgram);
-            prShaderSetUniformMatrix4fv(currentShaderProgram, "translation", &translationsToMatrix({0.0f, 0.0f, -30.0f}, {0.0f, 0.0f, 0.0f}, {30.0f, 30.0f, 30.0f}).m00);
+            prShaderSetUniformMatrix4fv(currentShaderProgram, "translation", &translationsToMatrix({0.0f, 0.0f, -30.0f}, {0.0f, 0.0f, 0.0f}, {30.0f, 30.0f, 30.0f}).raw[0][0]);
             prMeshDrawIndices(g_meshCube);
 
             g_materialSteel.bind(currentShaderProgram);
-            prShaderSetUniformMatrix4fv(currentShaderProgram, "translation", &translationsToMatrix({0.0f, -30.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, {30.0f, 30.0f, 30.0f}).m00);
+            prShaderSetUniformMatrix4fv(currentShaderProgram, "translation", &translationsToMatrix({0.0f, -30.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, {30.0f, 30.0f, 30.0f}).raw[0][0]);
             prMeshDrawIndices(g_meshCube);
 
             g_materialBrickWall.bind(currentShaderProgram);
-            prShaderSetUniformMatrix4fv(currentShaderProgram, "translation", &translationsToMatrix({-30.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, {30.0f, 30.0f, 30.0f}).m00);
+            prShaderSetUniformMatrix4fv(currentShaderProgram, "translation", &translationsToMatrix({-30.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, {30.0f, 30.0f, 30.0f}).raw[0][0]);
             prMeshDrawIndices(g_meshCube);
 
             g_materialBlack.bind(currentShaderProgram);
-            prShaderSetUniformMatrix4fv(currentShaderProgram, "translation", &translationsToMatrix({2.0f, 0.0f, 0.0f}, {0.0f, smoothSinOverTime, 0.0f}, {1.0f, 1.0f, 1.0f}).m00);
+            prShaderSetUniformMatrix4fv(currentShaderProgram, "translation", &translationsToMatrix({2.0f, 0.0f, 0.0f}, {0.0f, smoothSinOverTime, 0.0f}, {1.0f, 1.0f, 1.0f}).raw[0][0]);
             prMeshDrawIndices(g_meshCube);
 
             g_materialMetalRimmedContainer.bind(currentShaderProgram);
-            prShaderSetUniformMatrix4fv(currentShaderProgram, "translation", &translationsToMatrix({-2.0f, 0.0f, 0.0f}, {0.0f, smoothSinOverTime, 0.0f}, {1.0f, 1.0f, 1.0f}).m00);
+            prShaderSetUniformMatrix4fv(currentShaderProgram, "translation", &translationsToMatrix({-2.0f, 0.0f, 0.0f}, {0.0f, smoothSinOverTime, 0.0f}, {1.0f, 1.0f, 1.0f}).raw[0][0]);
             prMeshDrawIndices(g_meshCube);
 
             g_materialBrickWall.bind(currentShaderProgram);
-            prShaderSetUniformMatrix4fv(currentShaderProgram, "translation", &translationsToMatrix({0.0f, 2.0f, 0.0f}, {0.0f, smoothSinOverTime, 0.0f}, {1.0f, 1.0f, 1.0f}).m00);
+            prShaderSetUniformMatrix4fv(currentShaderProgram, "translation", &translationsToMatrix({0.0f, 2.0f, 0.0f}, {0.0f, smoothSinOverTime, 0.0f}, {1.0f, 1.0f, 1.0f}).raw[0][0]);
             prMeshDrawIndices(g_meshCube);
 
             g_materialWhite.bind(currentShaderProgram);
-            prShaderSetUniformMatrix4fv(currentShaderProgram, "translation", &translationsToMatrix({0.0f, -2.0f, 0.0f}, {0.0f, glm_rad(smoothSinOverTime * 100.0f), 0.0f}, {1.0f, 1.0f, 1.0f}).m00);
+            prShaderSetUniformMatrix4fv(currentShaderProgram, "translation", &translationsToMatrix({0.0f, -2.0f, 0.0f}, {0.0f, glm_rad(smoothSinOverTime * 100.0f), 0.0f}, {1.0f, 1.0f, 1.0f}).raw[0][0]);
             prMeshDrawIndices(g_meshCube);
 
             g_materialSteel.bind(currentShaderProgram);
-            prShaderSetUniformMatrix4fv(currentShaderProgram, "translation", &translationsToMatrix({0.0f, 0.0f, 2.0f}, {0.0f, glm_rad(smoothSinOverTime * 100.0f), 0.0f}, {1.0f, 1.0f, 1.0f}).m00);
+            prShaderSetUniformMatrix4fv(currentShaderProgram, "translation", &translationsToMatrix({0.0f, 0.0f, 2.0f}, {0.0f, glm_rad(smoothSinOverTime * 100.0f), 0.0f}, {1.0f, 1.0f, 1.0f}).raw[0][0]);
             prMeshDrawIndices(g_meshCube);
 
             g_materialSteel.bind(currentShaderProgram);
-            prShaderSetUniformMatrix4fv(currentShaderProgram, "translation", &translationsToMatrix({0.0f, 0.0f, -2.0f}, {0.0f, glm_rad(smoothSinOverTime * 100.0f), 0.0f}, {1.0f, 1.0f, 1.0f}).m00);
+            prShaderSetUniformMatrix4fv(currentShaderProgram, "translation", &translationsToMatrix({0.0f, 0.0f, -2.0f}, {0.0f, glm_rad(smoothSinOverTime * 100.0f), 0.0f}, {1.0f, 1.0f, 1.0f}).raw[0][0]);
             prMeshDrawIndices(g_meshCube);
         }
 
@@ -283,9 +283,10 @@ int main(int argc, char** argv) {
                 break;
         }
 
-        prShaderSetUniformMatrix4fv(g_shaderSkybox, "translation", &translationsToMatrix(camera->position, {0.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f}).m00);
-        prShaderSetUniformMatrix4fv(g_shaderSkybox, "view", &camera->view.m00);
-        prShaderSetUniformMatrix4fv(g_shaderSkybox, "projection", &camera->projection.m00);
+        prShaderSetUniformMatrix4fv(g_shaderSkybox, "translation", &translationsToMatrix(camera->position, {0.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f}).raw[0][0]);
+        prShaderSetUniformMatrix4fv(g_shaderSkybox, "view", &camera->view.raw[0][0]);
+        prShaderSetUniformMatrix4fv(g_shaderSkybox, "projection", &camera->projection.raw[0][0]);
+        prShaderSetUniform1i(g_shaderSkybox, "skybox", 0);
         g_window->openglContext->DepthFunc(GL_LEQUAL);
         prShaderBind(g_shaderSkybox);
         prMeshDrawIndices(g_meshCube);

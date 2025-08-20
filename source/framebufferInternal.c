@@ -37,6 +37,10 @@ void i_prFramebufferSetDataOnGPU(prFramebufferData* framebuffer) {
     i_prFramebufferSetAttachment(framebuffer, framebuffer->depthAttachment, framebuffer->depthAttachmentType, GL_DEPTH_ATTACHMENT);
     i_prFramebufferSetAttachment(framebuffer, framebuffer->stencilAttachment, framebuffer->stencilAttachmentType, GL_STENCIL_ATTACHMENT);
     i_prFramebufferSetAttachment(framebuffer, framebuffer->depthStencilAttachment, framebuffer->depthStencilAttachmentType, GL_DEPTH_STENCIL_ATTACHMENT);
+
+    framebuffer->context->NamedFramebufferDrawBuffer(framebuffer->FBO, framebuffer->drawBuffer);
+    framebuffer->context->NamedFramebufferDrawBuffers(framebuffer->FBO, framebuffer->drawBuffersCount, framebuffer->drawBuffers);
+    framebuffer->context->NamedFramebufferReadBuffer(framebuffer->FBO, framebuffer->readBuffer);
 }
 
 void i_prFramebufferSetAttachment(prFramebufferData* framebuffer, void* attachment, unsigned int type, GLenum attachmentPoint) {

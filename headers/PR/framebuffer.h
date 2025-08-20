@@ -20,6 +20,10 @@ typedef struct prFramebufferData {
     int depthAttachmentType;
     int stencilAttachmentType;
     int depthStencilAttachmentType;
+    GLenum drawBuffer;
+    GLenum* drawBuffers;
+    GLsizei drawBuffersCount;
+    GLenum readBuffer;
 } prFramebufferData;
 
 prFramebufferData* prFramebufferCreate();

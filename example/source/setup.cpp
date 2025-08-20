@@ -350,7 +350,7 @@ void setupTextures() {
         g_textureWhite = makeTextureSingleColor(g_window->openglContext, TEMP_RGBA(1.0f, 1.0f, 1.0f, 1.0f));
         g_textureNormalDefault = makeTextureSingleColor(g_window->openglContext, TEMP_RGBA(0.0f, 0.0f, 1.0f, 1.0f));
 
-        g_textureHUD = loadTexture(g_window->openglContext, PR_FILTER_NEAREST_MIPMAP_NEAREST, PR_FILTER_LINEAR, TO_RES("res/textures/HUD.png"));
+        g_textureHUD = loadTexture(g_window->openglContext, PR_FILTER_NEAREST_MIPMAP_NEAREST, PR_FILTER_NEAREST, TO_RES("res/textures/HUD.png"));
 
         g_textureContainer = loadTexture(g_window->openglContext, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, TO_RES("res/textures/container.jpg"));
         g_textureMetalRimmedContainer = loadTexture(g_window->openglContext, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, TO_RES("res/textures/container2.png"));

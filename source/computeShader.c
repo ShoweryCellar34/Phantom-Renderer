@@ -57,6 +57,11 @@ void prComputeShaderUpdate(prComputeShaderData* computeShaderProgram, const GLch
 }
 
 void prComputeShaderDispatch(prComputeShaderData* computeShaderProgram, unsigned int depth, unsigned int height, unsigned int width) {
+    if(!computeShaderProgram->context) {
+        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prComputeShaderDispatch: ");
+        return;
+    }
+
     computeShaderProgram->context->UseProgram(computeShaderProgram->computeShaderProgramObject);
     computeShaderProgram->context->DispatchCompute(depth, height, width);
 }

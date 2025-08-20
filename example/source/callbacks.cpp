@@ -102,8 +102,8 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
         snprintf(name, 32, "%i.png", timestamp);
 
         stbi_flip_vertically_on_write(1);
-        stbi_write_png(name, width, height, 4, pixels, width * 4);
-        prLogEvent(PR_EVENT_USER, PR_LOG_INFO, "Save screenshot with dimentions %ix%i and name: %s", width, height, name);
+        stbi_write_png(TO_USR("screenshots" / name), width, height, 4, pixels, width * 4);
+        prLogEvent(PR_EVENT_USER, PR_LOG_INFO, "Save screenshot with dimentions %ix%i to path: %s", width, height, TO_USR("screenshots" / name));
 
         prFree(pixels);
     }

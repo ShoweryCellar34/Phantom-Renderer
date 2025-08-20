@@ -101,7 +101,7 @@ prMeshData* g_meshQuad = nullptr;
 float pitch = 0.0f;
 float yaw = 0.0f;
 
-int currentSkybox = 0;
+int currentSkybox = 1;
 bool showHUD = true;
 bool showPostProcessing = true;
 

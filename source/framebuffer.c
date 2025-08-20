@@ -12,12 +12,22 @@
 prFramebufferData* prFramebufferCreate() {
     prFramebufferData* framebuffer = prCalloc(1, sizeof(prFramebufferData));
 
+    framebuffer->drawBuffer = PR_COLOR_ATTACHMENT_0;
+    framebuffer->drawBuffers = prMalloc(1 * sizeof(GLenum));
+    framebuffer->drawBuffers[0] = PR_COLOR_ATTACHMENT_0;
+    framebuffer->drawBuffersCount = 1;
+    framebuffer->readBuffer = PR_COLOR_ATTACHMENT_0;
+
     return framebuffer;
 }
 
 void prFramebufferDestroy(prFramebufferData* framebuffer) {
     if(framebuffer->FBO) {
         i_prFramebufferDestroyOnGPU(framebuffer);
+    }
+
+    if(framebuffer->drawBuffers) {
+        prFree(framebuffer->drawBuffers);
     }
 
     prFree(framebuffer);
@@ -75,7 +85,7 @@ GLenum prFramebufferCheckStatus(prFramebufferData* framebuffer) {
 }
 
 void prFramebufferLinkColorTexture(prFramebufferData* framebuffer, prTextureData* colorTexture, unsigned int attachmentPoint) {
-    if(colorTexture && framebuffer->context != colorTexture->context) {
+    if(colorTexture && framebuffer->context && framebuffer->context != colorTexture->context) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferLinkColorTexture: Texture context does not match framebuffer context. Aborting operation, nothing was modified");
         return;
     }
@@ -95,7 +105,7 @@ void prFramebufferLinkColorTexture(prFramebufferData* framebuffer, prTextureData
 }
 
 void prFramebufferLinkDepthTexture(prFramebufferData* framebuffer, prTextureData* depthTexture) {
-    if(depthTexture && framebuffer->context != depthTexture->context) {
+    if(depthTexture && framebuffer->context && framebuffer->context != depthTexture->context) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferLinkDepthTexture: Texture context does not match framebuffer context. Aborting operation, nothing was modified");
         return;
     }
@@ -108,7 +118,7 @@ void prFramebufferLinkDepthTexture(prFramebufferData* framebuffer, prTextureData
 }
 
 void prFramebufferLinkStencilTexture(prFramebufferData* framebuffer, prTextureData* stencilTexture) {
-    if(stencilTexture && framebuffer->context != stencilTexture->context) {
+    if(stencilTexture && framebuffer->context && framebuffer->context != stencilTexture->context) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferLinkStencilTexture: Texture context does not match framebuffer context. Aborting operation, nothing was modified");
         return;
     }
@@ -121,7 +131,7 @@ void prFramebufferLinkStencilTexture(prFramebufferData* framebuffer, prTextureDa
 }
 
 void prFramebufferLinkDepthStencilTexture(prFramebufferData* framebuffer, prTextureData* depthStencilTexture) {
-    if(depthStencilTexture && framebuffer->context != depthStencilTexture->context) {
+    if(depthStencilTexture && framebuffer->context && framebuffer->context != depthStencilTexture->context) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferLinkDepthStencilTexture: Texture context does not match framebuffer context. Aborting operation, nothing was modified");
         return;
     }
@@ -134,7 +144,7 @@ void prFramebufferLinkDepthStencilTexture(prFramebufferData* framebuffer, prText
 }
 
 void prFramebufferLinkColorTextureMultisampled(prFramebufferData* framebuffer, prTextureMultisampledData* colorTexture, unsigned int attachmentPoint) {
-    if(colorTexture && framebuffer->context != colorTexture->context) {
+    if(colorTexture && framebuffer->context && framebuffer->context != colorTexture->context) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferLinkColorTextureMultisampled: Multisampled texture context does not match framebuffer context. Aborting operation, nothing was modified");
         return;
     }
@@ -154,7 +164,7 @@ void prFramebufferLinkColorTextureMultisampled(prFramebufferData* framebuffer, p
 }
 
 void prFramebufferLinkDepthTextureMultisampled(prFramebufferData* framebuffer, prTextureMultisampledData* depthTexture) {
-    if(depthTexture && framebuffer->context != depthTexture->context) {
+    if(depthTexture && framebuffer->context && framebuffer->context != depthTexture->context) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferLinkDepthTextureMultisampled: Multisampled texture context does not match framebuffer context. Aborting operation, nothing was modified");
         return;
     }
@@ -167,7 +177,7 @@ void prFramebufferLinkDepthTextureMultisampled(prFramebufferData* framebuffer, p
 }
 
 void prFramebufferLinkStencilTextureMultisampled(prFramebufferData* framebuffer, prTextureMultisampledData* stencilTexture) {
-    if(stencilTexture && framebuffer->context != stencilTexture->context) {
+    if(stencilTexture && framebuffer->context && framebuffer->context != stencilTexture->context) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferLinkStencilTextureMultisampled: Multisampled texture context does not match framebuffer context. Aborting operation, nothing was modified");
         return;
     }
@@ -180,7 +190,7 @@ void prFramebufferLinkStencilTextureMultisampled(prFramebufferData* framebuffer,
 }
 
 void prFramebufferLinkDepthStencilTextureMultisampled(prFramebufferData* framebuffer, prTextureMultisampledData* depthStencilTexture) {
-    if(depthStencilTexture && framebuffer->context != depthStencilTexture->context) {
+    if(depthStencilTexture && framebuffer->context && framebuffer->context != depthStencilTexture->context) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferLinkDepthStencilTextureMultisampled: Multisampled texture context does not match framebuffer context. Aborting operation, nothing was modified");
         return;
     }
@@ -193,7 +203,7 @@ void prFramebufferLinkDepthStencilTextureMultisampled(prFramebufferData* framebu
 }
 
 void prFramebufferLinkColorCubeMap(prFramebufferData* framebuffer, prCubeMapData* colorCubeMap, unsigned int attachmentPoint) {
-    if(framebuffer->context != colorCubeMap->context) {
+    if(colorCubeMap && framebuffer->context && framebuffer->context != colorCubeMap->context) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferLinkColorCubeMap: Cube map context does not match framebuffer context. Aborting operation, nothing was modified");
         return;
     }
@@ -213,7 +223,7 @@ void prFramebufferLinkColorCubeMap(prFramebufferData* framebuffer, prCubeMapData
 }
 
 void prFramebufferLinkDepthCubeMap(prFramebufferData* framebuffer, prCubeMapData* depthCubeMap) {
-    if(framebuffer->context != depthCubeMap->context) {
+    if(depthCubeMap && framebuffer->context && framebuffer->context != depthCubeMap->context) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferLinkDepthCubeMap: Cube map context does not match framebuffer context. Aborting operation, nothing was modified");
         return;
     }
@@ -226,7 +236,7 @@ void prFramebufferLinkDepthCubeMap(prFramebufferData* framebuffer, prCubeMapData
 }
 
 void prFramebufferLinkStencilCubeMap(prFramebufferData* framebuffer, prCubeMapData* stencilCubeMap) {
-    if(framebuffer->context != stencilCubeMap->context) {
+    if(stencilCubeMap && framebuffer->context && framebuffer->context != stencilCubeMap->context) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferLinkStencilCubeMap: Cube map context does not match framebuffer context. Aborting operation, nothing was modified");
         return;
     }
@@ -239,7 +249,7 @@ void prFramebufferLinkStencilCubeMap(prFramebufferData* framebuffer, prCubeMapDa
 }
 
 void prFramebufferLinkDepthStencilCubeMap(prFramebufferData* framebuffer, prCubeMapData* depthStencilCubeMap) {
-    if(framebuffer->context != depthStencilCubeMap->context) {
+    if(depthStencilCubeMap && framebuffer->context && framebuffer->context != depthStencilCubeMap->context) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferLinkDepthStencilCubeMap: Cube map context does not match framebuffer context. Aborting operation, nothing was modified");
         return;
     }
@@ -252,7 +262,7 @@ void prFramebufferLinkDepthStencilCubeMap(prFramebufferData* framebuffer, prCube
 }
 
 void prFramebufferLinkColorRBO(prFramebufferData* framebuffer, prRenderBufferData* colorRBO, unsigned int attachmentPoint) {
-    if(framebuffer->context != colorRBO->context) {
+    if(colorRBO && framebuffer->context && framebuffer->context != colorRBO->context) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferLinkColorRBO: RenderBuffer context does not match framebuffer context. Aborting operation, nothing was modified");
         return;
     }
@@ -272,7 +282,7 @@ void prFramebufferLinkColorRBO(prFramebufferData* framebuffer, prRenderBufferDat
 }
 
 void prFramebufferLinkDepthRBO(prFramebufferData* framebuffer, prRenderBufferData* depthRBO) {
-    if(framebuffer->context != depthRBO->context) {
+    if(depthRBO && framebuffer->context && framebuffer->context != depthRBO->context) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferLinkDepthRBO: RenderBuffer context does not match framebuffer context. Aborting operation, nothing was modified");
         return;
     }
@@ -285,7 +295,7 @@ void prFramebufferLinkDepthRBO(prFramebufferData* framebuffer, prRenderBufferDat
 }
 
 void prFramebufferLinkStencilRBO(prFramebufferData* framebuffer, prRenderBufferData* stencilRBO) {
-    if(framebuffer->context != stencilRBO->context) {
+    if(stencilRBO && framebuffer->context && framebuffer->context != stencilRBO->context) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferLinkStencilRBO: RenderBuffer context does not match framebuffer context. Aborting operation, nothing was modified");
         return;
     }
@@ -298,7 +308,7 @@ void prFramebufferLinkStencilRBO(prFramebufferData* framebuffer, prRenderBufferD
 }
 
 void prFramebufferLinkDepthStencilRBO(prFramebufferData* framebuffer, prRenderBufferData* depthStencilRBO) {
-    if(framebuffer->context != depthStencilRBO->context) {
+    if(depthStencilRBO && framebuffer->context && framebuffer->context != depthStencilRBO->context) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferLinkDepthStencilRBO: RenderBuffer context does not match framebuffer context. Aborting operation, nothing was modified");
         return;
     }
@@ -314,7 +324,7 @@ void prFramebufferUnlinkColorAttachment(prFramebufferData* framebuffer, unsigned
     prLogEvent(PR_EVENT_DATA, PR_LOG_TRACE, "prFramebufferUnlinkColorAttachment: Unlinking color attachment (attachment point: %i)", attachmentPoint);
 
     framebuffer->colorAttachments[attachmentPoint] = NULL;
-    // framebuffer->colorAttachmentsTypes[attachmentPoint] = 0; this is not set to zero so the internal API can unlink the attachment properly.
+    // framebuffer->colorAttachmentsTypes[attachmentPoint] = 0; NOTE: this is not set to zero so the internal API can unlink the attachment properly.
 
     if(framebuffer->FBO) {
         i_prFramebufferUpdateBuffers(framebuffer);
@@ -355,34 +365,28 @@ void prFramebufferUnlinkDepthStencilAttachment(prFramebufferData* framebuffer) {
 }
 
 void prFramebufferSetDrawBuffer(prFramebufferData* framebuffer, GLenum buffer) {
-    if(!framebuffer->context) {
-        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferSetDrawBuffer: Framebuffer context cannot be NULL. Aborting operation, nothing was modified");
-        return;
-    }
-
-    framebuffer->context->NamedFramebufferDrawBuffer(framebuffer->FBO, buffer);
+    framebuffer->drawBuffer = buffer;
 }
 
 void prFramebufferDrawBuffers(prFramebufferData* framebuffer, GLsizei count, const GLenum* buffers) {
-    if(!framebuffer->context) {
-        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferDrawBuffers: Framebuffer context cannot be NULL. Aborting operation, nothing was modified");
-        return;
-    }
     if(count < 1) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferDrawBuffers: Count cannot be less than zero. Aborting operation, nothing was modified");
         return;
     }
 
-    framebuffer->context->NamedFramebufferDrawBuffers(framebuffer->FBO, count, buffers);
+    if(framebuffer->drawBuffers) {
+        prFree(framebuffer->drawBuffers);
+        framebuffer->drawBuffers = NULL;
+        framebuffer->drawBuffersCount = 0;
+    }
+
+    framebuffer->drawBuffers = prMalloc(count * sizeof(GLenum));
+    prMemcpy(framebuffer->drawBuffers, buffers, count);
+    framebuffer->drawBuffersCount = count;
 }
 
 void prFramebufferSetReadBuffer(prFramebufferData* framebuffer, GLenum buffer) {
-    if(!framebuffer->context) {
-        prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferSetReadBuffer: Framebuffer context cannot be NULL. Aborting operation, nothing was modified");
-        return;
-    }
-
-    framebuffer->context->NamedFramebufferReadBuffer(framebuffer->FBO, buffer);
+    framebuffer->readBuffer = buffer;
 }
 
 void prFramebufferBlit(GladGLContext* context, prFramebufferData* source, prFramebufferData* destination, GLint srcX0, GLint srcY0, GLint srcX1, GLint srcY1, GLint dstX0, GLint dstY0, GLint dstX1, GLint dstY1, GLbitfield mask, GLenum filter) {
