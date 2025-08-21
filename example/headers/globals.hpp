@@ -145,7 +145,7 @@ extern prTextureData* g_textureSteelNormal;
 extern prTextureData* g_textureBrickWall;
 extern prTextureData* g_textureBrickWallNormal;
 
-extern prCubeMapData* skyboxDefaultCubeMap;
+extern prCubeMapData* g_cubeMapBlack;
 extern prCubeMapData* g_cubeMapIslands;
 extern prCubeMapData* g_cubeMapSpace;
 extern prCubeMapData* g_cubeMap3;

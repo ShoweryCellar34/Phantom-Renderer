@@ -71,7 +71,7 @@ prTextureData* g_textureSteelNormal = nullptr;
 prTextureData* g_textureBrickWall = nullptr;
 prTextureData* g_textureBrickWallNormal = nullptr;
 
-prCubeMapData* skyboxDefaultCubeMap = nullptr;
+prCubeMapData* g_cubeMapBlack = nullptr;
 prCubeMapData* g_cubeMapIslands = nullptr;
 prCubeMapData* g_cubeMapSpace = nullptr;
 prCubeMapData* g_cubeMap3 = nullptr;

@@ -116,7 +116,8 @@ int main(int argc, char** argv) {
     mat4s lightSpaceMatrix = glms_mat4_mul(lightProjection, lightView);
     prShaderSetUniformMatrix4fv(g_shaderDirectionalLight, "lightSpaceMatrix", &lightSpaceMatrix.raw[0][0]);
 
-    float aspect = (float)1024 / (float)1024;
+    int pointLightResolution = 1024;
+    float aspect = (float)pointLightResolution / (float)pointLightResolution;
     float farPlane = 100.0f;
     mat4s light2Projection = glms_perspective(glm_rad(90.0f), aspect, 0.1f, farPlane);
     mat4s light2View[6] = {
@@ -214,7 +215,7 @@ int main(int argc, char** argv) {
                 case 1:
                     prFramebufferBind(g_framebufferPointShadowMap);
                     currentShaderProgram = g_shaderPointLight;
-                    g_window->openglContext->Viewport(0, 0, 1024, 1024);
+                    g_window->openglContext->Viewport(0, 0, pointLightResolution, pointLightResolution);
                     break;
 
                 case 2:
@@ -279,7 +280,7 @@ int main(int argc, char** argv) {
                 break;
 
             default:
-                prCubeMapBindTexture(skyboxDefaultCubeMap, 0);
+                prCubeMapBindTexture(g_cubeMapBlack, 0);
                 break;
         }
 

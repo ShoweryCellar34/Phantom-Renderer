@@ -172,6 +172,10 @@ void setupFramebuffers() {
         prFramebufferLinkColorTexture(g_framebufferDefault, g_textureColorDefault, 0);
         prFramebufferLinkDepthStencilRBO(g_framebufferDefault, g_RBODepthStencilDefault);
         prFramebufferLinkContext(g_framebufferDefault, g_window->openglContext);
+        if(prFramebufferCheckStatus(g_framebufferDefault) != GL_FRAMEBUFFER_COMPLETE) {
+            prLogEvent(PR_EVENT_USER, PR_LOG_ERROR, "setupFramebuffers: Failed to create framebuffer: g_framebufferDefault. Aborting operation, modifications may have occurred");
+            return;
+        }
 
 
 
@@ -191,10 +195,14 @@ void setupFramebuffers() {
         g_framebufferMultisampled = prFramebufferCreate();
         prFramebufferLinkColorRBO(g_framebufferMultisampled, g_RBOColorMultisampled, 0);
         prFramebufferLinkColorTextureMultisampled(g_framebufferMultisampled, g_multisampledTextureColorMultisampled, 1);
-        prFramebufferLinkContext(g_framebufferMultisampled, g_window->openglContext);
         GLenum tempAttachmentsArray[] = {PR_COLOR_ATTACHMENT_0, PR_COLOR_ATTACHMENT_1};
         prFramebufferDrawBuffers(g_framebufferMultisampled, 2, tempAttachmentsArray);
         prFramebufferLinkDepthStencilRBO(g_framebufferMultisampled, g_multisampledRBODepthStencilMultisampled);
+        prFramebufferLinkContext(g_framebufferMultisampled, g_window->openglContext);
+        if(prFramebufferCheckStatus(g_framebufferMultisampled) != GL_FRAMEBUFFER_COMPLETE) {
+            prLogEvent(PR_EVENT_USER, PR_LOG_ERROR, "setupFramebuffers: Failed to create framebuffer: g_framebufferMultisampled. Aborting operation, modifications may have occurred");
+            return;
+        }
 
 
 
@@ -205,6 +213,10 @@ void setupFramebuffers() {
         g_framebufferBloom = prFramebufferCreate();
         prFramebufferLinkColorTexture(g_framebufferBloom, g_textureBloom, 0);
         prFramebufferLinkContext(g_framebufferBloom, g_window->openglContext);
+        if(prFramebufferCheckStatus(g_framebufferBloom) != GL_FRAMEBUFFER_COMPLETE) {
+            prLogEvent(PR_EVENT_USER, PR_LOG_ERROR, "setupFramebuffers: Failed to create framebuffer: g_framebufferBloom. Aborting operation, modifications may have occurred");
+            return;
+        }
 
 
 
@@ -215,6 +227,10 @@ void setupFramebuffers() {
         g_framebufferGaussianBlur1 = prFramebufferCreate();
         prFramebufferLinkColorTexture(g_framebufferGaussianBlur1, g_textureColorGaussianBlur1, 0);
         prFramebufferLinkContext(g_framebufferGaussianBlur1, g_window->openglContext);
+        if(prFramebufferCheckStatus(g_framebufferGaussianBlur1) != GL_FRAMEBUFFER_COMPLETE) {
+            prLogEvent(PR_EVENT_USER, PR_LOG_ERROR, "setupFramebuffers: Failed to create framebuffer: g_framebufferGaussainBlur1. Aborting operation, modifications may have occurred");
+            return;
+        }
 
 
 
@@ -225,6 +241,10 @@ void setupFramebuffers() {
         g_framebufferGaussianBlur2 = prFramebufferCreate();
         prFramebufferLinkColorTexture(g_framebufferGaussianBlur2, g_textureColorGaussianBlur2, 0);
         prFramebufferLinkContext(g_framebufferGaussianBlur2, g_window->openglContext);
+        if(prFramebufferCheckStatus(g_framebufferGaussianBlur2) != GL_FRAMEBUFFER_COMPLETE) {
+            prLogEvent(PR_EVENT_USER, PR_LOG_ERROR, "setupFramebuffers: Failed to create framebuffer: g_framebufferGaussainBlur2. Aborting operation, modifications may have occurred");
+            return;
+        }
 
 
 
@@ -245,6 +265,10 @@ void setupFramebuffers() {
         prFramebufferSetDrawBuffer(g_framebufferSunShadowMap, PR_NONE);
         prFramebufferSetReadBuffer(g_framebufferSunShadowMap, PR_NONE);
         prFramebufferLinkContext(g_framebufferSunShadowMap, g_window->openglContext);
+        if(prFramebufferCheckStatus(g_framebufferSunShadowMap) != GL_FRAMEBUFFER_COMPLETE) {
+            prLogEvent(PR_EVENT_USER, PR_LOG_ERROR, "setupFramebuffers: Failed to create framebuffer: g_framebufferSunShadowMap. Aborting operation, modifications may have occurred");
+            return;
+        }
 
         g_cubeMapDepthPointShadowMap = prCubeMapCreate();
         GLenum tempFormatsArray[6] = {PR_FORMAT_DEPTH, PR_FORMAT_DEPTH, PR_FORMAT_DEPTH, PR_FORMAT_DEPTH, PR_FORMAT_DEPTH, PR_FORMAT_DEPTH};
@@ -266,6 +290,10 @@ void setupFramebuffers() {
         prFramebufferSetDrawBuffer(g_framebufferPointShadowMap, GL_NONE);
         prFramebufferSetReadBuffer(g_framebufferPointShadowMap, GL_NONE);
         prFramebufferLinkContext(g_framebufferPointShadowMap, g_window->openglContext);
+        if(prFramebufferCheckStatus(g_framebufferPointShadowMap) != GL_FRAMEBUFFER_COMPLETE) {
+            prLogEvent(PR_EVENT_USER, PR_LOG_ERROR, "setupFramebuffers: Failed to create framebuffer: g_framebufferPointShadowMap. Aborting operation, modifications may have occurred");
+            return;
+        }
 
         g_framebuffersInit = true;
     } else {
@@ -345,10 +373,10 @@ void setupTextures() {
 
         stbi_set_flip_vertically_on_load(1);
 
-        g_textureCheckerboard = makeTextureCheckerboard(g_window->openglContext, 8, TEMP_RGBA(1.0f, 0.0f, 1.0f, 1.0f), TEMP_RGBA(0.0f, 0.0f, 0.0f, 1.0f));
-        g_textureBlack = makeTextureSingleColor(g_window->openglContext, TEMP_RGBA(0.0f, 0.0f, 0.0f, 1.0f));
-        g_textureWhite = makeTextureSingleColor(g_window->openglContext, TEMP_RGBA(1.0f, 1.0f, 1.0f, 1.0f));
-        g_textureNormalDefault = makeTextureSingleColor(g_window->openglContext, TEMP_RGBA(0.0f, 0.0f, 1.0f, 1.0f));
+        g_textureCheckerboard = makeTextureCheckerboard(g_window->openglContext, 8, {1.0f, 0.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 0.0f, 1.0f});
+        g_textureBlack = makeTextureSingleColor(g_window->openglContext, {0.0f, 0.0f, 0.0f, 1.0f});
+        g_textureWhite = makeTextureSingleColor(g_window->openglContext, {1.0f, 1.0f, 1.0f, 1.0f});
+        g_textureNormalDefault = makeTextureSingleColor(g_window->openglContext, {0.0f, 0.0f, 1.0f, 1.0f});
 
         g_textureHUD = loadTexture(g_window->openglContext, PR_FILTER_NEAREST_MIPMAP_NEAREST, PR_FILTER_NEAREST, TO_RES("res/textures/HUD.png"));
 
@@ -360,14 +388,15 @@ void setupTextures() {
         g_textureBrickWall = loadTexture(g_window->openglContext, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, TO_RES("res/textures/brickwall.jpg"));
         g_textureBrickWallNormal = loadTexture(g_window->openglContext, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, TO_RES("res/textures/brickwall_normal.jpg"));
 
-        skyboxDefaultCubeMap = makeCubeMapSingleColors(g_window->openglContext, TEMP_RGBA_6(
-            0.0f, 0.0f, 0.0f, 1.0f,
-            0.0f, 0.0f, 0.0f, 1.0f,
-            0.0f, 0.0f, 0.0f, 1.0f,
-            0.0f, 0.0f, 0.0f, 1.0f,
-            0.0f, 0.0f, 0.0f, 1.0f,
-            0.0f, 0.0f, 0.0f, 1.0f
-        ));
+        vec4s cubeMapBlackColors[PR_CUBE_MAP_SIDES] = {
+            {0.0f, 0.0f, 0.0f, 1.0f},
+            {0.0f, 0.0f, 0.0f, 1.0f},
+            {0.0f, 0.0f, 0.0f, 1.0f},
+            {0.0f, 0.0f, 0.0f, 1.0f},
+            {0.0f, 0.0f, 0.0f, 1.0f},
+            {0.0f, 0.0f, 0.0f, 1.0f}
+        };
+        g_cubeMapBlack = makeCubeMapSingleColors(g_window->openglContext, cubeMapBlackColors);
 
         static const char* cubeMapIslandsTextures[6] = {
             "res/skyboxes/1/right.jpg",
@@ -391,30 +420,33 @@ void setupTextures() {
         g_cubeMapSpace = loadCubeMap(g_window->openglContext, PR_FILTER_LINEAR_MIPMAP_LINEAR, PR_FILTER_LINEAR, cubeMapSpaceTextures);
         stbi_set_flip_vertically_on_load(1);
 
-        g_cubeMap3 = makeCubeMapSingleColors(g_window->openglContext, TEMP_RGBA_6(
-            1.0f, 0.0f, 0.0f, 1.0f,
-            1.0f, 0.0f, 1.0f, 1.0f,
-            0.0f, 1.0f, 0.0f, 1.0f,
-            1.0f, 1.0f, 0.0f, 1.0f,
-            0.0f, 0.0f, 1.0f, 1.0f,
-            0.0f, 1.0f, 1.0f, 1.0f
-        ));
+        vec4s cubeMap3Colors[PR_CUBE_MAP_SIDES] = {
+            {1.0f, 0.0f, 0.0f, 1.0f},
+            {1.0f, 0.0f, 1.0f, 1.0f},
+            {0.0f, 1.0f, 0.0f, 1.0f},
+            {1.0f, 1.0f, 0.0f, 1.0f},
+            {0.0f, 0.0f, 1.0f, 1.0f},
+            {0.0f, 1.0f, 1.0f, 1.0f}
+        };
+        g_cubeMap3 = makeCubeMapSingleColors(g_window->openglContext, cubeMap3Colors);
 
-        g_cubeMap4 = makeCubeMapCheckerboards(g_window->openglContext, 32, TEMP_RGBA_6(
-            1.0f, 0.0f, 0.0f, 1.0f,
-            1.0f, 0.0f, 1.0f, 1.0f,
-            0.0f, 1.0f, 0.0f, 1.0f,
-            1.0f, 1.0f, 0.0f, 1.0f,
-            0.0f, 0.0f, 1.0f, 1.0f,
-            0.0f, 1.0f, 1.0f, 1.0f
-        ), TEMP_RGBA_6(
-            0.0f, 0.0f, 0.0f, 1.0f,
-            0.0f, 0.0f, 0.0f, 1.0f,
-            0.0f, 0.0f, 0.0f, 1.0f,
-            0.0f, 0.0f, 0.0f, 1.0f,
-            0.0f, 0.0f, 0.0f, 1.0f,
-            0.0f, 0.0f, 0.0f, 1.0f
-        ));
+        vec4s cubeMap4Colors1[PR_CUBE_MAP_SIDES] = {
+            {1.0f, 0.0f, 0.0f, 1.0f},
+            {1.0f, 0.0f, 1.0f, 1.0f},
+            {0.0f, 1.0f, 0.0f, 1.0f},
+            {1.0f, 1.0f, 0.0f, 1.0f},
+            {0.0f, 0.0f, 1.0f, 1.0f},
+            {0.0f, 1.0f, 1.0f, 1.0f}
+        };
+        vec4s cubeMap4Colors2[PR_CUBE_MAP_SIDES] = {
+            {0.0f, 0.0f, 0.0f, 1.0f},
+            {0.0f, 0.0f, 0.0f, 1.0f},
+            {0.0f, 0.0f, 0.0f, 1.0f},
+            {0.0f, 0.0f, 0.0f, 1.0f},
+            {0.0f, 0.0f, 0.0f, 1.0f},
+            {0.0f, 0.0f, 0.0f, 1.0f}
+        };
+        g_cubeMap4 = makeCubeMapCheckerboards(g_window->openglContext, 32, cubeMap4Colors1, cubeMap4Colors2);
 
         g_texturesInit = true;
     } else {
@@ -453,8 +485,8 @@ void shutdownTextures() {
         prTextureDestroy(g_textureBrickWallNormal);
         g_textureBrickWallNormal = nullptr;
 
-        prCubeMapDestroy(skyboxDefaultCubeMap);
-        skyboxDefaultCubeMap = nullptr;
+        prCubeMapDestroy(g_cubeMapBlack);
+        g_cubeMapBlack = nullptr;
         prCubeMapDestroy(g_cubeMapIslands);
         g_cubeMapIslands = nullptr;
         prCubeMapDestroy(g_cubeMapSpace);
@@ -487,14 +519,14 @@ void setupMaterials() {
             return;
         }
 
-        g_materialCheckerboard.setMaps(g_textureCheckerboard, g_textureCheckerboard, g_textureNormalDefault, 0.0f);
+        g_materialCheckerboard.setMaps(g_textureCheckerboard, g_textureCheckerboard, g_textureNormalDefault, 1.0f);
         g_materialBlack.setMaps(g_textureBlack, g_textureWhite, g_textureNormalDefault, 32.0f);
         g_materialWhite.setMaps(g_textureWhite, g_textureWhite, g_textureNormalDefault, 32.0f);
 
         g_materialHUD.setMaps(g_textureHUD, g_textureBlack, g_textureNormalDefault, 0.0f);
         g_materialPostProcessing.setMaps(g_texturePostProcessing, g_textureBlack, g_textureNormalDefault, 0.0f);
 
-        g_materialContainer.setMaps(g_textureContainer, g_textureBlack, g_textureNormalDefault, 0.0f);
+        g_materialContainer.setMaps(g_textureContainer, g_textureBlack, g_textureNormalDefault, 1.0f);
         g_materialMetalRimmedContainer.setMaps(g_textureMetalRimmedContainer, g_textureMetalRimmedContainerSpecular, g_textureNormalDefault, 64.0f);
         g_materialSteel.setMaps(g_textureSteel, g_textureBlack, g_textureSteelNormal, 48.0f);
         g_materialBrickWall.setMaps(g_textureBrickWall, g_textureBlack, g_textureBrickWallNormal, 16.0f);

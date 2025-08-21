@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cglm/struct.h>
 #include <PR/defines.h>
 
 #include <stdbool.h>
@@ -12,15 +13,15 @@ typedef struct prComputeShaderData prComputeShaderData;
 
 prTextureData* loadTexture(GladGLContext* context, unsigned int minFiltering, unsigned int magFiltering, const char* path);
 
-prTextureData* makeTextureSingleColor(GladGLContext* context, float color[4]);
+prTextureData* makeTextureSingleColor(GladGLContext* context, vec4s color);
 
-prTextureData* makeTextureCheckerboard(GladGLContext* context, size_t scale, float* color1, float* color2);
+prTextureData* makeTextureCheckerboard(GladGLContext* context, size_t scale, vec4s color1, vec4s color2);
 
 prCubeMapData* loadCubeMap(GladGLContext* context, unsigned int minFiltering, unsigned int magFiltering, const char* paths[PR_CUBE_MAP_SIDES]);
 
-prCubeMapData* makeCubeMapSingleColors(GladGLContext* context, float color[PR_CUBE_MAP_SIDES][4]);
+prCubeMapData* makeCubeMapSingleColors(GladGLContext* context, vec4s color[PR_CUBE_MAP_SIDES]);
 
-prCubeMapData* makeCubeMapCheckerboards(GladGLContext* context, size_t scale, float color1[PR_CUBE_MAP_SIDES][4], float color2[PR_CUBE_MAP_SIDES][4]);
+prCubeMapData* makeCubeMapCheckerboards(GladGLContext* context, size_t scale, vec4s color1[PR_CUBE_MAP_SIDES], vec4s color2[PR_CUBE_MAP_SIDES]);
 
 prShaderData* loadShader(GladGLContext* context, const char* vertexPath, const char* fragmentPath, const char* geometryPath);
 
