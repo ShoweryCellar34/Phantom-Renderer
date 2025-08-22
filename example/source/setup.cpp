@@ -257,7 +257,7 @@ void setupFramebuffers() {
 
         g_textureDepthSunShadowMap = prTextureCreate();
         prTextureUpdate(g_textureDepthSunShadowMap, PR_FORMAT_DEPTH, PR_WRAPPING_EDGE, PR_FILTER_LINEAR, PR_FILTER_LINEAR, false, NULL, 0, 2048, 2048);
-        prTextureBorderColor(g_textureDepthSunShadowMap, TEMP_RGBA(1.0f, 0.0f, 0.0f, 1.0f));
+        prTextureBorderColor(g_textureDepthSunShadowMap, {1.0f, 0.0f, 0.0f, 1.0f});
         prTextureLinkContext(g_textureDepthSunShadowMap, g_window->openglContext);
 
         g_framebufferSunShadowMap = prFramebufferCreate();
@@ -282,7 +282,7 @@ void setupFramebuffers() {
             tempTextureDataSizeArray,
             tempCubeMapSizeArray,
             tempCubeMapSizeArray);
-        prCubeMapBorderColor(g_cubeMapDepthPointShadowMap, TEMP_RGBA(1.0f, 0.0f, 0.0f, 1.0f));
+        prCubeMapBorderColor(g_cubeMapDepthPointShadowMap, {1.0f, 0.0f, 0.0f, 1.0f});
         prCubeMapLinkContext(g_cubeMapDepthPointShadowMap, g_window->openglContext);
 
         g_framebufferPointShadowMap = prFramebufferCreate();

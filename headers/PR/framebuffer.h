@@ -3,6 +3,7 @@
 #include <PR/defines.h>
 
 #include <glad/gl.h>
+#include <cglm/struct.h>
 
 typedef struct prTextureData prTextureData;
 typedef struct prTextureMultisampledData prTextureMultisampledData;
@@ -73,7 +74,7 @@ void prFramebufferBlit(GladGLContext* context, prFramebufferData* source, prFram
     GLbitfield mask, GLenum filter
 );
 
-void prFramebufferClearColor(GladGLContext* context, prFramebufferData* framebuffer, unsigned int attachmentIndex, GLfloat color[4]);
+void prFramebufferClearColor(GladGLContext* context, prFramebufferData* framebuffer, unsigned int attachmentIndex, vec4s color);
 
 void prFramebufferClearDepth(GladGLContext* context, prFramebufferData* framebuffer, GLfloat depth);
 

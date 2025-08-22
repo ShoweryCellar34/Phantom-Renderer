@@ -422,7 +422,7 @@ void prFramebufferBlit(GladGLContext* context, prFramebufferData* source, prFram
     i_prFramebufferBlitOnGPU(context, source, destination, srcX0, srcY0, srcX1, srcY1, dstX0, dstY0, dstX1, dstY1, mask, filter);
 }
 
-void prFramebufferClearColor(GladGLContext* context, prFramebufferData* framebuffer, unsigned int attachmentIndex, GLfloat color[4]) {
+void prFramebufferClearColor(GladGLContext* context, prFramebufferData* framebuffer, unsigned int attachmentIndex, vec4s color) {
     if(attachmentIndex >= PR_MAX_FRAMEBUFFER_COLOR_ATTACHMENTS) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prFramebufferClearColor: Attachment index too hight (%i). Aborting operation, nothing was modified", attachmentIndex);
         return;
@@ -442,9 +442,9 @@ void prFramebufferClearColor(GladGLContext* context, prFramebufferData* framebuf
             return;
         }
 
-        context->ClearNamedFramebufferfv(framebuffer->FBO, GL_COLOR, attachmentIndex, color);
+        context->ClearNamedFramebufferfv(framebuffer->FBO, GL_COLOR, attachmentIndex, color.raw);
     } else {
-        context->ClearNamedFramebufferfv(0, GL_COLOR, attachmentIndex, color);
+        context->ClearNamedFramebufferfv(0, GL_COLOR, attachmentIndex, color.raw);
     }
 }
 

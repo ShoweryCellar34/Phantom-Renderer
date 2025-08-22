@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <glad/gl.h>
+#include <cglm/struct.h>
 
 typedef struct prTextureData {
     GladGLContext* context;
@@ -16,7 +17,7 @@ typedef struct prTextureData {
     bool HDR;
     GLsizei width, height;
     int channels;
-    GLfloat borderColor[4];
+    vec4s borderColor;
     GLuint TBO;
 } prTextureData;
 
@@ -28,7 +29,7 @@ void prTextureLinkContext(prTextureData* texture, GladGLContext* context);
 
 void prTextureUpdate(prTextureData* texture, GLenum format, GLint wrappingMode, GLint minFilter, GLint magFilter, bool generateMipmaps, GLubyte* rawTextureData, size_t rawTextureDataCount, GLsizei width, GLsizei height);
 
-void prTextureBorderColor(prTextureData* texture, GLfloat borderColor[4]);
+void prTextureBorderColor(prTextureData* texture, vec4s borderColor);
 
 void prTextureBindImage(prTextureData* texture, GLuint index, GLint mipmapLevel, GLenum access, GLenum format);
 

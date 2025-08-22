@@ -328,14 +328,14 @@ void prCubeMapUpdate(prCubeMapData* cubeMap, int side, GLenum format, GLint wrap
     }
 }
 
-void prCubeMapBorderColor(prCubeMapData* cubeMap, GLfloat borderColor[4]) {
+void prCubeMapBorderColor(prCubeMapData* cubeMap, vec4s borderColor) {
     prLogEvent(PR_EVENT_DATA, PR_LOG_TRACE, "prCubeMapBorderColor: Updating cube map border color (R: %f G: %f B: %f A: %f)",
-        borderColor[0], borderColor[1], borderColor[2], borderColor[3]);
+        borderColor.r, borderColor.g, borderColor.b, borderColor.a);
 
-    cubeMap->borderColor[0] = borderColor[0];
-    cubeMap->borderColor[1] = borderColor[1];
-    cubeMap->borderColor[2] = borderColor[2];
-    cubeMap->borderColor[3] = borderColor[3];
+    cubeMap->borderColor.r = borderColor.r;
+    cubeMap->borderColor.g = borderColor.g;
+    cubeMap->borderColor.b = borderColor.b;
+    cubeMap->borderColor.a = borderColor.a;
 
     if(cubeMap->TBO) {
         i_prCubeMapUpdateBorderColorOnGPU(cubeMap);

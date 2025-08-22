@@ -159,14 +159,14 @@ void prTextureUpdate(prTextureData* texture, GLenum format, GLint wrappingMode, 
     }
 }
 
-void prTextureBorderColor(prTextureData* texture, GLfloat borderColor[4]) {
+void prTextureBorderColor(prTextureData* texture, vec4s borderColor) {
     prLogEvent(PR_EVENT_DATA, PR_LOG_TRACE, "prTextureBorderColor: Updating texture border color (R: %f G: %f B: %f A: %f)",
-        borderColor[0], borderColor[1], borderColor[2], borderColor[3]);
+        borderColor.r, borderColor.g, borderColor.b, borderColor.a);
 
-    texture->borderColor[0] = borderColor[0];
-    texture->borderColor[1] = borderColor[1];
-    texture->borderColor[2] = borderColor[2];
-    texture->borderColor[3] = borderColor[3];
+    texture->borderColor.r = borderColor.r;
+    texture->borderColor.g = borderColor.g;
+    texture->borderColor.b = borderColor.b;
+    texture->borderColor.a = borderColor.a;
 
     if(texture->TBO) {
         i_prTextureUpdateBorderColorOnGPU(texture);

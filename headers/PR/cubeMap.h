@@ -5,6 +5,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <glad/gl.h>
+#include <cglm/struct.h>
 
 typedef struct prCubeMapData {
     GladGLContext* context;
@@ -18,7 +19,7 @@ typedef struct prCubeMapData {
     bool HDR[PR_CUBE_MAP_SIDES];
     GLsizei width[PR_CUBE_MAP_SIDES], height[PR_CUBE_MAP_SIDES];
     int channels[PR_CUBE_MAP_SIDES];
-    GLfloat borderColor[4];
+    vec4s borderColor;
     GLuint TBO;
 } prCubeMapData;
 
@@ -32,6 +33,6 @@ void prCubeMapUpdateAll(prCubeMapData* cubeMap, GLenum format[PR_CUBE_MAP_SIDES]
 
 void prCubeMapUpdate(prCubeMapData* cubeMap, int side, GLenum format, GLint wrappingMode, GLint minFilter, GLint magFilter, bool generateMipmaps, GLubyte* rawTextureData, size_t rawTextureDataCount, GLsizei width, GLsizei height);
 
-void prCubeMapBorderColor(prCubeMapData* cubeMap, GLfloat borderColor[4]);
+void prCubeMapBorderColor(prCubeMapData* cubeMap, vec4s borderColor);
 
 void prCubeMapBindTexture(prCubeMapData* cubeMap, GLuint unit);
