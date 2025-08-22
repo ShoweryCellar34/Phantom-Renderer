@@ -381,7 +381,7 @@ void prFramebufferDrawBuffers(prFramebufferData* framebuffer, GLsizei count, con
     }
 
     framebuffer->drawBuffers = prMalloc(count * sizeof(GLenum));
-    prMemcpy(framebuffer->drawBuffers, buffers, count);
+    prMemcpy(framebuffer->drawBuffers, buffers, count * sizeof(GLenum));
     framebuffer->drawBuffersCount = count;
 }
 

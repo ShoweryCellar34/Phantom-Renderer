@@ -118,7 +118,7 @@ int main(int argc, char** argv) {
 
     int pointLightResolution = 1024;
     float aspect = (float)pointLightResolution / (float)pointLightResolution;
-    float farPlane = 100.0f;
+    float farPlane = 500.0f;
     mat4s light2Projection = glms_perspective(glm_rad(90.0f), aspect, 0.1f, farPlane);
     mat4s light2View[6] = {
         glms_lookat(point.position, {point.position.x + 1.0f, point.position.y, point.position.z}, {0.0f, -1.0f, 0.0f}),
@@ -235,6 +235,10 @@ int main(int argc, char** argv) {
 
             g_materialBrickWall.bind(currentShaderProgram);
             prShaderSetUniformMatrix4fv(currentShaderProgram, "translation", &translationsToMatrix({-30.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, {30.0f, 30.0f, 30.0f}).raw[0][0]);
+            prMeshDrawIndices(g_meshCube);
+
+            g_materialCheckerboard.bind(currentShaderProgram);
+            prShaderSetUniformMatrix4fv(currentShaderProgram, "translation", &translationsToMatrix({-115.0f, -20.0f, -115.0f}, {0.0f, 0.0f, 0.0f}, {200.0f, 10.0f, 200.0f}).raw[0][0]);
             prMeshDrawIndices(g_meshCube);
 
             g_materialBlack.bind(currentShaderProgram);
