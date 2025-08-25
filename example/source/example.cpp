@@ -70,6 +70,11 @@ int main(int argc, char** argv) {
         vec3s diffuse;
         vec3s specular;
 
+        float nearPlane;
+        float farPlane;
+        int width;
+        int height;
+
         GLuint shadowMap;
     } directionalLightData;
 
@@ -84,15 +89,22 @@ int main(int argc, char** argv) {
         vec3s diffuse;
         vec3s specular;
 
-        GLuint shadowMap;
+        float nearPlane;
         float farPlane;
+        int resolution;
+
+        GLuint shadowMap;
     } pointLightData;
 
     directionalLightData sun = {
         {-0.25f, -0.5f, -0.75f},
         {0.02f, 0.015f, 0.015f},
         {0.6f, 0.6f, 0.55f},
-        {1.3f, 1.3f, 1.25f},
+        {1.0f, 1.0f, 0.95f},
+        0.1f,
+        200.0f,
+        4096,
+        4096,
         4
     };
 
@@ -103,23 +115,24 @@ int main(int argc, char** argv) {
         {0.0f, 0.0f, 0.0f},
         {0.0f, 0.0f, 0.0f},
         {0.0f, 0.0f, 1.0f},
-        {1.5f, 0.0f, 0.0f},
-        5,
-        100.0f
+        {1.0f, 0.0f, 0.0f},
+        0.1f,
+        100.0f,
+        1024,
+        5
     };
 
     camera = prCameraCreate();
     prCameraLinkContext(camera, g_window->openglContext);
 
-    mat4s lightProjection = glms_ortho(-50.0f, 50.0f, -50.0f, 50.0f, 0.1f, 100.0f);
+    float aspectRatio = sun.width / sun.height;
+    mat4s lightProjection = glms_ortho(-50.0f * aspectRatio, 50.0f * aspectRatio, -50.0f * aspectRatio, 50.0f * aspectRatio, sun.nearPlane, sun.farPlane);
     mat4s lightView = glms_lookat({40.0f, 40.0f, 40.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f});
     mat4s lightSpaceMatrix = glms_mat4_mul(lightProjection, lightView);
     prShaderSetUniformMatrix4fv(g_shaderDirectionalLight, "lightSpaceMatrix", &lightSpaceMatrix.raw[0][0]);
 
-    int pointLightResolution = 1024;
-    float aspect = (float)pointLightResolution / (float)pointLightResolution;
-    float farPlane = 500.0f;
-    mat4s light2Projection = glms_perspective(glm_rad(90.0f), aspect, 0.1f, farPlane);
+    float aspectRatio2 = (float)point.resolution / (float)point.resolution;
+    mat4s light2Projection = glms_perspective(glm_rad(90.0f), aspectRatio2, point.nearPlane, point.farPlane);
     mat4s light2View[6] = {
         glms_lookat(point.position, {point.position.x + 1.0f, point.position.y, point.position.z}, {0.0f, -1.0f, 0.0f}),
         glms_lookat(point.position, {point.position.x + -1.0f, point.position.y, point.position.z}, {0.0f, -1.0f, 0.0f}),
@@ -143,7 +156,7 @@ int main(int argc, char** argv) {
     prShaderSetUniformMatrix4fv(g_shaderPointLight, "lightSpaceMatrices[4]", &light2SpaceMatrix[4].raw[0][0]);
     prShaderSetUniformMatrix4fv(g_shaderPointLight, "lightSpaceMatrices[5]", &light2SpaceMatrix[5].raw[0][0]);
     prShaderSetUniform3f(g_shaderPointLight, "lightPosition", point.position.x, point.position.y, point.position.z);
-    prShaderSetUniform1f(g_shaderPointLight, "farPlane", farPlane);
+    prShaderSetUniform1f(g_shaderPointLight, "farPlane", point.farPlane);
 
     g_window->openglContext->Enable(GL_DEPTH_TEST);
     g_window->openglContext->Enable(GL_BLEND);
@@ -209,13 +222,13 @@ int main(int argc, char** argv) {
                 case 0:
                     prFramebufferBind(g_framebufferSunShadowMap);
                     currentShaderProgram = g_shaderDirectionalLight;
-                    g_window->openglContext->Viewport(0, 0, 2048, 2048);
+                    g_window->openglContext->Viewport(0, 0, sun.width, sun.height);
                     break;
 
                 case 1:
                     prFramebufferBind(g_framebufferPointShadowMap);
                     currentShaderProgram = g_shaderPointLight;
-                    g_window->openglContext->Viewport(0, 0, pointLightResolution, pointLightResolution);
+                    g_window->openglContext->Viewport(0, 0, point.resolution, point.resolution);
                     break;
 
                 case 2:
