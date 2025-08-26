@@ -15,6 +15,10 @@
 #define SAMPLES 4
 #define BLOOM_BLUR_PASSES 6
 
+#define POINT_LIGHT_RESOLUTION 2048
+#define SUN_LIGHT_WIDTH 4096
+#define SUN_LIGHT_HEIGHT 4096
+
 // Logging
 extern FILE* g_logFile;
 extern std::filesystem::path g_logFilePath;

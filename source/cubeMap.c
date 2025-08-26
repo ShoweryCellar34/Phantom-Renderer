@@ -84,12 +84,14 @@ void prCubeMapUpdateAll(prCubeMapData* cubeMap, GLenum format[PR_CUBE_MAP_SIDES]
             }
         } else if(!rawTextureData[i] && (width[i] || height[i])) {
             temp = NULL;
+            cubeMap->HDR[i] = false;
             cubeMap->width[i] = width[i];
             cubeMap->height[i] = height[i];
             cubeMap->channels[i] = 0;
         } else if(rawTextureData[i] && (width[i] || height[i])) {
             temp = prMalloc(rawTextureDataCount[i]);
             prMemcpy(temp, (void*)rawTextureData[i], rawTextureDataCount[i]);
+            cubeMap->HDR[i] = false;
             cubeMap->width[i] = width[i];
             cubeMap->height[i] = height[i];
             cubeMap->channels[i] = 0;
@@ -230,11 +232,13 @@ void prCubeMapUpdate(prCubeMapData* cubeMap, int side, GLenum format, GLint wrap
         }
     } else if(!rawTextureData && (width || height)) {
         temp = NULL;
+        cubeMap->HDR[side] = false;
         cubeMap->width[side] = width;
         cubeMap->height[side] = height;
         cubeMap->channels[side] = 0;
     } else if(rawTextureData && (width || height)) {
         temp = prMalloc(rawTextureDataCount);
+        cubeMap->HDR[side] = false;
         prMemcpy(temp, (void*)rawTextureData, rawTextureDataCount);
         cubeMap->width[side] = width;
         cubeMap->height[side] = height;

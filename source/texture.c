@@ -68,12 +68,14 @@ void prTextureUpdate(prTextureData* texture, GLenum format, GLint wrappingMode, 
         }
     } else if(!rawTextureData && (width || height)) {
         temp = NULL;
+        texture->HDR = false;
         texture->width = width;
         texture->height = height;
         texture->channels = 0;
     } else if(rawTextureData && (width || height)) {
         temp = prMalloc(rawTextureDataCount);
         prMemcpy(temp, (void*)rawTextureData, rawTextureDataCount);
+        texture->HDR = false;
         texture->width = width;
         texture->height = height;
         texture->channels = 0;

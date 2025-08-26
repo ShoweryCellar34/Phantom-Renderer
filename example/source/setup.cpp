@@ -3,6 +3,7 @@
 #include <globals.hpp>
 
 #include <cstdio>
+#include <tinyobj_loader_c.h>
 #include <PR/PR.h>
 #include <files.hpp>
 #include <callbacks.hpp>
@@ -256,8 +257,8 @@ void setupFramebuffers() {
 
 
         g_textureDepthSunShadowMap = prTextureCreate();
-        prTextureUpdate(g_textureDepthSunShadowMap, PR_FORMAT_DEPTH, PR_WRAPPING_EDGE, PR_FILTER_LINEAR, PR_FILTER_LINEAR, false, NULL, 0, 2048, 2048);
-        prTextureBorderColor(g_textureDepthSunShadowMap, {1.0f, 0.0f, 0.0f, 1.0f});
+        prTextureUpdate(g_textureDepthSunShadowMap, PR_FORMAT_DEPTH, PR_WRAPPING_BORDER, PR_FILTER_LINEAR, PR_FILTER_LINEAR, false, NULL, 0, SUN_LIGHT_WIDTH, SUN_LIGHT_HEIGHT);
+        prTextureBorderColor(g_textureDepthSunShadowMap, {1.0f, 1.0f, 1.0f, 1.0f});
         prTextureLinkContext(g_textureDepthSunShadowMap, g_window->openglContext);
 
         g_framebufferSunShadowMap = prFramebufferCreate();
@@ -274,15 +275,15 @@ void setupFramebuffers() {
         GLenum tempFormatsArray[6] = {PR_FORMAT_DEPTH, PR_FORMAT_DEPTH, PR_FORMAT_DEPTH, PR_FORMAT_DEPTH, PR_FORMAT_DEPTH, PR_FORMAT_DEPTH};
         GLubyte* tempTextureDataArray[6] = {NULL, NULL, NULL, NULL, NULL, NULL};
         size_t tempTextureDataSizeArray[6] = {0, 0, 0, 0, 0, 0};
-        GLsizei tempCubeMapSizeArray[6] = {1024, 1024, 1024, 1024, 1024, 1024};
+        GLsizei tempCubeMapSizeArray[6] = {POINT_LIGHT_RESOLUTION, POINT_LIGHT_RESOLUTION, POINT_LIGHT_RESOLUTION, POINT_LIGHT_RESOLUTION, POINT_LIGHT_RESOLUTION, POINT_LIGHT_RESOLUTION};
         prCubeMapUpdateAll(g_cubeMapDepthPointShadowMap,
             tempFormatsArray,
-            PR_WRAPPING_EDGE, PR_FILTER_LINEAR, PR_FILTER_LINEAR, false,
+            PR_WRAPPING_BORDER, PR_FILTER_LINEAR, PR_FILTER_LINEAR, false,
             tempTextureDataArray,
             tempTextureDataSizeArray,
             tempCubeMapSizeArray,
             tempCubeMapSizeArray);
-        prCubeMapBorderColor(g_cubeMapDepthPointShadowMap, {1.0f, 0.0f, 0.0f, 1.0f});
+        prCubeMapBorderColor(g_cubeMapDepthPointShadowMap, {1.0f, 1.0f, 1.0f, 1.0f});
         prCubeMapLinkContext(g_cubeMapDepthPointShadowMap, g_window->openglContext);
 
         g_framebufferPointShadowMap = prFramebufferCreate();
@@ -373,7 +374,7 @@ void setupTextures() {
 
         stbi_set_flip_vertically_on_load(1);
 
-        g_textureCheckerboard = makeTextureCheckerboard(g_window->openglContext, 8, {1.0f, 0.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 0.0f, 1.0f});
+        g_textureCheckerboard = makeTextureCheckerboard(g_window->openglContext, 12, {1.0f, 0.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 0.0f, 1.0f});
         g_textureBlack = makeTextureSingleColor(g_window->openglContext, {0.0f, 0.0f, 0.0f, 1.0f});
         g_textureWhite = makeTextureSingleColor(g_window->openglContext, {1.0f, 1.0f, 1.0f, 1.0f});
         g_textureNormalDefault = makeTextureSingleColor(g_window->openglContext, {0.0f, 0.0f, 1.0f, 1.0f});
@@ -559,6 +560,37 @@ void shutdownMaterials() {
     }
 }
 
+void defaultFileReader(
+    void*       ctx,
+    const char* filename,
+    int         isMTL,
+    const char* objFilename,
+    char**      buffer,
+    size_t*     length
+) {
+    const char* baseDirectory = static_cast<const char*>(ctx);
+
+    char fullpath[1024];
+    snprintf(fullpath, sizeof(fullpath), "%s%s", baseDirectory, filename);
+
+    FILE* filePointer = fopen(fullpath, "rb");
+    if(!filePointer) {
+        *buffer = nullptr;
+        *length = 0;
+        return;
+    }
+
+    fseek(filePointer, 0, SEEK_END);
+    *length = ftell(filePointer);
+    rewind(filePointer);
+
+    *buffer = static_cast<char*>(prMalloc(*length));
+    if(*buffer) {
+        fread(*buffer, 1, *length, filePointer);
+    }
+    fclose(filePointer);
+}
+
 void setupMeshes() {
     if(!g_meshesInit) {
         prLogEvent(PR_EVENT_USER, PR_LOG_INFO, "shutdownMeshes: Creating meshes");
@@ -649,6 +681,30 @@ void setupMeshes() {
         };
         static int indicesQuadSize = sizeof(indicesQuad);
 
+        // 1. Prepare your attributes, shapes, materials
+        tinyobj_attrib_t attributes;
+        tinyobj_attrib_init(&attributes);
+
+        tinyobj_shape_t*    shapes         = nullptr;
+        size_t              shapeCount     = 0;
+        tinyobj_material_t* materials      = nullptr;
+        size_t              materialCount  = 0;
+
+        int returnCode = tinyobj_parse_obj(
+            &attributes,                  // out attributes
+            &shapes, &shapeCount,         // out shapes + count
+            &materials, &materialCount,   // out materials + count
+            "cube.obj",                   // in .obj filename
+            defaultFileReader,            // your callback
+            (void*)TO_RES("res/models/"), // user_data passed to reader
+            TINYOBJ_FLAG_TRIANGULATE      // flags bitfield
+        );
+
+        if(returnCode != TINYOBJ_SUCCESS) {
+            prLogEvent(PR_EVENT_USER, PR_LOG_ERROR, "setupMeshes: tinyobjloader-c error code %d. Aborting operation, modifications may have occured", returnCode);
+            return;
+        }
+
         g_meshCube = prMeshCreate();
         prMeshSetVertexAttribute(g_meshCube, 0, 3, PR_FLOAT, PR_FALSE, 14 * sizeof(GLfloat), (void*)(0 * sizeof(GLfloat)));
         prMeshSetVertexAttribute(g_meshCube, 1, 2, PR_FLOAT, PR_FALSE, 14 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
@@ -657,6 +713,10 @@ void setupMeshes() {
         prMeshSetVertexAttribute(g_meshCube, 4, 3, PR_FLOAT, PR_FALSE, 14 * sizeof(GLfloat), (void*)(11 * sizeof(GLfloat)));
         prMeshUpdate(g_meshCube, cubeData, cubeDataSize, indices, indicesSize);
         prMeshLinkContext(g_meshCube, g_window->openglContext);
+
+        tinyobj_materials_free(materials, materialCount);
+        tinyobj_shapes_free(shapes, shapeCount);
+        tinyobj_attrib_free(&attributes);
 
         g_meshQuad = prMeshCreate();
         prMeshSetVertexAttribute(g_meshQuad, 0, 2, PR_FLOAT, PR_FALSE, 4 * sizeof(GLfloat), (void*)(0 * sizeof(GLfloat)));
