@@ -129,7 +129,7 @@ int main(int argc, char** argv) {
 
     float aspectRatio = sun.width / sun.height;
     mat4s lightProjection = glms_ortho(-50.0f * aspectRatio, 50.0f, -50.0f, 50.0f, sun.nearPlane, sun.farPlane);
-    mat4s lightView = glms_lookat({40.0f, 40.0f, 40.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f});
+    mat4s lightView = glms_lookat(glms_vec3_scale(glms_vec3_negate(sun.direction), 40.0f), {0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f});
     mat4s lightSpaceMatrix = glms_mat4_mul(lightProjection, lightView);
     prShaderSetUniformMatrix4fv(g_shaderDirectionalLight, "lightSpaceMatrix", &lightSpaceMatrix.raw[0][0]);
 
@@ -222,18 +222,21 @@ int main(int argc, char** argv) {
         for(int i = 0; i < 3; i++) {
             switch(i) {
                 case 0:
+                    g_window->openglContext->CullFace(GL_FRONT);
                     prFramebufferBind(g_framebufferSunShadowMap);
                     currentShaderProgram = g_shaderDirectionalLight;
                     g_window->openglContext->Viewport(0, 0, sun.width, sun.height);
                     break;
 
                 case 1:
+                    g_window->openglContext->CullFace(GL_FRONT);
                     prFramebufferBind(g_framebufferPointShadowMap);
                     currentShaderProgram = g_shaderPointLight;
                     g_window->openglContext->Viewport(0, 0, point.resolution, point.resolution);
                     break;
 
                 case 2:
+                    g_window->openglContext->CullFace(GL_BACK);
                     prFramebufferBind(g_framebufferMultisampled);
                     currentShaderProgram = (useDebugShader ? g_shaderDebug : g_shaderDefault);
                     g_window->openglContext->Viewport(0, 0, g_windowWidth, g_windowHeight);

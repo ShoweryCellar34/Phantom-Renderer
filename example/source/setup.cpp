@@ -681,30 +681,6 @@ void setupMeshes() {
         };
         static int indicesQuadSize = sizeof(indicesQuad);
 
-        // 1. Prepare your attributes, shapes, materials
-        tinyobj_attrib_t attributes;
-        tinyobj_attrib_init(&attributes);
-
-        tinyobj_shape_t*    shapes         = nullptr;
-        size_t              shapeCount     = 0;
-        tinyobj_material_t* materials      = nullptr;
-        size_t              materialCount  = 0;
-
-        int returnCode = tinyobj_parse_obj(
-            &attributes,                  // out attributes
-            &shapes, &shapeCount,         // out shapes + count
-            &materials, &materialCount,   // out materials + count
-            "cube.obj",                   // in .obj filename
-            defaultFileReader,            // your callback
-            (void*)TO_RES("res/models/"), // user_data passed to reader
-            TINYOBJ_FLAG_TRIANGULATE      // flags bitfield
-        );
-
-        if(returnCode != TINYOBJ_SUCCESS) {
-            prLogEvent(PR_EVENT_USER, PR_LOG_ERROR, "setupMeshes: tinyobjloader-c error code %d. Aborting operation, modifications may have occured", returnCode);
-            return;
-        }
-
         g_meshCube = prMeshCreate();
         prMeshSetVertexAttribute(g_meshCube, 0, 3, PR_FLOAT, PR_FALSE, 14 * sizeof(GLfloat), (void*)(0 * sizeof(GLfloat)));
         prMeshSetVertexAttribute(g_meshCube, 1, 2, PR_FLOAT, PR_FALSE, 14 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
@@ -713,10 +689,6 @@ void setupMeshes() {
         prMeshSetVertexAttribute(g_meshCube, 4, 3, PR_FLOAT, PR_FALSE, 14 * sizeof(GLfloat), (void*)(11 * sizeof(GLfloat)));
         prMeshUpdate(g_meshCube, cubeData, cubeDataSize, indices, indicesSize);
         prMeshLinkContext(g_meshCube, g_window->openglContext);
-
-        tinyobj_materials_free(materials, materialCount);
-        tinyobj_shapes_free(shapes, shapeCount);
-        tinyobj_attrib_free(&attributes);
 
         g_meshQuad = prMeshCreate();
         prMeshSetVertexAttribute(g_meshQuad, 0, 2, PR_FLOAT, PR_FALSE, 4 * sizeof(GLfloat), (void*)(0 * sizeof(GLfloat)));
