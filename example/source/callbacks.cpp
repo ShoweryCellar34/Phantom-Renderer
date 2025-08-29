@@ -95,6 +95,7 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
         int height = viewportSize[3];
 
         unsigned char* pixels = reinterpret_cast<unsigned char*>(prMalloc(width * height * 4));
+        prFramebufferUnbind(context);
         context->ReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
 
         int timestamp = time(NULL);
@@ -102,6 +103,7 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
         snprintf(name, 32, "%i.png", timestamp);
 
         stbi_flip_vertically_on_write(1);
+        std::filesystem::create_directories(TO_USR("screenshots/"));
         stbi_write_png(TO_USR("screenshots" / name), width, height, 4, pixels, width * 4);
         prLogEvent(PR_EVENT_USER, PR_LOG_INFO, "Save screenshot with dimentions %ix%i to path: %s", width, height, TO_USR("screenshots" / name));
 

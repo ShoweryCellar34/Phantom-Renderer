@@ -19,6 +19,8 @@ void setLogFilePath(std::filesystem::path logFilePath) {
 }
 
 void setupLog() {
+    std::filesystem::create_directories(g_logFilePath.parent_path());
+
     prLogSetLevel(PR_LOG_TRACE);
     prLogSetStream(1, (FILE**)stdout);
 

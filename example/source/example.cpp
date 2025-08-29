@@ -21,7 +21,7 @@ void proccessInput(GLFWwindow* window) {
     if(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
         cameraSpeed *= 2.0f;
     }
-    if(glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS) {
+    if(glfwGetKey(window, GLFW_KEY_LEFT_ALT) == GLFW_PRESS) {
         cameraSpeed /= 2.0f;
     }
 
@@ -54,7 +54,7 @@ void proccessInput(GLFWwindow* window) {
 
 int main(int argc, char** argv) {
     setupPaths();
-    setLogFilePath(TO_USR("prLog.txt"));
+    setLogFilePath(TO_USR("logs/prLog.txt"));
     setupLog();
 
     setupWindow();
@@ -101,7 +101,7 @@ int main(int argc, char** argv) {
         {0.02f, 0.015f, 0.015f},
         {0.6f, 0.6f, 0.55f},
         {1.0f, 1.0f, 0.95f},
-        0.1f,
+        5.0f,
         200.0f,
         SUN_LIGHT_WIDTH,
         SUN_LIGHT_HEIGHT,
@@ -116,7 +116,7 @@ int main(int argc, char** argv) {
         {0.0f, 0.0f, 0.0f},
         {0.0f, 0.0f, 1.0f},
         {1.0f, 0.0f, 0.0f},
-        0.1f,
+        1.0f,
         100.0f,
         POINT_LIGHT_RESOLUTION,
         5
@@ -161,6 +161,8 @@ int main(int argc, char** argv) {
     prShaderSetUniform1f(g_shaderPointLight, "farPlane", point.farPlane);
 
     g_window->openglContext->Enable(GL_DEPTH_TEST);
+    g_window->openglContext->Enable(GL_CULL_FACE);
+    g_window->openglContext->FrontFace(GL_CCW);
     g_window->openglContext->Enable(GL_BLEND);
 
     glfwMaximizeWindow(g_window->window);
@@ -244,19 +246,19 @@ int main(int argc, char** argv) {
             }
 
             g_materialContainer.bind(currentShaderProgram);
-            prShaderSetUniformMatrix4fv(currentShaderProgram, "translation", &translationsToMatrix({0.0f, 0.0f, -30.0f}, {0.0f, 0.0f, 0.0f}, {30.0f, 30.0f, 30.0f}).raw[0][0]);
+            prShaderSetUniformMatrix4fv(currentShaderProgram, "translation", &translationsToMatrix({0.0f, 0.0f, -30.0f}, {0.0f, 0.0f, 0.0f}, {30.1f, 30.1f, 30.1f}).raw[0][0]);
             prMeshDrawIndices(g_meshCube);
 
             g_materialSteel.bind(currentShaderProgram);
-            prShaderSetUniformMatrix4fv(currentShaderProgram, "translation", &translationsToMatrix({0.0f, -30.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, {30.0f, 30.0f, 30.0f}).raw[0][0]);
+            prShaderSetUniformMatrix4fv(currentShaderProgram, "translation", &translationsToMatrix({0.0f, -30.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, {30.1f, 30.1f, 30.1f}).raw[0][0]);
             prMeshDrawIndices(g_meshCube);
 
             g_materialBrickWall.bind(currentShaderProgram);
-            prShaderSetUniformMatrix4fv(currentShaderProgram, "translation", &translationsToMatrix({-30.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, {30.0f, 30.0f, 30.0f}).raw[0][0]);
+            prShaderSetUniformMatrix4fv(currentShaderProgram, "translation", &translationsToMatrix({-30.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, {30.1f, 30.1f, 30.1f}).raw[0][0]);
             prMeshDrawIndices(g_meshCube);
 
             g_materialCheckerboard.bind(currentShaderProgram);
-            prShaderSetUniformMatrix4fv(currentShaderProgram, "translation", &translationsToMatrix({-115.0f, -20.0f, -115.0f}, {0.0f, 0.0f, 0.0f}, {200.0f, 10.0f, 200.0f}).raw[0][0]);
+            prShaderSetUniformMatrix4fv(currentShaderProgram, "translation", &translationsToMatrix({-115.0f, -20.0f, -115.0f}, {0.0f, 0.0f, 0.0f}, {200.01f, 10.01f, 200.01f}).raw[0][0]);
             prMeshDrawIndices(g_meshCube);
 
             g_materialBrickWall.bind(currentShaderProgram);
@@ -312,7 +314,9 @@ int main(int argc, char** argv) {
         prShaderSetUniform1i(g_shaderSkybox, "skybox", 0);
         g_window->openglContext->DepthFunc(GL_LEQUAL);
         prShaderBind(g_shaderSkybox);
+        g_window->openglContext->FrontFace(GL_CW);
         prMeshDrawIndices(g_meshCube);
+        g_window->openglContext->FrontFace(GL_CCW);
 
         if(showHUD == 1) {
             g_window->openglContext->BlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
