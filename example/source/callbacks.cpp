@@ -2,7 +2,11 @@
 
 #include <globals.hpp>
 
+#include <thread>
+
 void framebufferSizeCallback(GLFWwindow* window, int width, int height) {
+    g_windowRawWidth = width;
+    g_windowRawHeight = height;
     g_windowWidth = width;
     g_windowHeight = height;
     GladGLContext* context = reinterpret_cast<GladGLContext*>(glfwGetWindowUserPointer(window));
@@ -24,7 +28,9 @@ void framebufferSizeCallback(GLFWwindow* window, int width, int height) {
     prTextureUpdate(g_textureColorDefault, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, true, NULL, 0, g_windowWidth, g_windowHeight);
     prRenderBufferUpdate(g_RBODepthStencilDefault, PR_FORMAT_DEPTH_STENCIL, g_windowWidth, g_windowHeight, 0);
 
-    prCameraUpdateDimentions(camera);
+    prRenderBufferUpdate(g_RBOColorScreenShot, PR_FORMAT_RGB, g_windowRawWidth, g_windowRawHeight, 0);
+
+    prCameraUpdateDimentions(g_camera);
 }
 
 void cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
@@ -58,6 +64,13 @@ void cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
     }
 }
 
+void saveScreenShot(std::string path, unsigned char* pixels, int channels) {
+    stbi_write_png(path.c_str(), g_windowRawWidth, g_windowRawHeight, channels, pixels, g_windowRawWidth * channels);
+    prFree(pixels);
+
+    return;
+}
+
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
     if(key == GLFW_KEY_X && action == GLFW_PRESS) {
         showHUD = !showHUD;
@@ -86,17 +99,20 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
         useDebugShader = !useDebugShader;
     }
 
-    if(key == GLFW_KEY_ENTER && action == GLFW_PRESS) {
+    if(key == GLFW_KEY_ENTER && action == GLFW_PRESS && (!screenShotThread || screenShotThread->joinable())) {
         GladGLContext* context = reinterpret_cast<GladGLContext*>(glfwGetWindowUserPointer(window));
 
-        GLint viewportSize[4];
-        context->GetIntegerv(GL_VIEWPORT, viewportSize);
-        int width = viewportSize[2];
-        int height = viewportSize[3];
+        prFramebufferBlit(context, g_framebufferDefault, g_framebufferScreenShot,
+            0, 0, g_windowWidth, g_windowHeight,
+            0, 0, g_windowRawWidth, g_windowRawHeight,
+            PR_BUFFER_BIT_COLOR, PR_FILTER_NEAREST
+        );
+        prFramebufferBind(g_framebufferScreenShot);
 
-        unsigned char* pixels = reinterpret_cast<unsigned char*>(prMalloc(width * height * 4));
-        prFramebufferUnbind(context);
-        context->ReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+        int channels = 3;
+
+        unsigned char* pixels = reinterpret_cast<unsigned char*>(prMalloc(g_windowRawWidth * g_windowRawHeight * channels));
+        context->ReadPixels(0, 0, g_windowRawWidth, g_windowRawHeight, GL_RGB, GL_UNSIGNED_BYTE, pixels);
 
         int timestamp = time(NULL);
         char name[32];
@@ -104,10 +120,15 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 
         stbi_flip_vertically_on_write(1);
         std::filesystem::create_directories(TO_USR("screenshots/"));
-        stbi_write_png(TO_USR("screenshots" / name), width, height, 4, pixels, width * 4);
-        prLogEvent(PR_EVENT_USER, PR_LOG_INFO, "Save screenshot with dimentions %ix%i to path: %s", width, height, TO_USR("screenshots" / name));
+        prLogEvent(PR_EVENT_USER, PR_LOG_INFO, "Saving screenshot with dimentions %ix%i to path: %s", g_windowRawWidth, g_windowRawHeight, TO_USR("screenshots" / name));
 
-        prFree(pixels);
+        if(screenShotThread == nullptr) {
+            screenShotThread = new std::thread(saveScreenShot, std::string(TO_USR("screenshots" / name)), pixels, channels);
+        } else {
+            screenShotThread->join();
+            delete screenShotThread;
+            screenShotThread = new std::thread(saveScreenShot, std::string(TO_USR("screenshots" / name)), pixels, channels);
+        }
     }
 
     if(key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {

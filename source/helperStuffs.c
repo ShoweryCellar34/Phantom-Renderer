@@ -72,7 +72,7 @@ prTextureData* makeTextureCheckerboard(GladGLContext* context, size_t scale, vec
 
     prFree(template);
 
-    prTextureUpdate(texture, PR_FORMAT_RGBA, PR_WRAPPING_REPEAT, PR_FILTER_NEAREST_MIPMAP_NEAREST, PR_FILTER_NEAREST, true, textureData, scale * scale * 4, scale, scale);
+    prTextureUpdate(texture, PR_FORMAT_RGBA, PR_WRAPPING_REPEAT, PR_FILTER_NEAREST, PR_FILTER_NEAREST, false, textureData, scale * scale * 4, scale, scale);
     
     prFree(textureData);
 

@@ -114,7 +114,7 @@ void setupShaders() {
 
         g_computeShaderPostProcessing = loadComputeShader(g_window->openglContext, TO_RES("res/shaders/postProcessingComputeShader.glsl"));
         g_texturePostProcessing = prTextureCreate();
-        prTextureUpdate(g_texturePostProcessing, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, true, NULL, 0, g_windowWidth, g_windowHeight);
+        prTextureUpdate(g_texturePostProcessing, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR, PR_FILTER_LINEAR, false, NULL, 0, g_windowWidth, g_windowHeight);
         prTextureLinkContext(g_texturePostProcessing, g_window->openglContext);
 
         g_shadersInit = true;
@@ -164,7 +164,7 @@ void setupFramebuffers() {
         }
 
         g_textureColorDefault = prTextureCreate();
-        prTextureUpdate(g_textureColorDefault, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, true, NULL, 0, g_windowWidth, g_windowHeight);
+        prTextureUpdate(g_textureColorDefault, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR, PR_FILTER_LINEAR, false, NULL, 0, g_windowWidth, g_windowHeight);
         prTextureLinkContext(g_textureColorDefault, g_window->openglContext);
 
         g_RBODepthStencilDefault = prRenderBufferCreate();
@@ -210,7 +210,7 @@ void setupFramebuffers() {
 
 
         g_textureBloom = prTextureCreate();
-        prTextureUpdate(g_textureBloom, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, true, NULL, 0, g_windowWidth, g_windowHeight);
+        prTextureUpdate(g_textureBloom, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR, PR_FILTER_LINEAR, false, NULL, 0, g_windowWidth, g_windowHeight);
         prTextureLinkContext(g_textureBloom, g_window->openglContext);
 
         g_framebufferBloom = prFramebufferCreate();
@@ -224,7 +224,7 @@ void setupFramebuffers() {
 
 
         g_textureColorGaussianBlur1 = prTextureCreate();
-        prTextureUpdate(g_textureColorGaussianBlur1, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, true, NULL, 0, g_windowWidth, g_windowHeight);
+        prTextureUpdate(g_textureColorGaussianBlur1, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR, PR_FILTER_LINEAR, false, NULL, 0, g_windowWidth, g_windowHeight);
         prTextureLinkContext(g_textureColorGaussianBlur1, g_window->openglContext);
 
         g_framebufferGaussianBlur1 = prFramebufferCreate();
@@ -238,7 +238,7 @@ void setupFramebuffers() {
 
 
         g_textureColorGaussianBlur2 = prTextureCreate();
-        prTextureUpdate(g_textureColorGaussianBlur2, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, true, NULL, 0, g_windowWidth, g_windowHeight);
+        prTextureUpdate(g_textureColorGaussianBlur2, PR_FORMAT_RGBA, PR_WRAPPING_EDGE, PR_FILTER_LINEAR, PR_FILTER_LINEAR, false, NULL, 0, g_windowWidth, g_windowHeight);
         prTextureLinkContext(g_textureColorGaussianBlur2, g_window->openglContext);
 
         g_framebufferGaussianBlur2 = prFramebufferCreate();
@@ -298,6 +298,18 @@ void setupFramebuffers() {
             return;
         }
 
+        g_RBOColorScreenShot = prRenderBufferCreate();
+        prRenderBufferUpdate(g_RBOColorScreenShot, PR_FORMAT_RGB, g_windowRawWidth, g_windowRawHeight, 0);
+        prRenderBufferLinkContext(g_RBOColorScreenShot, g_window->openglContext);
+
+        g_framebufferScreenShot = prFramebufferCreate();
+        prFramebufferLinkColorRBO(g_framebufferScreenShot, g_RBOColorScreenShot, 0);
+        prFramebufferLinkContext(g_framebufferScreenShot, g_window->openglContext);
+        if(prFramebufferCheckStatus(g_framebufferScreenShot) != GL_FRAMEBUFFER_COMPLETE) {
+            prLogEvent(PR_EVENT_USER, PR_LOG_ERROR, "setupFramebuffers: Failed to create framebuffer: g_framebufferScreenShot. Aborting operation, modifications may have occurred");
+            return;
+        }
+
         g_framebuffersInit = true;
     } else {
         prLogEvent(PR_EVENT_USER, PR_LOG_ERROR, "setupFramebuffers: Framebuffers already initialized. Aborting operation, nothing was modified");
@@ -353,6 +365,11 @@ void shutdownFramebuffers() {
         g_framebufferPointShadowMap = nullptr;
         prCubeMapDestroy(g_cubeMapDepthPointShadowMap);
         g_cubeMapDepthPointShadowMap = nullptr;
+
+        prFramebufferDestroy(g_framebufferScreenShot);
+        g_framebufferScreenShot = nullptr;
+        prRenderBufferDestroy(g_RBOColorScreenShot);
+        g_RBOColorScreenShot = nullptr;
 
         g_framebuffersInit = false;
     } else {

@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include <filesystem>
+#include <thread>
 #include <PR/PR.h>
 #include <materials.hpp>
 
@@ -32,6 +33,8 @@ extern bool g_windowInit;
 
 extern prWindow* g_window;
 
+extern int g_windowRawWidth;
+extern int g_windowRawHeight;
 extern int g_windowWidth;
 extern int g_windowHeight;
 
@@ -71,6 +74,9 @@ extern prFramebufferData* g_framebufferMultisampled;
 extern prTextureData* g_textureColorDefault;
 extern prRenderBufferData* g_RBODepthStencilDefault;
 extern prFramebufferData* g_framebufferDefault;
+
+extern prRenderBufferData* g_RBOColorScreenShot;
+extern prFramebufferData* g_framebufferScreenShot;
 
 // Textures
 extern bool g_texturesInit;
@@ -126,8 +132,10 @@ extern bool showPostProcessing;
 
 extern bool useDebugShader;
 
-extern prCamera* camera;
+extern prCamera* g_camera;
 extern vec3s cameraPosition;
 
 extern float deltaTime;
 extern float lastFrame;
+
+extern std::thread* screenShotThread;

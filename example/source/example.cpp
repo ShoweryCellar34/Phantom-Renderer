@@ -26,29 +26,29 @@ void proccessInput(GLFWwindow* window) {
     }
 
     if(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-        cameraPosition = glms_vec3_add(cameraPosition, glms_vec3_scale(camera->front, cameraSpeed));
+        cameraPosition = glms_vec3_add(cameraPosition, glms_vec3_scale(g_camera->front, cameraSpeed));
     }
     if(glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-        cameraPosition = glms_vec3_sub(cameraPosition, glms_vec3_scale(camera->front, cameraSpeed));
+        cameraPosition = glms_vec3_sub(cameraPosition, glms_vec3_scale(g_camera->front, cameraSpeed));
     }
     if(glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-        cameraPosition = glms_vec3_sub(cameraPosition, glms_vec3_scale(glms_normalize(glms_cross(camera->front, camera->up)), cameraSpeed));
+        cameraPosition = glms_vec3_sub(cameraPosition, glms_vec3_scale(glms_normalize(glms_cross(g_camera->front, g_camera->up)), cameraSpeed));
     }
     if(glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-        cameraPosition = glms_vec3_add(cameraPosition, glms_vec3_scale(glms_normalize(glms_cross(camera->front, camera->up)), cameraSpeed));
+        cameraPosition = glms_vec3_add(cameraPosition, glms_vec3_scale(glms_normalize(glms_cross(g_camera->front, g_camera->up)), cameraSpeed));
     }
     if(glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
-        cameraPosition = glms_vec3_add(cameraPosition, glms_vec3_scale(camera->up, cameraSpeed));
+        cameraPosition = glms_vec3_add(cameraPosition, glms_vec3_scale(g_camera->up, cameraSpeed));
     }
     if(glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
-        cameraPosition = glms_vec3_sub(cameraPosition, glms_vec3_scale(camera->up, cameraSpeed));
+        cameraPosition = glms_vec3_sub(cameraPosition, glms_vec3_scale(g_camera->up, cameraSpeed));
     }
 
     if(glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) {
-        cameraPosition = glms_vec3_add(cameraPosition, glms_vec3_scale(glms_cross(camera->front, glms_normalize(glms_cross(camera->up, camera->front))), cameraSpeed));
+        cameraPosition = glms_vec3_add(cameraPosition, glms_vec3_scale(glms_cross(g_camera->front, glms_normalize(glms_cross(g_camera->up, g_camera->front))), cameraSpeed));
     }
     if(glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) {
-        cameraPosition = glms_vec3_sub(cameraPosition, glms_vec3_scale(glms_cross(camera->front, glms_normalize(glms_cross(camera->up, camera->front))), cameraSpeed));
+        cameraPosition = glms_vec3_sub(cameraPosition, glms_vec3_scale(glms_cross(g_camera->front, glms_normalize(glms_cross(g_camera->up, g_camera->front))), cameraSpeed));
     }
 }
 
@@ -122,10 +122,10 @@ int main(int argc, char** argv) {
         5
     };
 
-    camera = prCameraCreate();
-    prCameraLinkContext(camera, g_window->openglContext);
+    g_camera = prCameraCreate();
+    prCameraLinkContext(g_camera, g_window->openglContext);
     vec3s rotation = {glm_rad(yaw), glm_rad(pitch), glm_rad(0.0f)};
-    prCameraUpdate(camera, cameraPosition, rotation, 45.0f, 0.1f, 1500.0f);
+    prCameraUpdate(g_camera, cameraPosition, rotation, 45.0f, 0.1f, 1500.0f);
 
     float aspectRatio = sun.width / sun.height;
     mat4s lightProjection = glms_ortho(-50.0f * aspectRatio, 50.0f, -50.0f, 50.0f, sun.nearPlane, sun.farPlane);
@@ -184,12 +184,12 @@ int main(int argc, char** argv) {
         prFramebufferClearColor(g_window->openglContext, g_framebufferDefault, 0, {0.3f, 0.5f, 0.7f, 1.0f});
         prFramebufferClearDepthStencil(g_window->openglContext, g_framebufferDefault, 1.0f, 0);
 
-        float currentFrame = glfwGetTime();
+        float currentFrame = glfwGetTime() / 1.0f;
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;  
 
         vec3s rotation = {glm_rad(yaw), glm_rad(pitch), glm_rad(0.0f)};
-        prCameraUpdate(camera, cameraPosition, rotation, 45.0f, 0.1f, 1500.0f);
+        prCameraUpdate(g_camera, cameraPosition, rotation, 45.0f, 0.1f, 1500.0f);
 
         prShaderData* currentShaderProgram = (useDebugShader ? g_shaderDebug : g_shaderDefault);
 
@@ -216,9 +216,9 @@ int main(int argc, char** argv) {
         prShaderSetUniform1i(currentShaderProgram, "pointLights[0].shadowMap", point.shadowMap);
         prShaderSetUniform1f(currentShaderProgram, "pointLights[0].farPlane", point.farPlane);
 
-        prShaderSetUniform3f(currentShaderProgram, "cameraPosition", camera->position.x, camera->position.y, camera->position.z);
-        prShaderSetUniformMatrix4fv(currentShaderProgram, "view", &camera->view.raw[0][0]);
-        prShaderSetUniformMatrix4fv(currentShaderProgram, "projection", &camera->projection.raw[0][0]);
+        prShaderSetUniform3f(currentShaderProgram, "cameraPosition", g_camera->position.x, g_camera->position.y, g_camera->position.z);
+        prShaderSetUniformMatrix4fv(currentShaderProgram, "view", &g_camera->view.raw[0][0]);
+        prShaderSetUniformMatrix4fv(currentShaderProgram, "projection", &g_camera->projection.raw[0][0]);
         prShaderSetUniformMatrix4fv(currentShaderProgram, "lightSpaceMatrix", &lightSpaceMatrix.raw[0][0]);
 
         for(int i = 0; i < 3; i++) {
@@ -308,9 +308,9 @@ int main(int argc, char** argv) {
                 break;
         }
 
-        prShaderSetUniformMatrix4fv(g_shaderSkybox, "translation", &translationsToMatrix(camera->position, {0.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f}).raw[0][0]);
-        prShaderSetUniformMatrix4fv(g_shaderSkybox, "view", &camera->view.raw[0][0]);
-        prShaderSetUniformMatrix4fv(g_shaderSkybox, "projection", &camera->projection.raw[0][0]);
+        prShaderSetUniformMatrix4fv(g_shaderSkybox, "translation", &translationsToMatrix(g_camera->position, {0.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f}).raw[0][0]);
+        prShaderSetUniformMatrix4fv(g_shaderSkybox, "view", &g_camera->view.raw[0][0]);
+        prShaderSetUniformMatrix4fv(g_shaderSkybox, "projection", &g_camera->projection.raw[0][0]);
         prShaderSetUniform1i(g_shaderSkybox, "skybox", 0);
         g_window->openglContext->DepthFunc(GL_LEQUAL);
         prShaderBind(g_shaderSkybox);
@@ -385,9 +385,10 @@ int main(int argc, char** argv) {
         glfwPollEvents();
         proccessInput(g_window->window);
     }
+    screenShotThread->join();
 
-    prCameraDestroy(camera);
-    camera = NULL;
+    prCameraDestroy(g_camera);
+    g_camera = NULL;
 
     shutdownMeshes();
     shutdownMaterials();

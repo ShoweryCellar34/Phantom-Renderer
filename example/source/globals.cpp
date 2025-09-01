@@ -13,8 +13,10 @@ bool g_windowInit = false;
 
 prWindow* g_window = nullptr;
 
-int g_windowWidth = DEFAULT_WINDOW_WIDTH;
-int g_windowHeight = DEFAULT_WINDOW_HEIGHT;
+int g_windowRawWidth = DEFAULT_WINDOW_WIDTH;
+int g_windowRawHeight = DEFAULT_WINDOW_HEIGHT;
+int g_windowWidth = g_windowRawWidth;
+int g_windowHeight = g_windowRawHeight;
 
 // Shaders
 bool g_shadersInit = false;
@@ -52,6 +54,9 @@ prFramebufferData* g_framebufferMultisampled = nullptr;
 prTextureData* g_textureColorDefault = nullptr;
 prRenderBufferData* g_RBODepthStencilDefault = nullptr;
 prFramebufferData* g_framebufferDefault = nullptr;
+
+prRenderBufferData* g_RBOColorScreenShot = nullptr;
+prFramebufferData* g_framebufferScreenShot = nullptr;
 
 // Textures
 bool g_texturesInit = false;
@@ -107,8 +112,10 @@ bool showPostProcessing = true;
 
 bool useDebugShader = false;
 
-prCamera* camera = nullptr;
+prCamera* g_camera = nullptr;
 vec3s cameraPosition = {35.0f, 35.0f, 35.0f};
 
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
+
+std::thread* screenShotThread = nullptr;
