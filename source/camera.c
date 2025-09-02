@@ -23,15 +23,13 @@ void prCameraLinkContext(prCamera* camera, GladGLContext* context) {
     }
 }
 
+void prCameraSetUpdateFunction(prCamera* camera, PRCameraUpdateFunction updateFunction) {
+}
+
 void prCameraUpdate(prCamera* camera, vec3s position, vec3s rotation, float FOV, float closePlane, float farPlane) {
     camera->position = position;
 
-    // float roll = (rotation[2] * M_PI) / 180.0;
-
-    // mat4 rollMatrix;
-    // glm_mat4_identity(rollMatrix);
-    // glm_rotate(rollMatrix, roll, camera->front);
-    // glm_mat4_mulv3(rollMatrix, camera->up, 0.0f, camera->up);
+    mat4s rotationMatrix = glms_euler_xyz(rotation);
 
     camera->front.x = cos(rotation.x) * cos(rotation.y);
     camera->front.y = sin(rotation.y);
