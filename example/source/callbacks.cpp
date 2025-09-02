@@ -53,14 +53,14 @@ void cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
     xoffset *= sensitivity;
     yoffset *= sensitivity;
 
-    yaw += xoffset;
-    pitch += yoffset;
+    g_yaw += xoffset;
+    g_pitch += yoffset;
 
-    if(pitch > 89.0f) {
-        pitch = 89.0f;
+    if(g_pitch > 89.0f) {
+        g_pitch = 89.0f;
     }
-    if(pitch < -89.0f) {
-        pitch = -89.0f;
+    if(g_pitch < -89.0f) {
+        g_pitch = -89.0f;
     }
 }
 
@@ -73,33 +73,33 @@ void saveScreenShot(std::string path, unsigned char* pixels, int channels) {
 
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
     if(key == GLFW_KEY_X && action == GLFW_PRESS) {
-        showHUD = !showHUD;
+        g_showHUD = !g_showHUD;
     }
     if(key == GLFW_KEY_Z && action == GLFW_PRESS) {
-        showPostProcessing = !showPostProcessing;
+        g_showPostProcessing = !g_showPostProcessing;
     }
 
     if(key == GLFW_KEY_1 && action == GLFW_PRESS) {
-        currentSkybox = 1;
+        g_currentSkybox = 1;
     }
     if(key == GLFW_KEY_2 && action == GLFW_PRESS) {
-        currentSkybox = 2;
+        g_currentSkybox = 2;
     }
     if(key == GLFW_KEY_3 && action == GLFW_PRESS) {
-        currentSkybox = 3;
+        g_currentSkybox = 3;
     }
     if(key == GLFW_KEY_4 && action == GLFW_PRESS) {
-        currentSkybox = 4;
+        g_currentSkybox = 4;
     }
     if(key == GLFW_KEY_0 && action == GLFW_PRESS) {
-        currentSkybox = 0;
+        g_currentSkybox = 0;
     }
 
     if(key == GLFW_KEY_BACKSLASH && action == GLFW_PRESS) {
-        useDebugShader = !useDebugShader;
+        g_useDebugShader = !g_useDebugShader;
     }
 
-    if(key == GLFW_KEY_ENTER && action == GLFW_PRESS && (!screenShotThread || screenShotThread->joinable())) {
+    if(key == GLFW_KEY_ENTER && action == GLFW_PRESS && (!g_screenShotThread || g_screenShotThread->joinable())) {
         GladGLContext* context = reinterpret_cast<GladGLContext*>(glfwGetWindowUserPointer(window));
 
         prFramebufferBlit(context, g_framebufferDefault, g_framebufferScreenShot,
@@ -122,12 +122,12 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
         std::filesystem::create_directories(TO_USR("screenshots/"));
         prLogEvent(PR_EVENT_USER, PR_LOG_INFO, "Saving screenshot with dimentions %ix%i to path: %s", g_windowRawWidth, g_windowRawHeight, TO_USR("screenshots" / name));
 
-        if(screenShotThread == nullptr) {
-            screenShotThread = new std::thread(saveScreenShot, std::string(TO_USR("screenshots" / name)), pixels, channels);
+        if(g_screenShotThread == nullptr) {
+            g_screenShotThread = new std::thread(saveScreenShot, std::string(TO_USR("screenshots" / name)), pixels, channels);
         } else {
-            screenShotThread->join();
-            delete screenShotThread;
-            screenShotThread = new std::thread(saveScreenShot, std::string(TO_USR("screenshots" / name)), pixels, channels);
+            g_screenShotThread->join();
+            delete g_screenShotThread;
+            g_screenShotThread = new std::thread(saveScreenShot, std::string(TO_USR("screenshots" / name)), pixels, channels);
         }
     }
 

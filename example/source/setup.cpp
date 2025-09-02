@@ -260,7 +260,7 @@ void setupFramebuffers() {
 
         g_textureDepthSunShadowMap = prTextureCreate();
         prTextureUpdate(g_textureDepthSunShadowMap, PR_FORMAT_DEPTH, PR_WRAPPING_BORDER, PR_FILTER_LINEAR, PR_FILTER_LINEAR, false, NULL, 0, SUN_LIGHT_WIDTH, SUN_LIGHT_HEIGHT);
-        prTextureBorderColor(g_textureDepthSunShadowMap, {1.0f, 1.0f, 1.0f, 1.0f});
+        prTextureBorderColor(g_textureDepthSunShadowMap, {0.0f, 1.0f, 1.0f, 1.0f});
         prTextureLinkContext(g_textureDepthSunShadowMap, g_window->openglContext);
 
         g_framebufferSunShadowMap = prFramebufferCreate();
@@ -546,10 +546,10 @@ void setupMaterials() {
         g_materialHUD.setMaps(g_textureHUD, g_textureBlack, g_textureNormalDefault, 0.0f);
         g_materialPostProcessing.setMaps(g_texturePostProcessing, g_textureBlack, g_textureNormalDefault, 0.0f);
 
-        g_materialContainer.setMaps(g_textureContainer, g_textureBlack, g_textureNormalDefault, 1.0f);
+        g_materialContainer.setMaps(g_textureContainer, g_textureWhite, g_textureNormalDefault, 32.0f);
         g_materialMetalRimmedContainer.setMaps(g_textureMetalRimmedContainer, g_textureMetalRimmedContainerSpecular, g_textureNormalDefault, 64.0f);
-        g_materialSteel.setMaps(g_textureSteel, g_textureBlack, g_textureSteelNormal, 48.0f);
-        g_materialBrickWall.setMaps(g_textureBrickWall, g_textureBlack, g_textureBrickWallNormal, 16.0f);
+        g_materialSteel.setMaps(g_textureSteel, g_textureWhite, g_textureSteelNormal, 128.0f);
+        g_materialBrickWall.setMaps(g_textureBrickWall, g_textureWhite, g_textureBrickWallNormal, 96.0f);
 
         g_materialsInit = true;
     } else {

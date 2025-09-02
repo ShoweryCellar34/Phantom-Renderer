@@ -14,7 +14,7 @@
 #define DEFAULT_WINDOW_WIDTH 1280
 #define DEFAULT_WINDOW_HEIGHT 720
 #define SAMPLES 4
-#define BLOOM_BLUR_PASSES 6
+#define BLOOM_BLUR_PASSES 10
 
 #define POINT_LIGHT_RESOLUTION 2048
 #define SUN_LIGHT_WIDTH 4096
@@ -123,19 +123,22 @@ extern bool g_meshesInit;
 extern prMeshData* g_meshCube;
 extern prMeshData* g_meshQuad;
 
-extern float pitch;
-extern float yaw;
-
-extern int currentSkybox;
-extern bool showHUD;
-extern bool showPostProcessing;
-
-extern bool useDebugShader;
-
+// Camera
 extern prCamera* g_camera;
-extern vec3s cameraPosition;
+extern vec3s g_cameraPosition;
+extern float g_pitch;
+extern float g_yaw;
 
-extern float deltaTime;
-extern float lastFrame;
+// Time
+extern float g_deltaTime;
+extern float g_lastFrame;
 
-extern std::thread* screenShotThread;
+// State settings
+extern int g_currentSkybox;
+extern bool g_showHUD;
+extern bool g_showPostProcessing;
+
+extern bool g_useDebugShader;
+
+// Misc
+extern std::thread* g_screenShotThread;

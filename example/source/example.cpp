@@ -17,7 +17,7 @@ mat4s translationsToMatrix(vec3s position, vec3s rotation, vec3s scale) {
 }
 
 void proccessInput(GLFWwindow* window) {
-    float cameraSpeed = 7.5f * deltaTime;
+    float cameraSpeed = 7.5f * g_deltaTime;
     if(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
         cameraSpeed *= 2.0f;
     }
@@ -26,29 +26,29 @@ void proccessInput(GLFWwindow* window) {
     }
 
     if(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-        cameraPosition = glms_vec3_add(cameraPosition, glms_vec3_scale(g_camera->front, cameraSpeed));
+        g_cameraPosition = glms_vec3_add(g_cameraPosition, glms_vec3_scale(g_camera->front, cameraSpeed));
     }
     if(glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-        cameraPosition = glms_vec3_sub(cameraPosition, glms_vec3_scale(g_camera->front, cameraSpeed));
+        g_cameraPosition = glms_vec3_sub(g_cameraPosition, glms_vec3_scale(g_camera->front, cameraSpeed));
     }
     if(glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-        cameraPosition = glms_vec3_sub(cameraPosition, glms_vec3_scale(glms_normalize(glms_cross(g_camera->front, g_camera->up)), cameraSpeed));
+        g_cameraPosition = glms_vec3_sub(g_cameraPosition, glms_vec3_scale(glms_normalize(glms_cross(g_camera->front, g_camera->up)), cameraSpeed));
     }
     if(glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-        cameraPosition = glms_vec3_add(cameraPosition, glms_vec3_scale(glms_normalize(glms_cross(g_camera->front, g_camera->up)), cameraSpeed));
+        g_cameraPosition = glms_vec3_add(g_cameraPosition, glms_vec3_scale(glms_normalize(glms_cross(g_camera->front, g_camera->up)), cameraSpeed));
     }
     if(glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
-        cameraPosition = glms_vec3_add(cameraPosition, glms_vec3_scale(g_camera->up, cameraSpeed));
+        g_cameraPosition = glms_vec3_add(g_cameraPosition, glms_vec3_scale(g_camera->up, cameraSpeed));
     }
     if(glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
-        cameraPosition = glms_vec3_sub(cameraPosition, glms_vec3_scale(g_camera->up, cameraSpeed));
+        g_cameraPosition = glms_vec3_sub(g_cameraPosition, glms_vec3_scale(g_camera->up, cameraSpeed));
     }
 
     if(glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) {
-        cameraPosition = glms_vec3_add(cameraPosition, glms_vec3_scale(glms_cross(g_camera->front, glms_normalize(glms_cross(g_camera->up, g_camera->front))), cameraSpeed));
+        g_cameraPosition = glms_vec3_add(g_cameraPosition, glms_vec3_scale(glms_cross(g_camera->front, glms_normalize(glms_cross(g_camera->up, g_camera->front))), cameraSpeed));
     }
     if(glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) {
-        cameraPosition = glms_vec3_sub(cameraPosition, glms_vec3_scale(glms_cross(g_camera->front, glms_normalize(glms_cross(g_camera->up, g_camera->front))), cameraSpeed));
+        g_cameraPosition = glms_vec3_sub(g_cameraPosition, glms_vec3_scale(glms_cross(g_camera->front, glms_normalize(glms_cross(g_camera->up, g_camera->front))), cameraSpeed));
     }
 }
 
@@ -124,11 +124,11 @@ int main(int argc, char** argv) {
 
     g_camera = prCameraCreate();
     prCameraLinkContext(g_camera, g_window->openglContext);
-    vec3s rotation = {glm_rad(yaw), glm_rad(pitch), glm_rad(0.0f)};
-    prCameraUpdate(g_camera, cameraPosition, rotation, 45.0f, 0.1f, 1500.0f);
+    vec3s rotation = {glm_rad(g_yaw), glm_rad(g_pitch), glm_rad(0.0f)};
+    prCameraUpdate(g_camera, g_cameraPosition, rotation, 45.0f, 0.1f, 1500.0f);
 
     float aspectRatio = sun.width / sun.height;
-    mat4s lightProjection = glms_ortho(-50.0f * aspectRatio, 50.0f, -50.0f, 50.0f, sun.nearPlane, sun.farPlane);
+    mat4s lightProjection = glms_ortho(-100.0f, 100.0f, -100.0f, 100.0f, sun.nearPlane, sun.farPlane);
     mat4s lightView = glms_lookat(glms_vec3_scale(glms_vec3_negate(sun.direction), 40.0f), {0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f});
     mat4s lightSpaceMatrix = glms_mat4_mul(lightProjection, lightView);
     prShaderSetUniformMatrix4fv(g_shaderDirectionalLight, "lightSpaceMatrix", &lightSpaceMatrix.raw[0][0]);
@@ -185,16 +185,16 @@ int main(int argc, char** argv) {
         prFramebufferClearDepthStencil(g_window->openglContext, g_framebufferDefault, 1.0f, 0);
 
         float currentFrame = glfwGetTime() / 1.0f;
-        deltaTime = currentFrame - lastFrame;
-        lastFrame = currentFrame;  
+        g_deltaTime = currentFrame - g_lastFrame;
+        g_lastFrame = currentFrame;  
 
-        vec3s rotation = {glm_rad(yaw), glm_rad(pitch), glm_rad(0.0f)};
-        prCameraUpdate(g_camera, cameraPosition, rotation, 45.0f, 0.1f, 1500.0f);
+        vec3s rotation = {glm_rad(g_yaw), glm_rad(g_pitch), glm_rad(0.0f)};
+        prCameraUpdate(g_camera, g_cameraPosition, rotation, 45.0f, 0.1f, 1500.0f);
 
-        prShaderData* currentShaderProgram = (useDebugShader ? g_shaderDebug : g_shaderDefault);
+        prShaderData* currentShaderProgram = (g_useDebugShader ? g_shaderDebug : g_shaderDefault);
 
         static float seed = 0;
-        seed += deltaTime;
+        seed += g_deltaTime;
         float smoothSinOverTime = sin(seed);
         float smoothOverTime = seed;
 
@@ -240,7 +240,7 @@ int main(int argc, char** argv) {
                 case 2:
                     g_window->openglContext->CullFace(GL_BACK);
                     prFramebufferBind(g_framebufferMultisampled);
-                    currentShaderProgram = (useDebugShader ? g_shaderDebug : g_shaderDefault);
+                    currentShaderProgram = (g_useDebugShader ? g_shaderDebug : g_shaderDefault);
                     g_window->openglContext->Viewport(0, 0, g_windowWidth, g_windowHeight);
                     break;
             }
@@ -286,7 +286,7 @@ int main(int argc, char** argv) {
             prMeshDrawIndices(g_meshCube);
         }
 
-        switch(currentSkybox) {
+        switch(g_currentSkybox) {
             case 1:
                 prCubeMapBindTexture(g_cubeMapIslands, 0);
                 break;
@@ -318,7 +318,7 @@ int main(int argc, char** argv) {
         prMeshDrawIndices(g_meshCube);
         g_window->openglContext->FrontFace(GL_CCW);
 
-        if(showHUD == 1) {
+        if(g_showHUD == 1) {
             g_window->openglContext->BlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
             g_window->openglContext->Disable(GL_DEPTH_TEST);
             g_materialHUD.bind(g_shaderHUD);
@@ -332,7 +332,7 @@ int main(int argc, char** argv) {
         );
         prFramebufferBind(g_framebufferDefault);
 
-        if(showPostProcessing) {
+        if(g_showPostProcessing) {
             prTextureBindTexture(g_textureColorDefault, 0);
             prTextureBindImage(g_texturePostProcessing, 1, 0, PR_ACCESS_WRITE_ONLY, GL_RGBA32F);
             prComputeShaderDispatch(g_computeShaderPostProcessing, g_windowWidth , g_windowHeight, 1);
@@ -385,7 +385,9 @@ int main(int argc, char** argv) {
         glfwPollEvents();
         proccessInput(g_window->window);
     }
-    screenShotThread->join();
+    if(g_screenShotThread) {
+        g_screenShotThread->join();
+    }
 
     prCameraDestroy(g_camera);
     g_camera = NULL;

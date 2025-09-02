@@ -145,7 +145,7 @@ vec3 calculateShadedResult(vec3 diffuse, vec3 specular, vec3 normal) {
     vec3 result = vec3(0.0, 0.0, 0.0);
 
     for(int i = 0; i < NR_DIRECTIONAL_LIGHTS; i++) {
-        float bias = max(0.005 * (1.0 - dot(normal, normalize(-directionalLights[i].direction))), 0.000005);
+        float bias = max(0.005 * (1.0 - dot(normal, normalize(-directionalLights[i].direction))), 0.0005);
         float shadow = directonalShadowCalculation(directionalLights[i], geometryOut.fragmentPositionLightSpace, bias);
         result += calculateDirectionalLight(directionalLights[i], viewDirection, diffuse, specular, normal, shadow);
     }

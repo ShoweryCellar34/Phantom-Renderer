@@ -103,19 +103,22 @@ bool g_meshesInit = false;
 prMeshData* g_meshCube = nullptr;
 prMeshData* g_meshQuad = nullptr;
 
-float pitch = 0.0f;
-float yaw = 0.0f;
-
-int currentSkybox = 1;
-bool showHUD = true;
-bool showPostProcessing = true;
-
-bool useDebugShader = false;
-
+// Camera
 prCamera* g_camera = nullptr;
-vec3s cameraPosition = {35.0f, 35.0f, 35.0f};
+vec3s g_cameraPosition = {35.0f, 35.0f, 35.0f};
+float g_pitch = 0.0f;
+float g_yaw = 0.0f;
 
-float deltaTime = 0.0f;
-float lastFrame = 0.0f;
+// Time
+float g_deltaTime = 0.0f;
+float g_lastFrame = 0.0f;
 
-std::thread* screenShotThread = nullptr;
+// State settings
+int g_currentSkybox = 1;
+bool g_showHUD = true;
+bool g_showPostProcessing = true;
+
+bool g_useDebugShader = false;
+
+// Misc
+std::thread* g_screenShotThread = nullptr;
