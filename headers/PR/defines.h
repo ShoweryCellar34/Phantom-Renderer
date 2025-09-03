@@ -2,13 +2,15 @@
 
 #include <stdint.h>
 #include <stddef.h>
+#include <cglm/cglm.h>
 
-typedef struct prShaderData prShaderData;
 typedef struct prCamera prCamera;
+typedef struct prMeshData prMeshData;
 
 typedef int8_t prLogLevel_t;
 typedef int8_t prEvent_t;
-typedef void (* PRCameraUpdateFunction)(prShaderData* shader, prCamera* camera);
+typedef void (* PRCameraUpdateFunction)(prCamera* camera);
+typedef void (* PRMeshTranslationFunction)(prMeshData* mesh, mat4s translation);
 
 #define PR_MAXSTR_LEN                           1024
 #define PR_MAX_LOG_STREAMS                      8

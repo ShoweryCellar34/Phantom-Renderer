@@ -24,6 +24,6 @@ void prCameraLinkContext(prCamera* camera, GladGLContext* context);
 
 void prCameraSetUpdateFunction(prCamera* camera, PRCameraUpdateFunction updateFunction);
 
-void prCameraUpdate(prCamera* camera, vec3s position, vec3s rotation, float FOV, float closePlane, float farPlane);
+void prCameraUpdate(prCamera* camera, vec3s position, vec3s rotation, vec3s worldUp, float FOV, float closePlane, float farPlane);
 
 void prCameraUpdateDimentions(prCamera* camera);

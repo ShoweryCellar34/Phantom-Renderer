@@ -119,6 +119,7 @@ bool g_showHUD = true;
 bool g_showPostProcessing = true;
 
 bool g_useDebugShader = false;
+prShaderData* g_currentShaderProgram = nullptr;
 
 // Misc
 std::thread* g_screenShotThread = nullptr;

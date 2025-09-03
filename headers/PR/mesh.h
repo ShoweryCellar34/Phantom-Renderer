@@ -9,6 +9,7 @@ typedef struct prShaderData prShaderData;
 
 typedef struct prMeshData {
     GladGLContext* context;
+    PRMeshTranslationFunction translationFunction;
     void* GPUReadyBuffer;
     GLsizeiptr GPUReadyBufferSize;
     void* indices;
@@ -28,6 +29,8 @@ prMeshData* prMeshCreate();
 void prMeshDestroy(prMeshData* mesh);
 
 void prMeshLinkContext(prMeshData* mesh, GladGLContext* context);
+
+void prMeshSetTranslationFunction(prMeshData* mesh, PRMeshTranslationFunction translationFunction);
 
 void prMeshUpdate(prMeshData* mesh, void* GPUReadyBuffer, GLsizeiptr GPUReadyBufferSize, void* indices, GLsizeiptr indicesSize);
 

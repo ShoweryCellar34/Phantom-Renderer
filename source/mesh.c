@@ -34,6 +34,10 @@ void prMeshLinkContext(prMeshData* mesh, GladGLContext* context) {
     }
 }
 
+void prMeshSetTranslationFunction(prMeshData* mesh, PRMeshTranslationFunction translationFunction) {
+    mesh
+}
+
 void prMeshUpdate(prMeshData* mesh, void* GPUReadyBuffer, GLsizeiptr GPUReadyBufferSize, void* indices, GLsizeiptr indicesSize) {
     if(!GPUReadyBufferSize) {
         prLogEvent(PR_EVENT_DATA, PR_LOG_ERROR, "prMeshUpdate: Mesh data size cannot be zero. Aborting operation, nothing was modified");

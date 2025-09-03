@@ -20,6 +20,8 @@
 #define SUN_LIGHT_WIDTH 4096
 #define SUN_LIGHT_HEIGHT 4096
 
+#define VEC3_UP {0.0f, 1.0f, 0.0f}
+
 // Logging
 extern FILE* g_logFile;
 extern std::filesystem::path g_logFilePath;
@@ -139,6 +141,7 @@ extern bool g_showHUD;
 extern bool g_showPostProcessing;
 
 extern bool g_useDebugShader;
+extern prShaderData* g_currentShaderProgram;
 
 // Misc
 extern std::thread* g_screenShotThread;
