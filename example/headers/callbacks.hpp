@@ -8,6 +8,8 @@ void cursorPosCallback(GLFWwindow* window, double xpos, double ypos);
 
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
+void cubeMeshTranslationUpdate(prMeshData* mesh, void* translation);
+
 void APIENTRY openglDebugOutput(GLenum source, 
                             GLenum type,
                             unsigned int id,

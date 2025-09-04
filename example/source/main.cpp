@@ -1,7 +1,8 @@
 #include <globals.hpp>
 
-#include <PR/PR.h>
 #include <setup.hpp>
+#include <PR/PR.h>
+#include <string>
 
 mat4s translationsToMatrix(vec3s position, vec3s rotation, vec3s scale) {
     mat4s matrix = glms_mat4_identity();
@@ -61,7 +62,10 @@ void cameraUpdateFunction(prCamera* camera) {
 
 int main(int argc, char** argv) {
     setupPaths();
-    setLogFilePath(TO_USR("logs/prLog.txt"));
+    {
+        std::filesystem::path logFileName = (std::string)("logs/prLog" + std::to_string(time(NULL)) + ".txt");
+        setLogFilePath(TO_USR(logFileName));
+    }
     setupLog();
 
     setupWindow();
@@ -171,6 +175,7 @@ int main(int argc, char** argv) {
     g_window->openglContext->Enable(GL_DEPTH_TEST);
     g_window->openglContext->Enable(GL_CULL_FACE);
     g_window->openglContext->FrontFace(GL_CCW);
+    g_window->openglContext->CullFace(GL_BACK);
     g_window->openglContext->Enable(GL_BLEND);
 
     glfwMaximizeWindow(g_window->window);
@@ -229,21 +234,18 @@ int main(int argc, char** argv) {
         for(int i = 0; i < 3; i++) {
             switch(i) {
                 case 0:
-                    g_window->openglContext->CullFace(GL_FRONT);
                     prFramebufferBind(g_framebufferSunShadowMap);
                     g_currentShaderProgram = g_shaderDirectionalLight;
                     g_window->openglContext->Viewport(0, 0, sun.width, sun.height);
                     break;
 
                 case 1:
-                    g_window->openglContext->CullFace(GL_FRONT);
                     prFramebufferBind(g_framebufferPointShadowMap);
                     g_currentShaderProgram = g_shaderPointLight;
                     g_window->openglContext->Viewport(0, 0, point.resolution, point.resolution);
                     break;
 
                 case 2:
-                    g_window->openglContext->CullFace(GL_BACK);
                     prFramebufferBind(g_framebufferMultisampled);
                     g_currentShaderProgram = (g_useDebugShader ? g_shaderDebug : g_shaderDefault);
                     g_window->openglContext->Viewport(0, 0, g_windowWidth, g_windowHeight);
@@ -251,45 +253,42 @@ int main(int argc, char** argv) {
             }
 
             g_materialContainer.bind(g_currentShaderProgram);
-            prShaderSetUniformMatrix4fv(g_currentShaderProgram, "translation", &translationsToMatrix({0.0f, 0.0f, -30.0f}, {0.0f, 0.0f, 0.0f}, {30.1f, 30.1f, 30.1f}).raw[0][0]);
-            prMeshDrawIndices(g_meshCube);
+            prMeshDrawIndices(g_meshCube, (void*)&translationsToMatrix({0.0f, 0.0f, -30.0f}, {0.0f, 0.0f, 0.0f}, {30.1f, 30.1f, 30.1f}).raw[0][0]);
 
             g_materialSteel.bind(g_currentShaderProgram);
-            prShaderSetUniformMatrix4fv(g_currentShaderProgram, "translation", &translationsToMatrix({0.0f, -30.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, {30.1f, 30.1f, 30.1f}).raw[0][0]);
-            prMeshDrawIndices(g_meshCube);
+            prMeshDrawIndices(g_meshCube, (void*)&translationsToMatrix({0.0f, -30.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, {30.1f, 30.1f, 30.1f}).raw[0][0]);
 
             g_materialBrickWall.bind(g_currentShaderProgram);
-            prShaderSetUniformMatrix4fv(g_currentShaderProgram, "translation", &translationsToMatrix({-30.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, {30.1f, 30.1f, 30.1f}).raw[0][0]);
-            prMeshDrawIndices(g_meshCube);
+            prMeshDrawIndices(g_meshCube, (void*)&translationsToMatrix({-30.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, {30.1f, 30.1f, 30.1f}).raw[0][0]);
 
             g_materialCheckerboard.bind(g_currentShaderProgram);
-            prShaderSetUniformMatrix4fv(g_currentShaderProgram, "translation", &translationsToMatrix({-115.0f, -20.0f, -115.0f}, {0.0f, 0.0f, 0.0f}, {200.01f, 10.01f, 200.01f}).raw[0][0]);
-            prMeshDrawIndices(g_meshCube);
+            prMeshDrawIndices(g_meshCube, (void*)&translationsToMatrix({-230.0f, -20.0f, -230.0f}, {0.0f, 0.0f, 0.0f}, {400.01f, 10.01f, 400.01f}).raw[0][0]);
+
+            g_materialCheckerboard.bind(g_currentShaderProgram);
+            prMeshDrawIndices(g_meshCube, (void*)&translationsToMatrix({170.0f, -20.0f, -230.0f}, {0.0f, 0.0f, 0.0f}, {400.01f, 10.01f, 400.01f}).raw[0][0]);
+
+            g_materialCheckerboard.bind(g_currentShaderProgram);
+            prMeshDrawIndices(g_meshCube, (void*)&translationsToMatrix({-230.0f, -20.0f, 170.0f}, {0.0f, 0.0f, 0.0f}, {400.01f, 10.01f, 400.01f}).raw[0][0]);
 
             g_materialBrickWall.bind(g_currentShaderProgram);
-            prShaderSetUniformMatrix4fv(g_currentShaderProgram, "translation", &translationsToMatrix({2.0f, 0.0f, 0.0f}, {0.0f, smoothSinOverTime, 0.0f}, {1.0f, 1.0f, 1.0f}).raw[0][0]);
-            prMeshDrawIndices(g_meshCube);
+            prMeshDrawIndices(g_meshCube, (void*)&translationsToMatrix({2.0f, 0.0f, 0.0f}, {0.0f, glm_rad(smoothOverTime * 100.0f), 0.0f}, {1.0f, 1.0f, 1.0f}).raw[0][0]);
 
             g_materialSteel.bind(g_currentShaderProgram);
-            prShaderSetUniformMatrix4fv(g_currentShaderProgram, "translation", &translationsToMatrix({-2.0f, 0.0f, 0.0f}, {0.0f, smoothSinOverTime, 0.0f}, {1.0f, 1.0f, 1.0f}).raw[0][0]);
-            prMeshDrawIndices(g_meshCube);
+            prMeshDrawIndices(g_meshCube, (void*)&translationsToMatrix({-2.0f, 0.0f, 0.0f}, {0.0f, glm_rad(smoothSinOverTime * 100.0f), 0.0f}, {1.0f, 1.0f, 1.0f}).raw[0][0]);
 
             g_materialWhite.bind(g_currentShaderProgram);
-            prShaderSetUniformMatrix4fv(g_currentShaderProgram, "translation", &translationsToMatrix({0.0f, 2.0f, 0.0f}, {0.0f, smoothSinOverTime, 0.0f}, {1.0f, 1.0f, 1.0f}).raw[0][0]);
-            prMeshDrawIndices(g_meshCube);
+            prMeshDrawIndices(g_meshCube, (void*)&translationsToMatrix({0.0f, 2.0f, 0.0f}, {0.0f, glm_rad(smoothSinOverTime * 100.0f), 0.0f}, {1.0f, 1.0f, 1.0f}).raw[0][0]);
 
             g_materialBlack.bind(g_currentShaderProgram);
-            prShaderSetUniformMatrix4fv(g_currentShaderProgram, "translation", &translationsToMatrix({0.0f, -2.0f, 0.0f}, {0.0f, glm_rad(smoothSinOverTime * 100.0f), 0.0f}, {1.0f, 1.0f, 1.0f}).raw[0][0]);
-            prMeshDrawIndices(g_meshCube);
+            prMeshDrawIndices(g_meshCube, (void*)&translationsToMatrix({0.0f, -2.0f, 0.0f}, {0.0f, glm_rad(smoothOverTime * 100.0f), 0.0f}, {1.0f, 1.0f, 1.0f}).raw[0][0]);
 
             g_materialMetalRimmedContainer.bind(g_currentShaderProgram);
-            prShaderSetUniformMatrix4fv(g_currentShaderProgram, "translation", &translationsToMatrix({0.0f, 0.0f, 2.0f}, {0.0f, glm_rad(smoothSinOverTime * 100.0f), 0.0f}, {1.0f, 1.0f, 1.0f}).raw[0][0]);
-            prMeshDrawIndices(g_meshCube);
+            prMeshDrawIndices(g_meshCube, (void*)&translationsToMatrix({0.0f, 0.0f, 2.0f}, {0.0f, glm_rad(smoothSinOverTime * 100.0f), 0.0f}, {1.0f, 1.0f, 1.0f}).raw[0][0]);
 
             g_materialCheckerboard.bind(g_currentShaderProgram);
-            prShaderSetUniformMatrix4fv(g_currentShaderProgram, "translation", &translationsToMatrix({0.0f, 0.0f, -2.0f}, {0.0f, glm_rad(smoothSinOverTime * 100.0f), 0.0f}, {1.0f, 1.0f, 1.0f}).raw[0][0]);
-            prMeshDrawIndices(g_meshCube);
+            prMeshDrawIndices(g_meshCube, (void*)&translationsToMatrix({0.0f, 0.0f, -2.0f}, {0.0f, glm_rad(smoothOverTime * 100.0f), 0.0f}, {1.0f, 1.0f, 1.0f}).raw[0][0]);
         }
+        g_currentShaderProgram = nullptr;
 
         switch(g_currentSkybox) {
             case 1:
@@ -320,14 +319,14 @@ int main(int argc, char** argv) {
         g_window->openglContext->DepthFunc(GL_LEQUAL);
         prShaderBind(g_shaderSkybox);
         g_window->openglContext->FrontFace(GL_CW);
-        prMeshDrawIndices(g_meshCube);
+        prMeshDrawIndices(g_meshCube, nullptr);
         g_window->openglContext->FrontFace(GL_CCW);
 
         if(g_showHUD == 1) {
             g_window->openglContext->BlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
             g_window->openglContext->Disable(GL_DEPTH_TEST);
             g_materialHUD.bind(g_shaderHUD);
-            prMeshDrawIndices(g_meshQuad);
+            prMeshDrawIndices(g_meshQuad, nullptr);
         }
 
         prFramebufferBlit(g_window->openglContext, g_framebufferMultisampled, g_framebufferDefault,
@@ -344,7 +343,7 @@ int main(int argc, char** argv) {
             g_window->openglContext->MemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
 
             g_materialPostProcessing.bind(g_shaderHUD);
-            prMeshDrawIndices(g_meshQuad);
+            prMeshDrawIndices(g_meshQuad, nullptr);
         }
 
         prFramebufferSetReadBuffer(g_framebufferMultisampled, PR_COLOR_ATTACHMENT_1);
@@ -363,7 +362,7 @@ int main(int argc, char** argv) {
             prShaderSetUniform1i(g_shaderGaussianBlur, "horizontal", horizontal);
             prTextureBindTexture(firstIteration == true ? g_textureBloom : g_gaussianBlurTextures[!horizontal], 0);
             g_window->openglContext->Disable(GL_DEPTH_TEST);
-            prMeshDrawIndices(g_meshQuad);
+            prMeshDrawIndices(g_meshQuad, nullptr);
             horizontal = !horizontal;
             if(firstIteration) {
                 firstIteration = false;
@@ -378,7 +377,7 @@ int main(int argc, char** argv) {
         prShaderSetUniform1i(g_shaderHDR, "bloomBlur", 1);
         prShaderSetUniform1f(g_shaderHDR, "exposure", 1.2f);
         prShaderBind(g_shaderHDR);
-        prMeshDrawIndices(g_meshQuad);
+        prMeshDrawIndices(g_meshQuad, nullptr);
 
         prFramebufferBlit(g_window->openglContext, g_framebufferDefault, NULL,
             0, 0, g_windowWidth, g_windowHeight,

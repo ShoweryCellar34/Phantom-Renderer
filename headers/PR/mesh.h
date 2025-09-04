@@ -9,7 +9,7 @@ typedef struct prShaderData prShaderData;
 
 typedef struct prMeshData {
     GladGLContext* context;
-    PRMeshTranslationFunction translationFunction;
+    PRMeshDrawFunction drawFunction;
     void* GPUReadyBuffer;
     GLsizeiptr GPUReadyBufferSize;
     void* indices;
@@ -30,16 +30,16 @@ void prMeshDestroy(prMeshData* mesh);
 
 void prMeshLinkContext(prMeshData* mesh, GladGLContext* context);
 
-void prMeshSetTranslationFunction(prMeshData* mesh, PRMeshTranslationFunction translationFunction);
+void prMeshSetDrawFunction(prMeshData* mesh, PRMeshDrawFunction drawFunction);
 
 void prMeshUpdate(prMeshData* mesh, void* GPUReadyBuffer, GLsizeiptr GPUReadyBufferSize, void* indices, GLsizeiptr indicesSize);
 
 void prMeshSetVertexAttribute(prMeshData* mesh, GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const void* offset);
 
-void prMeshDrawIndices(prMeshData* mesh);
+void prMeshDrawIndices(prMeshData* mesh, void* data);
 
-void prMeshDrawIndicesInstances(prMeshData* mesh, GLsizei count);
+void prMeshDrawIndicesInstances(prMeshData* mesh, GLsizei count, void* data);
 
-void prMeshDraw(prMeshData* mesh, GLsizei verticesCount);
+void prMeshDraw(prMeshData* mesh, GLsizei verticesCount, void* data);
 
-void prMeshDrawInstances(prMeshData* mesh, GLsizei verticesCount, GLsizei count);
+void prMeshDrawInstances(prMeshData* mesh, GLsizei verticesCount, GLsizei count, void* data);

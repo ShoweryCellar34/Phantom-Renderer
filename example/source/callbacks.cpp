@@ -136,6 +136,12 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
     }
 }
 
+void cubeMeshTranslationUpdate(prMeshData* mesh, void* translation) {
+    if(translation) {
+        prShaderSetUniformMatrix4fv(g_currentShaderProgram, "translation", (GLfloat*)translation);
+    }
+}
+
 void APIENTRY openglDebugOutput(GLenum source, 
                                 GLenum type,
                                 unsigned int id,

@@ -21,9 +21,6 @@ void prCameraLinkContext(prCamera* camera, GladGLContext* context) {
     if(camera->context) {
         i_prCameraGetDimensions(camera);
     }
-    if(camera->updateFunction) {
-        camera->updateFunction(camera);
-    }
 }
 
 void prCameraSetUpdateFunction(prCamera* camera, PRCameraUpdateFunction updateFunction) {

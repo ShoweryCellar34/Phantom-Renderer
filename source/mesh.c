@@ -34,8 +34,8 @@ void prMeshLinkContext(prMeshData* mesh, GladGLContext* context) {
     }
 }
 
-void prMeshSetTranslationFunction(prMeshData* mesh, PRMeshTranslationFunction translationFunction) {
-    mesh
+void prMeshSetDrawFunction(prMeshData* mesh, PRMeshDrawFunction drawFunction) {
+    mesh->drawFunction = drawFunction;
 }
 
 void prMeshUpdate(prMeshData* mesh, void* GPUReadyBuffer, GLsizeiptr GPUReadyBufferSize, void* indices, GLsizeiptr indicesSize) {
@@ -89,7 +89,7 @@ void prMeshSetVertexAttribute(prMeshData* mesh, GLuint index, GLint size, GLenum
     mesh->offsetAttribute[index] = (void*)offset;
 }
 
-void prMeshDrawIndices(prMeshData* mesh) {
+void prMeshDrawIndices(prMeshData* mesh, void* data) {
     if(!mesh->context) {
         prLogEvent(PR_EVENT_OPENGL, PR_LOG_ERROR, "prMeshDrawIndices: Cannot draw mesh without a valid OpenGL context. Aborting operation, nothing was modified");
         return;
@@ -103,10 +103,14 @@ void prMeshDrawIndices(prMeshData* mesh) {
         return;
     }
 
+    if(mesh->drawFunction) {
+        mesh->drawFunction(mesh, data);
+    }
+
     i_prMeshDrawIndicesOnGPU(mesh);
 }
 
-void prMeshDrawIndicesInstances(prMeshData* mesh, GLsizei count) {
+void prMeshDrawIndicesInstances(prMeshData* mesh, GLsizei count, void* data) {
     if(!mesh->context) {
         prLogEvent(PR_EVENT_OPENGL, PR_LOG_ERROR, "prMeshDrawIndicesInstances: Cannot draw mesh without a valid OpenGL context. Aborting operation, nothing was modified");
         return;
@@ -120,10 +124,14 @@ void prMeshDrawIndicesInstances(prMeshData* mesh, GLsizei count) {
         return;
     }
 
+    if(mesh->drawFunction) {
+        mesh->drawFunction(mesh, data);
+    }
+
     i_prMeshDrawIndicesInstancesOnGPU(mesh, count);
 }
 
-void prMeshDraw(prMeshData* mesh, GLsizei verticesCount) {
+void prMeshDraw(prMeshData* mesh, GLsizei verticesCount, void* data) {
     if(!mesh->context) {
         prLogEvent(PR_EVENT_OPENGL, PR_LOG_ERROR, "prMeshDraw: Cannot draw mesh without a valid OpenGL context. Aborting operation, nothing was modified");
         return;
@@ -133,10 +141,14 @@ void prMeshDraw(prMeshData* mesh, GLsizei verticesCount) {
         return;
     }
 
+    if(mesh->drawFunction) {
+        mesh->drawFunction(mesh, data);
+    }
+
     i_prMeshDrawOnGPU(mesh, verticesCount);
 }
 
-void prMeshDrawInstances(prMeshData* mesh, GLsizei verticesCount, GLsizei count) {
+void prMeshDrawInstances(prMeshData* mesh, GLsizei verticesCount, GLsizei count, void* data) {
     if(!mesh->context) {
         prLogEvent(PR_EVENT_OPENGL, PR_LOG_ERROR, "prMeshDrawInstances: Cannot draw mesh without a valid OpenGL context. Aborting operation, nothing was modified");
         return;
@@ -144,6 +156,10 @@ void prMeshDrawInstances(prMeshData* mesh, GLsizei verticesCount, GLsizei count)
     if(!mesh->VAO) {
         prLogEvent(PR_EVENT_OPENGL, PR_LOG_ERROR, "prMeshDrawInstances: Cannot draw mesh without a valid OpenGL VAO. Aborting operation, nothing was modified");
         return;
+    }
+
+    if(mesh->drawFunction) {
+        mesh->drawFunction(mesh, data);
     }
 
     i_prMeshDrawInstancesOnGPU(mesh, verticesCount, count);
