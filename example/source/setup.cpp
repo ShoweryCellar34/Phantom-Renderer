@@ -404,9 +404,9 @@ void setupTextures() {
         g_textureMetalRimmedContainer = loadTexture(g_window->openglContext, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, TO_RES("res/textures/container2.png"));
         g_textureMetalRimmedContainerSpecular = loadTexture(g_window->openglContext, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, TO_RES("res/textures/container2_specular.png"));
         g_textureSteel = loadTexture(g_window->openglContext, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, TO_RES("res/textures/steel.jpg"));
-        g_textureSteelNormal = loadTexture(g_window->openglContext, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, TO_RES("res/textures/steelNormal.png"));
+        g_textureSteelNormal = loadTexture(g_window->openglContext, PR_FILTER_LINEAR, PR_FILTER_LINEAR, TO_RES("res/textures/steelNormal.png"));
         g_textureBrickWall = loadTexture(g_window->openglContext, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, TO_RES("res/textures/brickwall.jpg"));
-        g_textureBrickWallNormal = loadTexture(g_window->openglContext, PR_FILTER_LINEAR_MIPMAP_NEAREST, PR_FILTER_LINEAR, TO_RES("res/textures/brickwall_normal.jpg"));
+        g_textureBrickWallNormal = loadTexture(g_window->openglContext, PR_FILTER_LINEAR, PR_FILTER_LINEAR, TO_RES("res/textures/brickwall_normal.jpg"));
 
         vec4s cubeMapBlackColors[PR_CUBE_MAP_SIDES] = {
             {0.0f, 0.0f, 0.0f, 1.0f},
@@ -635,7 +635,7 @@ void setupMeshes() {
        -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,  1.0f, 0.0f, 0.0f,  0.0f, 1.0f, 0.0f,  0.0f, 0.0f,  1.0f,
        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,  1.0f, 0.0f, 0.0f,  0.0f, 1.0f, 0.0f,  0.0f, 0.0f,  1.0f,
 
-       -0.5f,  0.5f,  0.5f,  1.0f, 1.0f,  0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f, -1.0f, 0.0f, 0.0f, // Left face
+       -0.5f,  0.5f,  0.5f,  1.0f, 1.0f,  0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f, -1.0f, 0.0f, 0.0f,
        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,  0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f, -1.0f, 0.0f, 0.0f,
        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,  0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f, -1.0f, 0.0f, 0.0f,
        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,  0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f, -1.0f, 0.0f, 0.0f,

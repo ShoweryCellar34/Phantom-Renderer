@@ -115,8 +115,8 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
         context->ReadPixels(0, 0, g_windowRawWidth, g_windowRawHeight, GL_RGB, GL_UNSIGNED_BYTE, pixels);
 
         int timestamp = time(NULL);
-        char name[32];
-        snprintf(name, 32, "%i.png", timestamp);
+        char name[48];
+        snprintf(name, 48, "prScreenshot%i.png", timestamp);
 
         stbi_flip_vertically_on_write(1);
         std::filesystem::create_directories(TO_USR("screenshots/"));

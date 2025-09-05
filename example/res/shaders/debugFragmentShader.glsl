@@ -163,6 +163,7 @@ void main() {
     vec3 diffuse = texture(material.diffuse, geometryOut.textureCoordinates).rgb;
     vec3 specular = texture(material.specular, geometryOut.textureCoordinates).rgb;
     vec3 normal = texture(material.normal, geometryOut.textureCoordinates).rgb;
+    normal = normal * 2.0 - 1.0;
     normal = normalize(geometryOut.TBN * normal);
 
     vec4 shadedResult = vec4(calculateShadedResult(diffuse, specular, normal), 1.0);
