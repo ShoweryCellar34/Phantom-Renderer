@@ -704,8 +704,7 @@ void setupMeshes() {
         prMeshSetVertexAttribute(g_meshCube, 0, 3, PR_FLOAT, PR_FALSE, 14 * sizeof(GLfloat), (void*)(0 * sizeof(GLfloat)));
         prMeshSetVertexAttribute(g_meshCube, 1, 2, PR_FLOAT, PR_FALSE, 14 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
         prMeshSetVertexAttribute(g_meshCube, 2, 3, PR_FLOAT, PR_FALSE, 14 * sizeof(GLfloat), (void*)(5 * sizeof(GLfloat)));
-        prMeshSetVertexAttribute(g_meshCube, 3, 3, PR_FLOAT, PR_FALSE, 14 * sizeof(GLfloat), (void*)(8 * sizeof(GLfloat)));
-        prMeshSetVertexAttribute(g_meshCube, 4, 3, PR_FLOAT, PR_FALSE, 14 * sizeof(GLfloat), (void*)(11 * sizeof(GLfloat)));
+        prMeshSetVertexAttribute(g_meshCube, 3, 3, PR_FLOAT, PR_FALSE, 14 * sizeof(GLfloat), (void*)(11 * sizeof(GLfloat)));
         prMeshUpdate(g_meshCube, cubeData, cubeDataSize, indices, indicesSize);
         prMeshLinkContext(g_meshCube, g_window->openglContext);
         prMeshSetDrawFunction(g_meshCube, cubeMeshTranslationUpdate);
