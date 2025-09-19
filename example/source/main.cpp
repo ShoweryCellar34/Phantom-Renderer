@@ -184,17 +184,17 @@ int main(int argc, char** argv) {
 
     while(!glfwWindowShouldClose(g_window->window)) {
         g_window->openglContext->Enable(GL_DEPTH_TEST);
-        prFramebufferClearColor(g_window->openglContext, NULL, 0, {0.3f, 0.5f, 0.7f, 1.0f});
+        prFramebufferClearColor(g_window->openglContext, NULL, 0, {1.0f, 0.0f, 0.0f, 1.0f});
         prFramebufferClearDepth(g_window->openglContext, NULL, 1.0f);
         prFramebufferClearDepth(g_window->openglContext, g_framebufferSunShadowMap, 1.0f);
         prFramebufferClearDepth(g_window->openglContext, g_framebufferPointShadowMap, 1.0f);
         prFramebufferClearColor(g_window->openglContext, g_framebufferGaussianBlur1, 0, {0.0f, 0.0f, 0.0f, 0.0f});
         prFramebufferClearColor(g_window->openglContext, g_framebufferGaussianBlur2, 0, {0.0f, 0.0f, 0.0f, 0.0f});
         prFramebufferClearColor(g_window->openglContext, g_framebufferBloom, 0, {0.0f, 0.0f, 0.0f, 0.0f});
-        prFramebufferClearColor(g_window->openglContext, g_framebufferMultisampled, 0, {0.7f, 0.5f, 0.3f, 1.0f});
-        prFramebufferClearColor(g_window->openglContext, g_framebufferMultisampled, 1, {0.7f, 0.5f, 0.3f, 1.0f});
+        prFramebufferClearColor(g_window->openglContext, g_framebufferMultisampled, 0, {0.0f, 1.0f, 0.0f, 1.0f});
+        prFramebufferClearColor(g_window->openglContext, g_framebufferMultisampled, 1, {0.0f, 1.0f, 0.0f, 1.0f});
         prFramebufferClearDepthStencil(g_window->openglContext, g_framebufferMultisampled, 1.0f, 0);
-        prFramebufferClearColor(g_window->openglContext, g_framebufferDefault, 0, {0.3f, 0.5f, 0.7f, 1.0f});
+        prFramebufferClearColor(g_window->openglContext, g_framebufferDefault, 0, {0.0f, 0.0f, 1.0f, 1.0f});
         prFramebufferClearDepthStencil(g_window->openglContext, g_framebufferDefault, 1.0f, 0);
 
         float currentFrame = glfwGetTime() / 1.0f;
