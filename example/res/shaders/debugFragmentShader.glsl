@@ -4,7 +4,7 @@ layout(location = 1) out vec4 brightColor;
 
 uniform vec3 cameraPosition;
 uniform mat4 translation;
-uniform vec2 screenSize;
+uniform uvec2 screenSize;
 
 in GEOMETRY_OUT {
     vec3 fragmentPosition;

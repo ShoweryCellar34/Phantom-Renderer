@@ -55,8 +55,8 @@ void proccessInput(GLFWwindow* window) {
 void cameraUpdateFunction(prCamera* camera) {
     if(camera->context && g_currentShaderProgram) {
         prShaderSetUniform3f(g_currentShaderProgram, "cameraPosition", g_camera->position.x, g_camera->position.y, g_camera->position.z);
-        prShaderSetUniformMatrix4fv(g_currentShaderProgram, "view", &g_camera->view.raw[0][0]);
-        prShaderSetUniformMatrix4fv(g_currentShaderProgram, "projection", &g_camera->projection.raw[0][0]);
+        prShaderSetUniformMatrix4fv(g_currentShaderProgram, "view", 1, false, &g_camera->view.raw[0][0]);
+        prShaderSetUniformMatrix4fv(g_currentShaderProgram, "projection", 1, false, &g_camera->projection.raw[0][0]);
     }
 }
 
@@ -143,7 +143,7 @@ int main(int argc, char** argv) {
     mat4s lightProjection = glms_ortho(-100.0f, 100.0f, -100.0f, 100.0f, sun.nearPlane, sun.farPlane);
     mat4s lightView = glms_lookat(glms_vec3_scale(glms_vec3_negate(sun.direction), 40.0f), {0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f});
     mat4s lightSpaceMatrix = glms_mat4_mul(lightProjection, lightView);
-    prShaderSetUniformMatrix4fv(g_shaderDirectionalLight, "lightSpaceMatrix", &lightSpaceMatrix.raw[0][0]);
+    prShaderSetUniformMatrix4fv(g_shaderDirectionalLight, "lightSpaceMatrix", 1, false, &lightSpaceMatrix.raw[0][0]);
 
     float aspectRatio2 = (float)point.resolution / (float)point.resolution;
     mat4s light2Projection = glms_perspective(glm_rad(90.0f), aspectRatio2, point.nearPlane, point.farPlane);
@@ -163,12 +163,12 @@ int main(int argc, char** argv) {
         glms_mat4_mul(light2Projection, light2View[4]),
         glms_mat4_mul(light2Projection, light2View[5])
     };
-    prShaderSetUniformMatrix4fv(g_shaderPointLight, "lightSpaceMatrices[0]", &light2SpaceMatrix[0].raw[0][0]);
-    prShaderSetUniformMatrix4fv(g_shaderPointLight, "lightSpaceMatrices[1]", &light2SpaceMatrix[1].raw[0][0]);
-    prShaderSetUniformMatrix4fv(g_shaderPointLight, "lightSpaceMatrices[2]", &light2SpaceMatrix[2].raw[0][0]);
-    prShaderSetUniformMatrix4fv(g_shaderPointLight, "lightSpaceMatrices[3]", &light2SpaceMatrix[3].raw[0][0]);
-    prShaderSetUniformMatrix4fv(g_shaderPointLight, "lightSpaceMatrices[4]", &light2SpaceMatrix[4].raw[0][0]);
-    prShaderSetUniformMatrix4fv(g_shaderPointLight, "lightSpaceMatrices[5]", &light2SpaceMatrix[5].raw[0][0]);
+    prShaderSetUniformMatrix4fv(g_shaderPointLight, "lightSpaceMatrices[0]", 1, false, &light2SpaceMatrix[0].raw[0][0]);
+    prShaderSetUniformMatrix4fv(g_shaderPointLight, "lightSpaceMatrices[1]", 1, false, &light2SpaceMatrix[1].raw[0][0]);
+    prShaderSetUniformMatrix4fv(g_shaderPointLight, "lightSpaceMatrices[2]", 1, false, &light2SpaceMatrix[2].raw[0][0]);
+    prShaderSetUniformMatrix4fv(g_shaderPointLight, "lightSpaceMatrices[3]", 1, false, &light2SpaceMatrix[3].raw[0][0]);
+    prShaderSetUniformMatrix4fv(g_shaderPointLight, "lightSpaceMatrices[4]", 1, false, &light2SpaceMatrix[4].raw[0][0]);
+    prShaderSetUniformMatrix4fv(g_shaderPointLight, "lightSpaceMatrices[5]", 1, false, &light2SpaceMatrix[5].raw[0][0]);
     prShaderSetUniform3f(g_shaderPointLight, "lightPosition", point.position.x, point.position.y, point.position.z);
     prShaderSetUniform1f(g_shaderPointLight, "farPlane", point.farPlane);
 
@@ -229,7 +229,7 @@ int main(int argc, char** argv) {
         prShaderSetUniform1i(g_currentShaderProgram, "pointLights[0].shadowMap", point.shadowMap);
         prShaderSetUniform1f(g_currentShaderProgram, "pointLights[0].farPlane", point.farPlane);
 
-        prShaderSetUniformMatrix4fv(g_currentShaderProgram, "lightSpaceMatrix", &lightSpaceMatrix.raw[0][0]);
+        prShaderSetUniformMatrix4fv(g_currentShaderProgram, "lightSpaceMatrix", 1, false, &lightSpaceMatrix.raw[0][0]);
 
         for(int i = 0; i < 3; i++) {
             switch(i) {
@@ -312,9 +312,9 @@ int main(int argc, char** argv) {
                 break;
         }
 
-        prShaderSetUniformMatrix4fv(g_shaderSkybox, "translation", &translationsToMatrix(g_camera->position, {0.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f}).raw[0][0]);
-        prShaderSetUniformMatrix4fv(g_shaderSkybox, "view", &g_camera->view.raw[0][0]);
-        prShaderSetUniformMatrix4fv(g_shaderSkybox, "projection", &g_camera->projection.raw[0][0]);
+        prShaderSetUniformMatrix4fv(g_shaderSkybox, "translation", 1, false, &translationsToMatrix(g_camera->position, {0.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f}).raw[0][0]);
+        prShaderSetUniformMatrix4fv(g_shaderSkybox, "view", 1, false, &g_camera->view.raw[0][0]);
+        prShaderSetUniformMatrix4fv(g_shaderSkybox, "projection", 1, false, &g_camera->projection.raw[0][0]);
         prShaderSetUniform1i(g_shaderSkybox, "skybox", 0);
         g_window->openglContext->DepthFunc(GL_LEQUAL);
         prShaderBind(g_shaderSkybox);

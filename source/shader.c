@@ -115,67 +115,180 @@ void prShaderSetAttributeLocation(prShaderData* shaderProgram, GLuint index, con
     shaderProgram->context->BindAttribLocation(shaderProgram->shaderProgramObject, index, name);
 }
 
-void prShaderLocationSetUniform1i(prShaderData* shaderProgram, GLint location, GLint value) {
-    if(!shaderProgram || !shaderProgram->context || !shaderProgram->shaderProgramObject) {
-        return;
-    }
-    shaderProgram->context->Uniform1i(location, value);
-}
+// {1|2|3|4}{f|i|ui}
 
-void prShaderLocationSetUniform1f(prShaderData* shaderProgram, GLint location, GLfloat value) {
-    if(!shaderProgram || !shaderProgram->context || !shaderProgram->shaderProgramObject) {
-        return;
-    }
-    shaderProgram->context->Uniform1f(location, value);
-}
+void prShaderSetUniform1f(prShaderData* shaderProgram, const GLchar* uniformName, GLfloat value) {
+    UNIFORM_BOILERPLATE;
 
-void prShaderLocationSetUniform2f(prShaderData* shaderProgram, GLint location, GLfloat v1, GLfloat v2) {
-    if(!shaderProgram || !shaderProgram->context || !shaderProgram->shaderProgramObject) {
-        return;
-    }
-    shaderProgram->context->Uniform2f(location, v1, v2);
+    shaderProgram->context->ProgramUniform1f(shaderProgram->shaderProgramObject, uniformLocation, value);
 }
+void prShaderSetUniform2f(prShaderData* shaderProgram, const GLchar* uniformName, GLfloat v0, GLfloat v1) {
+    UNIFORM_BOILERPLATE;
 
-void prShaderLocationSetUniform3f(prShaderData* shaderProgram, GLint location, GLfloat v1, GLfloat v2, GLfloat v3) {
-    if(!shaderProgram || !shaderProgram->context || !shaderProgram->shaderProgramObject) {
-        return;
-    }
-    shaderProgram->context->Uniform3f(location, v1, v2, v3);
+    shaderProgram->context->ProgramUniform2f(shaderProgram->shaderProgramObject, uniformLocation, v0, v1);
 }
+void prShaderSetUniform3f(prShaderData* shaderProgram, const GLchar* uniformName, GLfloat v0, GLfloat v1, GLfloat v2) {
+    UNIFORM_BOILERPLATE;
 
-void prShaderLocationSetUniformMatrix4fv(prShaderData* shaderProgram, GLint location, const GLfloat* matrix) {
-    if(!shaderProgram || !shaderProgram->context || !shaderProgram->shaderProgramObject) {
-        return;
-    }
-    shaderProgram->context->UniformMatrix4fv(location, 1, GL_FALSE, matrix);
+    shaderProgram->context->ProgramUniform3f(shaderProgram->shaderProgramObject, uniformLocation, v0, v1, v2);
+}
+void prShaderSetUniform4f(prShaderData* shaderProgram, const GLchar* uniformName, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3) {
+    UNIFORM_BOILERPLATE;
+
+    shaderProgram->context->ProgramUniform4f(shaderProgram->shaderProgramObject, uniformLocation, v0, v1, v2, v3);
 }
 
 void prShaderSetUniform1i(prShaderData* shaderProgram, const GLchar* uniformName, GLint value) {
     UNIFORM_BOILERPLATE;
 
-    shaderProgram->context->Uniform1i(uniformLocation, value);
+    shaderProgram->context->ProgramUniform1i(shaderProgram->shaderProgramObject, uniformLocation, value);
 }
-
-void prShaderSetUniform1f(prShaderData* shaderProgram, const GLchar* uniformName, GLfloat value) {
+void prShaderSetUniform2i(prShaderData* shaderProgram, const GLchar* uniformName, GLint v0, GLint v1) {
     UNIFORM_BOILERPLATE;
 
-    shaderProgram->context->Uniform1f(uniformLocation, value);
+    shaderProgram->context->ProgramUniform2i(shaderProgram->shaderProgramObject, uniformLocation, v0, v1);
 }
-
-void prShaderSetUniform2f(prShaderData* shaderProgram, const GLchar* uniformName, GLfloat v1, GLfloat v2) {
+void prShaderSetUniform3i(prShaderData* shaderProgram, const GLchar* uniformName, GLint v0, GLint v1, GLint v2) {
     UNIFORM_BOILERPLATE;
 
-    shaderProgram->context->Uniform2f(uniformLocation, v1, v2);
+    shaderProgram->context->ProgramUniform3i(shaderProgram->shaderProgramObject, uniformLocation, v0, v1, v2);
 }
-
-void prShaderSetUniform3f(prShaderData* shaderProgram, const GLchar* uniformName, GLfloat v1, GLfloat v2, GLfloat v3) {
+void prShaderSetUniform4i(prShaderData* shaderProgram, const GLchar* uniformName, GLint v0, GLint v1, GLint v2, GLint v3) {
     UNIFORM_BOILERPLATE;
 
-    shaderProgram->context->Uniform3f(uniformLocation, v1, v2, v3);
+    shaderProgram->context->ProgramUniform4i(shaderProgram->shaderProgramObject, uniformLocation, v0, v1, v2, v3);
 }
 
-void prShaderSetUniformMatrix4fv(prShaderData* shaderProgram, const GLchar* uniformName, GLfloat* matrix) {
+void prShaderSetUniform1ui(prShaderData* shaderProgram, const GLchar* uniformName, GLuint value) {
     UNIFORM_BOILERPLATE;
 
-    shaderProgram->context->UniformMatrix4fv(uniformLocation, 1, GL_FALSE, matrix);
+    shaderProgram->context->ProgramUniform1ui(shaderProgram->shaderProgramObject, uniformLocation, value);
+}
+void prShaderSetUniform2ui(prShaderData* shaderProgram, const GLchar* uniformName, GLuint v0, GLuint v1) {
+    UNIFORM_BOILERPLATE;
+
+    shaderProgram->context->ProgramUniform2ui(shaderProgram->shaderProgramObject, uniformLocation, v0, v1);
+}
+void prShaderSetUniform3ui(prShaderData* shaderProgram, const GLchar* uniformName, GLuint v0, GLuint v1, GLuint v2) {
+    UNIFORM_BOILERPLATE;
+
+    shaderProgram->context->ProgramUniform3ui(shaderProgram->shaderProgramObject, uniformLocation, v0, v1, v2);
+}
+void prShaderSetUniform4ui(prShaderData* shaderProgram, const GLchar* uniformName, GLuint v0, GLuint v1, GLuint v2, GLuint v3) {
+    UNIFORM_BOILERPLATE;
+
+    shaderProgram->context->ProgramUniform4ui(shaderProgram->shaderProgramObject, uniformLocation, v0, v1, v2, v3);
+}
+
+// {1|2|3|4}{f|i|ui}v
+
+void prShaderSetUniform1fv(prShaderData* shaderProgram, const GLchar* uniformName, GLsizei count, const GLfloat* value) {
+    UNIFORM_BOILERPLATE;
+
+    shaderProgram->context->ProgramUniform1fv(shaderProgram->shaderProgramObject, uniformLocation, count, value);
+}
+void prShaderSetUniform2fv(prShaderData* shaderProgram, const GLchar* uniformName, GLsizei count, const GLfloat* value) {
+    UNIFORM_BOILERPLATE;
+
+    shaderProgram->context->ProgramUniform2fv(shaderProgram->shaderProgramObject, uniformLocation, count, value);
+}
+void prShaderSetUniform3fv(prShaderData* shaderProgram, const GLchar* uniformName, GLsizei count, const GLfloat* value) {
+    UNIFORM_BOILERPLATE;
+
+    shaderProgram->context->ProgramUniform3fv(shaderProgram->shaderProgramObject, uniformLocation, count, value);
+}
+void prShaderSetUniform4fv(prShaderData* shaderProgram, const GLchar* uniformName, GLsizei count, const GLfloat* value) {
+    UNIFORM_BOILERPLATE;
+
+    shaderProgram->context->ProgramUniform4fv(shaderProgram->shaderProgramObject, uniformLocation, count, value);
+}
+
+void prShaderSetUniform1iv(prShaderData* shaderProgram, const GLchar* uniformName, GLsizei count, const GLint* value) {
+    UNIFORM_BOILERPLATE;
+
+    shaderProgram->context->ProgramUniform1iv(shaderProgram->shaderProgramObject, uniformLocation, count, value);
+}
+void prShaderSetUniform2iv(prShaderData* shaderProgram, const GLchar* uniformName, GLsizei count, const GLint* value) {
+    UNIFORM_BOILERPLATE;
+
+    shaderProgram->context->ProgramUniform2iv(shaderProgram->shaderProgramObject, uniformLocation, count, value);
+}
+void prShaderSetUniform3iv(prShaderData* shaderProgram, const GLchar* uniformName, GLsizei count, const GLint* value) {
+    UNIFORM_BOILERPLATE;
+
+    shaderProgram->context->ProgramUniform3iv(shaderProgram->shaderProgramObject, uniformLocation, count, value);
+}
+void prShaderSetUniform4iv(prShaderData* shaderProgram, const GLchar* uniformName, GLsizei count, const GLint* value) {
+    UNIFORM_BOILERPLATE;
+
+    shaderProgram->context->ProgramUniform4iv(shaderProgram->shaderProgramObject, uniformLocation, count, value);
+}
+
+void prShaderSetUniform1uiv(prShaderData* shaderProgram, const GLchar* uniformName, GLsizei count, const GLuint* value) {
+    UNIFORM_BOILERPLATE;
+
+    shaderProgram->context->ProgramUniform1uiv(shaderProgram->shaderProgramObject, uniformLocation, count, value);
+}
+void prShaderSetUniform2uiv(prShaderData* shaderProgram, const GLchar* uniformName, GLsizei count, const GLuint* value) {
+    UNIFORM_BOILERPLATE;
+
+    shaderProgram->context->ProgramUniform2uiv(shaderProgram->shaderProgramObject, uniformLocation, count, value);
+}
+void prShaderSetUniform3uiv(prShaderData* shaderProgram, const GLchar* uniformName, GLsizei count, const GLuint* value) {
+    UNIFORM_BOILERPLATE;
+
+    shaderProgram->context->ProgramUniform3uiv(shaderProgram->shaderProgramObject, uniformLocation, count, value);
+}
+void prShaderSetUniform4uiv(prShaderData* shaderProgram, const GLchar* uniformName, GLsizei count, const GLuint* value) {
+    UNIFORM_BOILERPLATE;
+
+    shaderProgram->context->ProgramUniform4uiv(shaderProgram->shaderProgramObject, uniformLocation, count, value);
+}
+
+// Matrix{1|2|3|4}fv
+
+void prShaderSetUniformMatrix2fv(prShaderData* shaderProgram, const GLchar* uniformName, GLsizei count, GLboolean transpose, const GLfloat* value) {
+    UNIFORM_BOILERPLATE;
+
+    shaderProgram->context->ProgramUniformMatrix2fv(shaderProgram->shaderProgramObject, uniformLocation, count, transpose, value);
+}
+void prShaderSetUniformMatrix3fv(prShaderData* shaderProgram, const GLchar* uniformName, GLsizei count, GLboolean transpose, const GLfloat* value) {
+    UNIFORM_BOILERPLATE;
+
+    shaderProgram->context->ProgramUniformMatrix3fv(shaderProgram->shaderProgramObject, uniformLocation, count, transpose, value);
+}
+void prShaderSetUniformMatrix4fv(prShaderData* shaderProgram, const GLchar* uniformName, GLsizei count, GLboolean transpose, const GLfloat* value) {
+    UNIFORM_BOILERPLATE;
+
+    shaderProgram->context->ProgramUniformMatrix4fv(shaderProgram->shaderProgramObject, uniformLocation, count, transpose, value);
+}
+void prShaderSetUniformMatrix2x3fv(prShaderData* shaderProgram, const GLchar* uniformName, GLsizei count, GLboolean transpose, const GLfloat* value) {
+    UNIFORM_BOILERPLATE;
+
+    shaderProgram->context->ProgramUniformMatrix2x3fv(shaderProgram->shaderProgramObject, uniformLocation, count, transpose, value);
+}
+void prShaderSetUniformMatrix3x2fv(prShaderData* shaderProgram, const GLchar* uniformName, GLsizei count, GLboolean transpose, const GLfloat* value) {
+    UNIFORM_BOILERPLATE;
+
+    shaderProgram->context->ProgramUniformMatrix3x2fv(shaderProgram->shaderProgramObject, uniformLocation, count, transpose, value);
+}
+void prShaderSetUniformMatrix2x4fv(prShaderData* shaderProgram, const GLchar* uniformName, GLsizei count, GLboolean transpose, const GLfloat* value) {
+    UNIFORM_BOILERPLATE;
+
+    shaderProgram->context->ProgramUniformMatrix2x4fv(shaderProgram->shaderProgramObject, uniformLocation, count, transpose, value);
+}
+void prShaderSetUniformMatrix4x2fv(prShaderData* shaderProgram, const GLchar* uniformName, GLsizei count, GLboolean transpose, const GLfloat* value) {
+    UNIFORM_BOILERPLATE;
+
+    shaderProgram->context->ProgramUniformMatrix4x2fv(shaderProgram->shaderProgramObject, uniformLocation, count, transpose, value);
+}
+void prShaderSetUniformMatrix3x4fv(prShaderData* shaderProgram, const GLchar* uniformName, GLsizei count, GLboolean transpose, const GLfloat* value) {
+    UNIFORM_BOILERPLATE;
+
+    shaderProgram->context->ProgramUniformMatrix3x4fv(shaderProgram->shaderProgramObject, uniformLocation, count, transpose, value);
+}
+void prShaderSetUniformMatrix4x3fv(prShaderData* shaderProgram, const GLchar* uniformName, GLsizei count, GLboolean transpose, const GLfloat* value) {
+    UNIFORM_BOILERPLATE;
+
+    shaderProgram->context->ProgramUniformMatrix4x3fv(shaderProgram->shaderProgramObject, uniformLocation, count, transpose, value);
 }

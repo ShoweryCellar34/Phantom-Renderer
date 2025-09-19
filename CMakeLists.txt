@@ -1,8 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
 
-set(POSITION_INDEPENDENT_CODE true)
-set(CMAKE_INTERPROCEDURAL_OPTIMIZATION true)
-
 project(Phantom-Renderer DESCRIPTION "A Basic OpenGL renderer" LANGUAGES C HOMEPAGE_URL "https://github.com/ShoweryCellar34/Phantom-Renderer")
 file(GLOB PR_SOURCE source/*.c)
 add_library(Phantom-Renderer STATIC ${PR_SOURCE})
@@ -10,8 +7,6 @@ set_property(TARGET Phantom-Renderer PROPERTY C_STANDARD 11)
 target_include_directories(Phantom-Renderer PUBLIC headers)
 
 if(MSVC)
-    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-    target_compile_options(Phantom-Renderer PUBLIC "/W4 /MP")
     target_compile_definitions(Phantom-Renderer PUBLIC -D_CRT_SECURE_NO_WARNINGS)
 endif()
 if(GCC)
