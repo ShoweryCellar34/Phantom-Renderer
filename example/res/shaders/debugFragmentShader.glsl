@@ -168,7 +168,7 @@ void main() {
 
     vec4 shadedResult = vec4(calculateShadedResult(diffuse, specular, normal), 1.0);
     float brightness = dot(shadedResult.rgb, vec3(0.2126, 0.7152, 0.0722));
-    if(brightness > 1.0 && (gl_FragCoord.y > screenSize.y / 2 && (gl_FragCoord.x < screenSize.x / 3 || gl_FragCoord.x > (screenSize.x / 3) * 2))) {
+    if(brightness > 1.0) {
         brightColor = vec4(shadedResult.rgb, 1.0);
     } else {
         brightColor = vec4(0.0, 0.0, 0.0, 1.0);
