@@ -374,7 +374,7 @@ int main(int argc, char** argv) {
         prTextureBindTexture(g_textureColorDefault, 0);
         prTextureBindTexture(g_gaussianBlurTextures[!horizontal], 1);
         prShaderSetUniform1i(g_shaderHDR, "scene", 0);
-        prShaderSetUniform1i(g_shaderHDR, "bloomBlur", 1);
+        prShaderSetUniform1i(g_shaderHDR, "bloomBlurred", 1);
         prShaderSetUniform1f(g_shaderHDR, "exposure", 1.2f);
         prShaderBind(g_shaderHDR);
         prMeshDrawIndices(g_meshQuad, nullptr);

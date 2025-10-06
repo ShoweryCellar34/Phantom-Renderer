@@ -2,7 +2,7 @@
 out vec4 fragmentColor;
 
 uniform sampler2D scene;
-uniform sampler2D bloomBlur;
+uniform sampler2D bloomBlurred;
 uniform float exposure;
 
 in vec2 textureCoordinates;
