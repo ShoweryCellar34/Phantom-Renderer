@@ -2,7 +2,10 @@
 
 # What is Phantom Renderer?
 
-Phantom Renderer basic OpenGL based renderer using GLFW written in C, It is designed in a way that you are expected to manage the window (some heelper functions provided) because this being purely a renderer it only needs a glad opengl context so using SDL as a GLFW replacement would be simple (mayby, I have never tried it).
+Phantom Renderer basic OpenGL based renderer using GLFW written in C, It is designed in a way that you are expected to manage the window (some heelper functions provided) because this being purely a renderer it only needs a glad OpenGL context so using SDL as a GLFW replacement would be simple (maybe, I have never tried it).
+
+# Example application
+There is an example application in the `example/` folder that is build by default but can be disabled in cmake (set `PR_BUILD_EXAMPLE` cmake variable to false). The example is primarily mean to show what can be done with Phantom Renderer, but I am too stupid to get the the more complicated stuff working, as a result of my mistakes don't use my code as an opengl tutorial, use something like [LearnOpenGL](https://learnopengl.com) 
 
 ## Platform support
 

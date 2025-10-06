@@ -21,6 +21,8 @@ std::filesystem::path getUserDataPath() {
         prLogEvent(PR_EVENT_USER, PR_LOG_ERROR, "Failed to get user data path");
         return std::filesystem::path();
     }
+#else
+    return std::filesystem::path("./")
 #endif
 
     return path;
@@ -37,6 +39,8 @@ std::filesystem::path getExecutablePath() {
         exit(EXIT_FAILURE);
     }
     path = buffer;
+#else
+    return std::filesystem::path("./")
 #endif
 
     return path;
