@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include <stddef.h>
 
 extern void* prMalloc(size_t size);
 extern void* prRealloc(void* sourceMemory, size_t size);

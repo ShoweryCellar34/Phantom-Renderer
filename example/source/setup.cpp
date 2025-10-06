@@ -9,7 +9,7 @@
 #include <callbacks.hpp>
 
 void setupPaths() {
-    g_userDataPath = getUserDataPath() / "Example/";
+    g_userDataPath = getUserDataPath() / "ExampleAppData/";
     std::filesystem::create_directories(g_userDataPath);
     g_resourcesPath = getExecutablePath().parent_path();
 }

@@ -253,40 +253,40 @@ int main(int argc, char** argv) {
             }
 
             g_materialContainer.bind(g_currentShaderProgram);
-            prMeshDrawIndices(g_meshCube, (void*)&translationsToMatrix({0.0f, 0.0f, -30.0f}, {0.0f, 0.0f, 0.0f}, {30.1f, 30.1f, 30.1f}).raw[0][0]);
+            prMeshDrawIndices(g_meshCube, translationsToMatrix({0.0f, 0.0f, -30.0f}, {0.0f, 0.0f, 0.0f}, {30.1f, 30.1f, 30.1f}).raw[0]);
 
             g_materialSteel.bind(g_currentShaderProgram);
-            prMeshDrawIndices(g_meshCube, (void*)&translationsToMatrix({0.0f, -30.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, {30.1f, 30.1f, 30.1f}).raw[0][0]);
+            prMeshDrawIndices(g_meshCube, translationsToMatrix({0.0f, -30.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, {30.1f, 30.1f, 30.1f}).raw[0]);
 
             g_materialBrickWall.bind(g_currentShaderProgram);
-            prMeshDrawIndices(g_meshCube, (void*)&translationsToMatrix({-30.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, {30.1f, 30.1f, 30.1f}).raw[0][0]);
+            prMeshDrawIndices(g_meshCube, translationsToMatrix({-30.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, {30.1f, 30.1f, 30.1f}).raw[0]);
 
             g_materialCheckerboard.bind(g_currentShaderProgram);
-            prMeshDrawIndices(g_meshCube, (void*)&translationsToMatrix({-230.0f, -20.0f, -230.0f}, {0.0f, 0.0f, 0.0f}, {400.01f, 10.01f, 400.01f}).raw[0][0]);
+            prMeshDrawIndices(g_meshCube, translationsToMatrix({-230.0f, -20.0f, -230.0f}, {0.0f, 0.0f, 0.0f}, {400.01f, 10.01f, 400.01f}).raw[0]);
 
             g_materialCheckerboard.bind(g_currentShaderProgram);
-            prMeshDrawIndices(g_meshCube, (void*)&translationsToMatrix({170.0f, -20.0f, -230.0f}, {0.0f, 0.0f, 0.0f}, {400.01f, 10.01f, 400.01f}).raw[0][0]);
+            prMeshDrawIndices(g_meshCube, translationsToMatrix({170.0f, -20.0f, -230.0f}, {0.0f, 0.0f, 0.0f}, {400.01f, 10.01f, 400.01f}).raw[0]);
 
             g_materialCheckerboard.bind(g_currentShaderProgram);
-            prMeshDrawIndices(g_meshCube, (void*)&translationsToMatrix({-230.0f, -20.0f, 170.0f}, {0.0f, 0.0f, 0.0f}, {400.01f, 10.01f, 400.01f}).raw[0][0]);
+            prMeshDrawIndices(g_meshCube, translationsToMatrix({-230.0f, -20.0f, 170.0f}, {0.0f, 0.0f, 0.0f}, {400.01f, 10.01f, 400.01f}).raw[0]);
 
             g_materialBrickWall.bind(g_currentShaderProgram);
-            prMeshDrawIndices(g_meshCube, (void*)&translationsToMatrix({2.0f, 0.0f, 0.0f}, {0.0f, glm_rad(smoothOverTime * 100.0f), 0.0f}, {1.0f, 1.0f, 1.0f}).raw[0][0]);
+            prMeshDrawIndices(g_meshCube, translationsToMatrix({2.0f, 0.0f, 0.0f}, {0.0f, glm_rad(smoothOverTime * 100.0f), 0.0f}, {1.0f, 1.0f, 1.0f}).raw[0]);
 
             g_materialSteel.bind(g_currentShaderProgram);
-            prMeshDrawIndices(g_meshCube, (void*)&translationsToMatrix({-2.0f, 0.0f, 0.0f}, {0.0f, glm_rad(smoothSinOverTime * 100.0f), 0.0f}, {1.0f, 1.0f, 1.0f}).raw[0][0]);
+            prMeshDrawIndices(g_meshCube, translationsToMatrix({-2.0f, 0.0f, 0.0f}, {0.0f, glm_rad(smoothSinOverTime * 100.0f), 0.0f}, {1.0f, 1.0f, 1.0f}).raw[0]);
 
             g_materialWhite.bind(g_currentShaderProgram);
-            prMeshDrawIndices(g_meshCube, (void*)&translationsToMatrix({0.0f, 2.0f, 0.0f}, {0.0f, glm_rad(smoothSinOverTime * 100.0f), 0.0f}, {1.0f, 1.0f, 1.0f}).raw[0][0]);
+            prMeshDrawIndices(g_meshCube, translationsToMatrix({0.0f, 2.0f, 0.0f}, {0.0f, glm_rad(smoothSinOverTime * 100.0f), 0.0f}, {1.0f, 1.0f, 1.0f}).raw[0]);
 
             g_materialBlack.bind(g_currentShaderProgram);
-            prMeshDrawIndices(g_meshCube, (void*)&translationsToMatrix({0.0f, -2.0f, 0.0f}, {0.0f, glm_rad(smoothOverTime * 100.0f), 0.0f}, {1.0f, 1.0f, 1.0f}).raw[0][0]);
+            prMeshDrawIndices(g_meshCube, translationsToMatrix({0.0f, -2.0f, 0.0f}, {0.0f, glm_rad(smoothOverTime * 100.0f), 0.0f}, {1.0f, 1.0f, 1.0f}).raw[0]);
 
             g_materialMetalRimmedContainer.bind(g_currentShaderProgram);
-            prMeshDrawIndices(g_meshCube, (void*)&translationsToMatrix({0.0f, 0.0f, 2.0f}, {0.0f, glm_rad(smoothSinOverTime * 100.0f), 0.0f}, {1.0f, 1.0f, 1.0f}).raw[0][0]);
+            prMeshDrawIndices(g_meshCube, translationsToMatrix({0.0f, 0.0f, 2.0f}, {0.0f, glm_rad(smoothSinOverTime * 100.0f), 0.0f}, {1.0f, 1.0f, 1.0f}).raw[0]);
 
             g_materialCheckerboard.bind(g_currentShaderProgram);
-            prMeshDrawIndices(g_meshCube, (void*)&translationsToMatrix({0.0f, 0.0f, -2.0f}, {0.0f, glm_rad(smoothOverTime * 100.0f), 0.0f}, {1.0f, 1.0f, 1.0f}).raw[0][0]);
+            prMeshDrawIndices(g_meshCube, translationsToMatrix({0.0f, 0.0f, -2.0f}, {0.0f, glm_rad(smoothOverTime * 100.0f), 0.0f}, {1.0f, 1.0f, 1.0f}).raw[0]);
         }
         g_currentShaderProgram = nullptr;
 
@@ -312,7 +312,7 @@ int main(int argc, char** argv) {
                 break;
         }
 
-        prShaderSetUniformMatrix4fv(g_shaderSkybox, "translation", 1, false, &translationsToMatrix(g_camera->position, {0.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f}).raw[0][0]);
+        prShaderSetUniformMatrix4fv(g_shaderSkybox, "translation", 1, false, translationsToMatrix(g_camera->position, {0.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f}).raw[0]);
         prShaderSetUniformMatrix4fv(g_shaderSkybox, "view", 1, false, &g_camera->view.raw[0][0]);
         prShaderSetUniformMatrix4fv(g_shaderSkybox, "projection", 1, false, &g_camera->projection.raw[0][0]);
         prShaderSetUniform1i(g_shaderSkybox, "skybox", 0);

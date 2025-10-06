@@ -22,7 +22,7 @@ std::filesystem::path getUserDataPath() {
         return std::filesystem::path();
     }
 #else
-    return std::filesystem::path("./")
+    path = std::filesystem::current_path();
 #endif
 
     return path;
@@ -40,7 +40,7 @@ std::filesystem::path getExecutablePath() {
     }
     path = buffer;
 #else
-    return std::filesystem::path("./")
+    path = std::filesystem::current_path();
 #endif
 
     return path;
