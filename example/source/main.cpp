@@ -63,7 +63,7 @@ void cameraUpdateFunction(prCamera* camera) {
 int main(int argc, char** argv) {
     setupPaths();
     {
-        std::filesystem::path logFileName = (std::string)("logs/prLog" + std::to_string(time(NULL)) + ".txt");
+        std::filesystem::path logFileName = "logs" / (std::filesystem::path)("prLog" + std::to_string(time(NULL)) + ".txt");
         setLogFilePath(TO_USR(logFileName));
     }
     setupLog();
