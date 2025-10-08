@@ -1,4 +1,4 @@
-#version 460 core
+#version 450 core
 out vec4 fragmentColor;
   
 in vec2 textureCoordinates;

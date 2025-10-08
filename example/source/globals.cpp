@@ -5,8 +5,8 @@ FILE* g_logFile = nullptr;
 std::filesystem::path g_logFilePath;
 
 // Paths
-std::filesystem::path g_userDataPath;
-std::filesystem::path g_resourcesPath;
+std::filesystem::path g_userDataDirectory;
+std::filesystem::path g_execuableDirectory;
 
 // Windows
 bool g_windowInit = false;

@@ -1,4 +1,4 @@
-#version 460 core
+#version 450 core
 layout(local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
 layout(binding = 0) uniform sampler2D inputImage;
 layout(rgba32f, binding = 1) uniform image2D outputImage;

@@ -1,9 +1,12 @@
 #include <files.hpp>
 
-#ifdef _WIN32
+#if defined(_WIN32)
 #include <windows.h>
 #include <shlobj.h>
 #include <objbase.h>
+#elif defined(__linux__)
+#include <unistd.h>
+#include <limits.h> 
 #endif
 
 #include <PR/PR.h>
@@ -41,7 +44,7 @@ std::filesystem::path getUserDataPath() {
 std::filesystem::path getExecutablePath() {
     std::filesystem::path path;
 
-#ifdef _WIN32
+#if defined(_WIN32)
     char buffer[MAX_PATH];
     DWORD length = GetModuleFileNameA(NULL, buffer, MAX_PATH);
     if(length == 0) {
@@ -49,8 +52,17 @@ std::filesystem::path getExecutablePath() {
         exit(EXIT_FAILURE);
     }
     path = buffer;
-#else
-    path = std::filesystem::current_path();
+#elif defined(__linux__)
+    char executablePath[PATH_MAX];
+    ssize_t length;
+    length = readlink("/proc/self/exe", executablePath, sizeof(executablePath) - 1);
+
+    if(length != -1) {
+        executablePath[length] = '\0'; // Null-terminate the string
+        path = executablePath;
+    } else {
+            prLogEvent(PR_EVENT_USER, PR_LOG_ERROR, "Failed to use \"readlink\" to get \"/proc/self/exe\" for executable path");
+    }
 #endif
 
     return path;

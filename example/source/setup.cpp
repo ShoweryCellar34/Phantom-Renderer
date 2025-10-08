@@ -9,9 +9,9 @@
 #include <callbacks.hpp>
 
 void setupPaths() {
-    g_userDataPath = getUserDataPath() / "ExampleAppData/";
-    std::filesystem::create_directories(g_userDataPath);
-    g_resourcesPath = getExecutablePath().parent_path();
+    g_userDataDirectory = (getUserDataPath() / "ExampleAppData/").lexically_normal();
+    std::filesystem::create_directories(g_userDataDirectory);
+    g_execuableDirectory = getExecutablePath().parent_path().lexically_normal();
 }
 
 void setLogFilePath(std::filesystem::path logFilePath) {
@@ -27,11 +27,14 @@ void setupLog() {
     g_logFile = fopen(g_logFilePath.u8string().c_str(), "w");
     FILE* logStreams[] = {stdout, g_logFile};
     prLogSetStream(2, logStreams);
+
+    prLogEvent(PR_EVENT_USER, PR_LOG_TRACE, "User data directory:  %s", g_userDataDirectory.u8string().c_str());
+    prLogEvent(PR_EVENT_USER, PR_LOG_TRACE, "Executable directory: %s", g_execuableDirectory.u8string().c_str());
 }
 
 void shutdownLog() {
     fclose(g_logFile);
-    printf("Log file saved to path: %s", g_logFilePath.u8string().c_str());
+    printf("Log file saved to path: %s\n", g_logFilePath.u8string().c_str());
 }
 
 void setupWindow() {
@@ -58,6 +61,10 @@ void setupWindow() {
         glfwSetKeyCallback(g_window->window, keyCallback);
 
         glfwSetInputMode(g_window->window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        if(glfwRawMouseMotionSupported()) {
+            glfwSetInputMode(g_window->window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
+        }
+
         g_window->openglContext->Enable(GL_DEBUG_OUTPUT);
         g_window->openglContext->Enable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
         g_window->openglContext->DebugMessageCallback(openglDebugOutput, NULL);
@@ -93,7 +100,7 @@ void setupShaders() {
             prLogEvent(PR_EVENT_USER, PR_LOG_ERROR, "setupShaders: Window not initialized. Aborting operation, nothing was modified");
             return;
         }
-        if(g_resourcesPath.empty()) {
+        if(g_execuableDirectory.empty()) {
             prLogEvent(PR_EVENT_USER, PR_LOG_ERROR, "setupShaders: Resources path not set. Aborting operation, nothing was modified");
             return;
         }
@@ -386,7 +393,7 @@ void setupTextures() {
             return;
         }
 
-        if(g_resourcesPath.empty()) {
+        if(g_execuableDirectory.empty()) {
             prLogEvent(PR_EVENT_USER, PR_LOG_ERROR, "setupTextures: Resources path not set. Aborting operation, nothing was modified");
             return;
         }

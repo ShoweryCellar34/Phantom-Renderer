@@ -6,8 +6,8 @@
 #include <PR/PR.h>
 #include <materials.hpp>
 
-#define TO_USR(x) (g_userDataPath / x).u8string().c_str()
-#define TO_RES(x) (g_resourcesPath / x).u8string().c_str()
+#define TO_USR(x) (g_userDataDirectory / x).u8string().c_str()
+#define TO_RES(x) (g_execuableDirectory/ x).u8string().c_str()
 
 // Global Constants
 #define TITLE "Phantom-Renderer Example"
@@ -27,8 +27,8 @@ extern FILE* g_logFile;
 extern std::filesystem::path g_logFilePath;
 
 // Paths
-extern std::filesystem::path g_userDataPath;
-extern std::filesystem::path g_resourcesPath;
+extern std::filesystem::path g_userDataDirectory;
+extern std::filesystem::path g_execuableDirectory;
 
 //Windowing
 extern bool g_windowInit;

@@ -67,8 +67,6 @@ void cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
 void saveScreenShot(std::string path, unsigned char* pixels, int channels) {
     stbi_write_png(path.c_str(), g_windowRawWidth, g_windowRawHeight, channels, pixels, g_windowRawWidth * channels);
     prFree(pixels);
-
-    return;
 }
 
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {

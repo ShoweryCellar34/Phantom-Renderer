@@ -180,7 +180,7 @@ int main(int argc, char** argv) {
 
     glfwMaximizeWindow(g_window->window);
 
-    prShaderSetUniform2f(g_shaderDebug, "screenSize", g_windowWidth, g_windowHeight);
+    prShaderSetUniform2ui(g_shaderDebug, "screenSize", g_windowWidth, g_windowHeight);
 
     while(!glfwWindowShouldClose(g_window->window)) {
         g_window->openglContext->Enable(GL_DEPTH_TEST);

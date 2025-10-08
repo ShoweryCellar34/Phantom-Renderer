@@ -1,4 +1,4 @@
-#version 460 core
+#version 450 core
 out vec4 fragmentColor;
 
 uniform sampler2D scene;
@@ -10,7 +10,7 @@ in vec2 textureCoordinates;
 void main() {
     const float gamma = 2.2;
     vec3 hdrColor = texture(scene, textureCoordinates).rgb;
-    vec3 bloomColor = texture(bloomBlur, textureCoordinates).rgb;
+    vec3 bloomColor = texture(bloomBlurred, textureCoordinates).rgb;
     hdrColor += bloomColor;
 
     vec3 result = vec3(1.0) - exp(-hdrColor * exposure);
