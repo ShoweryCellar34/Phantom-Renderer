@@ -60,10 +60,10 @@ void setupWindow() {
         glfwSetCursorPosCallback(g_window->window, cursorPosCallback);
         glfwSetKeyCallback(g_window->window, keyCallback);
 
-        glfwSetInputMode(g_window->window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         if(glfwRawMouseMotionSupported()) {
             glfwSetInputMode(g_window->window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
         }
+        glfwSetInputMode(g_window->window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
         g_window->openglContext->Enable(GL_DEBUG_OUTPUT);
         g_window->openglContext->Enable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
