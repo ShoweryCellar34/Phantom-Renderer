@@ -12,7 +12,7 @@
 #include <PR/PR.h>
 
 std::filesystem::path getUserDataPath() {
-    std::filesystem::path path;
+    std::filesystem::path path = std::filesystem::current_path();
 
 #if defined(_WIN32)
     PWSTR tempPath;
@@ -42,7 +42,7 @@ std::filesystem::path getUserDataPath() {
 }
 
 std::filesystem::path getExecutablePath() {
-    std::filesystem::path path;
+    std::filesystem::path path = std::filesystem::current_path();
 
 #if defined(_WIN32)
     char buffer[MAX_PATH];
