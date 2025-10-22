@@ -3,7 +3,6 @@
 #include <globals.hpp>
 
 #include <cstdio>
-#include <tinyobj_loader_c.h>
 #include <PR/PR.h>
 #include <files.hpp>
 #include <callbacks.hpp>
@@ -584,37 +583,6 @@ void shutdownMaterials() {
     } else {
         prLogEvent(PR_EVENT_USER, PR_LOG_ERROR, "shutdownMaterials: Materials not initialized. Aborting operation, nothing was modified");
     }
-}
-
-void defaultFileReader(
-    void*       ctx,
-    const char* filename,
-    int         isMTL,
-    const char* objFilename,
-    char**      buffer,
-    size_t*     length
-) {
-    const char* baseDirectory = static_cast<const char*>(ctx);
-
-    char fullpath[1024];
-    snprintf(fullpath, sizeof(fullpath), "%s%s", baseDirectory, filename);
-
-    FILE* filePointer = fopen(fullpath, "rb");
-    if(!filePointer) {
-        *buffer = nullptr;
-        *length = 0;
-        return;
-    }
-
-    fseek(filePointer, 0, SEEK_END);
-    *length = ftell(filePointer);
-    rewind(filePointer);
-
-    *buffer = static_cast<char*>(prMalloc(*length));
-    if(*buffer) {
-        fread(*buffer, 1, *length, filePointer);
-    }
-    fclose(filePointer);
 }
 
 void setupMeshes() {

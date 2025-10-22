@@ -87,7 +87,7 @@ void i_prRenderBufferUpdateOnGPU(prRenderBufferData* renderBuffer) {
         return;
     }
 
-    int internalFomrat;
+    GLenum internalFomrat;
     i_prRenderbufferComputeFormats(renderBuffer, &internalFomrat);
 
     if(renderBuffer->samples >= PR_MIN_SAMPLES) {

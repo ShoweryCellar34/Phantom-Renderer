@@ -9,9 +9,6 @@ target_include_directories(Example PUBLIC headers)
 
 target_link_libraries(Example Phantom-Renderer)
 
-add_subdirectory(vendors/tinyobjloader-c)
-target_link_libraries(Example tinyobjloader-c)
-
 if(MSVC)
     set_target_properties(Example PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${PROJECT_BINARY_DIR}/$<CONFIG>/")
     add_custom_target(deleteResourcesMSVC-PRExample ALL COMMAND ${CMAKE_COMMAND} -E remove_directory ${PROJECT_BINARY_DIR}/$<CONFIG>/res COMMENT "Deleting old resources in binary directory")
