@@ -45,6 +45,7 @@ extern bool g_shadersInit;
 
 extern prShaderData* g_shaderDefault;
 extern prShaderData* g_shaderDebug;
+extern prShaderData* g_shaderNormal;
 extern prShaderData* g_shaderDirectionalLight;
 extern prShaderData* g_shaderPointLight;
 extern prShaderData* g_shaderSkybox;
@@ -140,7 +141,13 @@ extern int g_currentSkybox;
 extern bool g_showHUD;
 extern bool g_showPostProcessing;
 
-extern bool g_useDebugShader;
+enum class shaderModes {
+    default,
+    debug,
+    normal
+};
+
+extern shaderModes g_currentShaderMode;
 extern prShaderData* g_currentShaderProgram;
 
 // Misc

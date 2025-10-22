@@ -94,7 +94,22 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
     }
 
     if(key == GLFW_KEY_BACKSLASH && action == GLFW_PRESS) {
-        g_useDebugShader = !g_useDebugShader;
+        switch(g_currentShaderMode) {
+            case shaderModes::default:
+                g_currentShaderMode = shaderModes::debug;
+                break;
+
+            case shaderModes::debug:
+                g_currentShaderMode = shaderModes::normal;
+                break;
+
+            case shaderModes::normal:
+                g_currentShaderMode = shaderModes::default;
+                break;
+
+            default:
+                g_currentShaderMode = shaderModes::default;
+        }
     }
 
     if(key == GLFW_KEY_ENTER && action == GLFW_PRESS && (!g_screenShotThread || g_screenShotThread->joinable())) {

@@ -60,6 +60,25 @@ void cameraUpdateFunction(prCamera* camera) {
     }
 }
 
+prShaderData* getShaderFromMode(shaderModes mode) {
+    switch(mode) {
+        case shaderModes::default:
+            return g_shaderDefault;
+            break;
+
+        case shaderModes::debug:
+            return g_shaderDebug;
+            break;
+
+        case shaderModes::normal:
+            return g_shaderNormal;
+            break;
+
+        default:
+            return g_shaderDefault;
+    }
+}
+
 int main(int argc, char** argv) {
     setupPaths();
     {
@@ -201,7 +220,7 @@ int main(int argc, char** argv) {
         g_deltaTime = currentFrame - g_lastFrame;
         g_lastFrame = currentFrame;  
 
-        g_currentShaderProgram = (g_useDebugShader ? g_shaderDebug : g_shaderDefault);
+        g_currentShaderProgram = getShaderFromMode(g_currentShaderMode);
 
         vec3s rotation = {glm_rad(g_yaw), glm_rad(g_pitch), glm_rad(0.0f)};
         prCameraUpdate(g_camera, g_cameraPosition, rotation, VEC3_UP, 45.0f, 0.1f, 1500.0f);
@@ -247,7 +266,7 @@ int main(int argc, char** argv) {
 
                 case 2:
                     prFramebufferBind(g_framebufferMultisampled);
-                    g_currentShaderProgram = (g_useDebugShader ? g_shaderDebug : g_shaderDefault);
+                    g_currentShaderProgram = getShaderFromMode(g_currentShaderMode);
                     g_window->openglContext->Viewport(0, 0, g_windowWidth, g_windowHeight);
                     break;
             }

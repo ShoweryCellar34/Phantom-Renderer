@@ -23,6 +23,7 @@ bool g_shadersInit = false;
 
 prShaderData* g_shaderDefault = nullptr;
 prShaderData* g_shaderDebug = nullptr;
+prShaderData* g_shaderNormal = nullptr;
 prShaderData* g_shaderDirectionalLight = nullptr;
 prShaderData* g_shaderPointLight = nullptr;
 prShaderData* g_shaderSkybox = nullptr;
@@ -118,7 +119,7 @@ int g_currentSkybox = 1;
 bool g_showHUD = true;
 bool g_showPostProcessing = true;
 
-bool g_useDebugShader = false;
+shaderModes g_currentShaderMode = shaderModes::default;
 prShaderData* g_currentShaderProgram = nullptr;
 
 // Misc
