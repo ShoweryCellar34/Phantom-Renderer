@@ -167,28 +167,15 @@ void main() {
     normal = normalize(geometryOut.TBN * normal);
 
     vec4 shadedResult = vec4(calculateShadedResult(diffuse, specular, normal), 1.0);
-    float brightness = dot(shadedResult.rgb, vec3(0.2126, 0.7152, 0.0722));
-    if(brightness > 1.0) {
-        brightColor = vec4(shadedResult.rgb, 1.0);
-    } else {
-        brightColor = vec4(0.0, 0.0, 0.0, 1.0);
-    }
+    float brightness = vec4(0.0);
 
     vec4 result = vec4(0.0);
-    if(gl_FragCoord.y <= screenSize.y / 2) {
-        if(gl_FragCoord.x < screenSize.x / 2) {
-            result = vec4(specular, 1.0);
-        } else if(gl_FragCoord.x < screenSize.x) {
-            result = vec4(diffuse, 1.0);
-        }
+    if(gl_FragCoord.x < screenSize.x / 3) {
+        result = vec4(specular, 1.0);
+    } else if(gl_FragCoord.x < (screenSize.x / 3) * 2) {
+        result = vec4(diffuse, 1.0);
     } else {
-        if(gl_FragCoord.x < screenSize.x / 3) {
-            result = brightColor;
-        } else if(gl_FragCoord.x < screenSize.x / 3 * 2) {
-            result = vec4(normal * 0.5 + 0.5, 1.0);
-        } else {
-            result = shadedResult;
-        }
+        result = shadedResult;
     }
 
     fragmentColor = result;

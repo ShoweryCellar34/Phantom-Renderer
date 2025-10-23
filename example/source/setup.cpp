@@ -108,10 +108,6 @@ void setupShaders() {
         g_shaderDebug = loadShader(g_window->openglContext, TO_RES("res/shaders/debugVertexShader.glsl"), TO_RES("res/shaders/debugFragmentShader.glsl"), TO_RES("res/shaders/debugGeometryShader.glsl"));
         g_shaderNormal = loadShader(g_window->openglContext, TO_RES("res/shaders/normalVertexShader.glsl"), TO_RES("res/shaders/normalFragmentShader.glsl"), TO_RES("res/shaders/normalGeometryShader.glsl"));
 
-    // Default settings for normal visualization: length and color
-    prShaderSetUniform1f(g_shaderNormal, "normalLength", 2.5f);
-    prShaderSetUniform3f(g_shaderNormal, "normalColor", 1.0f, 1.0f, 0.0f);
-
         g_shaderDirectionalLight = loadShader(g_window->openglContext, TO_RES("res/shaders/depthVertexShader.glsl"), TO_RES("res/shaders/depthFragmentShader.glsl"), NULL);
         g_shaderPointLight = loadShader(g_window->openglContext, TO_RES("res/shaders/depth2VertexShader.glsl"), TO_RES("res/shaders/depth2FragmentShader.glsl"), TO_RES("res/shaders/depth2GeometryShader.glsl"));
 

@@ -166,7 +166,7 @@ void main() {
     normal = normalize(geometryOut.TBN * normal);
 
     vec3 result = calculateShadedResult(diffuse, specular, normal);
-    float brightness = dot(result.rgb, vec3(0.2126, 0.7152, 0.0722));
+    float brightness = dot(result.rgb, vec3(0.3, 0.6, 0.15));
     if(brightness > 1.0) {
         brightColor = vec4(result.rgb, 1.0);
     } else {
