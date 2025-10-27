@@ -1,39 +1,27 @@
 cmake_minimum_required(VERSION 3.20)
 
-project(Phantom-Renderer DESCRIPTION "A Basic OpenGL renderer" LANGUAGES C HOMEPAGE_URL "https://github.com/ShoweryCellar34/Phantom-Renderer")
-file(GLOB PR_SOURCE source/*.c)
-add_library(Phantom-Renderer STATIC ${PR_SOURCE})
-set_property(TARGET Phantom-Renderer PROPERTY C_STANDARD 11)
-target_include_directories(Phantom-Renderer PUBLIC headers)
-
-if(MSVC)
-    target_compile_definitions(Phantom-Renderer PUBLIC -D_CRT_SECURE_NO_WARNINGS)
-endif()
-if(GCC)
-    target_compile_options(Phantom-Renderer PUBLIC -Wall -Wextra -Wpedantic -fsanitize=address,undefined)
-endif()
-
-set(CGLM_SHARED false CACHE BOOL "Shared build")
-set(CGLM_STATIC true CACHE BOOL "Static build")
+set(CGLM_SHARED  false CACHE BOOL "Shared build")
+set(CGLM_STATIC  true  CACHE BOOL "Static build")
 set(CGLM_USE_C99 false CACHE BOOL "Use C99")
 add_subdirectory(vendors/cglm)
 
 set(GLAD_LIBRARY_TYPE "STATIC")
 add_subdirectory(vendors/glad)
 
-set(GLFW_BUILD_DOCS false CACHE BOOL "Build the GLFW documentation")
-set(GLFW_INSTALL false CACHE BOOL "Generate instilation target")
-set(GLFW_LIBRARY_TYPE "STATIC" CACHE STRING "Library type override for GLFW (SHARED, STATIC, OBJECT, or empty to follow BUILD_SHARED_LIBS)")
-set(GLFW_USE_HYBRID_HPG true CACHE BOOL "Force use of high-performance GPU on hybrid systems")
-add_subdirectory(vendors/glfw)
-
 set(STB_LIBRARY_TYPE "STATIC")
 add_subdirectory(vendors/stb)
 
-target_link_libraries(Phantom-Renderer cglm glad glfw stb)
+project(SH34-PR LANGUAGES C)
+set(CMAKE_C_STANDARD 11)
 
-option(PR_BUILD_EXAMPLE "Build the example program" true)
+file(GLOB_RECURSE PR_C_SOURCE "source/*.c")
+add_library(PR STATIC ${PR_C_SOURCE})
+target_link_libraries(PR PUBLIC cglm glad stb)
+target_include_directories(PR PUBLIC headers)
 
-if(${PR_BUILD_EXAMPLE})
-    add_subdirectory(example)
+if(MSVC)
+    target_compile_definitions(PR PRIVATE _CRT_SECURE_NO_WARNINGS)
+endif()
+if(GCC)
+    target_compile_options(PR PRIVATE -Wall -Wextra -Wpedantic -fsanitize=address,undefined)
 endif()
