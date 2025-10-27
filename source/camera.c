@@ -30,18 +30,18 @@ void prCameraSetUpdateFunction(prCamera* camera, PRCameraUpdateFunction updateFu
 void prCameraUpdate(prCamera* camera, vec3s position, vec3s rotation, vec3s worldUp, float FOV, float closePlane, float farPlane) {
     camera->position = position;
 
-    camera->front.x = cos(rotation.x) * cos(rotation.y);
-    camera->front.y = sin(rotation.y);
-    camera->front.z = sin(rotation.x) * cos(rotation.y);
+    camera->front.x = (float)(cos(rotation.x) * cos(rotation.y));
+    camera->front.y = (float)sin(rotation.y);
+    camera->front.z = (float)(sin(rotation.x) * cos(rotation.y));
     camera->front = glms_normalize(camera->front);
 
     vec3s right = glms_normalize(glms_cross(camera->front, worldUp));
 
     camera->up = glms_normalize(glms_cross(right, camera->front));
 
-    camera->up.x = camera->up.x * cos(rotation.z) + right.x * sin(rotation.z);
-    camera->up.y = camera->up.y * cos(rotation.z) + right.y * sin(rotation.z);
-    camera->up.z = camera->up.z * cos(rotation.z) + right.z * sin(rotation.z);
+    camera->up.x = camera->up.x * (float)(cos(rotation.z) + right.x * sin(rotation.z));
+    camera->up.y = camera->up.y * (float)(cos(rotation.z) + right.y * sin(rotation.z));
+    camera->up.z = camera->up.z * (float)(cos(rotation.z) + right.z * sin(rotation.z));
     camera->up = glms_normalize(camera->up);
 
     vec3s target = glms_vec3_add(position, camera->front);

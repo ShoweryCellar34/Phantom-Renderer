@@ -36,7 +36,7 @@ prTextureData* makeTextureSingleColor(GladGLContext* context, vec4s color) {
     prTextureData* texture = prTextureCreate();
     prTextureLinkContext(texture, context);
 
-    GLubyte textureData[4] = {color.r * 255.0f, color.g * 255.0f, color.b * 255.0f, color.a * 255.0f};
+    GLubyte textureData[4] = {(GLubyte)(color.r * 255.0f), (GLubyte)(color.g * 255.0f), (GLubyte)(color.b * 255.0f), (GLubyte)(color.a * 255.0f)};
 
     prTextureUpdate(texture, PR_FORMAT_RGBA, PR_WRAPPING_REPEAT, PR_FILTER_LINEAR, PR_FILTER_LINEAR, false, textureData, 4, 1, 1);
 
@@ -64,10 +64,10 @@ prTextureData* makeTextureCheckerboard(GladGLContext* context, size_t scale, vec
     GLubyte* textureData = prMalloc(scale * scale * 4 * sizeof(GLubyte));
     for(size_t i = 0; i < scale * scale; i++) {
         size_t index = i * 4;
-        textureData[index++] = (template[i] ? color1.r * 255 : color2.r * 255);
-        textureData[index++] = (template[i] ? color1.g * 255 : color2.g * 255);
-        textureData[index++] = (template[i] ? color1.b * 255 : color2.b * 255);
-        textureData[index] = (template[i] ? color1.a * 255 : color2.a * 255);
+        textureData[index++] = (template[i] ? (GLubyte)(color1.r * 255.0f) : (GLubyte)(color2.r * 255.0f));
+        textureData[index++] = (template[i] ? (GLubyte)(color1.g * 255.0f) : (GLubyte)(color2.g * 255.0f));
+        textureData[index++] = (template[i] ? (GLubyte)(color1.b * 255.0f) : (GLubyte)(color2.b * 255.0f));
+        textureData[index]   = (template[i] ? (GLubyte)(color1.a * 255.0f) : (GLubyte)(color2.a * 255.0f));
     }
 
     prFree(template);
@@ -116,12 +116,12 @@ prCubeMapData* loadCubeMap(GladGLContext* context, unsigned int minFiltering, un
 
 prCubeMapData* makeCubeMapSingleColors(GladGLContext* context, vec4s color[PR_CUBE_MAP_SIDES]) {
     unsigned char textureData[PR_CUBE_MAP_SIDES][4] = {
-        {color[0].r * 255.0f, color[0].g * 255.0f, color[0].b * 255.0f, color[0].a * 255.0f},
-        {color[1].r * 255.0f, color[1].g * 255.0f, color[1].b * 255.0f, color[1].a * 255.0f},
-        {color[2].r * 255.0f, color[2].g * 255.0f, color[2].b * 255.0f, color[2].a * 255.0f},
-        {color[3].r * 255.0f, color[3].g * 255.0f, color[3].b * 255.0f, color[3].a * 255.0f},
-        {color[4].r * 255.0f, color[4].g * 255.0f, color[4].b * 255.0f, color[4].a * 255.0f},
-        {color[5].r * 255.0f, color[5].g * 255.0f, color[5].b * 255.0f, color[5].a * 255.0f}
+        {(GLubyte)(color[0].r * 255.0f), (GLubyte)(color[0].g * 255.0f), (GLubyte)(color[0].b * 255.0f), (GLubyte)(color[0].a * 255.0f)},
+        {(GLubyte)(color[1].r * 255.0f), (GLubyte)(color[1].g * 255.0f), (GLubyte)(color[1].b * 255.0f), (GLubyte)(color[1].a * 255.0f)},
+        {(GLubyte)(color[2].r * 255.0f), (GLubyte)(color[2].g * 255.0f), (GLubyte)(color[2].b * 255.0f), (GLubyte)(color[2].a * 255.0f)},
+        {(GLubyte)(color[3].r * 255.0f), (GLubyte)(color[3].g * 255.0f), (GLubyte)(color[3].b * 255.0f), (GLubyte)(color[3].a * 255.0f)},
+        {(GLubyte)(color[4].r * 255.0f), (GLubyte)(color[4].g * 255.0f), (GLubyte)(color[4].b * 255.0f), (GLubyte)(color[4].a * 255.0f)},
+        {(GLubyte)(color[5].r * 255.0f), (GLubyte)(color[5].g * 255.0f), (GLubyte)(color[5].b * 255.0f), (GLubyte)(color[5].a * 255.0f)}
     };
     size_t textureFileSize[PR_CUBE_MAP_SIDES] = {4, 4, 4, 4, 4, 4};
 
@@ -162,10 +162,10 @@ prCubeMapData* makeCubeMapCheckerboards(GladGLContext* context, size_t scale, ve
     for(int i = 0; i < PR_CUBE_MAP_SIDES; i++) {
         for(size_t j = 0; j < scale * scale; j++) {
             size_t index = j * 4;
-            textureData[i][index++] = (template[j] ? color1[i].r * 255 : color2[i].r * 255);
-            textureData[i][index++] = (template[j] ? color1[i].g * 255 : color2[i].g * 255);
-            textureData[i][index++] = (template[j] ? color1[i].b * 255 : color2[i].b * 255);
-            textureData[i][index] = (template[j] ? color1[i].a * 255 : color2[i].a * 255);
+            textureData[i][index++] = (template[j] ? color1[i].r * 255.0f : color2[i].r * 255.0f);
+            textureData[i][index++] = (template[j] ? color1[i].g * 255.0f : color2[i].g * 255.0f);
+            textureData[i][index++] = (template[j] ? color1[i].b * 255.0f : color2[i].b * 255.0f);
+            textureData[i][index]   = (template[j] ? color1[i].a * 255.0f : color2[i].a * 255.0f);
         }
     }
 

@@ -4,20 +4,19 @@
 extern "C" {
 #endif
 
-#include "camera.h"
-#include "computeShader.h"
-#include "cubeMap.h"
-#include "defines.h"
-#include "framebuffer.h"
-#include "helperStuffs.h"
-#include "logger.h"
-#include "memory.h"
-#include "mesh.h"
-#include "renderbuffer.h"
-#include "shader.h"
-#include "texture.h"
-#include "textureMultisampled.h"
-#include "window.h"
+#include <PR/camera.h>
+#include <PR/computeShader.h>
+#include <PR/cubeMap.h>
+#include <PR/defines.h>
+#include <PR/framebuffer.h>
+#include <PR/helperStuffs.h>
+#include <PR/logger.h>
+#include <PR/memory.h>
+#include <PR/mesh.h>
+#include <PR/renderbuffer.h>
+#include <PR/shader.h>
+#include <PR/texture.h>
+#include <PR/textureMultisampled.h>
 
 #ifdef __cplusplus
 }
