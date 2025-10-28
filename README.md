@@ -2,11 +2,11 @@
 
 # What is Phantom Renderer?
 
-Phantom Renderer is a basic OpenGL toolbox written in C, It is designed in a way that you are expected to manage the window (some heelper functions provided) because this being purely a toolbox it only needs a glad OpenGL context so using any windowing library that supports Glad should work (I have confirmed it works with GLFW).
+Phantom Renderer is a basic OpenGL toolbox written in C. It is designed in a way that you are expected to manage the window (some helper functions provided) because this is purely a toolbox; it only needs a GLAD OpenGL context, so using any windowing library that supports GLAD should work (I have confirmed it works with GLFW).
 
 ## Platform support
 
-Phantom-Renderer just uses GLFW and [CMake](https://cmake.org/), and is tested on Arch linux with Hyprland and Windows 11/10.
+Phantom-Renderer just uses [CMake](https://cmake.org/) and GLAD and is tested on Arch Linux with Hyprland and Windows 11/10, but it might work on Apple devices, maybe possibly slightly if you do some code tweaks
 
 ## How to clone
 
