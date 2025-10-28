@@ -1,4 +1,5 @@
-#pragma once
+#ifndef PR_COMPUTE_SHADER_H
+#define PR_COMPUTE_SHADER_H
 
 #include <glad/gl.h>
 
@@ -17,3 +18,5 @@ void prComputeShaderLinkContext(prComputeShaderData* computeShaderProgram, GladG
 void prComputeShaderUpdate(prComputeShaderData* computeShaderProgram, const GLchar* computeShader);
 
 void prComputeShaderDispatch(prComputeShaderData* computeShaderProgram, unsigned int depth, unsigned int height, unsigned int width);
+
+#endif // PR_COMPUTE_SHADER_H

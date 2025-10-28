@@ -1,4 +1,5 @@
-#pragma once
+#ifndef PR_SHADER_H
+#define PR_SHADER_H
 
 #include <glad/gl.h>
 
@@ -65,3 +66,5 @@ void prShaderSetUniformMatrix2x4fv(prShaderData* shaderProgram, const GLchar* un
 void prShaderSetUniformMatrix4x3fv(prShaderData* shaderProgram, const GLchar* uniformName, GLsizei count, GLboolean transpose, const GLfloat* value);
 void prShaderSetUniformMatrix3x4fv(prShaderData* shaderProgram, const GLchar* uniformName, GLsizei count, GLboolean transpose, const GLfloat* value);
 void prShaderSetUniformMatrix4x3fv(prShaderData* shaderProgram, const GLchar* uniformName, GLsizei count, GLboolean transpose, const GLfloat* value);
+
+#endif // PR_SHADER_H

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef PR_FRAMEBUFFER_INTERNAL_H
+#define PR_FRAMEBUFFER_INTERNAL_H
 
 #include <PR/framebuffer.h>
 
@@ -17,3 +18,5 @@ void i_prFramebufferBlitOnGPU(GladGLContext* context, prFramebufferData* source,
     GLint dstX0, GLint dstY0, GLint dstX1, GLint dstY1,
     GLbitfield mask, GLenum filter
 );
+
+#endif // PR_FRAMEBUFFER_INTERNAL_H

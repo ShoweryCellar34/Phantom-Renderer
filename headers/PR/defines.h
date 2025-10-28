@@ -1,4 +1,5 @@
-#pragma once
+#ifndef PR_DEFINES_H
+#define PR_DEFINES_H
 
 #include <stdint.h>
 #include <stddef.h>
@@ -89,3 +90,5 @@ typedef void (* PRMeshDrawFunction)(prMeshData* mesh, void* data);
 #define PR_COLOR_ATTACHMENT_17                  GL_COLOR_ATTACHMENT17
 #define PR_COLOR_ATTACHMENT_18                  GL_COLOR_ATTACHMENT18
 #define PR_COLOR_ATTACHMENT_19                  GL_COLOR_ATTACHMENT19
+
+#endif // PR_DEFINES_H

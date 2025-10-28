@@ -1,4 +1,5 @@
-#pragma once
+#ifndef PR_MESH_INTERNAL_H
+#define PR_MESH_INTERNAL_H
 
 #include <glad/gl.h>
 
@@ -21,3 +22,5 @@ void i_prMeshDrawIndicesInstancesOnGPU(prMeshData* mesh, GLsizei count);
 void i_prMeshDrawOnGPU(prMeshData* mesh, GLsizei verticesCount);
 
 void i_prMeshDrawInstancesOnGPU(prMeshData* mesh, GLsizei verticesCount, GLsizei count);
+
+#endif // PR_MESH_INTERNAL_H

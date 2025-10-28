@@ -1,4 +1,5 @@
-#pragma once
+#ifndef PR_LOGGER_H
+#define PR_LOGGER_H
 
 #include <PR/defines.h>
 
@@ -19,3 +20,5 @@ void _prLog(prLogLevel_t level, const char* format, ...);
 void _prLogEvent(prEvent_t event, prLogLevel_t level, const char* format, ...);
 
 #define prLogEvent(event, level, format, ...) _prLogEvent(event, level, format, ##__VA_ARGS__)
+
+#endif // PR_LOGGER_H

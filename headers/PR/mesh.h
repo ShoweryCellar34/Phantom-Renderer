@@ -1,4 +1,5 @@
-#pragma once
+#ifndef PR_MESH_H
+#define PR_MESH_H
 
 #include <PR/defines.h>
 
@@ -43,3 +44,5 @@ void prMeshDrawIndicesInstances(prMeshData* mesh, GLsizei count, void* data);
 void prMeshDraw(prMeshData* mesh, GLsizei verticesCount, void* data);
 
 void prMeshDrawInstances(prMeshData* mesh, GLsizei verticesCount, GLsizei count, void* data);
+
+#endif // PR_MESH_H

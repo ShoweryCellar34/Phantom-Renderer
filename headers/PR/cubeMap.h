@@ -1,4 +1,5 @@
-#pragma once
+#ifndef PR_CUBE_MAP_H
+#define PR_CUBE_MAP_H
 
 #include <PR/defines.h>
 
@@ -36,3 +37,5 @@ void prCubeMapUpdate(prCubeMapData* cubeMap, int side, GLenum format, GLint wrap
 void prCubeMapBorderColor(prCubeMapData* cubeMap, vec4s borderColor);
 
 void prCubeMapBindTexture(prCubeMapData* cubeMap, GLuint unit);
+
+#endif // PR_CUBE_MAP_H

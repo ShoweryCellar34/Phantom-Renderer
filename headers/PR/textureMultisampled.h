@@ -1,4 +1,5 @@
-#pragma once
+#ifndef PR_TEXTURE_MULTISAMPLED_H
+#define PR_TEXTURE_MULTISAMPLED_H
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -22,3 +23,5 @@ void prTextureMultisampledUpdate(prTextureMultisampledData* texture, GLenum form
 void prTextureMultisampledBindImage(prTextureMultisampledData* texture, GLuint index, GLint mipmapLevel, GLenum access, GLenum format);
 
 void prTextureMultisampledBindTexture(prTextureMultisampledData* texture, unsigned int unit);
+
+#endif // PR_TEXTURE_MULTISAMPLED_H

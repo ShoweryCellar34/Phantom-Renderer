@@ -1,4 +1,5 @@
-#pragma once
+#ifndef PR_TEXTURE_MULTISAMPLED_INTERNAL_H
+#define PR_TEXTURE_MULTISAMPLED_INTERNAL_H
 
 typedef struct prTextureMultisampledData prTextureMultisampledData;
 
@@ -7,3 +8,5 @@ void i_prTextureMultisampledCreateOnGPU(prTextureMultisampledData* texture);
 void i_prTextureMultisampledDestroyOnGPU(prTextureMultisampledData* texture);
 
 void i_prTextureMultisampledUpdateOnGPU(prTextureMultisampledData* texture);
+
+#endif // PR_TEXTURE_MULTISAMPLED_INTERNAL_H

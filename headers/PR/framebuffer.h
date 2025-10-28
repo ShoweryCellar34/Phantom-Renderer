@@ -1,4 +1,5 @@
-#pragma once
+#ifndef PR_FRAMEBUFFER_H
+#define PR_FRAMEBUFFER_H
 
 #include <PR/defines.h>
 
@@ -81,3 +82,5 @@ void prFramebufferClearDepth(GladGLContext* context, prFramebufferData* framebuf
 void prFramebufferClearStencil(GladGLContext* context, prFramebufferData* framebuffer, GLint stencil);
 
 void prFramebufferClearDepthStencil(GladGLContext* context, prFramebufferData* framebuffer, GLfloat depth, GLint stencil);
+
+#endif // PR_FRAMEBUFFER_H

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef PR_HELPER_STUFFS_H
+#define PR_HELPER_STUFFS_H
 
 #include <cglm/struct.h>
 #include <PR/defines.h>
@@ -26,3 +27,5 @@ prCubeMapData* makeCubeMapCheckerboards(GladGLContext* context, size_t scale, ve
 prShaderData* loadShader(GladGLContext* context, const char* vertexPath, const char* fragmentPath, const char* geometryPath);
 
 prComputeShaderData* loadComputeShader(GladGLContext* context, const char* path);
+
+#endif // PR_HELPER_STUFFS_H

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef PR_CAMERA_H
+#define PR_CAMERA_H
 
 #include <PR/defines.h>
 
@@ -27,3 +28,5 @@ void prCameraSetUpdateFunction(prCamera* camera, PRCameraUpdateFunction updateFu
 void prCameraUpdate(prCamera* camera, vec3s position, vec3s rotation, vec3s worldUp, float FOV, float closePlane, float farPlane);
 
 void prCameraUpdateDimentions(prCamera* camera);
+
+#endif // PR_CAMERA_H

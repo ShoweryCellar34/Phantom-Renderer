@@ -1,4 +1,5 @@
-#pragma once
+#ifndef PR_PR_H
+#define PR_PR_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -21,3 +22,5 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
+
+#endif // PR_PR_H

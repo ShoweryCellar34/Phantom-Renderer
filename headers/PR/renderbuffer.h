@@ -1,4 +1,5 @@
-#pragma once
+#ifndef PR_RENDER_BUFFER_H
+#define PR_RENDER_BUFFER_H
 
 #include <stddef.h>
 #include <glad/gl.h>
@@ -17,3 +18,5 @@ void prRenderBufferDestroy(prRenderBufferData* renderBuffer);
 void prRenderBufferLinkContext(prRenderBufferData* renderBuffer, GladGLContext* context);
 
 void prRenderBufferUpdate(prRenderBufferData* renderBuffer, GLenum format, GLsizei width, GLsizei height, GLsizei samples);
+
+#endif // PR_RENDER_BUFFER_H

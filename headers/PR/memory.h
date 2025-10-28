@@ -1,4 +1,5 @@
-#pragma once
+#ifndef PR_MEMORY_H
+#define PR_MEMORY_H
 
 #include <stddef.h>
 
@@ -13,3 +14,5 @@ void* prMemcpy(void* destinatonMemory, const void* sourceMemory, size_t size);
 void* prMemmove(void* destinationMemory, const void* sourceMemory, size_t size);
 
 void prFree(void* memory);
+
+#endif // PR_MEMORY_H

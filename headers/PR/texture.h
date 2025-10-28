@@ -1,4 +1,5 @@
-#pragma once
+#ifndef PR_TEXTURE_H
+#define PR_TEXTURE_H
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -34,3 +35,5 @@ void prTextureBorderColor(prTextureData* texture, vec4s borderColor);
 void prTextureBindImage(prTextureData* texture, GLuint index, GLint mipmapLevel, GLenum access, GLenum format);
 
 void prTextureBindTexture(prTextureData* texture, unsigned int unit);
+
+#endif // PR_TEXTURE_H
